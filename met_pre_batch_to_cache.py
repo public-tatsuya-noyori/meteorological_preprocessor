@@ -183,7 +183,7 @@ def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list, conf_df, debug):
                     print('Debug', ':', 'batch_type =', batch_type, ', message_size =', message_size, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', ccc =', ccc, file=sys.stderr)
                 out_cache_file = create_cache(my_cccc, conf_df, in_f.name, ttaaii, cccc, ddhhmm, ccc, out_dir, message, debug)
                 if out_cache_file:
-                    out_cache_files.append(cached_file)
+                    out_cache_files.append(out_cache_file)
                 try:
                     byte4 = in_f.read(4)
                     if len(byte4) < 4:
