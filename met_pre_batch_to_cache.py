@@ -95,9 +95,9 @@ def create_cache(my_cccc, conf_df, in_file_name, ttaaii, cccc, ddhhmm, ccc, out_
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, ccc, 'is invalid. The file is not created', file=sys.stderr)
     return ''
 
-def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list_file, conf_df, debug):
+def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list, conf_df, debug):
     warno = 189
-    cached_file_list = []
+    out_cache_files= []
     in_files = [f for f in os.scandir(in_dir) if os.path.isfile(f) and os.access(f, os.R_OK) and not re.match(r'(^.*\.tmp$|^\..*$)', f.name)]
     for in_file in sorted(in_files, key=os.path.getmtime):
         with open(in_file, 'rb') as in_f:
@@ -181,9 +181,9 @@ def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list_file, conf_df, de
                         pass
                 if debug:
                     print('Debug', ':', 'batch_type =', batch_type, ', message_size =', message_size, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', ccc =', ccc, file=sys.stderr)
-                cached_file = create_cache(my_cccc, conf_df, in_f.name, ttaaii, cccc, ddhhmm, ccc, out_dir, message, debug)
-                if cached_file:
-                    cached_file_list.append(cached_file)
+                out_cache_file = create_cache(my_cccc, conf_df, in_f.name, ttaaii, cccc, ddhhmm, ccc, out_dir, message, debug)
+                if out_cache_file:
+                    out_cache_files.append(cached_file)
                 try:
                     byte4 = in_f.read(4)
                     if len(byte4) < 4:
@@ -192,14 +192,14 @@ def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list_file, conf_df, de
                 except:
                     start_char4 = None
                     print('Warning', warno, ':', 'The first 4 characters of', in_f.name, 'are not strings.', file=sys.stderr)
-    if len(cached_file_list) > 0:
-        with open(out_cached_list_file, 'w') as out_cached_list:
-            out_cached_list.write('\n'.join(cached_file_list))
+    if len(out_cache_files) > 0:
+        with open(out_cached_list, 'w') as out_cached_list_f:
+            out_cached_list_f.write('\n'.join(out_cache_files))
             if debug:
-                print('Debug', ':', len(cached_file_list), 'files have been saved as cache.', file=sys.stderr)
+                print('Debug', ':', len(out_cache_files), 'files have been saved as cache.', file=sys.stderr)
     else:
-        with open(out_cached_list_file, 'w') as out_cached_list:
-            out_cached_list.write('\n'.join(cached_file_list))
+        with open(out_cached_list, 'w') as out_cached_list_f:
+            out_cached_list_f.write('')
             if debug:
                 print('Debug', ':', 'No files have been saved as cache.', file=sys.stderr)
 
@@ -241,7 +241,7 @@ def main():
         print('Error', errno, ':', args.input_batch_file_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
     if not (os.access(args.output_cache_directory, os.R_OK) and os.access(args.output_cache_directory, os.W_OK) and os.access(args.output_cache_directory, os.X_OK)):
-        print('Error', errno, ':', args.output_cache_directory, 'is not readable and writable and executable.', file=sys.stderr)
+        print('Error', errno, ':', args.output_cache_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
     if not (os.access(args.output_cached_file_list, os.R_OK) and os.access(args.output_cached_file_list, os.W_OK)):
         print('Error', errno, ':', args.output_cached_file_list, 'is not readable/writable.', file=sys.stderr)
