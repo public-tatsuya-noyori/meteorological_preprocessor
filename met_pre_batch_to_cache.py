@@ -26,14 +26,12 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 
-def create_cache(my_cccc, conf_df, in_file_name, ttaaii, cccc, ddhhmm, ccc, out_dir, message, debug):
+def create_file(conf_df, in_file_name, ttaaii, cccc, ddhhmm, bbb, out_dir, message, debug):
     warno = 188
-    out_file_name = []
-    out_directory_path = []
     for conf_row in conf_df.itertuples():
         if re.match(conf_row.file_name_pattern, in_file_name) and re.match(conf_row.cccc_pattern, cccc) and re.match(conf_row.ttaaii_pattern, ttaaii):
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
-                print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, ccc, 'is invalid. The file is not created', file=sys.stderr)
+                print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
             data_date = ''
             now = datetime.now(timezone.utc)
@@ -50,91 +48,91 @@ def create_cache(my_cccc, conf_df, in_file_name, ttaaii, cccc, ddhhmm, ccc, out_
                         if ddhhmm[0:2] == data_date[6:8]:
                             break
             if data_date and re.match(r'([0-1][0-9]|2[0-4])', ddhhmm[2:4]) and re.match(r'[0-5][0-9]', ddhhmm[4:6]):
-                out_directory_path.append(out_dir)
-                out_directory_path.append(conf_row.access_control)
-                out_directory_path.append(conf_row.file_format)
-                out_directory_path.append(conf_row.data_category)
-                out_directory_path.append(conf_row.data_subcategory)
-                out_directory_path.append(cccc)
-                out_directory_path.append(data_date + ddhhmm[2:4])
-                directory_path = '/'.join(out_directory_path)
-                os.makedirs(directory_path, exist_ok=True)
-                out_file_name.append('A_')
-                out_file_name.append(ttaaii)
-                out_file_name.append(cccc)
-                out_file_name.append(ddhhmm)
-                out_file_name.append(ccc)
-                out_file_name.append('_C_')
-                out_file_name.append(my_cccc)
-                out_file_name.append('_')
-                file_name_prefix = ''.join(out_file_name)
-                for file_counter in range(0, 999):
-                    file_path_list = []
-                    file_path_list.append(directory_path)
-                    file_path_list.append('/')
-                    file_path_list.append(file_name_prefix)
-                    file_path_list.append(str(file_counter))
-                    file_path_list.append('.')
-                    file_path_list.append(conf_row.file_extension)
-                    file_path = ''.join(file_path_list)
+                out_directory_list = []
+                out_directory_list.append(out_dir)
+                out_directory_list.append(conf_row.access_control)
+                out_directory_list.append(conf_row.format)
+                out_directory_list.append(conf_row.category)
+                out_directory_list.append(conf_row.subcategory)
+                out_directory_list.append(cccc)
+                out_directory_list.append(data_date + ddhhmm[2:4])
+                out_directory = '/'.join(out_directory_list)
+                os.makedirs(out_directory, exist_ok=True)
+                out_file_name_prefix_list = []
+                out_file_name_prefix_list.append(ddhhmm[4:6])
+                out_file_name_prefix_list.append('_')
+                out_file_name_prefix_list.append(ttaaii)
+                if bbb:
+                    out_file_name_prefix_list.append('_')
+                    out_file_name_prefix_list.append(bbb)
+                out_file_name_prefix_list.append('_')
+                for out_file_counter in range(0, 999):
+                    out_file_list = []
+                    out_file_list.append(out_directory)
+                    out_file_list.append('/')
+                    out_file_list.append(''.join(out_file_name_prefix_list))
+                    out_file_list.append(str(out_file_counter))
+                    out_file_list.append('.')
+                    out_file_list.append(conf_row.file_extension)
+                    out_file = ''.join(out_file_list)
                     if debug:
-                        print('Debug', ':', 'file_path =', file_path, file=sys.stderr)
-                    if os.access(file_path, os.F_OK):
-                        with open(file_path, 'rb') as cmp_f:
-                            if message == cmp_f.read():
+                        print('Debug', ':', 'file_path =', out_file, file=sys.stderr)
+                    if os.access(out_file, os.F_OK):
+                        with open(out_file, 'rb') as out_file_f:
+                            if message == out_file_f.read():
                                 if debug:
-                                    print('Debug', ':', ttaaii, cccc, ddhhmm, ccc, 'is duplicate content. The file is not newly created.', file=sys.stderr)
+                                    print('Debug', ':', ttaaii, cccc, ddhhmm, bbb, 'is duplicate content. The file is not newly created.', file=sys.stderr)
                                 return ''
                     else:
-                        with open(file_path, 'wb') as out_f:
-                            out_f.write(message)
-                            return file_path
+                        with open(out_file, 'wb') as out_file_f:
+                            out_file_f.write(message)
+                            return out_file
 
-                print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, ccc, '. The file is not newly created', file=sys.stderr)
+                print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, bbb, '. The file is not newly created', file=sys.stderr)
             else:
-                print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, ccc, 'is invalid. The file is not created', file=sys.stderr)
+                print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
     return ''
 
-def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list, conf_df, debug):
+def convert_to_cache(in_dir, out_dir, out_list, conf_df, debug):
     warno = 189
-    out_cache_files= []
+    out_files= []
     in_files = [f for f in os.scandir(in_dir) if os.path.isfile(f) and os.access(f, os.R_OK) and not re.match(r'(^.*\.tmp$|^\..*$)', f.name)]
     for in_file in sorted(in_files, key=os.path.getmtime):
-        with open(in_file, 'rb') as in_f:
+        with open(in_file, 'rb') as in_file_f:
             batch_type = 0
             message_size = 0
             try:
-                start_char4 = in_f.read(4).decode()
+                start_char4 = in_file_f.read(4).decode()
             except:
                 start_char4 = None
-                print('Warning', warno, ':', 'The first 4 characters of', in_f.name, 'are not strings.', file=sys.stderr)
+                print('Warning', warno, ':', 'The first 4 characters of', in_file_f.name, 'are not strings.', file=sys.stderr)
                 pass
             while start_char4:
                 try:
                     if re.match(r'\d\d\d\d',start_char4):
                         batch_type = 1
-                        message_size = int(start_char4 + in_f.read(4).decode())
-                        in_f.read(12) # skip
+                        message_size = int(start_char4 + in_file_f.read(4).decode())
+                        in_file_f.read(12) # skip
                     elif start_char4 == '####':
                         batch_type = 2
-                        in_f.read(3) # skip '018'
-                        message_size = int(in_f.read(6).decode())
-                        in_f.read(5) # skip ####\n
+                        in_file_f.read(3) # skip '018'
+                        message_size = int(in_file_f.read(6).decode())
+                        in_file_f.read(5) # skip ####\n
                     elif start_char4 == '****':
                         batch_type = 3
-                        message_size = int(in_f.read(10).decode())
-                        in_f.read(5) # skip ****\n
+                        message_size = int(in_file_f.read(10).decode())
+                        in_file_f.read(5) # skip ****\n
                     else:
-                        print('Warning', warno, ':', 'The first 4 characters of', in_f.name, 'are not strings of batch ftp file.', file=sys.stderr)
+                        print('Warning', warno, ':', 'The first 4 characters of', in_file_f.name, 'are not strings of batch ftp file.', file=sys.stderr)
                         break
                 except:
-                    print('Warning', warno, ':', 'The message size of', in_f.name, 'is not strings.', file=sys.stderr)
+                    print('Warning', warno, ':', 'The message size of', in_file_f.name, 'is not strings.', file=sys.stderr)
                     break
                 message = None
                 if batch_type == 1:
-                    message = bytearray(in_f.read(message_size - 12))
+                    message = bytearray(in_file_f.read(message_size - 12))
                 elif batch_type == 2 or batch_type == 3:
-                    message = bytearray(in_f.read(message_size))
+                    message = bytearray(in_file_f.read(message_size))
                 message_counter = len(message) - 1
                 while message_counter > -1:
                     if message[message_counter] == 10 or message[message_counter] == 13 or message[message_counter] == 32:
@@ -152,107 +150,90 @@ def convert_to_cache(in_dir, out_dir, my_cccc, out_cached_list, conf_df, debug):
                 ttaaii = ''
                 cccc = ''
                 ddhhmm = ''
-                ccc = ''
+                bbb = ''
                 head_num = 0
                 message_counter = 0
                 while message_counter < len(message):
-                    if message[message_counter] == 32:
+                    if message[message_counter] == 10 or message[message_counter] == 13:
+                        break
+                    elif message[message_counter] == 32:
                         head_num += 1
                     else:
-                        if head_num == 2 and len(ddhhmm) == 6:
-                            break
                         if head_num == 0:
-                            ttaaii += message[message_counter].to_bytes(1, 'big').decode()
+                            ttaaii += message[message_counter].to_bytes(1, 'little').decode()
                         elif head_num == 1:
-                            cccc += message[message_counter].to_bytes(1, 'big').decode()
+                            cccc += message[message_counter].to_bytes(1, 'little').decode()
                         elif head_num == 2:
-                            ddhhmm += message[message_counter].to_bytes(1, 'big').decode()
+                            ddhhmm += message[message_counter].to_bytes(1, 'little').decode()
                         elif head_num == 3:
-                            ccc += message[message_counter].to_bytes(1, 'big').decode()
-                        if head_num == 3 and len(ccc) == 3:
-                            break
+                            bbb += message[message_counter].to_bytes(1, 'little').decode()
                     message_counter += 1
                 if batch_type == 1:
                     try:
-                        in_f.read(1) # skip
+                        in_file_f.read(2) # skip
                     except:
                         if debug:
                             print('Debug', ':', 'can not skip footer of a message.', file=sys.stderr)
                         pass
                 if debug:
-                    print('Debug', ':', 'batch_type =', batch_type, ', message_size =', message_size, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', ccc =', ccc, file=sys.stderr)
-                out_cache_file = create_cache(my_cccc, conf_df, in_f.name, ttaaii, cccc, ddhhmm, ccc, out_dir, message, debug)
-                if out_cache_file:
-                    out_cache_files.append(out_cache_file)
+                    print('Debug', ':', 'batch_type =', batch_type, ', message_size =', message_size, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', bbb =', bbb, file=sys.stderr)
+                out_file = create_file(conf_df, in_file_f.name, ttaaii, cccc, ddhhmm, bbb, out_dir, message, debug)
+                if out_file:
+                    out_files.append(out_file)
                 try:
-                    byte4 = in_f.read(4)
+                    byte4 = in_file_f.read(4)
                     if len(byte4) < 4:
                         break
                     start_char4 = byte4.decode()
                 except:
                     start_char4 = None
-                    print('Warning', warno, ':', 'The first 4 characters of', in_f.name, 'are not strings.', file=sys.stderr)
-    if len(out_cache_files) > 0:
-        with open(out_cached_list, 'w') as out_cached_list_f:
-            out_cached_list_f.write('\n'.join(out_cache_files))
-            if debug:
-                print('Debug', ':', len(out_cache_files), 'files have been saved as cache.', file=sys.stderr)
+                    print('Warning', warno, ':', 'The first 4 characters of', in_file_f.name, 'are not strings.', file=sys.stderr)
+    if len(out_files) > 0:
+        print('\n'.join(out_files), file=out_list)
+        if debug:
+            print('Debug', ':', len(out_files), 'files have been saved.', file=sys.stderr)
     else:
-        with open(out_cached_list, 'w') as out_cached_list_f:
-            out_cached_list_f.write('')
-            if debug:
-                print('Debug', ':', 'No files have been saved as cache.', file=sys.stderr)
+        if debug:
+            print('Debug', ':', 'No files have been saved.', file=sys.stderr)
 
 def main():
     errno=198
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_batch_file_directory', type=str, metavar='input_batch_file_directory')
-    parser.add_argument('output_cache_directory', type=str, metavar='output_cache_directory')
-    parser.add_argument('output_cached_file_list', type=str, metavar='output_cached_file_list')
-    parser.add_argument('my_cccc', type=str, metavar='my_cccc')
+    parser.add_argument('input_directory', type=str, metavar='input_directory')
+    parser.add_argument('output_directory', type=str, metavar='output_directory')
+    parser.add_argument('--output_list', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument("--config", type=str, metavar='config/batch_to_cache.csv', default='config/batch_to_cache.csv')
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
-    if not os.access(args.input_batch_file_directory, os.F_OK):
-        print('Error', errno, ':', args.input_batch_file_directory, 'does not exist.', file=sys.stderr)
+    if not os.access(args.input_directory, os.F_OK):
+        print('Error', errno, ':', args.input_directory, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
-    if not os.access(args.output_cache_directory, os.F_OK):
-        print('Error', errno, ':', args.output_cache_directory, 'does not exist.', file=sys.stderr)
-        sys.exit(errno)
-    if not os.access(args.output_cached_file_list, os.F_OK):
-        print('Error', errno, ':', args.output_cached_file_list, 'does not exist.', file=sys.stderr)
-        sys.exit(errno)
+    if not os.access(args.output_directory, os.F_OK):
+        os.makedirs(args.output_directory, exist_ok=True)
     if not os.access(args.config, os.F_OK):
         print('Error', errno, ':', args.config, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
-    if not os.path.isdir(args.input_batch_file_directory):
-        print('Error', errno, ':', args.input_batch_file_directory, 'is not directory.', file=sys.stderr)
+    if not os.path.isdir(args.input_directory):
+        print('Error', errno, ':', args.input_directory, 'is not directory.', file=sys.stderr)
         sys.exit(errno)
-    if not os.path.isdir(args.output_cache_directory):
-        print('Error', errno, ':', args.output_cache_directory, 'is not directory.', file=sys.stderr)
-        sys.exit(errno)
-    if not os.path.isfile(args.output_cached_file_list):
-        print('Error', errno, ':', args.output_cached_file_list, 'is not file.', file=sys.stderr)
+    if not os.path.isdir(args.output_directory):
+        print('Error', errno, ':', args.output_directory, 'is not directory.', file=sys.stderr)
         sys.exit(errno)
     if not os.path.isfile(args.config):
         print('Error', errno, ':', args.config, 'is not file.', file=sys.stderr)
         sys.exit(errno)
-    if not (os.access(args.input_batch_file_directory, os.R_OK) and os.access(args.input_batch_file_directory, os.W_OK) and os.access(args.input_batch_file_directory, os.X_OK)):
-        print('Error', errno, ':', args.input_batch_file_directory, 'is not readable/writable/executable.', file=sys.stderr)
+    if not (os.access(args.input_directory, os.R_OK) and os.access(args.input_directory, os.W_OK) and os.access(args.input_directory, os.X_OK)):
+        print('Error', errno, ':', args.input_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
-    if not (os.access(args.output_cache_directory, os.R_OK) and os.access(args.output_cache_directory, os.W_OK) and os.access(args.output_cache_directory, os.X_OK)):
-        print('Error', errno, ':', args.output_cache_directory, 'is not readable/writable/executable.', file=sys.stderr)
-        sys.exit(errno)
-    if not (os.access(args.output_cached_file_list, os.R_OK) and os.access(args.output_cached_file_list, os.W_OK)):
-        print('Error', errno, ':', args.output_cached_file_list, 'is not readable/writable.', file=sys.stderr)
+    if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
+        print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.config, os.R_OK):
         print('Error', errno, ':', args.config, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
     try:
-        conf_pa = csv.read_csv(args.config)
-        conf_df = conf_pa.to_pandas()
-        convert_to_cache(args.input_batch_file_directory, args.output_cache_directory, args.my_cccc, args.output_cached_file_list, conf_df, args.debug)
+        conf_df = csv.read_csv(args.config).to_pandas()
+        convert_to_cache(args.input_directory, args.output_directory, args.output_list, conf_df, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
