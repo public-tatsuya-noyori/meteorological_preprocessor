@@ -81,14 +81,14 @@ def create_file(conf_df, in_file_name, ttaaii, cccc, ddhhmm, bbb, out_dir, messa
                         with open(out_file, 'rb') as out_file_f:
                             if message == out_file_f.read():
                                 if debug:
-                                    print('Debug', ':', ttaaii, cccc, ddhhmm, bbb, 'is duplicate content. The file is not newly created.', file=sys.stderr)
+                                    print('Debug', ':', ttaaii, cccc, ddhhmm, bbb, 'is duplicate content. The file is not created.', file=sys.stderr)
                                 return ''
                     else:
                         with open(out_file, 'wb') as out_file_f:
                             out_file_f.write(message)
                             return out_file
 
-                print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, bbb, '. The file is not newly created', file=sys.stderr)
+                print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, bbb, '. The file is not created', file=sys.stderr)
             else:
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
     return ''
@@ -100,42 +100,51 @@ def convert_to_cache(in_dir, out_dir, out_list, conf_df, debug):
     for in_file in sorted(in_files, key=os.path.getmtime):
         with open(in_file, 'rb') as in_file_f:
             batch_type = 0
-            message_size = 0
+            message_length = 0
             try:
                 start_char4 = in_file_f.read(4).decode()
             except:
                 start_char4 = None
-                print('Warning', warno, ':', 'The first 4 characters of', in_file_f.name, 'are not strings.', file=sys.stderr)
+                print('Warning', warno, ':', 'The first 4 bytes of', in_file_f.name, 'are not strings.', file=sys.stderr)
                 pass
             while start_char4:
                 try:
                     if re.match(r'\d\d\d\d',start_char4):
                         batch_type = 1
-                        message_size = int(start_char4 + in_file_f.read(4).decode())
-                        in_file_f.read(12) # skip
+                        message_length = int(start_char4 + in_file_f.read(4).decode())
+                        format_identifier = int(in_file_f.read(2).decode())
+                        if format_identifier == 0:
+                            in_file_f.read(10) # skip
+                            message_length -= 10
+                        elif format_identifier == 1:
+                            in_file_f.read(3) # skip
+                            message_length -= 3
+                        else:
+                            print('Warning', warno, ':', 'The format identifier of', in_file_f.name, 'is not 00 or 01.', file=sys.stderr)
+                            break
                     elif start_char4 == '####':
                         batch_type = 2
                         in_file_f.read(3) # skip '018'
-                        message_size = int(in_file_f.read(6).decode())
+                        message_length = int(in_file_f.read(6).decode())
                         in_file_f.read(5) # skip ####\n
                     elif start_char4 == '****':
                         batch_type = 3
-                        message_size = int(in_file_f.read(10).decode())
+                        message_length = int(in_file_f.read(10).decode())
                         in_file_f.read(5) # skip ****\n
                     else:
-                        print('Warning', warno, ':', 'The first 4 characters of', in_file_f.name, 'are not strings of batch ftp file.', file=sys.stderr)
+                        print('Warning', warno, ':', 'The first 4 bytes of the message in', in_file_f.name, 'are not strings.', file=sys.stderr)
                         break
                 except:
-                    print('Warning', warno, ':', 'The message size of', in_file_f.name, 'is not strings.', file=sys.stderr)
+                    print('Warning', warno, ':', 'The bytes of message length in', in_file_f.name, 'are not strings.', file=sys.stderr)
                     break
                 message = None
                 if batch_type == 1:
-                    message = bytearray(in_file_f.read(message_size - 12))
+                    message = bytearray(in_file_f.read(message_length))
                 elif batch_type == 2 or batch_type == 3:
-                    message = bytearray(in_file_f.read(message_size))
+                    message = bytearray(in_file_f.read(message_length))
                 message_counter = len(message) - 1
                 while message_counter > -1:
-                    if message[message_counter] == 10 or message[message_counter] == 13 or message[message_counter] == 32:
+                    if message[message_counter] == 3 or message[message_counter] == 10 or message[message_counter] == 13 or message[message_counter] == 32:
                         message.pop(message_counter)
                     else:
                         break
@@ -151,32 +160,25 @@ def convert_to_cache(in_dir, out_dir, out_list, conf_df, debug):
                 cccc = ''
                 ddhhmm = ''
                 bbb = ''
-                head_num = 0
+                header_num = 0
                 message_counter = 0
                 while message_counter < len(message):
                     if message[message_counter] == 10 or message[message_counter] == 13:
                         break
                     elif message[message_counter] == 32:
-                        head_num += 1
+                        header_num += 1
                     else:
-                        if head_num == 0:
+                        if header_num == 0:
                             ttaaii += message[message_counter].to_bytes(1, 'little').decode()
-                        elif head_num == 1:
+                        elif header_num == 1:
                             cccc += message[message_counter].to_bytes(1, 'little').decode()
-                        elif head_num == 2:
+                        elif header_num == 2:
                             ddhhmm += message[message_counter].to_bytes(1, 'little').decode()
-                        elif head_num == 3:
+                        elif header_num == 3:
                             bbb += message[message_counter].to_bytes(1, 'little').decode()
                     message_counter += 1
-                if batch_type == 1:
-                    try:
-                        in_file_f.read(2) # skip
-                    except:
-                        if debug:
-                            print('Debug', ':', 'can not skip footer of a message.', file=sys.stderr)
-                        pass
                 if debug:
-                    print('Debug', ':', 'batch_type =', batch_type, ', message_size =', message_size, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', bbb =', bbb, file=sys.stderr)
+                    print('Debug', ':', 'batch_type =', batch_type, ', message_length =', message_length, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', bbb =', bbb, file=sys.stderr)
                 out_file = create_file(conf_df, in_file_f.name, ttaaii, cccc, ddhhmm, bbb, out_dir, message, debug)
                 if out_file:
                     out_files.append(out_file)
@@ -187,7 +189,7 @@ def convert_to_cache(in_dir, out_dir, out_list, conf_df, debug):
                     start_char4 = byte4.decode()
                 except:
                     start_char4 = None
-                    print('Warning', warno, ':', 'The first 4 characters of', in_file_f.name, 'are not strings.', file=sys.stderr)
+                    print('Warning', warno, ':', 'The first 4 bytes of the message in', in_file_f.name, 'are not strings.', file=sys.stderr)
     if len(out_files) > 0:
         print('\n'.join(out_files), file=out_list)
         if debug:

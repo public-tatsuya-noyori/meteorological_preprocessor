@@ -1,0 +1,4 @@
+cache/Open/Alphanumeric/Surface/SYNOP/RJTD/2020050700/00_SMJP02_0.txt
+cache/Open/Alphanumeric/Surface/SYNOP/RJTD/2020050700/00_SMPA01_0.txt
+cache/Open/Alphanumeric/Surface/SYNOP/RJTD/2020050700/00_SMJP02_CCA_0.txt
+cache/Open/Alphanumeric/Surface/SYNOP/RJTD/2020050700/00_SMJP01_0.txt
