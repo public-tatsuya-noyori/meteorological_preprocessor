@@ -103,6 +103,7 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
         out_seq_num_list.append(str(seq_num.file_digit))
         out_seq_num_list.append(',')
         out_seq_num_list.append(str(file_seq_num + 1))
+        out_seq_num_list.append('\n')
         out_seq_num_f.write(''.join(out_seq_num_list))
     if len(out_batch_files) > 0:
         print('\n'.join(out_batch_files), file=out_list)
