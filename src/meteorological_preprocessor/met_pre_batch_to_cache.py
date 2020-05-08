@@ -20,6 +20,7 @@
 
 import argparse
 import os
+import pkg_resources
 import re
 import sys
 import traceback
@@ -178,7 +179,7 @@ def convert_to_cache(in_dir, out_dir, out_list, conf_df, debug):
                             bbb += message[message_counter].to_bytes(1, 'little').decode()
                     message_counter += 1
                 if debug:
-                    print('Debug', ':', 'batch_type =', batch_type, ', message_length =', message_length, ', ttaaii =', ttaaii, ', cccc =', cccc, ', ddhhmm =', ddhhmm, ', bbb =', bbb, file=sys.stderr)
+                    print('Debug', ':', 'batch_type =', batch_type, 'message_length =', message_length, 'ttaaii =', ttaaii, 'cccc =', cccc, 'ddhhmm =', ddhhmm, 'bbb =', bbb, file=sys.stderr)
                 out_file = create_file(conf_df, in_file_f.name, ttaaii, cccc, ddhhmm, bbb, out_dir, message, debug)
                 if out_file:
                     out_files.append(out_file)
@@ -196,7 +197,7 @@ def convert_to_cache(in_dir, out_dir, out_list, conf_df, debug):
             print('Debug', ':', len(out_files), 'files have been saved.', file=sys.stderr)
     else:
         if debug:
-            print('Debug', ':', 'No files have been saved.', file=sys.stderr)
+            print('Debug', ':', 'No file has been saved.', file=sys.stderr)
 
 def main():
     errno=198
@@ -204,7 +205,7 @@ def main():
     parser.add_argument('input_directory', type=str, metavar='input_directory')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
-    parser.add_argument("--config", type=str, metavar='config/batch_to_cache.csv', default='config/batch_to_cache.csv')
+    parser.add_argument("--config", type=str, metavar='conf_batch_to_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_to_cache.csv'))
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_directory, os.F_OK):
@@ -224,8 +225,8 @@ def main():
     if not os.path.isfile(args.config):
         print('Error', errno, ':', args.config, 'is not file.', file=sys.stderr)
         sys.exit(errno)
-    if not (os.access(args.input_directory, os.R_OK) and os.access(args.input_directory, os.W_OK) and os.access(args.input_directory, os.X_OK)):
-        print('Error', errno, ':', args.input_directory, 'is not readable/writable/executable.', file=sys.stderr)
+    if not (os.access(args.input_directory, os.R_OK) and os.access(args.input_directory, os.X_OK)):
+        print('Error', errno, ':', args.input_directory, 'is not readable/executable.', file=sys.stderr)
         sys.exit(errno)
     if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
         print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)

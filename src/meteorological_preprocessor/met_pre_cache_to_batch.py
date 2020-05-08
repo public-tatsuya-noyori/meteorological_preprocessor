@@ -4,7 +4,6 @@ import os
 import re
 import sys
 import traceback
-from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 
 def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out_seq_num, debug):
@@ -21,21 +20,22 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
     with open(in_list, 'r') as in_list_f:
         out_batch_file = ''
         out_batch_file_f = None
-        is_new_batch_file = True
+        is_new_batch_file = False
         for in_file in in_list_f.readlines():
             in_file = in_file.rstrip('\n')
-            if seq_num.message_digit == 3:
-                if message_seq_num + 1 < 1000:
-                    message_seq_num += 1
-                else:
-                    message_seq_num = 1
-                    is_new_batch_file = True
-            elif seq_num.message_digit == 5:
-                if message_seq_num + 1 < 100000:
-                    message_seq_num += 1
-                else:
-                    message_seq_num = 1
-                    is_new_batch_file = True
+            if out_batch_file:
+                if seq_num.message_digit == 3:
+                    if message_seq_num + 1 < 1000:
+                        message_seq_num += 1
+                    else:
+                        message_seq_num = 1
+                        is_new_batch_file = True
+                elif seq_num.message_digit == 5:
+                    if message_seq_num + 1 < 100000:
+                        message_seq_num += 1
+                    else:
+                        message_seq_num = 1
+                        is_new_batch_file = True
             if is_new_batch_file:
                 if seq_num.file_digit == 8:
                     if file_seq_num + 1 < 100000000:
@@ -47,11 +47,10 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
                         file_seq_num += 1
                     else:
                         file_seq_num = 1
-            if out_batch_file and is_new_batch_file:
                 out_batch_file_f.close()
                 out_batch_files.append(out_batch_file)
                 out_batch_file = ''
-            is_new_batch_file = False
+                is_new_batch_file = False
             if not out_batch_file:
                 out_batch_file_list = []
                 out_batch_file_list.append(out_dir)
@@ -90,7 +89,7 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
                         message_list.extend(batch_00_foot)
                         out_batch_file_f.write(message_list)
                 if debug:
-                    print('Debug', ':', 'message_length =', message_length, ', seq_num.message_digit =', seq_num.message_digit, ', message_seq_num =', message_seq_num, ', seq_num.file_digit =', seq_num.file_digit, ', file_seq_num =', file_seq_num, file=sys.stderr)
+                    print('Debug', ':', 'message_length =', message_length, 'seq_num.message_digit =', seq_num.message_digit, 'message_seq_num =', message_seq_num, 'seq_num.file_digit =', seq_num.file_digit, 'file_seq_num =', file_seq_num, file=sys.stderr)
         if out_batch_file:
             out_batch_file_f.close()
             out_batch_files.append(out_batch_file)
@@ -99,11 +98,11 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
         out_seq_num_list.append('message_digit,message,file_digit,file\n')
         out_seq_num_list.append(str(seq_num.message_digit))
         out_seq_num_list.append(',')
-        out_seq_num_list.append(str(message_seq_num))
+        out_seq_num_list.append(str(message_seq_num + 1))
         out_seq_num_list.append(',')
         out_seq_num_list.append(str(seq_num.file_digit))
         out_seq_num_list.append(',')
-        out_seq_num_list.append(str(file_seq_num))
+        out_seq_num_list.append(str(file_seq_num + 1))
         out_seq_num_f.write(''.join(out_seq_num_list))
     if len(out_batch_files) > 0:
         print('\n'.join(out_batch_files), file=out_list)
@@ -111,33 +110,33 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
             print('Debug', ':', len(out_batch_files), 'batch files have been saved.', file=sys.stderr)
     else:
         if debug:
-            print('Debug', ':', 'No batch files have been saved.', file=sys.stderr)
+            print('Debug', ':', 'No batch file has been saved.', file=sys.stderr)
 
 def main():
     errno=198
     parser = argparse.ArgumentParser()
     parser.add_argument('input_list_file', metavar='input_list_file')
-    parser.add_argument('input_sequential_number_file', type=str, metavar='input_sequential_number_file')
+    parser.add_argument('input_sequential_number_csv_file', type=str, metavar='input_sequential_number_csv_file')
     parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('file_extension', type=str, metavar='file_extension', choices=['a','b','f','ua','ub'])
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
-    parser.add_argument('output_sequential_number_file', type=str, metavar='output_sequential_number_file')
+    parser.add_argument('output_sequential_number_csv_file', type=str, metavar='output_sequential_number_csv_file')
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_list_file, os.F_OK):
         print('Error', errno, ':', args.input_list_file, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
-    if not os.access(args.input_sequential_number_file, os.F_OK):
-        print('Error', errno, ':', args.input_sequential_number_file, 'does not exist.', file=sys.stderr)
+    if not os.access(args.input_sequential_number_csv_file, os.F_OK):
+        print('Error', errno, ':', args.input_sequential_number_csv_file, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.output_directory, os.F_OK):
         os.makedirs(args.output_directory, exist_ok=True)
     if not os.path.isfile(args.input_list_file):
         print('Error', errno, ':', args.input_list_file, 'is not file.', file=sys.stderr)
         sys.exit(errno)
-    if not os.path.isfile(args.input_sequential_number_file):
-        print('Error', errno, ':', args.input_sequential_number_file, 'is not file.', file=sys.stderr)
+    if not os.path.isfile(args.input_sequential_number_csv_file):
+        print('Error', errno, ':', args.input_sequential_number_csv_file, 'is not file.', file=sys.stderr)
         sys.exit(errno)
     if not os.path.isdir(args.output_directory):
         print('Error', errno, ':', args.output_directory, 'is not directory.', file=sys.stderr)
@@ -145,8 +144,8 @@ def main():
     if not os.access(args.input_list_file, os.R_OK):
         print('Error', errno, ':', args.input_list_file, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
-    if not os.access(args.input_sequential_number_file, os.R_OK):
-        print('Error', errno, ':', args.input_sequential_number_file, 'is not readable.', file=sys.stderr)
+    if not os.access(args.input_sequential_number_csv_file, os.R_OK):
+        print('Error', errno, ':', args.input_sequential_number_csv_file, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
     if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
         print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)
@@ -155,34 +154,34 @@ def main():
         print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
         sys.exit(errno)
     try:
-        seq_num = list(csv.read_csv(args.input_sequential_number_file).to_pandas().itertuples())[0]
+        seq_num = list(csv.read_csv(args.input_sequential_number_csv_file).to_pandas().itertuples())[0]
         if seq_num.file_digit == 8:
             if seq_num.file < 0 or seq_num.file > 99999999:
-                print('Error', errno, ':', 'The sequential number of the file of', args.input_sequential_number_file, 'is invalid (<0 or >99999999).', file=sys.stderr)
+                print('Error', errno, ':', 'The sequential number of the file of', args.input_sequential_number_csv_file, 'is invalid (<0 or >99999999).', file=sys.stderr)
                 sys.exit(errno)
         elif seq_num.file_digit == 4:
             if seq_num.file < 0 or seq_num.file > 9999:
-                print('Error', errno, ':', 'The sequential number of the file of', args.input_sequential_number_file, 'is invalid (<0 or >9999).', file=sys.stderr)
+                print('Error', errno, ':', 'The sequential number of the file of', args.input_sequential_number_csv_file, 'is invalid (<0 or >9999).', file=sys.stderr)
                 sys.exit(errno)
         else:
-            print('Error', errno, ':', 'The file digit of ', args.input_sequential_number_file, 'is invalid (!=8 or !=4).', file=sys.stderr)
+            print('Error', errno, ':', 'The file digit of ', args.input_sequential_number_csv_file, 'is invalid (!=8 or !=4).', file=sys.stderr)
             sys.exit(errno)
         if seq_num.message_digit == 3:
             if seq_num.message < 1 or seq_num.message > 999:
-               print('Error', errno, ':', 'The sequential number of message of', args.input_sequential_number_file, 'is invalid (<1 or >999).', file=sys.stderr)
+               print('Error', errno, ':', 'The sequential number of message of', args.input_sequential_number_csv_file, 'is invalid (<1 or >999).', file=sys.stderr)
                sys.exit(errno)
         elif seq_num.message_digit == 5:
             if seq_num.message < 1 or seq_num.message > 99999:
-               print('Error', errno, ':', 'The sequential number of message of', args.input_sequential_number_file, 'is invalid (<1 or >99999).', file=sys.stderr)
+               print('Error', errno, ':', 'The sequential number of message of', args.input_sequential_number_csv_file, 'is invalid (<1 or >99999).', file=sys.stderr)
                sys.exit(errno)
         elif seq_num.message_digit == 0:
             if seq_num.message != 0:
-               print('Error', errno, ':', 'The sequential number of message of', args.input_sequential_number_file, 'is invalid (!=0).', file=sys.stderr)
+               print('Error', errno, ':', 'The sequential number of message of', args.input_sequential_number_csv_file, 'is invalid (!=0).', file=sys.stderr)
                sys.exit(errno)
         else:
-            print('Error', errno, ':', 'The message digit of', args.input_sequential_number_file, 'is invalid (!=3 or !=5 or !=0).', file=sys.stderr)
+            print('Error', errno, ':', 'The message digit of', args.input_sequential_number_csv_file, 'is invalid (!=3 or !=5 or !=0).', file=sys.stderr)
             sys.exit(errno)
-        convert_to_batch(args.input_list_file, seq_num, args.my_cccc, args.file_extension, args.output_directory, args.output_list, args.output_sequential_number_file, args.debug)
+        convert_to_batch(args.input_list_file, seq_num, args.my_cccc, args.file_extension, args.output_directory, args.output_list, args.output_sequential_number_csv_file, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
