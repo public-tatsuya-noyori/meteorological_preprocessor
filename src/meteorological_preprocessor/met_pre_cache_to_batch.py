@@ -25,7 +25,7 @@ import sys
 import traceback
 from pyarrow import csv
 
-def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out_seq_num, debug):
+def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list_file, out_seq_num_file, debug):
     warno = 189
     out_batch_files = []
     batch_00_head_1 = bytes([48, 48, 1, 13, 13, 10]) # 0 0 SOH CR CR LF
@@ -36,11 +36,11 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
     file_seq_num = seq_num.file
     if seq_num.message_digit != 0 and file_seq_num == 0:
         message_seq_num = 0
-    with open(in_list, 'r') as in_list_f:
+    with open(in_list_file, 'r') as in_list_file_stream:
         out_batch_file = ''
-        out_batch_file_f = None
+        out_batch_file_stream = None
         is_new_batch_file = False
-        for in_file in in_list_f.readlines():
+        for in_file in in_list_file_stream.readlines():
             in_file = in_file.rstrip('\n')
             if out_batch_file:
                 if seq_num.message_digit == 3:
@@ -66,7 +66,7 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
                         file_seq_num += 1
                     else:
                         file_seq_num = 1
-                out_batch_file_f.close()
+                out_batch_file_stream.close()
                 out_batch_files.append(out_batch_file)
                 out_batch_file = ''
                 is_new_batch_file = False
@@ -82,9 +82,9 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
                 out_batch_file_list.append('.')
                 out_batch_file_list.append(file_ext)
                 out_batch_file = ''.join(out_batch_file_list)
-                out_batch_file_f = open(out_batch_file, 'wb')
-            with open(in_file, 'rb') as in_file_f:
-                message = in_file_f.read()
+                out_batch_file_stream = open(out_batch_file, 'wb')
+            with open(in_file, 'rb') as in_file_stream:
+                message = in_file_stream.read()
                 message_list = bytearray()
                 if seq_num.message_digit == 0:
                     message_length = len(message) + 3
@@ -94,7 +94,7 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
                         message_list.extend(str(message_length).zfill(8).encode())
                         message_list.extend(batch_01_head)
                         message_list.extend(message)
-                        out_batch_file_f.write(message_list)
+                        out_batch_file_stream.write(message_list)
                 else:
                     message_length = len(message) + 11 + seq_num.message_digit
                     if message_length > 99999999:
@@ -106,13 +106,13 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
                         message_list.extend(batch_00_head_2)
                         message_list.extend(message)
                         message_list.extend(batch_00_foot)
-                        out_batch_file_f.write(message_list)
+                        out_batch_file_stream.write(message_list)
                 if debug:
                     print('Debug', ':', 'message_length =', message_length, 'seq_num.message_digit =', seq_num.message_digit, 'message_seq_num =', message_seq_num, 'seq_num.file_digit =', seq_num.file_digit, 'file_seq_num =', file_seq_num, file=sys.stderr)
         if out_batch_file:
-            out_batch_file_f.close()
+            out_batch_file_stream.close()
             out_batch_files.append(out_batch_file)
-    with open(out_seq_num, 'w') as out_seq_num_f:
+    with open(out_seq_num_file, 'w') as out_seq_num_file_stream:
         out_seq_num_list = []
         out_seq_num_list.append('message_digit,message,file_digit,file\n')
         out_seq_num_list.append(str(seq_num.message_digit))
@@ -123,9 +123,9 @@ def convert_to_batch(in_list, seq_num, my_cccc, file_ext, out_dir, out_list, out
         out_seq_num_list.append(',')
         out_seq_num_list.append(str(file_seq_num + 1))
         out_seq_num_list.append('\n')
-        out_seq_num_f.write(''.join(out_seq_num_list))
+        out_seq_num_file_stream.write(''.join(out_seq_num_list))
     if len(out_batch_files) > 0:
-        print('\n'.join(out_batch_files), file=out_list)
+        print('\n'.join(out_batch_files), file=out_list_file)
         if debug:
             print('Debug', ':', len(out_batch_files), 'batch files have been saved.', file=sys.stderr)
     else:
@@ -140,7 +140,7 @@ def main():
     parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('file_extension', type=str, metavar='file_extension', choices=['a','b','f','ua','ub'])
     parser.add_argument('output_directory', type=str, metavar='output_directory')
-    parser.add_argument('--output_list', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
+    parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument('output_sequential_number_csv_file', type=str, metavar='output_sequential_number_csv_file')
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
@@ -201,7 +201,7 @@ def main():
         else:
             print('Error', errno, ':', 'The message digit of', args.input_sequential_number_csv_file, 'is invalid (!=3 or !=5 or !=0).', file=sys.stderr)
             sys.exit(errno)
-        convert_to_batch(args.input_list_file, seq_num, args.my_cccc, args.file_extension, args.output_directory, args.output_list, args.output_sequential_number_csv_file, args.debug)
+        convert_to_batch(args.input_list_file, seq_num, args.my_cccc, args.file_extension, args.output_directory, args.output_list_file, args.output_sequential_number_csv_file, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
