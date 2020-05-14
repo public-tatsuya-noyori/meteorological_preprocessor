@@ -27,9 +27,24 @@ import traceback
 from datetime import datetime, timedelta
 from pyarrow import csv
 
-def create_file(conf_df, in_file, ttaaii, cccc, ddhhmm, bbb, out_dir, message, debug):
+def create_file(in_file, start_char4, out_dir, conf_list, debug):
+    warno = 187
+    for conf_row in conf_list:
+        if re.match(conf_row.file_name_pattern, os.path.basename(in_file)):
+            cccc = conf_row.file_name_pattern.rstrip('^$')
+            if re.match('^BUFR$', start_char4) or re.match('^[IJ][A-Z][A-Z][A-Z]$', start_char4):
+                print('Info', ':', 'Not implemented yet', file=sys.stderr)
+            elif re.match('^GRIB$', start_char4) or re.match('^H[A-Z][A-Z][A-Z]$', start_char4):
+                print('Info', ':', 'Not implemented yet', file=sys.stderr)
+            else:
+                print('Warning', warno, ':', 'The first 4 bytes of', in_file, 'is not matched with BUFR or GRIB. The file is not created', file=sys.stderr)
+        else:
+            print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
+    return ''
+
+def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir, conf_list, debug):
     warno = 188
-    for conf_row in conf_df.itertuples():
+    for conf_row in conf_list:
         if re.match(conf_row.file_name_pattern, os.path.basename(in_file)) and re.match(conf_row.cccc_pattern, cccc) and re.match(conf_row.ttaaii_pattern, ttaaii):
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
@@ -63,14 +78,14 @@ def create_file(conf_df, in_file, ttaaii, cccc, ddhhmm, bbb, out_dir, message, d
                 os.makedirs(out_directory, exist_ok=True)
                 out_file_name_prefix_list = []
                 out_file_name_prefix_list.append(ttaaii)
-                for out_file_counter in range(0, 999):
+                for out_file_ext_counter in range(0, 999):
                     out_file_list = []
                     out_file_list.append(out_directory)
                     out_file_list.append('/')
                     out_file_list.append(''.join(out_file_name_prefix_list))
-                    if out_file_counter != 0:
+                    if out_file_ext_counter != 0:
                         out_file_list.append('_')
-                        out_file_list.append(str(out_file_counter))
+                        out_file_list.append(str(out_file_ext_counter))
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
@@ -92,9 +107,9 @@ def create_file(conf_df, in_file, ttaaii, cccc, ddhhmm, bbb, out_dir, message, d
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'in', in_file, 'is invalid. The file is not created', file=sys.stderr)
     return ''
 
-def convert_to_cache(in_dir, out_dir, out_list_file, conf_df, debug):
+def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
     warno = 189
-    out_files= []
+    out_file_counter = 0
     in_dir_entry_list = [f for f in os.scandir(in_dir) if os.path.isfile(f) and os.access(f, os.R_OK) and not re.match(r'(^.*\.tmp$|^\..*$)', f.name)]
     for in_dir_entry in sorted(in_dir_entry_list, key=os.path.getmtime):
         in_file = in_dir_entry.path
@@ -132,7 +147,14 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_df, debug):
                         message_length = int(in_file_stream.read(10).decode())
                         in_file_stream.read(5) # skip ****\n
                     else:
-                        print('Warning', warno, ':', 'The first 4 bytes of the message in', in_file, 'are not strings.', file=sys.stderr)
+                        out_file = create_file(in_file, start_char4, out_dir, conf_list, debug)
+                        if out_file:
+                            print(out_file, file=out_list_file)
+                            out_file_counter += 1
+                        break
+                    if message_length <= 0:
+                        if debug:
+                            print('Debug', ':', 'The message length of ', in_file, 'is invalid. (<=0)', bbb, file=sys.stderr)
                         break
                 except:
                     print('Warning', warno, ':', 'The bytes of message length in', in_file, 'are not strings.', file=sys.stderr)
@@ -179,9 +201,10 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_df, debug):
                     message_counter += 1
                 if debug:
                     print('Debug', ':', 'in_file =', in_file, 'batch_type =', batch_type, 'message_length =', message_length, 'ttaaii =', ttaaii, 'cccc =', cccc, 'ddhhmm =', ddhhmm, 'bbb =', bbb, file=sys.stderr)
-                out_file = create_file(conf_df, in_file, ttaaii, cccc, ddhhmm, bbb, out_dir, message, debug)
+                out_file = create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir, conf_list, debug)
                 if out_file:
-                    out_files.append(out_file)
+                    print(out_file, file=out_list_file)
+                    out_file_counter += 1
                 try:
                     byte4 = in_file_stream.read(4)
                     if len(byte4) < 4:
@@ -190,13 +213,7 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_df, debug):
                 except:
                     start_char4 = None
                     print('Warning', warno, ':', 'The first 4 bytes of the message in', in_file.name, 'are not strings.', file=sys.stderr)
-    if len(out_files) > 0:
-        print('\n'.join(out_files), file=out_list_file)
-        if debug:
-            print('Debug', ':', len(out_files), 'files have been saved.', file=sys.stderr)
-    else:
-        if debug:
-            print('Debug', ':', 'No file has been saved.', file=sys.stderr)
+    print('Info', ':', out_file_counter, 'files have been saved.', file=sys.stderr)
 
 def main():
     errno=198
@@ -234,8 +251,8 @@ def main():
         print('Error', errno, ':', args.config, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
     try:
-        conf_df = csv.read_csv(args.config).to_pandas()
-        convert_to_cache(args.input_directory, args.output_directory, args.output_list_file, conf_df, args.debug)
+        conf_list = list(csv.read_csv(args.config).to_pandas().itertuples())
+        convert_to_cache(args.input_directory, args.output_directory, args.output_list_file, conf_list, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

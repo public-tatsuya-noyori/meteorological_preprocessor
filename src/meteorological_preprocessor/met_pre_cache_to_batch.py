@@ -27,7 +27,7 @@ from pyarrow import csv
 
 def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list_file, out_seq_num_file, debug):
     warno = 189
-    out_batch_files = []
+    out_batch_file_counter = 0
     batch_00_head_1 = bytes([48, 48, 1, 13, 13, 10]) # 0 0 SOH CR CR LF
     batch_00_head_2 = bytes([13, 13, 10]) # CR CR LF
     batch_00_foot = bytes([13, 13, 10, 3]) # CR CR LF ETX
@@ -67,7 +67,8 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
                     else:
                         file_seq_num = 1
                 out_batch_file_stream.close()
-                out_batch_files.append(out_batch_file)
+                print(out_batch_file, file=out_list_file)
+                out_batch_file_counter += 1
                 out_batch_file = ''
                 is_new_batch_file = False
             if not out_batch_file:
@@ -111,7 +112,8 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
                     print('Debug', ':', 'message_length =', message_length, 'seq_num.message_digit =', seq_num.message_digit, 'message_seq_num =', message_seq_num, 'seq_num.file_digit =', seq_num.file_digit, 'file_seq_num =', file_seq_num, file=sys.stderr)
         if out_batch_file:
             out_batch_file_stream.close()
-            out_batch_files.append(out_batch_file)
+            print(out_batch_file, file=out_list_file)
+            out_batch_file_counter += 1
     with open(out_seq_num_file, 'w') as out_seq_num_file_stream:
         out_seq_num_list = []
         out_seq_num_list.append('message_digit,message,file_digit,file\n')
@@ -124,13 +126,7 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
         out_seq_num_list.append(str(file_seq_num + 1))
         out_seq_num_list.append('\n')
         out_seq_num_file_stream.write(''.join(out_seq_num_list))
-    if len(out_batch_files) > 0:
-        print('\n'.join(out_batch_files), file=out_list_file)
-        if debug:
-            print('Debug', ':', len(out_batch_files), 'batch files have been saved.', file=sys.stderr)
-    else:
-        if debug:
-            print('Debug', ':', 'No batch file has been saved.', file=sys.stderr)
+    print('Info', ':', out_batch_file_counter, 'batch files have been saved.', file=sys.stderr)
 
 def main():
     errno=198

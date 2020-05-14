@@ -8,6 +8,7 @@ file_name_pattern,cccc_pattern,ttaaii_pattern,access_control,format,category,sub
 ^.*$,^.*$,^UA[A-Z][A-Z][0-9][0-9]$,Open,Alphanumeric,Upper_air,AIREP,txt
 ^.*$,^.*$,^UD[A-Z][A-Z][0-9][0-9]$,Open,Alphanumeric,Upper_air,AMDAR,txt
 ^.*$,^.*$,^UZ[A-Z][A-Z][0-9][0-9]$,Open,Alphanumeric,Upper_air,TEMP_DROP,txt
+^.*$,^.*$,^ISA[A-Z][0-9][0-9]$,Open,BUFR,Surface,AWS,bufr
 ^.*$,^.*$,^IS[IMN][A-Z][0-9][0-9]$,Open,BUFR,Surface,SYNOP,bufr
 ^.*$,^.*$,^ISS[A-Z][0-9][0-9]$,Open,BUFR,Surface,SHIP,bufr
 ^.*$,^.*$,^ISX[A-Z][0-9][0-9]$,Open,BUFR,Surface,GPS_PWV,bufr
