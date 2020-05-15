@@ -71,21 +71,18 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
                 out_directory_list.append(conf_row.category)
                 out_directory_list.append(conf_row.subcategory)
                 out_directory_list.append(cccc)
-                out_directory_list.append(data_date[0:4])
-                out_directory_list.append(data_date[4:8])
-                out_directory_list.append(ddhhmm[2:6])
+                out_directory_list.append(data_date + ddhhmm[0:4])
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
-                out_file_name_prefix_list = []
-                out_file_name_prefix_list.append(ttaaii)
-                for out_file_ext_counter in range(0, 999):
+                for out_file_ext_counter in range(1, 999):
                     out_file_list = []
                     out_file_list.append(out_directory)
                     out_file_list.append('/')
-                    out_file_list.append(''.join(out_file_name_prefix_list))
-                    if out_file_ext_counter != 0:
-                        out_file_list.append('_')
-                        out_file_list.append(str(out_file_ext_counter))
+                    out_file_list.append(ddhhmm[4:6])
+                    out_file_list.append('_')
+                    out_file_list.append(str(out_file_ext_counter).zfill(3))
+                    out_file_list.append('_')
+                    out_file_list.append(ttaaii)
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
@@ -212,7 +209,7 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
                     start_char4 = byte4.decode()
                 except:
                     start_char4 = None
-                    print('Warning', warno, ':', 'The first 4 bytes of the message in', in_file.name, 'are not strings.', file=sys.stderr)
+                    print('Warning', warno, ':', 'The first 4 bytes of the message in', in_file, 'are not strings.', file=sys.stderr)
     print('Info', ':', out_file_counter, 'files have been saved.', file=sys.stderr)
 
 def main():
@@ -221,7 +218,7 @@ def main():
     parser.add_argument('input_directory', type=str, metavar='input_directory')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
-    parser.add_argument("--config", type=str, metavar='conf_batch_to_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_to_cache.csv'))
+    parser.add_argument("--config", type=str, metavar='conf_batch_file_to_wmo_codes_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_file_to_wmo_codes_cache.csv'))
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_directory, os.F_OK):
