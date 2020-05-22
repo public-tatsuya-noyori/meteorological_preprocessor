@@ -32,6 +32,7 @@ def create_file(in_file, start_char4, out_dir, conf_list, debug):
     for conf_row in conf_list:
         if re.match(conf_row.file_name_pattern, os.path.basename(in_file)):
             cccc = conf_row.file_name_pattern.rstrip('^$')
+
             if re.match('^BUFR$', start_char4) or re.match('^[IJ][A-Z][A-Z][A-Z]$', start_char4):
                 print('Info', ':', 'Not implemented yet', file=sys.stderr)
             elif re.match('^GRIB$', start_char4) or re.match('^H[A-Z][A-Z][A-Z]$', start_char4):
@@ -46,6 +47,12 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
     warno = 188
     for conf_row in conf_list:
         if re.match(conf_row.file_name_pattern, os.path.basename(in_file)) and re.match(conf_row.cccc_pattern, cccc) and re.match(conf_row.ttaaii_pattern, ttaaii):
+            try:
+                if conf_row.text_pattern and not re.match(conf_row.text_pattern, message.replace(b'\n', b' ').replace(b'\r', b' ').decode()):
+                    continue
+            except:
+                print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
+                continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
@@ -67,9 +74,7 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
                 out_directory_list = []
                 out_directory_list.append(out_dir)
                 out_directory_list.append(conf_row.access_control)
-                out_directory_list.append(conf_row.format)
-                out_directory_list.append(conf_row.category)
-                out_directory_list.append(conf_row.subcategory)
+                out_directory_list.append(conf_row.format + '_' + conf_row.category + '_' + conf_row.subcategory)
                 out_directory_list.append(cccc)
                 out_directory_list.append(data_date + ddhhmm[0:4])
                 out_directory = '/'.join(out_directory_list)
@@ -78,11 +83,19 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
                     out_file_list = []
                     out_file_list.append(out_directory)
                     out_file_list.append('/')
-                    out_file_list.append(ddhhmm[4:6])
+                    out_file_list.append(cccc)
+                    out_file_list.append('_')
+                    out_file_list.append(ttaaii)
+                    out_file_list.append('_')
+                    out_file_list.append(data_date + ddhhmm)
                     out_file_list.append('_')
                     out_file_list.append(str(out_file_ext_counter).zfill(3))
                     out_file_list.append('_')
-                    out_file_list.append(ttaaii)
+                    out_file_list.append(conf_row.subcategory)
+                    out_file_list.append('_')
+                    out_file_list.append(conf_row.category)
+                    out_file_list.append('_')
+                    out_file_list.append(conf_row.format)
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
@@ -118,7 +131,6 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
             except:
                 start_char4 = None
                 print('Warning', warno, ':', 'The first 4 bytes of', in_file, 'are not strings.', file=sys.stderr)
-                pass
             while start_char4:
                 try:
                     if re.match(r'\d\d\d\d',start_char4):
@@ -151,7 +163,7 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
                         break
                     if message_length <= 0:
                         if debug:
-                            print('Debug', ':', 'The message length of ', in_file, 'is invalid. (<=0)', bbb, file=sys.stderr)
+                            print('Debug', ':', 'The message length of', in_file, 'is invalid. (<=0)', bbb, file=sys.stderr)
                         break
                 except:
                     print('Warning', warno, ':', 'The bytes of message length in', in_file, 'are not strings.', file=sys.stderr)

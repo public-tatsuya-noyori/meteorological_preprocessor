@@ -25,7 +25,7 @@ import sys
 import traceback
 from pyarrow import csv
 
-def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list_file, out_seq_num_file, debug):
+def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list_file, out_seq_num_file, limit_num, limit_size, debug):
     warno = 189
     out_batch_file_counter = 0
     batch_00_head_1 = bytes([48, 48, 1, 13, 13, 10]) # 0 0 SOH CR CR LF
@@ -40,9 +40,20 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
         out_batch_file = ''
         out_batch_file_stream = None
         is_new_batch_file = False
+        message_counter = 0
         for in_file in in_list_file_stream.readlines():
             in_file = in_file.rstrip('\n')
+            try:
+                if os.path.getsize(in_file) > limit_size:
+                    print('Warning', warno, ':', 'The size of', in_file, 'is over the limitation of the size of a file. The file is not added to a batch file.', file=sys.stderr)
+                    continue
+            except:
+                print('Warning', warno, ':', 'can not read the size of', in_file, '. The file is not added to a batch file.', file=sys.stderr)
+                continue
             if out_batch_file:
+                if message_counter == limit_num:
+                    is_new_batch_file = True
+                    message_counter = 0
                 if seq_num.message_digit == 3:
                     if message_seq_num + 1 < 1000:
                         message_seq_num += 1
@@ -96,6 +107,7 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
                         message_list.extend(batch_01_head)
                         message_list.extend(message)
                         out_batch_file_stream.write(message_list)
+                        message_counter += 1
                 else:
                     message_length = len(message) + 11 + seq_num.message_digit
                     if message_length > 99999999:
@@ -108,6 +120,7 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
                         message_list.extend(message)
                         message_list.extend(batch_00_foot)
                         out_batch_file_stream.write(message_list)
+                        message_counter += 1
                 if debug:
                     print('Debug', ':', 'message_length =', message_length, 'seq_num.message_digit =', seq_num.message_digit, 'message_seq_num =', message_seq_num, 'seq_num.file_digit =', seq_num.file_digit, 'file_seq_num =', file_seq_num, file=sys.stderr)
         if out_batch_file:
@@ -138,6 +151,8 @@ def main():
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument('output_sequential_number_csv_file', type=str, metavar='output_sequential_number_csv_file')
+    parser.add_argument("--limit_num", type=int, metavar='limitation of the number of messages in a file. default = 100)', default=100)
+    parser.add_argument("--limit_size", type=int, metavar='limitation of the size of a message. default = 1048576 = 1MB', default=1048576)
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_list_file, os.F_OK):
@@ -197,7 +212,7 @@ def main():
         else:
             print('Error', errno, ':', 'The message digit of', args.input_sequential_number_csv_file, 'is invalid (!=3 or !=5 or !=0).', file=sys.stderr)
             sys.exit(errno)
-        convert_to_batch(args.input_list_file, seq_num, args.my_cccc, args.file_extension, args.output_directory, args.output_list_file, args.output_sequential_number_csv_file, args.debug)
+        convert_to_batch(args.input_list_file, seq_num, args.my_cccc, args.file_extension, args.output_directory, args.output_list_file, args.output_sequential_number_csv_file, args.limit_num, args.limit_size, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
