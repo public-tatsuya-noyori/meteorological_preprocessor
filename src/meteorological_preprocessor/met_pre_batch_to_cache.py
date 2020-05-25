@@ -32,7 +32,6 @@ def create_file(in_file, start_char4, out_dir, conf_list, debug):
     for conf_row in conf_list:
         if re.match(conf_row.file_name_pattern, os.path.basename(in_file)):
             cccc = conf_row.file_name_pattern.rstrip('^$')
-
             if re.match('^BUFR$', start_char4) or re.match('^[IJ][A-Z][A-Z][A-Z]$', start_char4):
                 print('Info', ':', 'Not implemented yet', file=sys.stderr)
             elif re.match('^GRIB$', start_char4) or re.match('^H[A-Z][A-Z][A-Z]$', start_char4):
@@ -48,7 +47,7 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
     for conf_row in conf_list:
         if re.match(conf_row.file_name_pattern, os.path.basename(in_file)) and re.match(conf_row.cccc_pattern, cccc) and re.match(conf_row.ttaaii_pattern, ttaaii):
             try:
-                if conf_row.text_pattern and not re.match(conf_row.text_pattern, message.replace(b'\n', b' ').replace(b'\r', b' ').decode()):
+                if conf_row.text_pattern and not re.match(conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                     continue
             except:
                 print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'is invalid. The file is not created', file=sys.stderr)
@@ -74,8 +73,13 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
                 out_directory_list = []
                 out_directory_list.append(out_dir)
                 out_directory_list.append(conf_row.access_control)
-                out_directory_list.append(conf_row.format + '_' + conf_row.category + '_' + conf_row.subcategory)
-                out_directory_list.append(cccc)
+                out_directory_list.append(conf_row.format)
+                if conf_row.format == 'an_code' or conf_row.format == 'bufr':
+                    out_directory_list.append(conf_row.category + '_' + conf_row.subcategory)
+                    out_directory_list.append(cccc)
+                elif conf_row.format == 'an_text' or conf_row.format == 'grib' or conf_row.format == 'crex':
+                    out_directory_list.append(cccc)
+                    out_directory_list.append(conf_row.category + '_' + conf_row.subcategory)
                 out_directory_list.append(data_date + ddhhmm[0:4])
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
@@ -230,7 +234,7 @@ def main():
     parser.add_argument('input_directory', type=str, metavar='input_directory')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
-    parser.add_argument("--config", type=str, metavar='conf_batch_file_to_wmo_codes_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_file_to_wmo_codes_cache.csv'))
+    parser.add_argument("--config", type=str, metavar='conf_batch_to_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_to_cache.csv'))
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_directory, os.F_OK):
