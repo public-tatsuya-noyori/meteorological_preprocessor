@@ -223,7 +223,6 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
             none_index_list = [index for index, value in enumerate(tmp_prop_list) if value == None]
             del_counter = 0
             for none_index in none_index_list:
-                print(none_index)
                 del tmp_prop_list[none_index - del_counter]
                 del tmp_id_list[none_index - del_counter]
                 del_counter += 1
