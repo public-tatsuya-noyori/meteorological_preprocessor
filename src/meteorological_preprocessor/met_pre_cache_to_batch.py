@@ -103,9 +103,9 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
                     if message_length > 99999999:
                         print('Warning', warno, ':', 'The message length of', in_file, 'is invalid. (>99999999)', file=sys.stderr)
                     else:
-                        message_list.extend(str(message_length).zfill(8).encode())
-                        message_list.extend(batch_01_head)
-                        message_list.extend(message)
+                        message_list + str(message_length).zfill(8).encode()
+                        message_list + batch_01_head
+                        message_list + message
                         out_batch_file_stream.write(message_list)
                         message_counter += 1
                 else:
@@ -113,12 +113,12 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
                     if message_length > 99999999:
                         print('Warning', warno, ':', 'The message length of', in_file, 'is invalid. (>99999999)', file=sys.stderr)
                     else:
-                        message_list.extend(str(message_length).zfill(8).encode())
-                        message_list.extend(batch_00_head_1)
-                        message_list.extend(str(message_seq_num).zfill(seq_num.message_digit).encode())
-                        message_list.extend(batch_00_head_2)
-                        message_list.extend(message)
-                        message_list.extend(batch_00_foot)
+                        message_list + str(message_length).zfill(8).encode()
+                        message_list + batch_00_head_1
+                        message_list + str(message_seq_num).zfill(seq_num.message_digit).encode()
+                        message_list + batch_00_head_2
+                        message_list + message
+                        message_list + batch_00_foot
                         out_batch_file_stream.write(message_list)
                         message_counter += 1
                 if debug:

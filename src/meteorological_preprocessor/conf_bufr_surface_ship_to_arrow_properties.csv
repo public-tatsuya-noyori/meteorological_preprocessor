@@ -1,3 +1,4 @@
-name,units,min,max,key,missing,slide,step
-air_temperature,K,-273.15,32767,airTemperature,-100,,
-dewpoint_temperature,K,-273.15,32767,dewpointTemperature,-100,,
+name,datatype,min,max,key,slide,step
+air_temperature__K,float16,-273.15,32767,airTemperature,0,0
+dewpoint_temperature__K,float16,-273.15,32767,dewpointTemperature,0,0
+an_hour_maximum_wind_gust_speed__ms-1,float16,0,32767,maximumWindGustSpeed,1,2
