@@ -1,0 +1,9 @@
+name,units,min,max,key,slide,step
+location_id,,,,shipOrMobileLandStationIdentifier,,
+latitude,degree,-90,90,latitude,,
+longitude,degree,-180,180,longitude,,
+datetime,,0,9999,year,,
+datetime,,1,12,month,,
+datetime,,1,31,day,,
+datetime,,0,23,hour,,
+datetime,,0,59,minute,,
