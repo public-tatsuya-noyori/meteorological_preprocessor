@@ -42,7 +42,7 @@ def create_file(in_file, start_char4, out_dir, conf_list, debug):
             print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
-def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir, conf_list, debug):
+def create_file_with_header(in_file, my_cccc, ttaaii, cccc, ddhhmm, bbb, message, out_dir, conf_list, debug):
     warno = 188
     for conf_row in conf_list:
         if re.match(conf_row.file_name_pattern, os.path.basename(in_file)) and re.match(conf_row.cccc_pattern, cccc) and re.match(conf_row.ttaaii_pattern, ttaaii):
@@ -80,19 +80,22 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
                 elif conf_row.format == 'an_text' or conf_row.format == 'grib' or conf_row.format == 'crex':
                     out_directory_list.append(cccc)
                     out_directory_list.append(conf_row.category + '_' + conf_row.subcategory)
-                out_directory_list.append(data_date + ddhhmm[0:4])
+                out_directory_list.append(data_date + ddhhmm[2:4])
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
                 for out_file_ext_counter in range(1, 999):
                     out_file_list = []
                     out_file_list.append(out_directory)
-                    out_file_list.append('/')
-                    out_file_list.append(cccc)
-                    out_file_list.append('_')
+                    out_file_list.append('/A_')
                     out_file_list.append(ttaaii)
+                    out_file_list.append(cccc)
+                    out_file_list.append(ddhhmm)
+                    out_file_list.append(bbb)
+                    out_file_list.append('_C_')
+                    out_file_list.append(my_cccc)
                     out_file_list.append('_')
-                    out_file_list.append(data_date + ddhhmm)
-                    out_file_list.append('_')
+                    out_file_list.append(data_date + ddhhmm[2:6])
+                    out_file_list.append('00_')
                     out_file_list.append(str(out_file_ext_counter).zfill(3))
                     out_file_list.append('_')
                     out_file_list.append(conf_row.subcategory)
@@ -121,7 +124,7 @@ def create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'in', in_file, 'is invalid. The file is not created', file=sys.stderr)
     return ''
 
-def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
+def convert_to_cache(in_dir, my_cccc, out_dir, out_list_file, conf_list, debug):
     warno = 189
     out_file_counter = 0
     in_dir_entry_list = [f for f in os.scandir(in_dir) if os.path.isfile(f) and os.access(f, os.R_OK) and not re.match(r'(^.*\.tmp$|^\..*$)', f.name)]
@@ -214,7 +217,7 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
                     message_counter += 1
                 if debug:
                     print('Debug', ':', 'in_file =', in_file, 'batch_type =', batch_type, 'message_length =', message_length, 'ttaaii =', ttaaii, 'cccc =', cccc, 'ddhhmm =', ddhhmm, 'bbb =', bbb, file=sys.stderr)
-                out_file = create_file_with_header(in_file, ttaaii, cccc, ddhhmm, bbb, message, out_dir, conf_list, debug)
+                out_file = create_file_with_header(in_file, my_cccc, ttaaii, cccc, ddhhmm, bbb, message, out_dir, conf_list, debug)
                 if out_file:
                     print(out_file, file=out_list_file)
                     out_file_counter += 1
@@ -231,12 +234,16 @@ def convert_to_cache(in_dir, out_dir, out_list_file, conf_list, debug):
 def main():
     errno=198
     parser = argparse.ArgumentParser()
+    parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('input_directory', type=str, metavar='input_directory')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument("--config", type=str, metavar='conf_batch_to_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_to_cache.csv'))
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
+    if not re.match(r'^[A-Z]{4}$', args.my_cccc):
+        print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
+        sys.exit(errno)
     if not os.access(args.input_directory, os.F_OK):
         print('Error', errno, ':', args.input_directory, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
@@ -265,7 +272,7 @@ def main():
         sys.exit(errno)
     try:
         conf_list = list(csv.read_csv(args.config).to_pandas().itertuples())
-        convert_to_cache(args.input_directory, args.output_directory, args.output_list_file, conf_list, args.debug)
+        convert_to_cache(args.input_directory, args.my_cccc, args.output_directory, args.output_list_file, conf_list, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

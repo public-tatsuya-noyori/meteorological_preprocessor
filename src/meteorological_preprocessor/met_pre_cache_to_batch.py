@@ -144,9 +144,9 @@ def convert_to_batch(in_list_file, seq_num, my_cccc, file_ext, out_dir, out_list
 def main():
     errno=198
     parser = argparse.ArgumentParser()
+    parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('input_list_file', metavar='input_list_file')
     parser.add_argument('input_sequential_number_csv_file', type=str, metavar='input_sequential_number_csv_file')
-    parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('file_extension', type=str, metavar='file_extension', choices=['a','b','f','ua','ub'])
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
@@ -155,6 +155,9 @@ def main():
     parser.add_argument("--limit_size", type=int, metavar='limitation of the size of a message. default = 1048576 = 1MB', default=1048576)
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
+    if not re.match(r'^[A-Z]{4}$', args.my_cccc):
+        print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
+        sys.exit(errno)
     if not os.access(args.input_list_file, os.F_OK):
         print('Error', errno, ':', args.input_list_file, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
@@ -180,9 +183,6 @@ def main():
         sys.exit(errno)
     if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
         print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)
-        sys.exit(errno)
-    if not re.match(r'^[A-Z]{4}$', args.my_cccc):
-        print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
         sys.exit(errno)
     try:
         seq_num = list(csv.read_csv(args.input_sequential_number_csv_file).to_pandas().itertuples())[0]
