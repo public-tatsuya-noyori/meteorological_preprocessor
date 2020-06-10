@@ -106,7 +106,7 @@ def create_file(in_file, start_char4, out_dir, tmp_grib_file, conf_list, debug):
                             if ddhhmm[0:2] == data_date[6:8]:
                                 break
             if not cccc:
-                cccc = conf_row.cccc_pattern.strip('^$')
+                cccc = conf_row.cccc
             out_directory_list = []
             out_directory_list.append(out_dir)
             out_directory_list.append(conf_row.access_control)
@@ -200,7 +200,9 @@ def create_file(in_file, start_char4, out_dir, tmp_grib_file, conf_list, debug):
 def create_file_with_header(in_file, my_cccc, ttaaii, cccc, ddhhmm, bbb, message, out_dir, tmp_grib_file, conf_list, debug):
     warno = 188
     for conf_row in conf_list:
-        if re.match(conf_row.file_name_pattern, os.path.basename(in_file)) and re.match(conf_row.cccc_pattern, cccc) and re.match(conf_row.ttaaii_pattern, ttaaii):
+        if re.match(conf_row.ttaaii_pattern, ttaaii) and re.match(conf_row.file_name_pattern, os.path.basename(in_file)):
+            if conf_row.cccc and conf_row.cccc != cccc:
+                continue
             try:
                 if conf_row.text_pattern and not re.match(conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                     continue
