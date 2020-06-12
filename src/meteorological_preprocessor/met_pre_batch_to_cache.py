@@ -40,7 +40,8 @@ def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):
                 ttaaii_cccc_ddhhmm_bbb_data_date_list.append(word)
             break
         elif message[message_counter] == 32:
-            ttaaii_cccc_ddhhmm_bbb_data_date_list.append(word)
+            if word:
+                ttaaii_cccc_ddhhmm_bbb_data_date_list.append(word)
             word = ''
             header_num += 1
         else:
@@ -241,7 +242,6 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                     else:
                         return ''
                 else:
-                    out_directory_list.append(conf_row.category)
                     out_directory_list.append(conf_row.subcategory)
                     out_directory_list.append(data_date + ddhhmm[2:4])
                 out_directory = '/'.join(out_directory_list)
