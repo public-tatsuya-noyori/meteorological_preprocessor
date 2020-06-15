@@ -72,6 +72,8 @@ RJTD,^H[A-Z][A-Z][A-Z][0-9][0-9]$,^A_H[A-Z][A-Z][A-Z][0-9][0-9].*$,open,grib,gsm
 ,^IXC[A-Z][0-9][0-9]$,^A_IXC[A-Z][0-9][0-9].*$,open,bufr,satellite,cloud_analysis,bin,
 KNES,^J[A-Z][A-Z][A-Z][0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,bufr,satellite,amv,bin,
 KNES,^J[A-Z][A-Z][A-Z][0-9][0-9]$,^A_J[A-Z][A-Z][A-Z][0-9][0-9].*$,open,bufr,satellite,amv,bin,
+,^K[A-Z][A-Z][A-Z][0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,crex,unknown,unknown,bin,
+,^K[A-Z][A-Z][A-Z][0-9][0-9]$,^A_K[A-Z][A-Z][A-Z][0-9][0-9].*$,open,crex,unknown,unknown,txt,
 ,^AC[A-Z][A-Z][0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,alphanumeric,analysis,cyclone,txt,
 ,^AC[A-Z][A-Z][0-9][0-9]$,^A_AC[A-Z][A-Z][0-9][0-9].*$,open,alphanumeric,analysis,cyclone,txt,
 ,^AG[A-Z][A-Z][0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,alphanumeric,analysis,hydrological_or_marine,txt,

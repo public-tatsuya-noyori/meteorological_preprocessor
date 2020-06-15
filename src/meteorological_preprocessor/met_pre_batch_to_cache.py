@@ -102,6 +102,9 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             ddhhmm = ''
             bbb = ''
             data_date = ''
+            out_directory_list = []
+            out_directory_list.append(out_dir)
+            out_directory_list.append(conf_row.access_control)
             if re.match('^[A-Z][A-Z][A-Z][A-Z]$', start_char4):
                 ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
             if len(ttaaii_cccc_ddhhmm_bbb_data_date_list) == 5:
@@ -110,14 +113,19 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 ddhhmm = ttaaii_cccc_ddhhmm_bbb_data_date_list[2]
                 bbb = ttaaii_cccc_ddhhmm_bbb_data_date_list[3]
                 data_date = ttaaii_cccc_ddhhmm_bbb_data_date_list[4]
-            if not cccc:
+                out_directory_list.append(cccc)
+                out_directory_list.append(conf_row.format)
+                out_directory_list.append(conf_row.category)
+                out_directory_list.append(conf_row.subcategory)
+                out_directory_list.append(data_date + ddhhmm[2:4])
+            elif conf_row.cccc:
                 cccc = conf_row.cccc
-            out_directory_list = []
-            out_directory_list.append(out_dir)
-            out_directory_list.append(conf_row.access_control)
-            out_directory_list.append(cccc)
-            out_directory_list.append(conf_row.format)
-            out_directory_list.append(conf_row.category)
+                out_directory_list.append(cccc)
+                out_directory_list.append(conf_row.format)
+                out_directory_list.append(conf_row.category)
+            else:
+                print('Warning', warno, ':', in_file, 'is not matched on cccc of configuration file. The file is not created', file=sys.stderr)
+                return ''
             if conf_row.format == 'grib' or re.match('^GRIB$', start_char4):
                 subdir_list = get_grib_subdir_list(in_file)
                 if len(subdir_list) == 3:

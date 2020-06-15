@@ -21,8 +21,34 @@ parallel=4
 set -e
 mkdir -p work.tmp
 cd work.tmp
-dir_list='https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sflnd/DS.synop/
-https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.intl/'
+dir_list='https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sflnd/DS.metar/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sflnd/DS.sclim/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sflnd/DS.synop/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sflnd/DS.tafst/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sfmar/DS.dbuoy/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sfmar/DS.ships/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sluan/DS.airep/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sluan/DS.airmet/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sluan/DS.amdar/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sluan/DS.pirep/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sluan/DS.recco/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.sluan/DS.sigmt/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.vsndn/DS.dropw/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.vsndn/DS.prflr/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.vsndn/DS.raobf/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.an/DC.vsndn/DS.raobs/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bb/DC.radar/DS.carib/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bb/DC.sluan/DS.recco/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.intl/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.mos/DS.mavjs/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.mos/DS.mexjs/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.sfsat/DS.altika/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.sfsat/DS.gssd/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.sfsat/DS.hdw/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.sfsat/DS.qscat/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.sfsat/DS.swind/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.bf/DC.tacbf/
+https://tgftp.nws.noaa.gov/SL.us008001/DF.c5/DC.bathy/'
 is_pre=1
 if test -f noaa_pre_file_time_list.txt; then
     if test -f noaa_file_time_list.txt; then
