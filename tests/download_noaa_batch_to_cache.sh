@@ -79,7 +79,7 @@ if test ${is_pre} -eq 1 -a ${err_num} -eq 0; then
 	set +e
         aria2c -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l noaa_log.txt -i noaa_updated.txt -d batch_noaa >> noaa_get2.txt
 	set -e
-        met_pre_batch_to_cache RJTD batch_noaa cache
+        met_pre_batch_to_cache RJTD batch_noaa cache 2>>met_pre_batch_to_cache.log
         grep -F '[ERROR]' noaa_log.txt | grep 'URI=' | sed -e 's/^.*URI=//g' | grep -v '^ *$' | sort -u > noaa_updated.txt
         updated_num=`cat noaa_updated.txt | wc -l`
         rm -rf batch_noaa

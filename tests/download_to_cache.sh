@@ -17,8 +17,8 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -ex
-is_download_wis_jma_to_cache_running=`touch download_wis_jma_to_cache.pid && cat download_wis_jma_to_cache.pid | xargs -I{} ps --no-headers  -q {} | wc -l`
+set -e
+is_download_wis_jma_to_cache_running=`touch download_wis_jma_to_cache.pid && cat download_wis_jma_to_cache.pid | xargs -I{} ps --no-headers -q {} | wc -l`
 if test ${is_download_wis_jma_to_cache_running} -eq 0; then
     ./download_wis_jma_to_cache.sh > download_wis_jma_to_cache_list_file.txt &
     echo $! > download_wis_jma_to_cache.pid
@@ -30,11 +30,11 @@ fi
 #fi
 is_upload_to_object_storage_running=`touch upload_to_object_storage.pid && cat upload_to_object_storage.pid  | xargs -I{} ps --no-headers -q {} | wc -l`
 if test ${is_upload_to_object_storage_running} -eq 0; then
-    ./rclone --ignore-checksum --ignore-existing --max-age 1d --max-size 1G --no-update-modtime --stats 0 --timeout 1m --transfers 32 --s3-upload-concurrency 32 --use-server-modtime -u copy work.tmp/cache/open iij1:japan-meteorological-agency-open-data --log-level ERROR --log-file upload_to_object_storage.log &
-    echo $! > upload_to_object_storage.pid
-fi
-is_delete_object_storage_running=`touch delete_object_storage.pid && cat delete_object_storage.pid  | xargs -I{} ps --no-headers -q {} | wc -l`
-if test ${is_delete_object_storage_running} -eq 0; then
-    ./rclone delete --min-age 1d --use-server-modtime iij1:japan-meteorological-agency-open-data/ --log-level ERROR --log-file delete_object_storage.log &
-    echo $! > delete_object_storage.pid
+    mkdir -p work.tmp/cache/open/0.created_URLs
+    now=`date "+%Y%m%d%H%M%S"`
+    if test -s work.tmp/wis_jma_to_cache.txt; then
+        grep ^cache/open work.tmp/wis_jma_to_cache.txt | sed -e 's%^cache/open%https://ap1.dag.iij.gio.com/japan-meteorological-agency-oepn-data%g' > work.tmp/cache/open/0.created_URLs/system_A_${now}.txt
+        ./rclone --ignore-checksum --ignore-existing --no-update-modtime --no-traverse --max-age 1d --max-size 1G --stats 0 --timeout 1m --transfers 4 copy work.tmp/cache/open iij1:japan-meteorological-agency-open-data --log-level DEBUG --log-file upload_to_object_storage.log &
+        echo $! > upload_to_object_storage.pid
+    fi
 fi

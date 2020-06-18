@@ -152,7 +152,6 @@ def main():
     parser.add_argument("--limit_num", type=int, metavar='limitation of the number of messages in a file. default = 100)', default=100)
     parser.add_argument("--limit_size", type=int, metavar='limitation of the size of a message. default = 1048576 = 1MB', default=1048576)
     parser.add_argument("--debug", action='store_true')
-    input_file_list = []
     args = parser.parse_args()
     if not re.match(r'^[A-Z]{4}$', args.my_cccc):
         print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
@@ -211,6 +210,7 @@ def main():
         else:
             print('Error', errno, ':', 'The message digit of', args.input_sequential_number_csv_file, 'is invalid (!=3 or !=5 or !=0).', file=sys.stderr)
             sys.exit(errno)
+        input_file_list = []
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         convert_to_batch(args.my_cccc, input_file_list, seq_num, args.file_extension, args.output_directory, args.output_list_file, args.output_sequential_number_csv_file, args.limit_num, args.limit_size, args.debug)

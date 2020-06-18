@@ -83,7 +83,7 @@ def get_grib_subdir_list(grib_file):
                 if gid is None:
                     break
                 subdir_list.append(str(codes_get(gid, 'iDirectionIncrementInDegrees')) + '_' + str(codes_get(gid, 'jDirectionIncrementInDegrees')))
-                subdir_list.append(str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')))
+                subdir_list.append(str(codes_get(gid, 'laitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')))
                 subdir_list.append(str(codes_get(gid, 'dataDate')).zfill(8) + str(codes_get(gid, 'dataTime')).zfill(4)[0:2])
                 codes_release(gid)
             except:
