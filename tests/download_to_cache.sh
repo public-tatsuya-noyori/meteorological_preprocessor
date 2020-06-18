@@ -33,7 +33,7 @@ if test ${is_upload_to_object_storage_running} -eq 0; then
     mkdir -p work.tmp/cache/open/0.created_URLs
     now=`date "+%Y%m%d%H%M%S"`
     if test -s work.tmp/wis_jma_to_cache.txt; then
-        grep ^cache/open work.tmp/wis_jma_to_cache.txt | sed -e 's%^cache/open%https://ap1.dag.iij.gio.com/japan-meteorological-agency-oepn-data%g' > work.tmp/cache/open/0.created_URLs/system_A_${now}.txt
+        grep ^cache/open work.tmp/wis_jma_to_cache.txt | sed -e 's%^cache/open%https://ap1.dag.iijgio.com/japan-meteorological-agency-oepn-data%g' > work.tmp/cache/open/0.created_URLs/system_A_${now}.txt
         grep ^cache/open work.tmp/wis_jma_to_cache.txt | sed -e 's%^cache/open%%g' > work.tmp/wis_jma_files_raw.txt
 	echo "0.created_URLs/system_A_${now}.txt" >> work.tmp/wis_jma_files_raw.txt
         ./rclone --ignore-checksum --ignore-existing --no-update-modtime --no-traverse --max-age 1h --max-size 1G --stats 0 --timeout 1m --transfers 4 --s3-upload-cutoff 0 -u copy --files-from-raw work.tmp/wis_jma_files_raw.txt iij1:japan-meteorological-agency-open-data --log-level ERROR --log-file upload_to_object_storage.log &
