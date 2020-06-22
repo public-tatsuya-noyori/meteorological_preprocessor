@@ -44,7 +44,7 @@ if test ${open} -eq 1; then
 else
     acl='closed'
 fi
-for raw_list_file in `ls -1 ${raw_list_file_dir}`; do
+for raw_list_file in `ls -1 ${raw_list_file_dir} | grep -v tmp`; do
   now=`date "+%Y%m%d%H%M%S"`
   mkdir -p ${local_dir}/${acl}/4PubSub/${pub_num}
   mkdir -p ${local_dir}/${acl}/4PubSub_log/${pub_num}
