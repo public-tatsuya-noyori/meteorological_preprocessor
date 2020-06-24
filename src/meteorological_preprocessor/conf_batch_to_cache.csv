@@ -5,6 +5,8 @@ RJTD,^H[A-Z][A-Z][A-Z][0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn
 RJTD,^H[A-Z][A-Z][A-Z][0-9][0-9]$,^A_H[A-Z][A-Z][A-Z][0-9][0-9].*$,open,grib,gsm,,bin,
 ,^IEAX[0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,bufr,satellite,amsua,bin,
 ,^IEAX[0-9][0-9]$,^A_IEAX[0-9][0-9].*$,open,bufr,satellite,amsua,bin,
+,^IEDX[0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,bufr,satellite,iasi_l2,bin,
+,^IEDX[0-9][0-9]$,^A_IEDX[0-9][0-9].*$,open,bufr,satellite,iasi_l2,bin,
 ,^IEHX[0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,bufr,satellite,hirs,bin,
 ,^IEHX[0-9][0-9]$,^A_IEHX[0-9][0-9].*$,open,bufr,satellite,hirs,bin,
 ,^IEIX[0-9][0-9]$,^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin))$,open,bufr,satellite,iasi,bin,
