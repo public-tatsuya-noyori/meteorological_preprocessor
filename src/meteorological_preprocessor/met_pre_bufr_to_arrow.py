@@ -12,42 +12,36 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
-def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc_time_list, conf_prop_list, debug):
+def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc_time_list, conf_prop_list, debug):
     warno = 189
     out_arrows = []
-    with open(in_list_file, 'r') as in_list_file_stream:
-        loc_time_dict = {}
-        prop_dict = {}
-        for in_file in in_list_file_stream.readlines():
-            in_file = in_file.rstrip('\n')
-            matched = re.search('/bufr_'+ cat + '_' + subcat + '/', in_file)
-            if not matched:
-                print('Debug', ':', in_file, 'is not', '/bufr_'+ cat + '_' + subcat + '/.', file=sys.stderr)
-                continue
-            elif not os.access(in_file, os.F_OK):
-                print('Warning', warno, ':', in_file, 'does not exist.', file=sys.stderr)
-                continue
-            elif not os.path.isfile(in_file):
-                print('Warning', warno, ':', in_file, 'is not file.', file=sys.stderr)
-                continue
-            elif not os.access(in_file, os.R_OK):
-                print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
-                continue
-            in_file_stream = open(in_file, 'r')
+    loc_time_dict = {}
+    prop_dict = {}
+    datatype_dict = {}
+    for in_file in in_file_list:
+        matched = re.search('/bufr/'+ cat + '/' + subcat + '/', in_file)
+        if not matched:
+            print('Debug', ':', in_file, 'is not', '/bufr/'+ cat + '/' + subcat + '/.', file=sys.stderr)
+            continue
+        elif not os.access(in_file, os.F_OK):
+            print('Warning', warno, ':', in_file, 'does not exist.', file=sys.stderr)
+            continue
+        elif not os.path.isfile(in_file):
+            print('Warning', warno, ':', in_file, 'is not file.', file=sys.stderr)
+            continue
+        elif not os.access(in_file, os.R_OK):
+            print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
+            continue
+        with open(in_file, 'r') as in_file_stream:
             if debug:
                 print('Debug', ':', in_file, file=sys.stderr)
             while True:
                 bufr = codes_bufr_new_from_file(in_file_stream)
                 if bufr is None:
                     break
-                try:
-                    codes_set(bufr, 'unpack', 1)
-                except CodesInternalError as err:
-                    print('Warning', warno, ':', 'CodesInternalError is happend at unpack in', in_file, file=sys.stderr)
-                    codes_release(bufr)
-                    break
                 tmp_loc_time_dict = {}
                 try:
+                    codes_set(bufr, 'unpack', 1)
                     none_list = []
                     is_loc_time = True
                     for conf_row in conf_loc_time_list:
@@ -58,7 +52,7 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                             if type(values[0]) == str:
                                 values = [value.lstrip().rstrip() for value in values]
                             else:
-                                if conf_row.name == 'location_id':
+                                if conf_row.name == 'location ID':
                                     values = [None if value < conf_row.min or value > conf_row.max else str(value) for value in values]
                                 elif conf_row.name == 'datetime':
                                     if conf_row.key == 'year':
@@ -67,11 +61,10 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                                         values = [None if value < conf_row.min or value > conf_row.max else '.' + str(value).zfill(4) for value in values]
                                     else:
                                         values = [None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values]
-
                                 else:
                                     values = [None if value < conf_row.min or value > conf_row.max else value for value in values]
                             tmp_loc_time_dict[conf_row.key] = values
-                            if conf_row.name == 'location_id' or conf_row.name == 'datetime':
+                            if conf_row.name == 'location ID' or conf_row.name == 'datetime':
                                 tmp_none_list = [False if value == None else True for value in values]
                                 if len(none_list) > 0:
                                     none_list = none_list * np.array(tmp_none_list)
@@ -86,7 +79,6 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                     tmp_loc_time_dict['none'] = none_list
                 except CodesInternalError as err:
                     print('Warning', warno, ':', 'CodesInternalError is happend at tmp_loc_time_dict in', in_file, file=sys.stderr)
-                    codes_release(bufr)
                     break
                 tmp_prop_dict = {}
                 try:
@@ -102,8 +94,8 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                             tmp_prop_dict[conf_row.name] = values
                 except CodesInternalError as err:
                     print('Warning', warno, ':', 'CodesInternalError is happend at tmp_prop_dict in', in_file, file=sys.stderr)
-                    codes_release(bufr)
                     break
+                codes_release(bufr)
                 if len(tmp_prop_dict) > 0 and len(tmp_loc_time_dict) > 0:
                     none_index_list = [index for index, value in enumerate(tmp_loc_time_dict['none']) if value == False]
                     tmp_loc_id_np = np.array([])
@@ -115,22 +107,27 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                     is_millisecond = False
                     conf_loc_time_name_keys_dict = {}
                     for conf_row in conf_loc_time_list:
+                        datatype_dict[conf_row.name] = conf_row.datatype
                         if conf_row.name in conf_loc_time_name_keys_dict:
                             conf_loc_time_name_keys_dict[conf_row.name] = conf_loc_time_name_keys_dict[conf_row.name] + [conf_row.key]
                         else:
                             conf_loc_time_name_keys_dict[conf_row.name] = [conf_row.key]
-                        if conf_row.name == 'location_id':
+                        if conf_row.name == 'location ID':
                             tmp_loc_id_list = tmp_loc_time_dict[conf_row.key]
+                            del_counter = 0
                             for none_index in none_index_list:
-                                del tmp_loc_id_list[none_index]
+                                del tmp_loc_id_list[none_index - del_counter]
+                                del_counter += 1
                             if len(tmp_loc_id_np) > 0:
                                 tmp_loc_id_np = tmp_loc_id_np + '_' + np.array(tmp_loc_id_list, dtype=object)
                             else:
                                 tmp_loc_id_np = np.array(tmp_loc_id_list, dtype=object)
                         elif conf_row.name == 'datetime':
                             tmp_datetime_list = tmp_loc_time_dict[conf_row.key]
+                            del_counter = 0
                             for none_index in none_index_list:
-                                del tmp_datetime_list[none_index]
+                                del tmp_datetime_list[none_index - del_counter]
+                                del_counter += 1
                             if len(tmp_datetime_np) > 0:
                                 tmp_datetime_np = tmp_datetime_np + np.array(tmp_datetime_list, dtype=object)
                             else:
@@ -139,36 +136,42 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                                 is_second = True
                             if conf_row.key == 'millisecond':
                                 is_millisecond = True
-                        elif conf_row.name == 'latitude__deg':
+                        elif conf_row.name == 'latitude [degree]':
                             tmp_latitude_list = tmp_loc_time_dict[conf_row.key]
+                            del_counter = 0
                             for none_index in none_index_list:
-                                del tmp_latitude_list[none_index]
+                                del tmp_latitude_list[none_index - del_counter]
+                                del_counter += 1
                             if len(tmp_latitude_np) > 0:
                                 tmp_latitude_np = tmp_latitude_np + np.array(tmp_latitude_list)
                             else:
                                 tmp_latitude_np = np.array(tmp_latitude_list)
-                        elif conf_row.name == 'longitude__deg':
+                        elif conf_row.name == 'longitude [degree]':
                             tmp_longitude_list = tmp_loc_time_dict[conf_row.key]
+                            del_counter = 0
                             for none_index in none_index_list:
-                                del tmp_longitude_list[none_index]
+                                del tmp_longitude_list[none_index - del_counter]
+                                del_counter += 1
                             if len(tmp_longitude_np) > 0:
                                 tmp_longitude_np = tmp_longitude_np + np.array(tmp_longitude_list)
                             else:
                                 tmp_longitude_np = np.array(tmp_longitude_list)
                         elif conf_row.name == 'height':
                             tmp_height_list = tmp_loc_time_dict[conf_row.key]
+                            del_counter = 0
                             for none_index in none_index_list:
-                                del tmp_height_list[none_index]
+                                del tmp_height_list[none_index - del_counter]
+                                del_counter += 1
                             if len(tmp_height_np) > 0:
                                 tmp_height_np = tmp_height_np + np.array(tmp_height_list)
                             else:
                                 tmp_height_np = np.array(tmp_height_list)
                     if len(tmp_loc_id_np) > 0 and len(tmp_datetime_np) > 0:
-                        if 'location_id' in loc_time_dict:
-                            loc_id_list = loc_time_dict['location_id']
-                            loc_time_dict['location_id'] = loc_id_list + tmp_loc_id_np.tolist()
-                        elif 'location_id' in conf_loc_time_name_keys_dict.keys():
-                            loc_time_dict['location_id'] = tmp_loc_id_np.tolist()
+                        if 'location ID' in loc_time_dict:
+                            loc_id_list = loc_time_dict['location ID']
+                            loc_time_dict['location ID'] = loc_id_list + tmp_loc_id_np.tolist()
+                        elif 'location ID' in conf_loc_time_name_keys_dict.keys():
+                            loc_time_dict['location ID'] = tmp_loc_id_np.tolist()
                         tmp_datetime_list = []
                         if not is_second:
                             tmp_datetime_list = [datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) for dt_str in tmp_datetime_np.tolist()]
@@ -181,22 +184,23 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                             loc_time_dict['datetime'] = datetime_list + tmp_datetime_list
                         elif 'datetime' in conf_loc_time_name_keys_dict.keys():
                             loc_time_dict['datetime'] = tmp_datetime_list
-                        if 'latitude__deg' in loc_time_dict:
-                            latitude_list = loc_time_dict['latitude__deg']
-                            loc_time_dict['latitude__deg'] = latitude_list + tmp_latitude_np.tolist()
-                        elif 'latitude__deg' in conf_loc_time_name_keys_dict.keys():
-                            loc_time_dict['latitude__deg'] = tmp_latitude_np.tolist()
-                        if 'longitude__deg' in loc_time_dict:
-                            longitude_list = loc_time_dict['longitude__deg']
-                            loc_time_dict['longitude__deg'] = longitude_list + tmp_longitude_np.tolist()
-                        elif 'longitude__deg' in conf_loc_time_name_keys_dict.keys():
-                            loc_time_dict['longitude__deg'] = tmp_longitude_np.tolist()
+                        if 'latitude [degree]' in loc_time_dict:
+                            latitude_list = loc_time_dict['latitude [degree]']
+                            loc_time_dict['latitude [degree]'] = latitude_list + tmp_latitude_np.tolist()
+                        elif 'latitude [degree]' in conf_loc_time_name_keys_dict.keys():
+                            loc_time_dict['latitude [degree]'] = tmp_latitude_np.tolist()
+                        if 'longitude [degree]' in loc_time_dict:
+                            longitude_list = loc_time_dict['longitude [degree]']
+                            loc_time_dict['longitude [degree]'] = longitude_list + tmp_longitude_np.tolist()
+                        elif 'longitude [degree]' in conf_loc_time_name_keys_dict.keys():
+                            loc_time_dict['longitude [degree]'] = tmp_longitude_np.tolist()
                         if 'height' in loc_time_dict:
                             height_list = loc_time_dict['height']
                             loc_time_dict['height'] = height_list + tmp_height_np.tolist()
                         elif 'height' in conf_loc_time_name_keys_dict.keys():
                             loc_time_dict['height'] = tmp_height_np.tolist()
                         for conf_row in conf_prop_list:
+                            datatype_dict[conf_row.name] = conf_row.datatype
                             tmp_prop_list = tmp_prop_dict[conf_row.name]
                             del_counter = 0
                             for none_index in none_index_list:
@@ -208,35 +212,34 @@ def convert_to_arrow(in_list_file, out_dir, cat, subcat, out_list_file, conf_loc
                                 prop_dict[conf_row.name] = prop_list + tmp_prop_list
                             else:
                                 prop_dict[conf_row.name] = tmp_prop_list
-                codes_release(bufr)
-            in_file_stream.close()
-        id_list = [id_num for id_num in range(1, len(loc_time_dict['datetime']) + 1)]
-        loc_time_data = [pa.array(id_list)]
-        name_list = ['id']
-        for key in loc_time_dict.keys():
-            loc_time_data.append(pa.array(loc_time_dict[key]))
-            name_list.append(key)
-        loc_time_batch = pa.record_batch(loc_time_data, names=name_list)
-        with open('location_datetime.arrow', 'bw') as out_f:
-            writer = pa.ipc.new_file(out_f, loc_time_batch.schema)
-            writer.write_batch(loc_time_batch)
+    id_list = [id_num for id_num in range(1, len(loc_time_dict['datetime']) + 1)]
+    loc_time_data = [pa.array(id_list, 'uint32')]
+    name_list = ['id']
+    for key in loc_time_dict.keys():
+        loc_time_data.append(pa.array(loc_time_dict[key], datatype_dict[key]))
+        name_list.append(key)
+    loc_time_batch = pa.record_batch(loc_time_data, names=name_list)
+    with open('location_datetime.arrow', 'bw') as out_f:
+        writer = pa.ipc.new_file(out_f, loc_time_batch.schema)
+        writer.write_batch(loc_time_batch)
+        writer.close()
+    for key in prop_dict.keys():
+        tmp_id_list = id_list.copy()
+        tmp_prop_list = prop_dict[key]
+        none_index_list = [index for index, value in enumerate(tmp_prop_list) if value == None]
+        del_counter = 0
+        for none_index in none_index_list:
+            del tmp_prop_list[none_index - del_counter]
+            del tmp_id_list[none_index - del_counter]
+            del_counter += 1
+        prop_data = []
+        prop_data.append(pa.array(tmp_id_list, 'uint32'))
+        prop_data.append(pa.array(tmp_prop_list, datatype_dict[key]))
+        prop_batch = pa.record_batch(prop_data, names=['id', key])
+        with open(key.split('[')[0].strip().replace(' ', '_') + '.arrow', 'bw') as out_f:
+            writer = pa.ipc.new_file(out_f, prop_batch.schema)
+            writer.write_batch(prop_batch)
             writer.close()
-        for key in prop_dict.keys():
-            tmp_prop_list = prop_dict[key]
-            tmp_id_list = id_list.copy()
-            none_index_list = [index for index, value in enumerate(tmp_prop_list) if value == None]
-            del_counter = 0
-            for none_index in none_index_list:
-                del tmp_prop_list[none_index - del_counter]
-                del tmp_id_list[none_index - del_counter]
-                del_counter += 1
-            prop_data = [pa.array(tmp_id_list), pa.array(tmp_prop_list)]
-            prop_batch = pa.record_batch(prop_data, names=['id', key])
-            with open(key + '.arrow', 'bw') as out_f:
-                writer = pa.ipc.new_file(out_f, prop_batch.schema)
-                writer.write_batch(prop_batch)
-                writer.close()
-
 
 def main():
     errno=198
@@ -286,9 +289,12 @@ def main():
         print('Error', errno, ':', config_properties, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
     try:
+        input_file_list = []
+        with open(args.input_list_file, 'r') as in_list_file_stream:
+            input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_location_time_list = list(csv.read_csv(config_location_time).to_pandas().itertuples())
         conf_properties_list = list(csv.read_csv(config_properties).to_pandas().itertuples())
-        convert_to_arrow(args.input_list_file, args.output_directory, args.category, args.subcategory, args.output_list_file, conf_location_time_list, conf_properties_list, args.debug)
+        convert_to_arrow(input_file_list, args.output_directory, args.category, args.subcategory, args.output_list_file, conf_location_time_list, conf_properties_list, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

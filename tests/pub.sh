@@ -23,10 +23,10 @@ opt_num=0
 for arg in "$@"; do
   case "${arg}" in
     '--closed' ) open=0; ope_num=1;;
-    '--help' ) echo "pub.sh raw_list_file_dir local_dir rclone_remote bucket pub_num [--closed]"; exit 0;;
+    '--help' ) echo "pub.sh raw_list_file_dir local_dir rclone_remote bucket pubsub_name parallel [--closed]"; exit 0;;
   esac
 done
-if test $# -lt `expr 5 + ${opt_num}`; then
+if test $# -lt `expr 6 + ${opt_num}`; then
   echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
@@ -38,29 +38,30 @@ fi
 local_dir=$2
 rclone_remote=$3
 bucket=$4
-pub_num=$5
+pubsub_name=$5
+parallel=$6
 if test ${open} -eq 1; then
     acl='open'
 else
     acl='closed'
 fi
-for raw_list_file in `ls -1 ${raw_list_file_dir} | grep -v tmp`; do
+for raw_list_file in `ls -1 ${raw_list_file_dir} | grep -v \.tmp$`; do
   now=`date "+%Y%m%d%H%M%S"`
-  mkdir -p ${local_dir}/${acl}/4PubSub/${pub_num}
-  mkdir -p ${local_dir}/${acl}/4PubSub_log/${pub_num}
-  grep ^${local_dir}/${acl}/ ${raw_list_file_dir}/${raw_list_file} | sed -e "s%^${local_dir}/${acl}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${acl}/4PubSub/${pub_num}/${now}.txt
-  if test -s ${local_dir}/${acl}/4PubSub/${pub_num}/${now}.txt; then
-    unpub_num=1
-    while test ${unpub_num} -ne 0; do
-      rm -f ${local_dir}/${acl}/4PubSub_log/${pub_num}/${now}.log
-      rclone --ignore-checksum --ignore-existing --no-update-modtime --no-traverse --stats 0 --timeout 1m --transfers 8 --s3-upload-cutoff 0 --log-level INFO --log-file ${local_dir}/${acl}/4PubSub_log/${pub_num}/${now}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pub_num}/${now}.txt ${local_dir}/${acl} ${rclone_remote}:${bucket}
-      unpub_num=`grep ERROR ${local_dir}/${acl}/4PubSub_log/${pub_num}/${now}.log | wc -l`
+  mkdir -p ${local_dir}/${acl}/4PubSub/${pubsub_name}
+  mkdir -p ${local_dir}/${acl}/4PubSub_log/${pubsub_name}
+  grep ^${local_dir}/${acl}/ ${raw_list_file_dir}/${raw_list_file} | sed -e "s%^${local_dir}/${acl}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${acl}/4PubSub/${pubsub_name}/${now}.txt
+  if test -s ${local_dir}/${acl}/4PubSub/${pubsub_name}/${now}.txt; then
+    unpubsub_name=1
+    while test ${unpubsub_name} -ne 0; do
+      rm -f ${local_dir}/${acl}/4PubSub_log/${pubsub_name}/${now}.log
+      rclone --ignore-checksum --ignore-existing --no-update-modtime --no-traverse --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level INFO --log-file ${local_dir}/${acl}/4PubSub_log/${pubsub_name}/${now}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pubsub_name}/${now}.txt ${local_dir}/${acl} ${rclone_remote}:${bucket}
+      unpubsub_name=`grep ERROR ${local_dir}/${acl}/4PubSub_log/${pubsub_name}/${now}.log | wc -l`
     done
-    unpub_num=1
-    while test ${unpub_num} -ne 0; do
-      rm -f ${local_dir}/${acl}/4PubSub_log/${pub_num}/${now}_index.log
-      rclone --ignore-checksum --ignore-existing --no-update-modtime --no-traverse --stats 0 --timeout 1m --transfers 8 --s3-upload-cutoff 0 --log-level INFO --log-file ${local_dir}/${acl}/4PubSub_log/${pub_num}/${now}_index.log copy ${local_dir}/${acl}/4PubSub/${pub_num}/${now}.txt ${rclone_remote}:${bucket}/4PubSub/${pub_num}
-      unpub_num=`grep ERROR ${local_dir}/${acl}/4PubSub_log/${pub_num}/${now}_index.log | wc -l`
+    unpubsub_name=1
+    while test ${unpubsub_name} -ne 0; do
+      rm -f ${local_dir}/${acl}/4PubSub_log/${pubsub_name}/${now}_index.log
+      rclone --ignore-checksum --ignore-existing --no-update-modtime --no-traverse --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level INFO --log-file ${local_dir}/${acl}/4PubSub_log/${pubsub_name}/${now}_index.log copy ${local_dir}/${acl}/4PubSub/${pubsub_name}/${now}.txt ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}
+      unpubsub_name=`grep ERROR ${local_dir}/${acl}/4PubSub_log/${pubsub_name}/${now}_index.log | wc -l`
     done
     rm -f ${raw_list_file_dir}/${raw_list_file}
   fi
