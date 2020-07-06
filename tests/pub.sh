@@ -48,18 +48,18 @@ fi
 pub_datetime=`date -u "+%Y%m%d%H%M%S"`
 mkdir -p ${local_dir}/${acl}/4PubSub/${pubsub_name}
 mkdir -p ${local_dir}/${acl}/4Pub_log/${pubsub_name}
-grep ^${local_dir}/${acl}/ ${raw_list_file_dir}/${raw_list_file} | sed -e "s%^${local_dir}/${acl}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt
+grep ^${local_dir}/${acl}/ ${raw_list_file} | sed -e "s%^${local_dir}/${acl}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt
 if test -s ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt; then
   unpub_num=1
   while test ${unpub_num} -ne 0; do
-    rm -f ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}.log
-    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${local_dir}/${acl} ${rclone_remote}:${bucket}
-    unpub_num=`grep ERROR ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}.log | wc -l`
+    now=`date -u "+%Y%m%d%H%M%S"`
+    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${local_dir}/${acl} ${rclone_remote}:${bucket}
+    unpub_num=`grep ERROR ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}.log | wc -l`
   done
   unpub_num=1
   while test ${unpub_num} -ne 0; do
-    rm -f ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_index.log
-    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_index.log copy ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}
-    unpub_num=`grep ERROR ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_index.log | wc -l`
+    now=`date -u "+%Y%m%d%H%M%S"`
+    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}
+    unpub_num=`grep ERROR ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}_index.log | wc -l`
   done
 fi

@@ -21,11 +21,9 @@ set -e
 mkdir -p wis_jma_urgent/cached
 is_download_from_wis_jma_urgent_an_bufr_to_cache_running=`touch download_from_wis_jma_urgent_an_bufr_to_cache.pid && cat download_from_wis_jma_urgent_an_bufr_to_cache.pid | xargs -I{} ps --no-headers -q {} | wc -l`
 if test ${is_download_from_wis_jma_urgent_an_bufr_to_cache_running} -eq 0; then
-  ./download_from_wis_jma_urgent_an_bufr_to_cache.sh >> wis_jma_urgent/download_from_wis_jma_urgent_an_bufr_to_cache.log &
+  ./download_from_wis_jma_urgent_an_bufr_to_cache.sh >> wis_jma_urgent/download_from_wis_jma_urgent_an_bufr_to_cache.log
+  for raw_list_file in `ls -1 wis_jma_urgent/cached`; do
+    ./pub.sh wis_jma_urgent/cached/${raw_list_file} cache iij1 japan-meteorological-agency-open-data JMA_1 8 >> wis_jma_urgent/pub.log && rm -f wis_jma_urgent/cached/${raw_list_file} &
+  done &
   echo $! > download_from_wis_jma_urgent_an_bufr_to_cache.pid
-fi
-is_pub_wis_jma_urgent_an_bufr_running=`touch pub_wis_jma_urgent_an_bufr.pid && cat pub_wis_jma_urgent_an_bufr.pid | xargs -I{} ps --no-headers -q {} | wc -l`
-if test ${is_pub_wis_jma_urgent_an_bufr_running} -eq 0; then
-  ./pub.sh wis_jma_urgent/cached cache iij1 japan-meteorological-agency-open-data JMA_urgent_1 8 >> wis_jma_urgent/pub.log & 
-  echo $! > pub_wis_jma_urgent_an_bufr.pid
 fi

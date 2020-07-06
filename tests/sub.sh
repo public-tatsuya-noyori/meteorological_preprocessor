@@ -51,15 +51,18 @@ for pubsub_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file $
   fi
   local_latest_created=`ls -1 ${local_dir}/${acl}/4PubSub/${pubsub_name} | tail -1`
   for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${pubsub_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | sort -u`; do
-  unsub_num=1
-  while test ${unsub_num} -ne 0; do
-    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}/${newly_created} ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}.tmp
-    unsub_num=`grep ERROR ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}_index.log | wc -l`
+    unsub_num=1
+    while test ${unsub_num} -ne 0; do
+      now=`date -u "+%Y%m%d%H%M%S"`
+      rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}/${newly_created} ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}.tmp
+      unsub_num=`grep ERROR ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log | wc -l`
+    done
+    unsub_num=1
+    while test ${unsub_num} -ne 0; do
+      now=`date -u "+%Y%m%d%H%M%S"`
+      rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${acl}
+      unsub_num=`grep ERROR ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log | wc -l`
+    done
+    mv -f ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}.tmp ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}
   done
-  unsub_num=1
-  while test ${unsub_num} -ne 0; do
-    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${acl}
-    unsub_num=`grep ERROR ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}.log | wc -l`
-  done
-  mv -f ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}.tmp ${local_dir}/${acl}/4PubSub/${pubsub_name}/${newly_created}
 done

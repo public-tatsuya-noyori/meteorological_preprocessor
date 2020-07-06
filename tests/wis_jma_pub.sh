@@ -27,7 +27,7 @@ fi
 is_pub_wis_jma_an_bufr_running=`touch pub_wis_jma_an_bufr.pid && cat pub_wis_jma_an_bufr.pid | xargs -I{} ps --no-headers -q {} | wc -l`
 if test ${is_pub_wis_jma_an_bufr_running} -eq 0; then
   for raw_list_file in `ls -1 wis_jma/cached`; do
-    ./pub.sh wis_jma/cached cache iij1 japan-meteorological-agency-open-data JMA_1 8 >> wis_jma/pub.log && rm -f wis_jma/cached/${raw_list_file} &
-    echo $! > pub_wis_jma_an_bufr.pid
-  done
+    ./pub.sh wis_jma/cached/${raw_list_file} cache iij1 japan-meteorological-agency-open-data JMA_1 8 >> wis_jma/pub.log && rm -f wis_jma/cached/${raw_list_file}
+  done &
+  echo $! > pub_wis_jma_an_bufr.pid
 fi

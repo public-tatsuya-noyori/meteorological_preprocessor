@@ -31,4 +31,4 @@ num_days_ago=$1
 rclone_remote=$2
 bucket=$3
 parallel=$4
-rclone --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket}
+rclone --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket}
