@@ -17,21 +17,18 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -evx
-open=1
-opt_num=0
+set -e
 for arg in "$@"; do
   case "${arg}" in
     '--help' ) echo "del.sh num_days_ago rclone_remote bucket parallel"; exit 0;;
   esac
 done
-if test $# -lt `expr 4 + ${opt_num}`; then
+if test $# -lt 4; then
   echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
-date=`date +"%Y%m%d" --date "$1 days ago"`
 num_days_ago=$1
 rclone_remote=$2
 bucket=$3
 parallel=$4
-rclone --ignore-checksum --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket}
+rclone --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket}

@@ -40,7 +40,7 @@ if test ${err_num} -eq 0; then
   if test ${is_pre} -eq 1 -a -s wis_jma_urgent/created.txt; then
     grep -E '/(Alphanumeric|BUFR)/' wis_jma_urgent/created.txt > wis_jma_urgent/tmp_created.txt
     mv -f wis_jma_urgent/tmp_created.txt wis_jma_urgent/created.txt 
-    now=`date "+%Y%m%d%H%M%S"`
+    now=`date -u "+%Y%m%d%H%M%S"`
     created_num=`cat wis_jma_urgent/created.txt | wc -l`
     while test ${created_num} -ne 0; do
       rm -rf wis_jma_urgent/downloaded wis_jma_urgent/aria2c.log wis_jma_urgent/get_file_stdout.txt
