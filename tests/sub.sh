@@ -49,7 +49,7 @@ for pubsub_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file $
     latest_created=`rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${pubsub_name} | tail -1`
     rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}.log copy ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}/${latest_created} ${local_dir}/${acl}/4PubSub/${pubsub_name}
   fi
-  local_latest_created=`ls -1 ${local_dir}/${acl}/4PubSub/${pubsub_name} | tail -1`
+  local_latest_created=`ls -1 ${local_dir}/${acl}/4PubSub/${pubsub_name} | grep -v ^.*\.tmp$ | tail -1`
   for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${acl}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${pubsub_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | sort -u`; do
     unsub_num=1
     while test ${unsub_num} -ne 0; do
