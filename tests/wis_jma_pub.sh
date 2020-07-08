@@ -26,7 +26,7 @@ if test ${is_download_from_wis_jma_an_bufr_to_cache_running} -eq 0; then
 fi
 is_pub_wis_jma_an_bufr_running=`touch pub_wis_jma_an_bufr.pid && cat pub_wis_jma_an_bufr.pid | xargs -I{} ps --no-headers -q {} | wc -l`
 if test ${is_pub_wis_jma_an_bufr_running} -eq 0; then
-  for raw_list_file in `ls -1 wis_jma/cached`; do
+  for raw_list_file in `ls -1 wis_jma/cached | grep -v '^.*\.tmp$'`; do
     ./pub.sh wis_jma/cached/${raw_list_file} cache iij1 japan-meteorological-agency-open-data JMA_1 8 >> wis_jma/pub.log && rm -f wis_jma/cached/${raw_list_file}
   done &
   echo $! > pub_wis_jma_an_bufr.pid

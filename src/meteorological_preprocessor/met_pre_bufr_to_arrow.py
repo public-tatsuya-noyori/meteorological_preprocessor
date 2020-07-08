@@ -67,6 +67,8 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                             values = [None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values]
                                     else:
                                         values = [None if value < conf_row.min or value > conf_row.max else value for value in values]
+                                    if conf_row.name == 'longitude [degree]':
+                                        values = [conf_row.max if value == conf_row.min else value for value in values]
                                 tmp_loc_time_dict[conf_row.key] = values
                                 if conf_row.name == 'location ID' or conf_row.name == 'datetime':
                                     tmp_none_list = [False if value == None else True for value in values]
@@ -216,53 +218,54 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                     prop_dict[conf_row.name] = prop_list + tmp_prop_list
                                 else:
                                     prop_dict[conf_row.name] = tmp_prop_list
-        id_list = [id_num for id_num in range(0, len(loc_time_dict['datetime']))]
-        loc_time_data = [pa.array(id_list, 'uint32')]
-        name_list = ['id']
-        for key in loc_time_dict.keys():
-            if key == 'datetime':
-                if is_millisecond:
-                    loc_time_data.append(pa.array(loc_time_dict[key], pa.timestamp('ms', tz='utc')))
+        if 'datetime' in loc_time_dict:
+            id_list = [id_num for id_num in range(0, len(loc_time_dict['datetime']))]
+            loc_time_data = [pa.array(id_list, 'uint32')]
+            name_list = ['id']
+            for key in loc_time_dict.keys():
+                if key == 'datetime':
+                    if is_millisecond:
+                        loc_time_data.append(pa.array(loc_time_dict[key], pa.timestamp('ms', tz='utc')))
+                    else:
+                        loc_time_data.append(pa.array(loc_time_dict[key], pa.timestamp('s', tz='utc')))
                 else:
-                    loc_time_data.append(pa.array(loc_time_dict[key], pa.timestamp('s', tz='utc')))
-            else:
-                loc_time_data.append(pa.array(loc_time_dict[key], datatype_dict[key]))
-            name_list.append(key)
-        datetime_directory_list = [str(datetime.year).zfill(4) + str(datetime.month).zfill(2) + str(datetime.day).zfill(2) + str(datetime.hour).zfill(2) for datetime in loc_time_dict['datetime']]
-        for datetime_directory in set(datetime_directory_list):
-            datetime_index_list = [index for index, value in enumerate(loc_time_dict['datetime']) if value.year == int(datetime_directory[0:4]) and value.month == int(datetime_directory[4:6]) and value.day == int(datetime_directory[6:8]) and value.hour == int(datetime_directory[8:10])]
-            tmp_loc_time_data = [loc_time.take(pa.array(datetime_index_list)) for loc_time in loc_time_data]
-            if len(tmp_loc_time_data) > 0:
-                out_directory_list = [out_dir, cccc, 'location_datetime']
-                out_directory = '/'.join(out_directory_list)
-                os.makedirs(out_directory + '/' + datetime_directory, exist_ok=True)
-                out_file_list = [out_directory, datetime_directory, out_file_date_hour_arrow]
-                out_file = '/'.join(out_file_list)
-                with open(out_file, 'bw') as out_f:
-                    loc_time_batch = pa.record_batch(tmp_loc_time_data, names=name_list)
-                    writer = pa.ipc.new_file(out_f, loc_time_batch.schema)
-                    writer.write_batch(loc_time_batch)
-                    writer.close()
-                    print(out_file, file=out_list_file)
-            for key in prop_dict.keys():
-                datetime_id_list = pa.array(id_list, 'uint32').take(pa.array(datetime_index_list))
-                datetime_prop_data = pa.array(prop_dict[key], datatype_dict[key]).take(pa.array(datetime_index_list))
-                value_index_list = [index for index, value in enumerate(datetime_prop_data) if value != None]
-                if len(value_index_list) > 0:
-                    prop_data = []
-                    prop_data.append(datetime_id_list.take(pa.array(value_index_list)))
-                    prop_data.append(datetime_prop_data.take(pa.array(value_index_list)))
-                    out_directory_list = [out_dir, cccc, key.split('[')[0].strip().replace(' ', '_')]
+                    loc_time_data.append(pa.array(loc_time_dict[key], datatype_dict[key]))
+                name_list.append(key)
+            datetime_directory_list = [str(datetime.year).zfill(4) + str(datetime.month).zfill(2) + str(datetime.day).zfill(2) + str(datetime.hour).zfill(2) for datetime in loc_time_dict['datetime']]
+            for datetime_directory in set(datetime_directory_list):
+                datetime_index_list = [index for index, value in enumerate(loc_time_dict['datetime']) if value.year == int(datetime_directory[0:4]) and value.month == int(datetime_directory[4:6]) and value.day == int(datetime_directory[6:8]) and value.hour == int(datetime_directory[8:10])]
+                tmp_loc_time_data = [loc_time.take(pa.array(datetime_index_list)) for loc_time in loc_time_data]
+                if len(tmp_loc_time_data) > 0:
+                    out_directory_list = [out_dir, cccc, 'bufr_to_arrow', cat, subcat, 'location_datetime']
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory + '/' + datetime_directory, exist_ok=True)
                     out_file_list = [out_directory, datetime_directory, out_file_date_hour_arrow]
                     out_file = '/'.join(out_file_list)
                     with open(out_file, 'bw') as out_f:
-                        prop_batch = pa.record_batch(prop_data, names=['id', key])
-                        writer = pa.ipc.new_file(out_f, prop_batch.schema)
-                        writer.write_batch(prop_batch)
+                        loc_time_batch = pa.record_batch(tmp_loc_time_data, names=name_list)
+                        writer = pa.ipc.new_file(out_f, loc_time_batch.schema)
+                        writer.write_batch(loc_time_batch)
                         writer.close()
                         print(out_file, file=out_list_file)
+                for key in prop_dict.keys():
+                    datetime_id_list = pa.array(id_list, 'uint32').take(pa.array(datetime_index_list))
+                    datetime_prop_data = pa.array(prop_dict[key], datatype_dict[key]).take(pa.array(datetime_index_list))
+                    value_index_list = [index for index, value in enumerate(datetime_prop_data) if value != None]
+                    if len(value_index_list) > 0:
+                        prop_data = []
+                        prop_data.append(datetime_id_list.take(pa.array(value_index_list)))
+                        prop_data.append(datetime_prop_data.take(pa.array(value_index_list)))
+                        out_directory_list = [out_dir, cccc, 'bufr_to_arrow', cat, subcat, key.split('[')[0].strip().replace(' ', '_')]
+                        out_directory = '/'.join(out_directory_list)
+                        os.makedirs(out_directory + '/' + datetime_directory, exist_ok=True)
+                        out_file_list = [out_directory, datetime_directory, out_file_date_hour_arrow]
+                        out_file = '/'.join(out_file_list)
+                        with open(out_file, 'bw') as out_f:
+                            prop_batch = pa.record_batch(prop_data, names=['id', key])
+                            writer = pa.ipc.new_file(out_f, prop_batch.schema)
+                            writer.write_batch(prop_batch)
+                            writer.close()
+                            print(out_file, file=out_list_file)
 
 def main():
     errno=198
