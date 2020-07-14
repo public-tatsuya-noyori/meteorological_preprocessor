@@ -183,7 +183,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                         print('Debug', ':', 'file_path =', out_file, file=sys.stderr)
                     if os.access(out_file, os.F_OK):
                         with open(out_file, 'rb') as out_file_stream:
-                            if message == out_file_stream.read():
+                            if len(message) == os.path.getsize(out_file) and message == out_file_stream.read():
                                 if debug:
                                     print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
                                 return ''
@@ -275,7 +275,7 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                         print('Debug', ':', 'file_path =', out_file, file=sys.stderr)
                     if os.access(out_file, os.F_OK):
                         with open(out_file, 'rb') as out_file_stream:
-                            if message == out_file_stream.read():
+                            if len(message) == os.path.getsize(out_file) and message == out_file_stream.read():
                                 if debug:
                                     print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
                                 return ''
