@@ -18,15 +18,12 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
-open=1
-opt_num=0
 for arg in "$@"; do
   case "${arg}" in
-    '--closed' ) open=0; ope_num=1;;
-    '--help' ) echo "pub.sh raw_list_file local_dir rclone_remote bucket pubsub_name parallel [--closed]"; exit 0;;
+    '--help' ) echo "pub.sh raw_list_file local_dir rclone_remote bucket pubsub_name parallel access"; exit 0;;
   esac
 done
-if test $# -lt `expr 6 + ${opt_num}`; then
+if test $# -lt `expr 7 + ${opt_num}`; then
   echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
@@ -40,26 +37,22 @@ rclone_remote=$3
 bucket=$4
 pubsub_name=$5
 parallel=$6
-if test ${open} -eq 1; then
-  acl='open'
-else
-  acl='closed'
-fi
+access=$7
 pub_datetime=`date -u "+%Y%m%d%H%M%S"`
-mkdir -p ${local_dir}/${acl}/4PubSub/${pubsub_name}
-mkdir -p ${local_dir}/${acl}/4Pub_log/${pubsub_name}
-grep ^${local_dir}/${acl}/ ${raw_list_file} | sed -e "s%^${local_dir}/${acl}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt
-if test -s ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt; then
+mkdir -p ${local_dir}/${access}/4PubSub/${pubsub_name}
+mkdir -p ${local_dir}/${access}/4Pub_log/${pubsub_name}
+grep ^${local_dir}/${access}/ ${raw_list_file} | sed -e "s%^${local_dir}/${access}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${access}/4PubSub/${pubsub_name}/${pub_datetime}.txt
+if test -s ${local_dir}/${access}/4PubSub/${pubsub_name}/${pub_datetime}.txt; then
   unpub_num=1
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
-    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${local_dir}/${acl} ${rclone_remote}:${bucket}
-    unpub_num=`grep ERROR ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}.log | wc -l`
+    rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
+    unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}.log | wc -l`
   done
   unpub_num=1
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
-    rclone --ignore-checksum --ignore-existing --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${acl}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}
-    unpub_num=`grep ERROR ${local_dir}/${acl}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}_index.log | wc -l`
+    rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${access}/4PubSub/${pubsub_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${pubsub_name}
+    unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${pubsub_name}/${pub_datetime}_${now}_index.log | wc -l`
   done
 fi
