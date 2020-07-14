@@ -44,7 +44,7 @@ if test $# -ge 9; then
 fi
 sub_datetime=`date -u "+%Y%m%d%H%M%S"`
 mkdir -p ${local_dir}/${access}/4Sub_log/${sub_name}
-for pubsub_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub | grep ${pubsub_name_pattern} | grep -v '^ *$' | sort -u`; do
+for pubsub_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub | grep -E "${pubsub_name_pattern}" | grep -v '^ *$' | sort -u`; do
   if test ! -d ${local_dir}/${access}/4PubSub/${pubsub_name}; then
     mkdir -p ${local_dir}/${access}/4PubSub/${pubsub_name}
     latest_created=`rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${pubsub_name} | tail -1`
@@ -60,10 +60,10 @@ for pubsub_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file $
     done
     if test -n "${include_pattern}"; then
       if test -n "${exclude_pattern}"; then
-        match_list=`cat ${local_dir}/${access}/4PubSub/${pubsub_name}/${newly_created}.tmp | grep -v "${exclude_pattern}" | grep "${include_pattern}" | uniq`
+        match_list=`cat ${local_dir}/${access}/4PubSub/${pubsub_name}/${newly_created}.tmp | grep -v -E "${exclude_pattern}" | grep -E "${include_pattern}" | uniq`
 	echo "${match_list}" > ${local_dir}/${access}/4PubSub/${pubsub_name}/${newly_created}.tmp
       else
-        match_list=`cat ${local_dir}/${access}/4PubSub/${pubsub_name}/${newly_created}.tmp | grep "${include_pattern}" | uniq`
+        match_list=`cat ${local_dir}/${access}/4PubSub/${pubsub_name}/${newly_created}.tmp | grep -E "${include_pattern}" | uniq`
 	echo "${match_list}" > ${local_dir}/${access}/4PubSub/${pubsub_name}/${newly_created}.tmp
       fi
     fi
