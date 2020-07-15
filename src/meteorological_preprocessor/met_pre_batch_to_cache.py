@@ -95,8 +95,9 @@ def get_grib_subdir_list(grib_file):
 
 def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug):
     warno = 187
+    in_file_name = os.path.basename(in_file)
     for conf_row in conf_list:
-        if re.match(conf_row.file_name_pattern, os.path.basename(in_file)):
+        if re.match(conf_row.file_name_pattern, in_file_name):
             ttaaii = ''
             cccc = ''
             ddhhmm = ''
@@ -162,31 +163,37 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             out_directory = '/'.join(out_directory_list)
             os.makedirs(out_directory, exist_ok=True)
             if ttaaii:
+                out_file_prefix_list = []
+                out_file_prefix_list.append(out_directory)
+                out_file_prefix_list.append('/A_')
+                out_file_prefix_list.append(ttaaii)
+                out_file_prefix_list.append(cccc)
+                out_file_prefix_list.append(ddhhmm)
+                out_file_prefix_list.append(bbb)
+                out_file_prefix_list.append('_C_')
+                out_file_prefix_list.append(my_cccc)
+                out_file_prefix_list.append('_')
+                out_file_prefix_list.append(data_date + ddhhmm[2:6])
+                out_file_prefix_list.append('00_')
+                out_file_prefix = ''.join(out_file_prefix_list)
                 for out_file_ext_counter in range(1, 999):
-                    out_file_list = []
-                    out_file_list.append(out_directory)
-                    out_file_list.append('/A_')
-                    out_file_list.append(ttaaii)
-                    out_file_list.append(cccc)
-                    out_file_list.append(ddhhmm)
-                    out_file_list.append(bbb)
-                    out_file_list.append('_C_')
-                    out_file_list.append(my_cccc)
-                    out_file_list.append('_')
-                    out_file_list.append(data_date + ddhhmm[2:6])
-                    out_file_list.append('00_')
+                    out_file_list = [out_file_prefix]
                     out_file_list.append(str(out_file_ext_counter).zfill(3))
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if debug:
-                        print('Debug', ':', 'file_path =', out_file, file=sys.stderr)
-                    if os.access(out_file, os.F_OK):
-                        with open(out_file, 'rb') as out_file_stream:
-                            if len(message) == os.path.getsize(out_file) and message == out_file_stream.read():
-                                if debug:
-                                    print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
-                                return ''
+                    if os.path.exists(out_file) and len(message) == os.path.getsize(out_file):
+                        next_out_file_list = [out_file_prefix]
+                        next_out_file_list.append(str(out_file_ext_counter + 1).zfill(3))
+                        next_out_file_list.append('.')
+                        next_out_file_list.append(conf_row.file_extension)
+                        next_out_file = ''.join(next_out_file_list)
+                        if not os.path.exists(next_out_file):
+                            with open(out_file, 'rb') as out_file_stream:
+                                if message == out_file_stream.read():
+                                    if debug:
+                                        print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
+                                    return ''
                     else:
                         with open(out_file, 'wb') as out_file_stream:
                             out_file_stream.write(message)
@@ -198,7 +205,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_file_list.append(out_directory)
                 out_file_list.append(os.path.basename(in_file))
                 out_file = '/'.join(out_file_list)
-                if os.access(out_file, os.F_OK):
+                if os.path.exists(out_file):
                     if debug:
                         print('Debug', ':', in_file, 'already exists', '. The file is not created', file=sys.stderr)
                     return ''
@@ -254,38 +261,46 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                     out_directory_list.append(data_date + ddhhmm[2:4])
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
+                out_file_prefix_list = []
+                out_file_prefix_list.append(out_directory)
+                out_file_prefix_list.append('/A_')
+                out_file_prefix_list.append(ttaaii)
+                out_file_prefix_list.append(cccc)
+                out_file_prefix_list.append(ddhhmm)
+                out_file_prefix_list.append(bbb)
+                out_file_prefix_list.append('_C_')
+                out_file_prefix_list.append(my_cccc)
+                out_file_prefix_list.append('_')
+                out_file_prefix_list.append(data_date + ddhhmm[2:6])
+                out_file_prefix_list.append('00_')
+                out_file_prefix = ''.join(out_file_prefix_list)
                 for out_file_ext_counter in range(1, 999):
-                    out_file_list = []
-                    out_file_list.append(out_directory)
-                    out_file_list.append('/A_')
-                    out_file_list.append(ttaaii)
-                    out_file_list.append(cccc)
-                    out_file_list.append(ddhhmm)
-                    out_file_list.append(bbb)
-                    out_file_list.append('_C_')
-                    out_file_list.append(my_cccc)
-                    out_file_list.append('_')
-                    out_file_list.append(data_date + ddhhmm[2:6])
-                    out_file_list.append('00_')
+                    out_file_list = [out_file_prefix]
                     out_file_list.append(str(out_file_ext_counter).zfill(3))
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if debug:
-                        print('Debug', ':', 'file_path =', out_file, file=sys.stderr)
-                    if os.access(out_file, os.F_OK):
-                        with open(out_file, 'rb') as out_file_stream:
-                            if len(message) == os.path.getsize(out_file) and message == out_file_stream.read():
-                                if debug:
-                                    print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
-                                return ''
+                    if os.path.exists(out_file) and len(message) == os.path.getsize(out_file):
+                        next_out_file_list = [out_file_prefix]
+                        next_out_file_list.append(str(out_file_ext_counter + 1).zfill(3))
+                        next_out_file_list.append('.')
+                        next_out_file_list.append(conf_row.file_extension)
+                        next_out_file = ''.join(next_out_file_list)
+                        if not os.path.exists(next_out_file):
+                            with open(out_file, 'rb') as out_file_stream:
+                                if message == out_file_stream.read():
+                                    if debug:
+                                        print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
+                                    return ''
                     else:
                         with open(out_file, 'wb') as out_file_stream:
                             out_file_stream.write(message)
                             return out_file
                 print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, 'on', in_file, '. The file is not created', file=sys.stderr)
+                return ''
             else:
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
+                return ''
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
