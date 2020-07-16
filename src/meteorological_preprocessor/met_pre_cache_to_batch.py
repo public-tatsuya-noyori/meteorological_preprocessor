@@ -137,7 +137,7 @@ def convert_to_batch(my_cccc, in_file_list, seq_num, file_ext, out_dir, out_list
         out_seq_num_list.append(str(file_seq_num + 1))
         out_seq_num_list.append('\n')
         out_seq_num_file_stream.write(''.join(out_seq_num_list))
-    print('Info', ':', out_batch_file_counter, 'batch files have been saved.', file=sys.stderr)
+    print('Info', ':', out_batch_file_counter, 'batch files have been created.', file=sys.stderr)
 
 def main():
     errno=198

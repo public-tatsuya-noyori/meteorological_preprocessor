@@ -93,7 +93,7 @@ def get_grib_subdir_list(grib_file):
         return []
     return subdir_list
 
-def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug):
+def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug):
     warno = 187
     in_file_name = os.path.basename(in_file)
     for conf_row in conf_list:
@@ -182,21 +182,33 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if os.path.exists(out_file) and len(message) == os.path.getsize(out_file):
-                        next_out_file_list = [out_file_prefix]
-                        next_out_file_list.append(str(out_file_ext_counter + 1).zfill(3))
-                        next_out_file_list.append('.')
-                        next_out_file_list.append(conf_row.file_extension)
-                        next_out_file = ''.join(next_out_file_list)
-                        if not os.path.exists(next_out_file):
-                            with open(out_file, 'rb') as out_file_stream:
-                                if message == out_file_stream.read():
-                                    if debug:
-                                        print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
-                                    return ''
-                    else:
+                    if out_file in created_out_file_list or os.path.exists(out_file):
+                        continue
+                    elif out_file_ext_counter == 1:
                         with open(out_file, 'wb') as out_file_stream:
                             out_file_stream.write(message)
+                        return out_file
+                    else:
+                        previous_out_file_list = [out_file_prefix]
+                        previous_out_file_list.append(str(out_file_ext_counter - 1).zfill(3))
+                        previous_out_file_list.append('.')
+                        previous_out_file_list.append(conf_row.file_extension)
+                        previous_out_file = ''.join(previous_out_file_list)
+                        if os.path.exists(previous_out_file) and len(message) == os.path.getsize(previous_out_file):
+                            previous_out_file_message = bytearray()
+                            with open(previous_out_file, 'rb') as previous_out_file_stream:
+                                previous_out_file_message = previous_out_file_stream.read()
+                            if message == previous_out_file_message:
+                                if debug:
+                                    print('Debug', ':', out_file, 'is duplicate content. The file is not created.', file=sys.stderr)
+                                return ''
+                            else:
+                                with open(out_file, 'wb') as out_file_stream:
+                                    out_file_stream.write(message)
+                                return out_file
+                        else:
+                            with open(out_file, 'wb') as out_file_stream:
+                                out_file_stream.write(message)
                             return out_file
                 print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, '. The file is not created', file=sys.stderr)
                 return ''
@@ -212,11 +224,11 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 else:
                     with open(out_file, 'wb') as out_file_stream:
                         out_file_stream.write(message)
-                        return out_file
+                    return out_file
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
-def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug):
+def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug):
     warno = 188
     ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
     if len(ttaaii_cccc_ddhhmm_bbb_data_date_list) != 5:
@@ -280,21 +292,33 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if os.path.exists(out_file) and len(message) == os.path.getsize(out_file):
-                        next_out_file_list = [out_file_prefix]
-                        next_out_file_list.append(str(out_file_ext_counter + 1).zfill(3))
-                        next_out_file_list.append('.')
-                        next_out_file_list.append(conf_row.file_extension)
-                        next_out_file = ''.join(next_out_file_list)
-                        if not os.path.exists(next_out_file):
-                            with open(out_file, 'rb') as out_file_stream:
-                                if message == out_file_stream.read():
-                                    if debug:
-                                        print('Debug', ':', in_file, 'is duplicate content. The file is not created.', file=sys.stderr)
-                                    return ''
-                    else:
+                    if out_file in created_out_file_list or os.path.exists(out_file):
+                        continue
+                    elif out_file_ext_counter == 1:
                         with open(out_file, 'wb') as out_file_stream:
                             out_file_stream.write(message)
+                        return out_file
+                    else:
+                        previous_out_file_list = [out_file_prefix]
+                        previous_out_file_list.append(str(out_file_ext_counter - 1).zfill(3))
+                        previous_out_file_list.append('.')
+                        previous_out_file_list.append(conf_row.file_extension)
+                        previous_out_file = ''.join(previous_out_file_list)
+                        if os.path.exists(previous_out_file) and len(message) == os.path.getsize(previous_out_file):
+                            previous_out_file_message = bytearray()
+                            with open(previous_out_file, 'rb') as previous_out_file_stream:
+                                previous_out_file_message = previous_out_file_stream.read()
+                            if message == previous_out_file_message:
+                                if debug:
+                                    print('Debug', ':', out_file, 'is duplicate content. The file is not created.', file=sys.stderr)
+                                return ''
+                            else:
+                                with open(out_file, 'wb') as out_file_stream:
+                                    out_file_stream.write(message)
+                                return out_file
+                        else:
+                            with open(out_file, 'wb') as out_file_stream:
+                                out_file_stream.write(message)
                             return out_file
                 print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, 'on', in_file, '. The file is not created', file=sys.stderr)
                 return ''
@@ -306,7 +330,7 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
 
 def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_file, conf_list, debug):
     warno = 189
-    out_file_counter = 0
+    created_out_file_list = []
     for in_file in input_file_list:
         if debug:
             print('Debug', ':', 'in_file =', in_file, file=sys.stderr)
@@ -352,14 +376,14 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                     else:
                         message.extend(start_byte4)
                         message.extend(in_file_stream.read())
-                        out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug)
+                        out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug)
                         if out_file:
+                            created_out_file_list.append(out_file)
                             print(out_file, file=out_list_file)
-                            out_file_counter += 1
                         break
                     if message_length <= 0:
                         if debug:
-                            print('Debug', ':', 'The message length of', in_file, 'is invalid. (<=0)', bbb, file=sys.stderr)
+                            print('Debug', ':', 'The message length of', in_file, 'is invalid. (<=0)', file=sys.stderr)
                         break
                 except:
                     print('Warning', warno, ':', 'The bytes of message length on', in_file, 'are not strings.', file=sys.stderr)
@@ -384,10 +408,10 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                     else:
                         break
                     message_counter += 1
-                out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug)
+                out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug)
                 if out_file:
+                    created_out_file_list.append(out_file)
                     print(out_file, file=out_list_file)
-                    out_file_counter += 1
                 try:
                     byte4 = in_file_stream.read(4)
                     if len(byte4) < 4:
@@ -396,7 +420,7 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                 except:
                     start_char4 = None
                     print('Warning', warno, ':', 'The start 4 bytes of the message on', in_file, 'are not strings.', file=sys.stderr)
-    print('Info', ':', out_file_counter, 'files have been saved.', file=sys.stderr)
+    print('Info', ':', len(created_out_file_list), 'files have been created.', file=sys.stderr)
 
 def main():
     errno=198
