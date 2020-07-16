@@ -182,7 +182,9 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if out_file in created_out_file_list or os.path.exists(out_file):
+                    if out_file in created_out_file_list 
+                        continue
+                    elif os.path.exists(out_file):
                         continue
                     elif out_file_ext_counter == 1:
                         with open(out_file, 'wb') as out_file_stream:
@@ -292,7 +294,9 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if out_file in created_out_file_list or os.path.exists(out_file):
+                    if out_file in created_out_file_list:
+                        continue
+                    elif os.path.exists(out_file):
                         continue
                     elif out_file_ext_counter == 1:
                         with open(out_file, 'wb') as out_file_stream:
