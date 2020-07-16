@@ -182,7 +182,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
-                    if out_file in created_out_file_list 
+                    if out_file in created_out_file_list:
                         continue
                     elif os.path.exists(out_file):
                         continue
