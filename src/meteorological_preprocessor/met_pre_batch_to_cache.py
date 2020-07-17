@@ -24,7 +24,7 @@ import pkg_resources
 import re
 import sys
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
@@ -173,46 +173,22 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_file_prefix_list.append('_C_')
                 out_file_prefix_list.append(my_cccc)
                 out_file_prefix_list.append('_')
-                out_file_prefix_list.append(data_date + ddhhmm[2:6])
-                out_file_prefix_list.append('00_')
+                out_file_prefix_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S'))
+                out_file_prefix_list.append('_')
                 out_file_prefix = ''.join(out_file_prefix_list)
-                for out_file_ext_counter in range(1, 999):
+                for out_file_ext_counter in range(1, 99):
                     out_file_list = [out_file_prefix]
-                    out_file_list.append(str(out_file_ext_counter).zfill(3))
+                    out_file_list.append(str(out_file_ext_counter).zfill(2))
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
                     if out_file in created_out_file_list:
                         continue
-                    elif os.path.exists(out_file):
-                        continue
-                    elif out_file_ext_counter == 1:
+                    else:
                         with open(out_file, 'wb') as out_file_stream:
                             out_file_stream.write(message)
                         return out_file
-                    else:
-                        previous_out_file_list = [out_file_prefix]
-                        previous_out_file_list.append(str(out_file_ext_counter - 1).zfill(3))
-                        previous_out_file_list.append('.')
-                        previous_out_file_list.append(conf_row.file_extension)
-                        previous_out_file = ''.join(previous_out_file_list)
-                        if os.path.exists(previous_out_file) and len(message) == os.path.getsize(previous_out_file):
-                            previous_out_file_message = bytearray()
-                            with open(previous_out_file, 'rb') as previous_out_file_stream:
-                                previous_out_file_message = previous_out_file_stream.read()
-                            if message == previous_out_file_message:
-                                if debug:
-                                    print('Debug', ':', out_file, 'is duplicate content. The file is not created.', file=sys.stderr)
-                                return ''
-                            else:
-                                with open(out_file, 'wb') as out_file_stream:
-                                    out_file_stream.write(message)
-                                return out_file
-                        else:
-                            with open(out_file, 'wb') as out_file_stream:
-                                out_file_stream.write(message)
-                            return out_file
-                print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, '. The file is not created', file=sys.stderr)
+                print('Warning', warno, ':', 'There are 99 files with the same', ttaaii, cccc, ddhhmm, '. The file is not created', file=sys.stderr)
                 return ''
             else:
                 out_file_list = []
@@ -285,46 +261,22 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                 out_file_prefix_list.append('_C_')
                 out_file_prefix_list.append(my_cccc)
                 out_file_prefix_list.append('_')
-                out_file_prefix_list.append(data_date + ddhhmm[2:6])
-                out_file_prefix_list.append('00_')
+                out_file_prefix_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S'))
+                out_file_prefix_list.append('_')
                 out_file_prefix = ''.join(out_file_prefix_list)
-                for out_file_ext_counter in range(1, 999):
+                for out_file_ext_counter in range(1, 99):
                     out_file_list = [out_file_prefix]
-                    out_file_list.append(str(out_file_ext_counter).zfill(3))
+                    out_file_list.append(str(out_file_ext_counter).zfill(2))
                     out_file_list.append('.')
                     out_file_list.append(conf_row.file_extension)
                     out_file = ''.join(out_file_list)
                     if out_file in created_out_file_list:
                         continue
-                    elif os.path.exists(out_file):
-                        continue
-                    elif out_file_ext_counter == 1:
+                    else:
                         with open(out_file, 'wb') as out_file_stream:
                             out_file_stream.write(message)
                         return out_file
-                    else:
-                        previous_out_file_list = [out_file_prefix]
-                        previous_out_file_list.append(str(out_file_ext_counter - 1).zfill(3))
-                        previous_out_file_list.append('.')
-                        previous_out_file_list.append(conf_row.file_extension)
-                        previous_out_file = ''.join(previous_out_file_list)
-                        if os.path.exists(previous_out_file) and len(message) == os.path.getsize(previous_out_file):
-                            previous_out_file_message = bytearray()
-                            with open(previous_out_file, 'rb') as previous_out_file_stream:
-                                previous_out_file_message = previous_out_file_stream.read()
-                            if message == previous_out_file_message:
-                                if debug:
-                                    print('Debug', ':', out_file, 'is duplicate content. The file is not created.', file=sys.stderr)
-                                return ''
-                            else:
-                                with open(out_file, 'wb') as out_file_stream:
-                                    out_file_stream.write(message)
-                                return out_file
-                        else:
-                            with open(out_file, 'wb') as out_file_stream:
-                                out_file_stream.write(message)
-                            return out_file
-                print('Warning', warno, ':', 'There are 999 files with the same', ttaaii, cccc, ddhhmm, 'on', in_file, '. The file is not created', file=sys.stderr)
+                print('Warning', warno, ':', 'There are 99 files with the same', ttaaii, cccc, ddhhmm, 'on', in_file, '. The file is not created', file=sys.stderr)
                 return ''
             else:
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
@@ -358,6 +310,8 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                     if re.match(r'\d\d\d\d',start_char4):
                         batch_type = 1
                         message_length = int(start_char4 + in_file_stream.read(4).decode())
+                        if message_length == 0:
+                            break
                         format_identifier = int(in_file_stream.read(2).decode())
                         if format_identifier == 0:
                             in_file_stream.read(10) # skip
