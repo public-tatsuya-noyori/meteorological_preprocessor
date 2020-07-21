@@ -55,7 +55,7 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                 if type(values[0]) == str:
                                     values = [value.lstrip().rstrip() for value in values]
                                 else:
-                                    if conf_row.name == 'location ID':
+                                    if conf_row.name == 'location':
                                         values = [None if value < conf_row.min or value > conf_row.max else str(value) for value in values]
                                     elif conf_row.name == 'datetime':
                                         if conf_row.key == 'year':
@@ -70,7 +70,7 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                     if conf_row.name == 'longitude [degree]':
                                         values = [conf_row.max if value == conf_row.min else value for value in values]
                                 tmp_loc_time_dict[conf_row.key] = values
-                                if conf_row.name == 'location ID' or conf_row.name == 'datetime':
+                                if conf_row.name == 'location' or conf_row.name == 'datetime':
                                     tmp_none_list = [False if value == None else True for value in values]
                                     if len(none_list) > 0:
                                         none_list = none_list * np.array(tmp_none_list)
@@ -118,7 +118,7 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                 conf_loc_time_name_keys_dict[conf_row.name] = conf_loc_time_name_keys_dict[conf_row.name] + [conf_row.key]
                             else:
                                 conf_loc_time_name_keys_dict[conf_row.name] = [conf_row.key]
-                            if conf_row.name == 'location ID':
+                            if conf_row.name == 'location':
                                 tmp_loc_id_list = tmp_loc_time_dict[conf_row.key]
                                 del_counter = 0
                                 for none_index in none_index_list:
@@ -173,11 +173,11 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                 else:
                                     tmp_height_np = np.array(tmp_height_list)
                         if len(tmp_loc_id_np) > 0 and len(tmp_datetime_np) > 0:
-                            if 'location ID' in loc_time_dict:
-                                loc_id_list = loc_time_dict['location ID']
-                                loc_time_dict['location ID'] = loc_id_list + tmp_loc_id_np.tolist()
-                            elif 'location ID' in conf_loc_time_name_keys_dict.keys():
-                                loc_time_dict['location ID'] = tmp_loc_id_np.tolist()
+                            if 'location' in loc_time_dict:
+                                loc_id_list = loc_time_dict['location']
+                                loc_time_dict['location'] = loc_id_list + tmp_loc_id_np.tolist()
+                            elif 'location' in conf_loc_time_name_keys_dict.keys():
+                                loc_time_dict['location'] = tmp_loc_id_np.tolist()
                             tmp_datetime_list = []
                             if not is_second:
                                 tmp_datetime_list = [datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) for dt_str in tmp_datetime_np.tolist()]
