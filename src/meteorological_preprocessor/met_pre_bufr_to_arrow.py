@@ -250,7 +250,7 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                 for key in prop_dict.keys():
                     datetime_id_list = pa.array(id_list, 'uint32').take(pa.array(datetime_index_list))
                     datetime_prop_data = pa.array(prop_dict[key], datatype_dict[key]).take(pa.array(datetime_index_list))
-                    value_index_list = [index for index, value in enumerate(datetime_prop_data) if value != None]
+                    value_index_list = [index for index, value in enumerate(datetime_prop_data.tolist()) if value != None]
                     if len(value_index_list) > 0:
                         prop_data = []
                         prop_data.append(datetime_id_list.take(pa.array(value_index_list)))
