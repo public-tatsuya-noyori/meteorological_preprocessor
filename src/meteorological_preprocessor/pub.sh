@@ -22,7 +22,7 @@ update=0
 for arg in "$@"; do
   case "${arg}" in
     '--update' ) update=1;;
-    '--help' ) echo "pub.sh raw_list_file local_dir rclone_remote bucket priority_name parallel access [--update]"; exit 0;;
+    '--help' ) echo "$0 raw_list_file local_dir rclone_remote bucket priority_name parallel access [--update]"; exit 0;;
   esac
 done
 if test $# -lt `expr 7 + ${opt_num}`; then
@@ -58,7 +58,13 @@ if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; 
   unpub_num=1
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
-    rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}
+    set +e
+    retry_num=`expr 1 + ${retry_num}`
+    rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log | wc -l`
+    set -e
+    if test ${unpub_num} -gt 0 -a ${retry_num} -gt 4; then
+      exit 1
+    fi
   done
 fi

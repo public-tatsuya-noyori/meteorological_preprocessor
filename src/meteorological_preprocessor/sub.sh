@@ -20,7 +20,7 @@
 set -e
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "sub.sh sub_name rclone_remote bucket priority_name_pattern local_dir parallel access [include_pattern] [exclude_pattern]"; exit 0;;
+    '--help' ) echo "$0 sub_name rclone_remote bucket priority_name_pattern local_dir parallel access [include_pattern] [exclude_pattern]"; exit 0;;
   esac
 done
 if test $# -lt `expr 7 + ${opt_num}`; then

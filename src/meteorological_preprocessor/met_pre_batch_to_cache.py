@@ -378,7 +378,6 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                 except:
                     start_char4 = None
                     print('Warning', warno, ':', 'The start 4 bytes of the message on', in_file, 'are not strings.', file=sys.stderr)
-    print('Info', ':', len(created_out_file_list), 'files have been created.', file=sys.stderr)
 
 def main():
     errno=198

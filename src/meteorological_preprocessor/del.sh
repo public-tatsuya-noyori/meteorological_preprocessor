@@ -20,7 +20,7 @@
 set -e
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "del.sh num_days_ago rclone_remote bucket parallel"; exit 0;;
+    '--help' ) echo "$0 num_days_ago rclone_remote bucket parallel"; exit 0;;
   esac
 done
 if test $# -lt 4; then

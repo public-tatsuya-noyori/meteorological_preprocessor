@@ -12,11 +12,6 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     warno = 189
     out_arrows = []
     res = 180 / 2**zoom
-    cccc = ''
-    form = ''
-    cat_dir = ''
-    date_hour = ''
-    created = ''
     for in_file in in_file_list:
         loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/location_datetime/([0-9]*)/([0-9]*)\.arrow$', in_file)
         if loc_time_match:
@@ -55,7 +50,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 keeped = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 new_df_duplicated_id_list = concat_df[duplicated]['id'].tolist()
                                 old_df_keeped_id_list = concat_df[keeped]['id'].tolist()
-                                replace_id_list_dict[tile_x,  tile_y, datetime] = [new_df_duplicated_id_list, old_df_keeped_id_list]
+                                replace_id_list_dict[(tile_x,  tile_y, datetime)] = [new_df_duplicated_id_list, old_df_keeped_id_list]
                                 with open(out_file, 'bw') as out_f:
                                     writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
                                     writer.write_table(pa.Table.from_pandas(concat_df[~duplicated]))
@@ -86,9 +81,10 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     out_file = ''.join([out_directory, '/', str(datetime.year).zfill(4), str(datetime.month).zfill(2), str(datetime.day).zfill(2), str(datetime.hour).zfill(2), '.arrow'])
                                     new_df.insert(0, 'indicator', cccc)
                                     if os.path.exists(out_file):
-
-                                        new_df['id'].replace(new_df_duplicated_id_list, old_df_keeped_id_list, inplace=True)
-
+                                        new_df_duplicated_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][0]
+                                        old_df_keeped_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][1]
+                                        if len(new_df_duplicated_id_list) > 0:
+                                            new_df['id'].replace(new_df_duplicated_id_list, old_df_keeped_id_list, inplace=True)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df])
                                         duplicated = concat_df.duplicated(subset=['indicator', 'id'])
@@ -106,6 +102,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                             writer.close()
                                         if not out_file in out_arrows:
                                             out_arrows.append(out_file)
+    print('\n'.join(out_arrows), file=out_list_file)
 
 def main():
     errno=198
