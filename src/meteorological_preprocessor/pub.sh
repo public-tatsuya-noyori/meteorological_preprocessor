@@ -21,11 +21,10 @@ set -e
 update=0
 for arg in "$@"; do
   case "${arg}" in
-    '--update' ) update=1;;
-    '--help' ) echo "$0 raw_list_file local_dir rclone_remote bucket priority_name parallel access [--update]"; exit 0;;
+    '--help' ) echo "$0 raw_list_file local_dir rclone_remote bucket priority_name parallel access"; exit 0;;
   esac
 done
-if test $# -lt `expr 7 + ${update}`; then
+if test $# -lt 7; then
   echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
@@ -43,16 +42,12 @@ access=$7
 pub_datetime=`date -u "+%Y%m%d%H%M%S"`
 mkdir -p ${local_dir}/${access}/4PubSub/${priority_name}
 mkdir -p ${local_dir}/${access}/4Pub_log/${priority_name}
-grep ^${local_dir}/${access}/ ${raw_list_file} | sed -e "s%^${local_dir}/${access}/%/%g" | grep -v '^ *$' | sort -u > ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt
+grep ^${local_dir}/${access}/ ${raw_list_file} | sed -e "s%^${local_dir}/${access}/%/%g" | grep -v '^ *$' | uniq > ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt
 if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; then
   unpub_num=1
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
-    if test ${update} -eq 0; then
-      rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
-    else
-      rclone --ignore-checksum --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
-    fi
+    rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log | wc -l`
   done
   unpub_num=1
@@ -61,7 +56,7 @@ if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; 
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
     retry_num=`expr 1 + ${retry_num}`
-    rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}
+    rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log | wc -l`
     set -e
     if test ${unpub_num} -gt 0 -a ${retry_num} -gt 4; then
