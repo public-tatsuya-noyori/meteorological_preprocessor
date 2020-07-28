@@ -25,7 +25,7 @@ for arg in "$@"; do
     '--help' ) echo "$0 raw_list_file local_dir rclone_remote bucket priority_name parallel access [--update]"; exit 0;;
   esac
 done
-if test $# -lt `expr 7 + ${opt_num}`; then
+if test $# -lt `expr 7 + ${update}`; then
   echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
@@ -49,13 +49,14 @@ if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; 
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
     if test ${update} -eq 0; then
-      rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
+      rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
     else
       rclone --ignore-checksum --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
     fi
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}.log | wc -l`
   done
   unpub_num=1
+  retry_num=0
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e

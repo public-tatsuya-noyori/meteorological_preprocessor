@@ -93,7 +93,7 @@ def get_grib_subdir_list(grib_file):
         return []
     return subdir_list
 
-def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug):
+def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug):
     warno = 187
     in_file_name = os.path.basename(in_file)
     for conf_row in conf_list:
@@ -163,33 +163,23 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             out_directory = '/'.join(out_directory_list)
             os.makedirs(out_directory, exist_ok=True)
             if ttaaii:
-                out_file_prefix_list = []
-                out_file_prefix_list.append(out_directory)
-                out_file_prefix_list.append('/A_')
-                out_file_prefix_list.append(ttaaii)
-                out_file_prefix_list.append(cccc)
-                out_file_prefix_list.append(ddhhmm)
-                out_file_prefix_list.append(bbb)
-                out_file_prefix_list.append('_C_')
-                out_file_prefix_list.append(my_cccc)
-                out_file_prefix_list.append('_')
-                out_file_prefix_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S'))
-                out_file_prefix_list.append('_')
-                out_file_prefix = ''.join(out_file_prefix_list)
-                for out_file_ext_counter in range(1, 99):
-                    out_file_list = [out_file_prefix]
-                    out_file_list.append(str(out_file_ext_counter).zfill(2))
-                    out_file_list.append('.')
-                    out_file_list.append(conf_row.file_extension)
-                    out_file = ''.join(out_file_list)
-                    if out_file in created_out_file_list:
-                        continue
-                    else:
-                        with open(out_file, 'wb') as out_file_stream:
-                            out_file_stream.write(message)
-                        return out_file
-                print('Warning', warno, ':', 'There are 99 files with the same', ttaaii, cccc, ddhhmm, '. The file is not created', file=sys.stderr)
-                return ''
+                out_file_list = []
+                out_file_list.append(out_directory)
+                out_file_list.append('/A_')
+                out_file_list.append(ttaaii)
+                out_file_list.append(cccc)
+                out_file_list.append(ddhhmm)
+                out_file_list.append(bbb)
+                out_file_list.append('_C_')
+                out_file_list.append(my_cccc)
+                out_file_list.append('_')
+                out_file_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')[:-4])
+                out_file_list.append('.')
+                out_file_list.append(conf_row.file_extension)
+                out_file = ''.join(out_file_list)
+                with open(out_file, 'wb') as out_file_stream:
+                    out_file_stream.write(message)
+                return out_file
             else:
                 out_file_list = []
                 out_file_list.append(out_directory)
@@ -206,7 +196,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
-def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug):
+def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug):
     warno = 188
     ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
     if len(ttaaii_cccc_ddhhmm_bbb_data_date_list) != 5:
@@ -251,33 +241,23 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                     out_directory_list.append(data_date + ddhhmm[2:4])
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
-                out_file_prefix_list = []
-                out_file_prefix_list.append(out_directory)
-                out_file_prefix_list.append('/A_')
-                out_file_prefix_list.append(ttaaii)
-                out_file_prefix_list.append(cccc)
-                out_file_prefix_list.append(ddhhmm)
-                out_file_prefix_list.append(bbb)
-                out_file_prefix_list.append('_C_')
-                out_file_prefix_list.append(my_cccc)
-                out_file_prefix_list.append('_')
-                out_file_prefix_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S'))
-                out_file_prefix_list.append('_')
-                out_file_prefix = ''.join(out_file_prefix_list)
-                for out_file_ext_counter in range(1, 99):
-                    out_file_list = [out_file_prefix]
-                    out_file_list.append(str(out_file_ext_counter).zfill(2))
-                    out_file_list.append('.')
-                    out_file_list.append(conf_row.file_extension)
-                    out_file = ''.join(out_file_list)
-                    if out_file in created_out_file_list:
-                        continue
-                    else:
-                        with open(out_file, 'wb') as out_file_stream:
-                            out_file_stream.write(message)
-                        return out_file
-                print('Warning', warno, ':', 'There are 99 files with the same', ttaaii, cccc, ddhhmm, 'on', in_file, '. The file is not created', file=sys.stderr)
-                return ''
+                out_file_list = []
+                out_file_list.append(out_directory)
+                out_file_list.append('/A_')
+                out_file_list.append(ttaaii)
+                out_file_list.append(cccc)
+                out_file_list.append(ddhhmm)
+                out_file_list.append(bbb)
+                out_file_list.append('_C_')
+                out_file_list.append(my_cccc)
+                out_file_list.append('_')
+                out_file_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')[:-4])
+                out_file_list.append('.')
+                out_file_list.append(conf_row.file_extension)
+                out_file = ''.join(out_file_list)
+                with open(out_file, 'wb') as out_file_stream:
+                    out_file_stream.write(message)
+                return out_file
             else:
                 print('Warning', warno, ':', 'ddhhmm of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
@@ -286,7 +266,6 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
 
 def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_file, conf_list, debug):
     warno = 189
-    created_out_file_list = []
     for in_file in input_file_list:
         if debug:
             print('Debug', ':', 'in_file =', in_file, file=sys.stderr)
@@ -334,9 +313,8 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                     else:
                         message.extend(start_byte4)
                         message.extend(in_file_stream.read())
-                        out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug)
+                        out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug)
                         if out_file:
-                            created_out_file_list.append(out_file)
                             print(out_file, file=out_list_file)
                         break
                     if message_length <= 0:
@@ -366,9 +344,8 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                     else:
                         break
                     message_counter += 1
-                out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, created_out_file_list, debug)
+                out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug)
                 if out_file:
-                    created_out_file_list.append(out_file)
                     print(out_file, file=out_list_file)
                 try:
                     byte4 = in_file_stream.read(4)

@@ -17,13 +17,13 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -evx
+set -e
 for arg in "$@"; do
   case "${arg}" in
     '--help' ) echo "$0 clone_name src_rclone_remote src_bucket priority_name_pattern dst_rclone_remote dst_bucket local_dir parallel access [include_pattern] [exclude_pattern]"; exit 0;;
   esac
 done
-if test $# -lt `expr 9 + ${opt_num}`; then
+if test $# -lt 9`; then
   echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
@@ -50,14 +50,14 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file
   if test ! -d ${local_dir}/${access}/4PubSub/${priority_name}; then
     mkdir -p ${local_dir}/${access}/4PubSub/${priority_name}
     latest_created=`rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}.log lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} | tail -1`
-    rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}.log copy ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${latest_created} ${local_dir}/${access}/4PubSub/${priority_name}
+    rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}.log copy ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${latest_created} ${local_dir}/${access}/4PubSub/${priority_name}
   fi
   local_latest_created=`ls -1 ${local_dir}/${access}/4PubSub/${priority_name} | grep -v ^.*\.tmp$ | tail -1`
   for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}.log lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | sort -u`; do
     unclone_num=1
     while test ${unclone_num} -ne 0; do
       now=`date -u "+%Y%m%d%H%M%S"`
-      rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log copyto ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+      rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log copyto ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
       unclone_num=`grep ERROR ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log | wc -l`
     done
     if test -n "${include_pattern}"; then
@@ -72,7 +72,7 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file
     unclone_num=1
     while test ${unclone_num} -ne 0; do
       now=`date -u "+%Y%m%d%H%M%S"`
-      rclone --ignore-checksum --ignore-existing --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
+      rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --no-update-modtime --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
       unclone_num=`grep ERROR ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log | wc -l`
     done
     mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}
