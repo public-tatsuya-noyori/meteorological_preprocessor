@@ -56,7 +56,7 @@ if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; 
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
     retry_num=`expr 1 + ${retry_num}`
-    rclone --ignore-checksum --immutable --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log copy ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}
+    rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log copyto ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${now}.txt
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub_log/${priority_name}/${pub_datetime}_${now}_index.log | wc -l`
     set -e
     if test ${unpub_num} -gt 0 -a ${retry_num} -gt 4; then

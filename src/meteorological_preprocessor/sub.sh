@@ -20,7 +20,7 @@
 set -e
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "$0 sub_name rclone_remote bucket priority_name_pattern local_dir parallel access [include_pattern] [exclude_pattern]"; exit 0;;
+    '--help' ) echo "$0 sub_name rclone_remote bucket priority_name_pattern local_dir parallel access [include_pattern_file] [exclude_pattern_file]"; exit 0;;
   esac
 done
 if test $# -lt 7; then
@@ -34,13 +34,13 @@ priority_name_pattern=$4
 local_dir=$5
 parallel=$6
 access=$7
-include_pattern=''
+include_pattern_file=''
 if test $# -ge 8; then
-  include_pattern=$8
+  include_pattern_file=$8
 fi
-exclude_pattern=''
+exclude_pattern_file=''
 if test $# -ge 9; then
-  exclude_pattern=$8
+  exclude_pattern_file=$9
 fi
 sub_datetime=`date -u "+%Y%m%d%H%M%S"`
 mkdir -p ${local_dir}/${access}/4Sub_log/${sub_name}
@@ -48,31 +48,33 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file
   if test ! -d ${local_dir}/${access}/4PubSub/${priority_name}; then
     mkdir -p ${local_dir}/${access}/4PubSub/${priority_name}
     latest_created=`rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} | tail -1`
-    rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log copy ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${latest_created} ${local_dir}/${access}/4PubSub/${priority_name}
+    rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log copy ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${latest_created} ${local_dir}/${access}/4PubSub/${priority_name}
   fi
   local_latest_created=`ls -1 ${local_dir}/${access}/4PubSub/${priority_name} | grep -v ^.*\.tmp$ | tail -1`
-  for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | sort -u`; do
+  for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}.log lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | uniq`; do
     unsub_num=1
     while test ${unsub_num} -ne 0; do
       now=`date -u "+%Y%m%d%H%M%S"`
-      rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+      rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --log-level DEBUG --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
       unsub_num=`grep ERROR ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log | wc -l`
     done
-    if test -n "${include_pattern}"; then
-      if test -n "${exclude_pattern}"; then
-        match_list=`cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -v -E "${exclude_pattern}" | grep -E "${include_pattern}" | uniq`
+    if test -n "${include_pattern_file}"; then
+      if test -n "${exclude_pattern_file}"; then
+        match_list=`cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -v -E -f "${exclude_pattern_file}" | grep -E -f "${include_pattern_file}" | uniq`
 	echo "${match_list}" > ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
       else
-        match_list=`cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -E "${include_pattern}" | uniq`
+        match_list=`cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -E -f "${include_pattern_file}" | uniq`
 	echo "${match_list}" > ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
       fi
     fi
-    unsub_num=1
-    while test ${unsub_num} -ne 0; do
-      now=`date -u "+%Y%m%d%H%M%S"`
-      rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
-      unsub_num=`grep ERROR ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log | wc -l`
-    done
-    mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}
+    if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp; then
+      unsub_num=1
+      while test ${unsub_num} -ne 0; do
+        now=`date -u "+%Y%m%d%H%M%S"`
+        rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level DEBUG --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
+        unsub_num=`grep ERROR ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log | wc -l`
+      done
+      mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}
+    fi
   done
 done
