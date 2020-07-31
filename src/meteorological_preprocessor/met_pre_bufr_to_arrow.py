@@ -15,14 +15,14 @@ from eccodes import *
 def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc_time_list, conf_prop_list, debug):
     warno = 189
     out_arrows = []
-    loc_time_dict = {}
-    prop_dict = {}
-    datatype_dict = {}
     now = datetime.utcnow()
     out_file_date_hour_arrow_list = [str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.arrow']
     out_file_date_hour_arrow = ''.join(out_file_date_hour_arrow_list)
-    is_millisecond = False
     for cccc in list(set([re.sub('^.*/', '', re.sub('/bufr/' + cat + '/' + subcat + '/' +'.*$', '', in_file)) for in_file in in_file_list if re.match(r'^.*/bufr/' + cat + '/' + subcat + '/.*$', in_file)])):
+        loc_time_dict = {}
+        prop_dict = {}
+        datatype_dict = {}
+        is_millisecond = False
         for in_file in in_file_list:
             if not re.match(r'^.*/' + cccc + '/bufr/' + cat + '/' + subcat + '/.*$', in_file):
                 continue
@@ -56,7 +56,7 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                     values = [value.lstrip().rstrip() for value in values]
                                 else:
                                     if conf_row.name == 'location':
-                                        values = [None if value < conf_row.min or value > conf_row.max else str(value) for value in values]
+                                        values = [None if value < conf_row.min or value > conf_row.max else value for value in values]
                                     elif conf_row.name == 'datetime':
                                         if conf_row.key == 'year':
                                             values = [None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in values]
@@ -125,9 +125,15 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
                                     del tmp_loc_id_list[none_index - del_counter]
                                     del_counter += 1
                                 if len(tmp_loc_id_np) > 0:
-                                    tmp_loc_id_np = tmp_loc_id_np + '_' + np.array(tmp_loc_id_list, dtype=object)
+                                    if conf_row.multiply != 0:
+                                        tmp_loc_id_np = tmp_loc_id_np + conf_row.multiply * np.array(tmp_loc_id_list, dtype=object)
+                                    else:
+                                        tmp_loc_id_np = tmp_loc_id_np + '_' + np.array(tmp_loc_id_list, dtype=object)
                                 else:
-                                    tmp_loc_id_np = np.array(tmp_loc_id_list, dtype=object)
+                                    if conf_row.multiply != 0:
+                                        tmp_loc_id_np = conf_row.multiply * np.array(tmp_loc_id_list, dtype=object)
+                                    else:
+                                        tmp_loc_id_np = np.array(tmp_loc_id_list, dtype=object)
                             elif conf_row.name == 'datetime':
                                 tmp_datetime_list = tmp_loc_time_dict[conf_row.key]
                                 del_counter = 0

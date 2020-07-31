@@ -12,6 +12,11 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     warno = 189
     out_arrows = []
     res = 180 / 2**zoom
+    cccc = ''
+    form = ''
+    cat_dir = ''
+    date_hour = ''
+    created = ''
     for in_file in in_file_list:
         loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/location_datetime/([0-9]*)/([0-9]*)\.arrow$', in_file)
         if loc_time_match:
