@@ -52,25 +52,25 @@ if test $# -ge 9; then
   exclusive_pattern_file=$9
 fi
 sub_datetime=`date -u "+%Y%m%d%H%M%S"`
-mkdir -p ${local_dir}/${access}/4Sub_log/${sub_name}
 for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub | grep -E "${priority_name_pattern}" | uniq`; do
-  if test ! -d ${local_dir}/${access}/4PubSub/${priority_name}; then
-    latest_created=`rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} | tail -1`
-    rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR copy ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${latest_created} ${local_dir}/${access}/4PubSub/${priority_name}
+  mkdir -p ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log
+  if test ! -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt; then
+    rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt
+    exit 0
   fi
-  local_latest_created=`ls -1 ${local_dir}/${access}/4PubSub/${priority_name} | grep -v '^.*\.tmp$' | tail -1`
-  for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | uniq`; do
+  rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new
+  for newly_created in `diff ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new | grep '>' | cut -c3-`; do
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
-    rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
-    unsub_num=`grep ERROR ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log | wc -l`
+    rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+    unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log | wc -l`
     if test ${unsub_num} -ne 0; then
-      cat ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log
-      rm -f ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log
+      cat ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
+      rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
       exit 199
     fi
     set -e
-    rm -f ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}_index.log
+    rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
     if test -n "${inclusive_pattern_file}"; then
       if test -n "${exclusive_pattern_file}"; then
         cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} | uniq > ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp.new
@@ -83,17 +83,18 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
     if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp; then
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
-      rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO --log-file ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
-      unsub_num=`grep ERROR ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log | wc -l`
+      rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
+      unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log | wc -l`
       if test ${unsub_num} -ne 0; then
-        grep ERROR ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log
-        rm -f ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log
+        grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
+        rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
         exit 199
       fi
       mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}
-      sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_dir}/${access}/\1|g" ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log
+      sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_dir}/${access}/\1|g" ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
       set -e
-      rm -f ${local_dir}/${access}/4Sub_log/${sub_name}/${sub_datetime}_${now}.log
+      rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
     fi
   done
+  mv -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt
 done

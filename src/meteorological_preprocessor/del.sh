@@ -20,7 +20,7 @@
 set -e
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "$0 num_days_ago rclone_remote bucket parallel"; exit 0;;
+    '--help' ) echo "$0 num_days_ago rclone_remote bucket/directory parallel"; exit 0;;
   esac
 done
 if test $# -lt 4; then
@@ -29,6 +29,6 @@ if test $# -lt 4; then
 fi
 num_days_ago=$1
 rclone_remote=$2
-bucket=$3
+bucket_directory=$3
 parallel=$4
-rclone --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket}
+rclone --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket_directory}

@@ -36,13 +36,13 @@ dst_bucket=$6
 local_dir=$7
 parallel=$8
 set +e
-parallel=`echo "$6" | grep '^[0-9]\+$'`
+parallel=`echo "$8" | grep '^[0-9]\+$'`
 set -e
 if test -z "${parallel}"; then
-  echo "ERROR: $6 is not integer."
+  echo "ERROR: $8 is not integer."
   exit 199
-elif test $6 -le 0; then
-  echo "ERROR: $6 is not more than 1."
+elif test $8 -le 0; then
+  echo "ERROR: $8 is not more than 1."
   exit 199
 fi
 access=$9
@@ -55,25 +55,24 @@ if test $# -ge 11; then
   exclusive_pattern_file=$11
 fi
 clone_datetime=`date -u "+%Y%m%d%H%M%S"`
-mkdir -p ${local_dir}/${access}/4Clone_log/${clone_name}
 for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub | grep -E "${priority_name_pattern}" | grep -v '^ *$' | uniq`; do
-  if test ! -d ${local_dir}/${access}/4PubSub/${priority_name}; then
-    latest_created=`rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} | tail -1`
-    rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}.log copy ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${latest_created} ${local_dir}/${access}/4PubSub/${priority_name}
+  mkdir -p ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log
+  if test ! -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt; then
+    rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt
   fi
-  local_latest_created=`ls -1 ${local_dir}/${access}/4PubSub/${priority_name} | grep -v '^.*\.tmp$' | tail -1`
-  for newly_created in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} | grep ${local_latest_created} -A 100000 | sed -e '1d' | grep -v '^ *$' | uniq`; do
+  rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt.new
+  for newly_created in `diff ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt.new | grep '>' | cut -c3-`; do
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
-    rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log copyto ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
-    unclone_num=`grep ERROR ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log | wc -l`
+    rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_sub.log copyto ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+    unclone_num=`grep ERROR ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_sub.log | wc -l`
     if test ${unclone_num} -ne 0; then
-      cat ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log
-      rm -f ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log
+      cat ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_sub.log
+      rm -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_sub.log
       exit 199
     fi
     set -e
-    rm -f ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_sub.log
+    rm -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_sub.log
     if test -n "${inclusive_pattern_file}"; then
       if test -n "${exclusive_pattern_file}"; then
         cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} | uniq > ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp.new
@@ -86,26 +85,26 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
     if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp; then
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
-      rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
-      unclone_num=`grep ERROR ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log | wc -l`
+      rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
+      unclone_num=`grep ERROR ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log | wc -l`
       if test ${unclone_num} -ne 0; then
-        cat ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log
-        rm -f ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log
+        cat ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log
+        rm -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log
         exit 199
       fi
       set -e
-      rm -f ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}.log
+      rm -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log
       unclone_num=1
       retry_num=0
       while test ${unclone_num} -ne 0; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e
-        rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
-        unclone_num=`grep ERROR ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_pub.log | wc -l`
+        rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
+        unclone_num=`grep ERROR ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log | wc -l`
         if test ${unclone_num} -ne 0; then
           if test ${retry_num} -ge 8; then
-            cat ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_pub.log
-            rm -f ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_pub.log
+            cat ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log
+            rm -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log
             exit 199
           else
             sleep 1
@@ -113,9 +112,10 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
           retry_num=`expr 1 + ${retry_num}`
         fi
         set -e
-        rm -f ${local_dir}/${access}/4Clone_log/${clone_name}/${clone_datetime}_${now}_index_pub.log
+        rm -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log
       done
       mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}
     fi
   done
+  mv -f ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt.new ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/index.txt
 done
