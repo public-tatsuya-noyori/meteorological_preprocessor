@@ -85,7 +85,7 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
     if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp; then
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
-      rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --s3-upload-concurrency ${parallel} --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
+      rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
       unclone_num=`grep ERROR ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log | wc -l`
       if test ${unclone_num} -ne 0; then
         cat ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}.log
@@ -99,7 +99,7 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
       while test ${unclone_num} -ne 0; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e
-        rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --s3-upload-cutoff 0 --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
+        rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
         unclone_num=`grep ERROR ${local_dir}/${access}/4Clone/${priority_name}/${clone_name}/log/${clone_datetime}_${now}_index_pub.log | wc -l`
         if test ${unclone_num} -ne 0; then
           if test ${retry_num} -ge 8; then
