@@ -61,7 +61,6 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
   rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${rclone_remote}:${bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new
   for newly_created in `diff ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new | grep '>' | cut -c3-`; do
     now=`date -u "+%Y%m%d%H%M%S"`
-    set +e
     rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp
     unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log | wc -l`
     if test ${unsub_num} -ne 0; then
@@ -69,7 +68,6 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
       rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
       exit 199
     fi
-    set -e
     rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
     if test -n "${inclusive_pattern_file}"; then
       if test -n "${exclusive_pattern_file}"; then
@@ -85,8 +83,9 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
     rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
+    exit_code=$?
     unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log | wc -l`
-    if test ${unsub_num} -ne 0; then
+    if test ${exit_code} -ne 0 -o ${unsub_num} -ne 0; then
       grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
       rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
       exit 199

@@ -57,7 +57,6 @@ mkdir -p ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log
 grep "^${local_dir}/${access}/" ${raw_list_file} | sed -e "s|^${local_dir}/${access}/|/|g" > ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt
 if test -s ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt; then
   now=`date -u "+%Y%m%d%H%M%S"`
-  set +e
   rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
   unpub_num=`grep ERROR ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log | wc -l`
   if test ${unpub_num} -ne 0; then
@@ -65,7 +64,6 @@ if test -s ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_dateti
     rm -f ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log
     exit 199
   fi
-  set -e
   rm -f ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log
   unpub_num=1
   retry_num=0
@@ -73,8 +71,9 @@ if test -s ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_dateti
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
     rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log copyto ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${now}.txt
+    exit_code=$?
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log | wc -l`
-    if test ${unpub_num} -ne 0; then
+    if test ${exit_code} -ne 0 -o ${unpub_num} -ne 0; then
       if test ${retry_num} -ge 8; then
 	cat ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log
         rm -f ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log
