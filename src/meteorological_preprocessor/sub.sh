@@ -62,7 +62,7 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
   for newly_created in `diff ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new | grep '>' | cut -c3-`; do
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
-    rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+    rclone --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log copyto ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp
     unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log | wc -l`
     if test ${unsub_num} -ne 0; then
       cat ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
@@ -73,28 +73,28 @@ for priority_name in `rclone --stats 0 --timeout 1m --log-level ERROR lsf --max-
     rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}_index.log
     if test -n "${inclusive_pattern_file}"; then
       if test -n "${exclusive_pattern_file}"; then
-        cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} | uniq > ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp.new
-        mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp.new ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+        grep -v -E -f ${exclusive_pattern_file} ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp | grep -E -f ${inclusive_pattern_file} | uniq >> ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/merged_${sub_datetime}.tmp
       else
-        cat ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp | grep -E -f ${inclusive_pattern_file} | uniq > ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp.new
-        mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp.new ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp
+        grep -E -f ${inclusive_pattern_file} ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp | uniq >> ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/merged_${sub_datetime}.tmp
       fi
-    fi
-    if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp; then
-      now=`date -u "+%Y%m%d%H%M%S"`
-      set +e
-      rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
-      unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log | wc -l`
-      if test ${unsub_num} -ne 0; then
-        grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
-        rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
-        exit 199
-      fi
-      mv -f ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}.tmp ${local_dir}/${access}/4PubSub/${priority_name}/${newly_created}
-      sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_dir}/${access}/\1|g" ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
-      set -e
-      rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
+    else
+      cat ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp >> ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/merged_${sub_datetime}.tmp
     fi
   done
+  if test -s ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/merged_${sub_datetime}.tmp; then
+    now=`date -u "+%Y%m%d%H%M%S"`
+    set +e
+    rclone --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level INFO --log-file ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/${newly_created}.tmp ${rclone_remote}:${bucket} ${local_dir}/${access}
+    unsub_num=`grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log | wc -l`
+    if test ${unsub_num} -ne 0; then
+      grep ERROR ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
+      rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
+      exit 199
+    fi
+    sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_dir}/${access}/\1|g" ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
+    set -e
+    rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/log/${sub_datetime}_${now}.log
+    rm -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/merged_${sub_datetime}.tmp
+  fi
   mv -f ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt.new ${local_dir}/${access}/4Sub/${priority_name}/${sub_name}/index.txt
 done

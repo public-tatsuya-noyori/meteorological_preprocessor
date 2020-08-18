@@ -54,11 +54,11 @@ fi
 access=$8
 pub_datetime=`date -u "+%Y%m%d%H%M%S"`
 mkdir -p ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log
-grep "^${local_dir}/${access}/" ${raw_list_file} | sed -e "s|^${local_dir}/${access}/|/|g" > ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt
-if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; then
+grep "^${local_dir}/${access}/" ${raw_list_file} | sed -e "s|^${local_dir}/${access}/|/|g" > ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt
+if test -s ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt; then
   now=`date -u "+%Y%m%d%H%M%S"`
   set +e
-  rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
+  rclone --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt ${local_dir}/${access} ${rclone_remote}:${bucket}
   unpub_num=`grep ERROR ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log | wc -l`
   if test ${unpub_num} -ne 0; then
     cat ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}.log
@@ -72,7 +72,7 @@ if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; 
   while test ${unpub_num} -ne 0; do
     now=`date -u "+%Y%m%d%H%M%S"`
     set +e
-    rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log copyto ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${now}.txt
+    rclone --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log copyto ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt ${rclone_remote}:${bucket}/4PubSub/${priority_name}/${now}.txt
     unpub_num=`grep ERROR ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log | wc -l`
     if test ${unpub_num} -ne 0; then
       if test ${retry_num} -ge 8; then
@@ -87,4 +87,5 @@ if test -s ${local_dir}/${access}/4PubSub/${priority_name}/${pub_datetime}.txt; 
     set -e
     rm -f ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/log/${pub_datetime}_${now}_index.log
   done
+  rm -f ${local_dir}/${access}/4Pub/${priority_name}/${pub_name}/${pub_datetime}.txt
 fi
