@@ -74,7 +74,7 @@ if test ${is_running} -eq 0; then
       fi
       rm -f ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log
       error_count=1
-      retry_count=0
+      retry_count=1
       while test ${error_count} -ne 0; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e

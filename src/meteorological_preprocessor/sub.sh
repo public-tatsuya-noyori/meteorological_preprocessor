@@ -70,7 +70,7 @@ if test -s ${local_dir}/${access}/${job_dir}/${unique_job_name}/pid.txt; then
 fi
 if test ${is_running} -eq 0; then
   {
-    job_loop_count=0
+    job_loop_count=1
     while test ${job_loop_count} -lt ${job_loop_num}; do 
       priority_name_list=`rclone --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub | grep -E "${priority_name_pattern}"`
       if test -z "${priority_name_list}"; then
@@ -126,7 +126,7 @@ if test ${is_running} -eq 0; then
         fi
       done
       job_loop_count=`expr 1 + ${job_loop_count}`
-      if test ${is_urgent} -eq 1 -a ${job_loop_count} -lt ${job_loop_num}; then
+      if test ${is_urgent} -eq 1 -a ${job_loop_count} -le ${job_loop_num}; then
         now_unixtime=`date -u "+%s"`
         now_unixtime=`expr 0 + ${now_unixtime}`
         set +e
