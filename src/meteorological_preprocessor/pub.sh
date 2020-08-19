@@ -65,7 +65,7 @@ if test ${is_running} -eq 0; then
     grep "^${local_dir}/${access}/" ${raw_list_file} | sed -e "s|^${local_dir}/${access}/|/|g" > ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp
     if test -s ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp; then
       now=`date -u "+%Y%m%d%H%M%S"`
-      rclone --retries 1 --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${local_dir}/${access} ${dst_rclone_remote}:${dst_bucket}
+      rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --ignore-checksum --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${local_dir}/${access} ${dst_rclone_remote}:${dst_bucket}
       error_count=`grep ERROR ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log | wc -l`
       if test ${error_count} -ne 0; then
         cat ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log >&2
@@ -78,7 +78,7 @@ if test ${is_running} -eq 0; then
       while test ${error_count} -ne 0; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e
-        rclone --retries 1 --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
+        rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
         exit_code=$?
         set -e
         error_count=`grep ERROR ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_pub.log | wc -l`
@@ -97,5 +97,7 @@ if test ${is_running} -eq 0; then
       rm -f ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp
     fi
   } &
-  echo $! > ${local_dir}/${access}/${job_dir}/${unique_job_name}/pid.txt
+  pid=$!
+  echo ${pid} > ${local_dir}/${access}/${job_dir}/${unique_job_name}/pid.txt
+  wait ${pid}
 fi

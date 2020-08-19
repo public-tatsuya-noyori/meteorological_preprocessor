@@ -75,7 +75,7 @@ if test ${is_running} -eq 0; then
   {
     job_loop_count=1
     while test ${job_loop_count} -le ${job_loop_num}; do
-      priority_name_list=`rclone --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub | grep -E "${priority_name_pattern}"`
+      priority_name_list=`rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub | grep -E "${priority_name_pattern}"`
       if test -z "${priority_name_list}"; then
         echo "ERROR: can not get priority_name_list." >&2
         exit 199
@@ -83,14 +83,14 @@ if test ${is_running} -eq 0; then
       for priority_name in `echo ${priority_name_list}`; do
         mkdir -p ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log
         if test ! -f ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt; then
-          rclone --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt
+          rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt
           exit 0
         fi
-        rclone --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt.new
+        rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --stats 0 --timeout 1m --log-level ERROR lsf --max-depth 1 ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name} > ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt.new
         if test -s ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt.new; then
           for newly_created in `diff ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/index.txt.new | grep '>' | cut -c3-`; do
             now=`date -u "+%Y%m%d%H%M%S"`
-            rclone --retries 1 --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_sub.log copyto ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/${newly_created}.tmp
+            rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_sub.log copyto ${src_rclone_remote}:${src_bucket}/4PubSub/${priority_name}/${newly_created} ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/${newly_created}.tmp
             error_count=`grep ERROR ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_sub.log | wc -l`
             if test ${error_count} -ne 0; then
               cat ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_sub.log >&2
@@ -111,7 +111,7 @@ if test ${is_running} -eq 0; then
           done
           if test -s ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp; then
             now=`date -u "+%Y%m%d%H%M%S"`
-            rclone --retries 1 --ignore-checksum --update --use-server-modtime --no-gzip-encoding --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
+            rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --ignore-checksum --update --use-server-modtime --no-traverse --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log copy --files-from-raw ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${src_rclone_remote}:${src_bucket} ${dst_rclone_remote}:${dst_bucket}
             error_count=`grep ERROR ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log | wc -l`
             if test ${error_count} -ne 0; then
               cat ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}.log >&2
@@ -124,7 +124,7 @@ if test ${is_running} -eq 0; then
             while test ${error_count} -ne 0; do
               now=`date -u "+%Y%m%d%H%M%S"`
               set +e
-              rclone --retries 1 --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
+              rclone --contimeout 30s --timeout 30s --low-level-retries 1 --retries 1 --ignore-checksum --immutable --no-traverse --size-only --stats 0 --timeout 1m --log-level ERROR --log-file ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_pub.log copyto ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/output_${job_datetime}.tmp ${dst_rclone_remote}:${dst_bucket}/4PubSub/${priority_name}/${now}.txt
               exit_code=$?
               set -e
               error_count=`grep ERROR ${local_dir}/${access}/${job_dir}/${unique_job_name}/${priority_name}/log/${job_datetime}_${now}_index_pub.log | wc -l`
@@ -162,5 +162,7 @@ if test ${is_running} -eq 0; then
       job_loop_count=`expr 1 + ${job_loop_count}`
     done
   } &
-  echo $! > ${local_dir}/${access}/${job_dir}/${unique_job_name}/pid.txt
+  pid=$!
+  echo ${pid} > ${local_dir}/${access}/${job_dir}/${unique_job_name}/pid.txt
+  wait ${pid}
 fi
