@@ -18,17 +18,43 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+del() {
+  rclone --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 1 --retries 1 --size-only --stats 0 --timeout ${timeout} delete --min-age "${hours_ago}h" --rmdirs ${rclone_remote}:${bucket_directory}
+}
+job_directory=4Del
+timeout=30s
+retry_num=8
+cron=0
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "$0 num_days_ago rclone_remote bucket/directory parallel"; exit 0;;
+    "--help" ) echo "$0 local_work_directory unique_job_name rclone_remote bucket/directory hours_ago parallel"; exit 0;;
+    "--cron" ) cron=1;shift;;
   esac
 done
-if test $# -lt 4; then
-  echo -e "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
+if test -z $4; then
+  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
-num_days_ago=$1
-rclone_remote=$2
-bucket_directory=$3
-parallel=$4
-rclone --size-only --stats 0 --timeout 1m --transfers ${parallel} --log-level ERROR delete --min-age "${num_days_ago}d" --rmdirs ${rclone_remote}:${bucket_directory}
+local_work_directory=$1
+unique_job_name=$2
+rclone_remote=$3
+bucket_directory=$4
+hours_ago=$5
+parallel=$6
+if test ${cron} -eq 1; then
+  if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
+    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+  else
+    mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
+    running=0
+  fi
+  if test ${running} -eq 0; then
+    del &
+    pid=$!
+    echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
+    wait ${pid}
+  fi
+else
+  mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
+  del
+fi
