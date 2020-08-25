@@ -1,0 +1,18 @@
+* * * * * clone.sh --cron local_dir ap_to_us_p1 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p1 2
+* * * * * clone.sh --cron local_dir ap_to_us_p2 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p2 8
+* * * * * clone.sh --cron local_dir ap_to_us_p3 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p3 8
+* * * * * clone.sh --cron local_dir ap_to_us_p4 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p4 32
+* * * * * clone.sh --cron local_dir ap_to_us_p5 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p5 32
+
+* * * * * clone.sh --cron local_dir us_to_eu_p1 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p1 2
+* * * * * clone.sh --cron local_dir us_to_eu_p2 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p2 8
+* * * * * clone.sh --cron local_dir us_to_eu_p3 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p3 8
+* * * * * clone.sh --cron local_dir us_to_eu_p4 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p4 32
+* * * * * clone.sh --cron local_dir us_to_eu_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 32
+
+0   0 * * * del.sh --cron cache ap       wasabi    japan.meteorological.agency.open.data                      24 8
+10  * * * * del.sh --cron cache ap_index wasabi    japan.meteorological.agency.open.data/4PubSub              24 1
+20  8 * * * del.sh --cron cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            24 8
+30  * * * * del.sh --cron cache us_index wasabi_us japan.meteorological.agency.open.data.us.east.1/4PubSub    24 1
+40 16 * * * del.sh --cron cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         24 8
+50  * * * * del.sh --cron cache eu_index wasabi_eu japan.meteorological.agency.open.data.eu.central.1/4PubSub 24 1
