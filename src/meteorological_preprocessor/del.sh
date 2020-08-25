@@ -18,7 +18,7 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
-del() {
+delete() {
   rclone --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 1 --retries 1 --size-only --stats 0 --timeout ${timeout} delete --min-age "${hours_ago}h" --rmdirs ${rclone_remote}:${bucket_directory}
 }
 job_directory=4Del
@@ -49,12 +49,12 @@ if test ${cron} -eq 1; then
     running=0
   fi
   if test ${running} -eq 0; then
-    del &
+    delete &
     pid=$!
     echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
     wait ${pid}
   fi
 else
   mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
-  del
+  delete
 fi
