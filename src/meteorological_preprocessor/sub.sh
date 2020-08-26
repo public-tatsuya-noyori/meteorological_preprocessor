@@ -17,7 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -exv
+set -e
 subscribe() {
   job_count=1
   while test ${job_count} -le ${job_num}; do
