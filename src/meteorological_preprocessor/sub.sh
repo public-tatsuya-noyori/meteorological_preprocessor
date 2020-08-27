@@ -51,7 +51,16 @@ subscribe() {
         fi
         if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
           rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
+          set +e
           rclone --transfers ${parallel} --update --use-server-modtime --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+          exit_code=$?
+          set -e
+          if test ${exit_code} -ne 0; then
+            set +e
+            grep ERROR ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp >&2
+            set -e
+	    exit ${exit_code}
+          fi
           sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_work_directory}/\1|g" ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
           rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
           rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp

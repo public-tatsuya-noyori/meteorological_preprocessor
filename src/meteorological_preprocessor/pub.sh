@@ -33,7 +33,7 @@ publish(){
       set -e
       if test ${exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
         cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp >&2
-        exit 199
+        exit ${exit_code}
       fi
       retry_count=`expr 1 + ${retry_count}`
     done
