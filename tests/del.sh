@@ -1,0 +1,1 @@
+../src/meteorological_preprocessor/del.sh
