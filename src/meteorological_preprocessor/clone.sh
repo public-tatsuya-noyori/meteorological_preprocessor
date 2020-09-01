@@ -36,7 +36,7 @@ clone() {
         diff ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new | grep '>' | cut -c3- | sed -e "s|^|/${index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff
         if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff; then
           rm -rf ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}
-          rclone --transfers ${parallel} --update --use-server-modtime --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
+          rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
           if test -n "${inclusive_pattern_file}"; then
             set +e
             if test -n "${exclusive_pattern_file}"; then
@@ -50,7 +50,7 @@ clone() {
           fi
         fi
         if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-          rclone --transfers ${parallel} --update --use-server-modtime --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${dest_rclone_remote}:${dest_bucket}
+          rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${dest_rclone_remote}:${dest_bucket}
           exit_code=1
           retry_count=1
           rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
