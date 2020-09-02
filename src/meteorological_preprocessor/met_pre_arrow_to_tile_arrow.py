@@ -43,7 +43,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                     for datetime in new_datetime_list_dict[tile_x,  tile_y]:
                         new_df = tile_df[(datetime == tile_df['datetime'])]
                         if len(new_df['id'].tolist()) > 0:
-                            out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/indicator_location_datetime/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), '/', str(zoom), '/', str(tile_x)])
+                            out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/location_datetime/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), '/', str(zoom), '/', str(tile_x)])
                             out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
                             new_id_list_dict[tile_x,  tile_y, datetime] = new_df['id'].tolist()
                             new_df.insert(0, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))

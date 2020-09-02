@@ -1,4 +1,5 @@
 name,datatype,min,max,key,slide,step
+pressure reduced to mean sea level [Pa],uint32,0,131070,pressureReducedToMeanSeaLevel,0,0
 air temperature [K],float32,-273.15,32767,airTemperature,0,0
-dewpoint temperature [K],float32,-273.15,32767,dewpointTemperature,0,0
-one hour maximum wind gust speed [m/s],float32,0,32767,maximumWindGustSpeed,1,2
+wind direction [degree],uint32,0,360,windDirection,0,0
+wind speed [m/s],float32,0,32767,windSpeed,0,0
