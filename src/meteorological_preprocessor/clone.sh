@@ -19,6 +19,7 @@
 #
 set -e
 clone() {
+  exit_code=0
   job_count=1
   while test ${job_count} -le ${job_num}; do
     if test ${urgent} -eq 1 -a ${job_count} -ne 1; then
@@ -41,11 +42,10 @@ clone() {
     if test ! -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt; then
       set +e
       rclone --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --quiet lsf --max-depth 1 ${source_rclone_remote}:${source_bucket}/${index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
-      exit_code=$?
+      tmp_exit_code=$?
       set -e
-      if test ${exit_code} -eq 0; then
-        exit 0
-      else
+      if test ${tmp_exit_code} -ne 0; then
+        exit_code=${tmp_exit_code}
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
         job_count=`expr 1 + ${job_count}`
         continue
@@ -53,9 +53,10 @@ clone() {
     fi
     set +e
     rclone --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --quiet lsf --max-depth 1 ${source_rclone_remote}:${source_bucket}/${index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new
-    exit_code=$?
+    tmp_exit_code=$?
     set -e
-    if test ${exit_code} -ne 0; then
+    if test ${tmp_exit_code} -ne 0; then
+      exit_code=${tmp_exit_code}
       job_count=`expr 1 + ${job_count}`
       continue
     fi
@@ -64,10 +65,11 @@ clone() {
       if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff; then
         rm -rf ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}
         set +e
-        rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
-        exit_code=$?
+        rclone --transfers ${parallel} --ignore-existing --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
+        tmp_exit_code=$?
         set -e
-        if test ${exit_code} -ne 0; then
+        if test ${tmp_exit_code} -ne 0; then
+          exit_code=${tmp_exit_code}
           job_count=`expr 1 + ${job_count}`
           continue
         fi
@@ -85,30 +87,33 @@ clone() {
       fi
       if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
         set +e
-        rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${dest_rclone_remote}:${dest_bucket}
-        exit_code=$?
+        rclone --transfers ${parallel} --ignore-existing --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${dest_rclone_remote}:${dest_bucket}
+        tmp_exit_code=$?
         set -e
-        if test ${exit_code} -ne 0; then
+        if test ${tmp_exit_code} -ne 0; then
+          exit_code=${tmp_exit_code}
           job_count=`expr 1 + ${job_count}`
           continue
         fi
-        exit_code=1
+        tmp_exit_code=1
         retry_count=1
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
-        while test ${exit_code} -ne 0; do
+        while test ${tmp_exit_code} -ne 0; do
           now=`date -u "+%Y%m%d%H%M%S"`
           set +e
           rclone --immutable --quiet --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 1 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copyto ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${dest_rclone_remote}:${dest_bucket}/${index_directory}/${priority}/${now}.txt
-          exit_code=$?
+          tmp_exit_code=$?
           set -e
-          if test ${exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
+          if test ${tmp_exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
             cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp >&2
-            exit ${exit_code}
+            exit ${tmp_exit_code}
           fi
           retry_count=`expr 1 + ${retry_count}`
         done
-        if test ${exit_code} -ne 0; then
+        if test ${tmp_exit_code} -eq 0; then
           mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
+        else
+          exit_code=${tmp_exit_code}
         fi
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
@@ -166,9 +171,9 @@ fi
 if test ${priority} = 'p1'; then
   urgent=1
   job_num=4
+  time_limit=`expr ${job_period} / ${job_num}`
+  deadline=`expr \( ${job_num} - 1 \) \* ${time_limit}`
 fi
-time_limit=`expr ${job_period} / ${job_num}`
-deadline=`expr \( ${job_num} - 1 \) \* ${time_limit}`
 inclusive_pattern_file=''
 if test $# -ge 9; then
   inclusive_pattern_file=$9
