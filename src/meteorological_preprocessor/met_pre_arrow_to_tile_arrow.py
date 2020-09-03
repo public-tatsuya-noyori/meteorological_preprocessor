@@ -18,6 +18,8 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     date_hour = ''
     created = ''
     for in_file in in_file_list:
+        if debug:
+            print('Debug', ': in_file', in_file, file=sys.stderr)
         loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/location_datetime/([0-9]*)/([0-9]*)\.arrow$', in_file)
         if loc_time_match:
             cccc = loc_time_match.group(1)
@@ -49,6 +51,8 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             new_df.insert(0, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                             new_df = new_df.astype({'indicator': 'uint32'}, {'id': 'uint32'})
                             if os.path.exists(out_file):
+                                if debug:
+                                    print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                 unique_key_list = new_df.columns.values.tolist().remove('id')
@@ -92,23 +96,27 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         old_df_keeped_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][1]
                                         if len(new_df_duplicated_id_list) > 0:
                                             new_df['id'].replace(new_df_duplicated_id_list, old_df_keeped_id_list, inplace=True)
+                                        if debug:
+                                    	    print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         duplicated = concat_df.duplicated(subset=['indicator', 'id'])
-                                        with open(out_file, 'bw') as out_f:
-                                            writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
-                                            writer.write_table(pa.Table.from_pandas(concat_df[~duplicated]))
-                                            writer.close()
-                                        if not out_file in out_arrows:
-                                            out_arrows.append(out_file)
+                                        if len(concat_df[~duplicated]) > 0:
+                                            with open(out_file, 'bw') as out_f:
+                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
+                                                writer.write_table(pa.Table.from_pandas(concat_df[~duplicated]))
+                                                writer.close()
+                                            if not out_file in out_arrows:
+                                                out_arrows.append(out_file)
                                     else:
-                                        os.makedirs(out_directory, exist_ok=True)
-                                        with open(out_file, 'bw') as out_f:
-                                            writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
-                                            writer.write_table(pa.Table.from_pandas(new_df))
-                                            writer.close()
-                                        if not out_file in out_arrows:
-                                            out_arrows.append(out_file)
+                                        if len(new_df) > 0:
+                                            os.makedirs(out_directory, exist_ok=True)
+                                            with open(out_file, 'bw') as out_f:
+                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
+                                                writer.write_table(pa.Table.from_pandas(new_df))
+                                                writer.close()
+                                            if not out_file in out_arrows:
+                                                out_arrows.append(out_file)
     print('\n'.join(out_arrows), file=out_list_file)
 
 def main():
