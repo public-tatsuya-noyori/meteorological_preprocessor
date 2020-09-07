@@ -49,7 +49,7 @@ job_directory=4Pub
 timeout=10s
 retry_num=8
 cron=0
-cutoff=64M
+cutoff=32M
 rm_list_file=0
 for arg in "$@"; do
   case "${arg}" in
