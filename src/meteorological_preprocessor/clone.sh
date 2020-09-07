@@ -87,7 +87,7 @@ clone() {
       fi
       if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
         set +e
-        rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${dest_rclone_remote}:${dest_bucket}
+        rclone --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --s3-copy-cutoff ${cutoff} --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${dest_rclone_remote}:${dest_bucket}
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -ne 0; then
@@ -132,6 +132,7 @@ job_directory=4Clone
 timeout=10s
 retry_num=8
 cron=0
+cutoff=64M
 job_period=60
 urgent=0
 job_num=1

@@ -12,11 +12,11 @@ from datetime import datetime, timezone
 from pyarrow import csv
 from eccodes import *
 
-def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc_time_list, conf_prop_list, debug):
+def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file, conf_loc_time_list, conf_prop_list, debug):
     warno = 189
     out_arrows = []
     now = datetime.utcnow()
-    out_file_date_hour_arrow_list = [str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.arrow']
+    out_file_date_hour_arrow_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.arrow']
     out_file_date_hour_arrow = ''.join(out_file_date_hour_arrow_list)
     for cccc in list(set([re.sub('^.*/', '', re.sub('/bufr/' + cat + '/' + subcat + '/' +'.*$', '', in_file)) for in_file in in_file_list if re.match(r'^.*/bufr/' + cat + '/' + subcat + '/.*$', in_file)])):
         loc_time_dict = {}
@@ -277,6 +277,7 @@ def convert_to_arrow(in_file_list, out_dir, cat, subcat, out_list_file, conf_loc
 def main():
     errno=198
     parser = argparse.ArgumentParser()
+    parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('category', type=str, metavar='category')
@@ -286,6 +287,9 @@ def main():
     args = parser.parse_args()
     config_location_time = pkg_resources.resource_filename(__name__, 'conf_bufr_to_arrow_' + args.category + '_' + args.subcategory + '_location_time.csv')
     config_properties = pkg_resources.resource_filename(__name__, 'conf_bufr_to_arrow_' + args.category + '_' + args.subcategory + '_properties.csv')
+    if not re.match(r'^[A-Z]{4}$', args.my_cccc):
+        print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
+        sys.exit(errno)
     if not os.access(args.input_list_file, os.F_OK):
         print('Error', errno, ':', args.input_list_file, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
@@ -327,7 +331,7 @@ def main():
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_location_time_list = list(csv.read_csv(config_location_time).to_pandas().itertuples())
         conf_properties_list = list(csv.read_csv(config_properties).to_pandas().itertuples())
-        convert_to_arrow(input_file_list, args.output_directory, args.category, args.subcategory, args.output_list_file, conf_location_time_list, conf_properties_list, args.debug)
+        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.category, args.subcategory, args.output_list_file, conf_location_time_list, conf_properties_list, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

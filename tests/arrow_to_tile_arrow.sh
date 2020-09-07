@@ -17,7 +17,6 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -evx
 sh_name=arrow_to_tile_arrow.sh
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 if test -s pid/${sh_name}.txt; then
@@ -27,11 +26,17 @@ else
   running=0
 fi
 if test ${running} -eq 0; then
+  now=`date -u "+%Y%m%d%H%M%S"`
   {
     for i in `ls -1 sub_arrow_synop|grep -v '\.tmp$'|uniq`; do
-      ./met_pre_arrow_to_tile_arrow.py sub_arrow_synop/${i} cache_tile_arrow 1 1>/dev/null 2>>log/met_pre_arrow_to_tile_arrow.py.log
+      ./met_pre_arrow_to_tile_arrow.py sub_arrow_synop/${i} cache_tile_arrow 1 1>>tile_arrow/${now}.txt.tmp 2>>log/met_pre_arrow_to_tile_arrow.py.log
       rm -f sub_arrow_synop/${i}
     done
+    if test -s tile_arrow/${now}.txt.tmp; then
+      mv tile_arrow/${now}.txt.tmp tile_arrow/${now}.txt
+    else
+      rm -f tile_arrow/${now}.txt.tmp
+    fi
   } &
   pid=$!
   echo ${pid} > pid/${sh_name}.txt

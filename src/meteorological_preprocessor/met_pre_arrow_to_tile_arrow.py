@@ -16,17 +16,19 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     form = ''
     cat_dir = ''
     date_hour = ''
+    creator = ''
     created = ''
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
-        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/location_datetime/([0-9]*)/([0-9]*)\.arrow$', in_file)
+        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/location_datetime/([0-9]*)/C_([A-Z]{4})_([0-9]*)\.arrow$', in_file)
         if loc_time_match:
             cccc = loc_time_match.group(1)
             form = loc_time_match.group(2)
             cat_dir = loc_time_match.group(3)
             date_hour = loc_time_match.group(4)
-            created = loc_time_match.group(5)
+            creator = loc_time_match.group(5)
+            created = loc_time_match.group(6)
             new_datetime_list_dict = {}
             new_id_list_dict = {}
             replace_id_list_dict = {}
@@ -76,7 +78,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 if not out_file in out_arrows:
                                     out_arrows.append(out_file)
         else:
-            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/([^/]*)/' + date_hour + '/' + created + '\.arrow$', in_file)
+            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/([^/]*)/' + date_hour + '/C_' + creator + '_' + created + '\.arrow$', in_file)
             if prop_match:
                 prop_short_name = prop_match.group(1)
                 in_df = pa.ipc.open_file(in_file).read_pandas()
@@ -100,11 +102,11 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     	    print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
-                                        duplicated = concat_df.duplicated(subset=['indicator', 'id'])
-                                        if len(concat_df[~duplicated]) > 0:
+                                        updated_df = concat_df[~concat_df.duplicated(subset=['indicator', 'id'])]
+                                        if len(updated_df) > 0:
                                             with open(out_file, 'bw') as out_f:
-                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
-                                                writer.write_table(pa.Table.from_pandas(concat_df[~duplicated]))
+                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
+                                                writer.write_table(pa.Table.from_pandas(updated_df))
                                                 writer.close()
                                             if not out_file in out_arrows:
                                                 out_arrows.append(out_file)

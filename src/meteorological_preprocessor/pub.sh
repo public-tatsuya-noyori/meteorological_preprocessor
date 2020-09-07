@@ -21,7 +21,7 @@ set -e
 publish(){
   grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-    rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+    rclone --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
     exit_code=1
     retry_count=1
     rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
@@ -49,6 +49,7 @@ job_directory=4Pub
 timeout=10s
 retry_num=8
 cron=0
+cutoff=64M
 rm_list_file=0
 for arg in "$@"; do
   case "${arg}" in
