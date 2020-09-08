@@ -22,7 +22,7 @@ delete() {
   rclone --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 3 --retries 1 --size-only --stats 0 --timeout ${timeout} delete --min-age "${hours_ago}h" --rmdirs ${rclone_remote}:${bucket_directory}
 }
 job_directory=4Del
-timeout=10s
+timeout=8s
 retry_num=8
 cron=0
 for arg in "$@"; do

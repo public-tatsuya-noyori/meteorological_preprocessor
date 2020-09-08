@@ -46,7 +46,7 @@ publish(){
 }
 index_directory=4PubSub
 job_directory=4Pub
-timeout=10s
+timeout=8s
 retry_num=8
 cron=0
 cutoff=32M

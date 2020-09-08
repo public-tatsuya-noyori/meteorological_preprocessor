@@ -117,7 +117,7 @@ subscribe() {
 }
 index_directory=4PubSub
 job_directory=4Sub
-timeout=10s
+timeout=8s
 cron=0
 cutoff=32M
 job_period=60
