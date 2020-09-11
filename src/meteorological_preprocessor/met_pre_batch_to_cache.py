@@ -82,8 +82,14 @@ def get_grib_subdir_list(grib_file):
                 gid = codes_grib_new_from_file(grib_file_stream)
                 if gid is None:
                     break
-                subdir_list.append(str(codes_get(gid, 'iDirectionIncrementInDegrees')) + '_' + str(codes_get(gid, 'jDirectionIncrementInDegrees')))
-                subdir_list.append(str(codes_get(gid, 'laitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')))
+                i_size = codes_get(gid, 'iDirectionIncrementInDegrees');
+                j_size = codes_get(gid, 'jDirectionIncrementInDegrees');
+                if i_size <= 0 and j_size > 0:
+                    i_size = j_size
+                elif i_size > 0 and j_size <= 0:
+                    j_size = i_size
+                subdir_list.append(str(i_size) + '_' + str(j_size))
+                subdir_list.append(str(codes_get(gid, 'latitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')))
                 subdir_list.append(str(codes_get(gid, 'dataDate')).zfill(8) + str(codes_get(gid, 'dataTime')).zfill(4)[0:2])
                 codes_release(gid)
             except:
@@ -117,8 +123,6 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_directory_list.append(cccc)
                 out_directory_list.append(conf_row.format)
                 out_directory_list.append(conf_row.category)
-                out_directory_list.append(conf_row.subcategory)
-                out_directory_list.append(data_date + ddhhmm[2:4])
             elif conf_row.cccc:
                 cccc = conf_row.cccc
                 out_directory_list.append(cccc)
@@ -160,6 +164,9 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                             print('Warning', warno, ':', 'BUFR decode error on', in_file, 'has occurred. The file is not created', file=sys.stderr)
                 if not is_bufr:
                     return ''
+            if conf_row.format != 'grib' and not re.match('^GRIB$', start_char4):
+                out_directory_list.append(conf_row.subcategory)
+                out_directory_list.append(data_date + ddhhmm[2:4])
             out_directory = '/'.join(out_directory_list)
             os.makedirs(out_directory, exist_ok=True)
             if ttaaii:

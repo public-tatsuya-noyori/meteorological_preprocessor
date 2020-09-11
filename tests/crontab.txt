@@ -1,11 +1,14 @@
 # download from WIS-JMA
 * * * * * cd /home/noyori/tests; ./download_pub.sh p1 >> log/download_pub.sh.p1.log 2>&1
 * * * * * cd /home/noyori/tests; ./download.sh p2 >> log/download.sh.p2.log 2>&1
+* * * * * cd /home/noyori/tests; ./download.sh p2_crex >> log/download.sh.p2_crex.log 2>&1
 * * * * * cd /home/noyori/tests; ./download.sh p3 >> log/download.sh.p3.log 2>&1
 * * * * * cd /home/noyori/tests; ./download.sh p4 >> log/download.sh.p4.log 2>&1
+* * * * * cd /home/noyori/tests; ./download.sh p5 >> log/download.sh.p4.log 2>&1
 
 # publish to ap
 * * * * * cd /home/noyori/tests; for i in `ls -1 download_p2/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_p2/open ap_p2 ${i} wasabi japan.meteorological.agency.open.data p2  8;done >> log/pub.sh.ap_p2.log 2>&1
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_crex/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_p2_crex/open ap_p2_crex ${i} wasabi japan.meteorological.agency.open.data p2  2;done >> log/pub.sh.ap_p2_crex.log 2>&1
 * * * * * cd /home/noyori/tests; for i in `ls -1 download_p3/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_p3/open ap_p3 ${i} wasabi japan.meteorological.agency.open.data p3 16;done >> log/pub.sh.ap_p3.log 2>&1
 * * * * * cd /home/noyori/tests; for i in `ls -1 download_p4/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_p4/open ap_p4 ${i} wasabi japan.meteorological.agency.open.data p4 32;done >> log/pub.sh.ap_p4.log 2>&1
 
@@ -36,10 +39,10 @@
 * * * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache sub_bufr_synop wasabi_eu japan.meteorological.agency.open.data p3 8 bufr_synop_pattern.txt 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr_synop.log; if test -s sub_bufr_synop/${now}.tmp; then mv -f sub_bufr_synop/${now}.tmp sub_bufr_synop/${now}.txt; else rm -f sub_bufr_synop/${now}.tmp; fi
 
 # convert bufr synop to arrow
-* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
+#* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
 
 # convert arrow to tile arrow
-* * * * * cd /home/noyori/tests; ./arrow_to_tile_arrow.sh >> log/arrow_to_tile_arrow.sh.log 2>&1
+#* * * * * cd /home/noyori/tests; ./arrow_to_tile_arrow.sh >> log/arrow_to_tile_arrow.sh.log 2>&1
 
 # publish tile arrow
-* * * * * cd /home/noyori/tests; ./pub_tile_arrow.sh >> log/pub_tile_arrow.sh.log 2>&1
+#* * * * * cd /home/noyori/tests; ./pub_tile_arrow.sh >> log/pub_tile_arrow.sh.log 2>&1

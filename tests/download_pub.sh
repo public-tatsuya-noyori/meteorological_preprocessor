@@ -24,36 +24,31 @@ if test $1 = 'p1'; then
   parallel=16
   format=Alphanumeric
   category=Warning
-  in_pattern=''
-  ex_pattern=''
 elif test $1 = 'p2'; then
   priority=p2
   parallel=16
   format=Alphanumeric
   category='!Warning'
-  in_pattern=''
-  ex_pattern=''
+elif test $1 = 'p2_crex'; then
+  priority=p2
+  parallel=16
+  format=CREX
+  category='!Warning'
 elif test $1 = 'p3'; then
   priority=p3
   parallel=16
   format=BUFR
   category='!Satellite'
-  in_pattern=''
-  ex_pattern='(/A_ISX|/Satellite)'
 elif test $1 = 'p4'; then
   priority=p4
   parallel=16
   format=BUFR
-  category='!Warning'
-  in_pattern='/Satellite'
-  ex_pattern=''
-elif test $1 = 'p5'; then
+  category='Satellite'
+elif test $1 = 'p4'; then
   priority=p5
   parallel=16
-  format=BUFR
-  category='!Warning'
-  in_pattern='/A_ISX'
-  ex_pattern=''
+  format=GRIB
+  category=''
 fi
 if test -s download_${priority}/pid.txt; then
   running=`cat download_${priority}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority} " | wc -l`
@@ -100,7 +95,7 @@ if test -s download_${priority}/created.txt; then
     set +e
     aria2c --check-certificate=false -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l download_${priority}/aria2c.log -i download_${priority}/created.txt -d download_${priority}/downloaded >> download_${priority}/get_file_stdout.txt
     set -e
-    met_pre_batch_to_cache RJTD download_${priority}/downloaded cache_${priority} 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
+    ./met_pre_batch_to_cache.py RJTD download_${priority}/downloaded cache_${priority} 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
     grep -F '[ERROR]' download_${priority}/aria2c.log | grep 'URI=' | sed -e 's/^.*URI=//g' | grep -v '^ *$' | sort -u > download_${priority}/created.txt
     if test -s download_${priority}/created.txt; then
       created_num=`cat download_${priority}/created.txt | wc -l`
@@ -109,8 +104,9 @@ if test -s download_${priority}/created.txt; then
     fi
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
-    mv -f download_${priority}/cached/${now}.txt.tmp download_${priority}/cached/${now}.txt
+    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" > download_${priority}/cached/${now}.txt
   fi
+  rm -f download_${priority}/cached/${now}.txt.tmp
 fi
 for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_${priority}/open ap_${priority} ${i} wasabi japan.meteorological.agency.open.data ${priority} 4;done
 } &

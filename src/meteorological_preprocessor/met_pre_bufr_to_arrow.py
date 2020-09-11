@@ -4,6 +4,7 @@ import math
 import os
 import pkg_resources
 import pyarrow as pa
+import pandas as pd
 import re
 import sys
 import traceback
@@ -47,7 +48,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                     tmp_loc_time_dict = {}
                     try:
                         codes_set(bufr, 'unpack', 1)
-                        none_list = []
+                        none_np = np.array([])
                         is_loc_time = True
                         for conf_row in conf_loc_time_list:
                             values = codes_get_array(bufr, conf_row.key)
@@ -63,40 +64,38 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                             if conf_row.slide > -1 and conf_row.step > 0:
                                 values = np.array(values)[conf_row.slide::conf_row.step]
                             if len(values) > 0:
-                                if type(values[0]) == str:
-                                    values = [value.lstrip().rstrip() for value in values]
+                                if values[0] == str:
+                                    values = np.array([value.lstrip().rstrip() for value in values])
                                 else:
+                                    values_df = pd.DataFrame(values)
+                                    not_nan_values_df = values_df.where((pd.notnull(values_df)), None)
+                                    values = not_nan_values_df.to_numpy()
                                     if conf_row.name == 'location':
-                                        values = [None if value < conf_row.min or value > conf_row.max else value for value in values]
+                                        values = np.array([None if value == None or value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
                                     elif conf_row.name == 'datetime':
-                                        if conf_row.key == 'year':
-                                            values = [None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in values]
-                                        elif conf_row.key == 'millisecond':
-                                            values = [None if value < conf_row.min or value > conf_row.max else '.' + str(value).zfill(4) for value in values]
+                                        values = np.array([None if value == None or value < conf_row.min or value > conf_row.max else str(value) for value in values])
+                                        if conf_row.key == 'millisecond':
                                             is_millisecond = True
                                         elif conf_row.key == 'second':
-                                            values = [None if value < conf_row.min or value > conf_row.max else '.' + str(value).zfill(4) for value in values]
                                             is_second = True
-                                        else:
-                                            values = [None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values]
                                     else:
-                                        values = [None if value < conf_row.min or value > conf_row.max else value for value in values]
+                                        values = np.array([None if value == None or value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
                                     if conf_row.name == 'longitude [degree]':
-                                        values = [conf_row.max if value == conf_row.min else value for value in values]
+                                        values = np.array([conf_row.max if value == conf_row.min else value for value in values], dtype=object)
                                 tmp_loc_time_dict[conf_row.key] = values
                                 if conf_row.name == 'location' or conf_row.name == 'datetime':
-                                    tmp_none_list = [False if value == None else True for value in values]
-                                    if len(none_list) > 0:
-                                        none_list = none_list * np.array(tmp_none_list)
+                                    tmp_none_np = np.array([False if value == None else True for value in values])
+                                    if len(none_np) > 0:
+                                        none_np = none_np * tmp_none_np
                                     else:
-                                        none_list = np.array(tmp_none_list)
+                                        none_np = tmp_none_np
                             else:
                                 is_loc_time = False
                                 break
                         if not is_loc_time or not is_target:
                             codes_release(bufr)
                             break
-                        tmp_loc_time_dict['none'] = none_list
+                        tmp_loc_time_dict['none'] = none_np
                     except CodesInternalError as err:
                         print('Warning', warno, ':', 'CodesInternalError is happend at tmp_loc_time_dict in', in_file, file=sys.stderr)
                         break
@@ -104,13 +103,14 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                     try:
                         for conf_row in conf_prop_list:
                             values = codes_get_array(bufr, conf_row.key)
-                            if conf_row.slide > -1 and conf_row.step > 0:
-                                values = np.array(values)[conf_row.slide::conf_row.step]
                             if len(values) > 0:
-                                if type(values[0]) == str:
-                                    values = [value.lstrip().rstrip() for value in values]
+                                if values[0] == str:
+                                    values = np.array([value.lstrip().rstrip() for value in values])
                                 else:
-                                    values = [None if value < conf_row.min or value > conf_row.max else value for value in values]
+                                    values_df = pd.DataFrame(values)
+                                    not_nan_values_df = values_df.where((pd.notnull(values_df)), None)
+                                    values = not_nan_values_df.to_numpy()                                                                          
+                                    values = np.array([None if value == None or value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
                                 tmp_prop_dict[conf_row.name] = values
                     except CodesInternalError as err:
                         print('Warning', warno, ':', 'CodesInternalError is happend at tmp_prop_dict in', in_file, file=sys.stderr)
@@ -135,7 +135,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                             else:
                                 conf_loc_time_name_keys_dict[conf_row.name] = [conf_row.key]
                             if conf_row.name == 'location':
-                                tmp_loc_id_pa = pa.array(tmp_loc_time_dict[conf_row.key])
+                                tmp_loc_id_pa = pa.array(tmp_loc_time_dict[conf_row.key].tolist())
                                 if not_none_index_pa:
                                     tmp_loc_id_pa = tmp_loc_id_pa.take(not_none_index_pa)
                                 if tmp_loc_id_pa:
@@ -150,16 +150,16 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                                         else:
                                             message_loc_id_np = np.array(tmp_loc_id_pa.tolist(), dtype=object)
                             elif conf_row.name == 'datetime':
-                                tmp_datetime_pa = pa.array(tmp_loc_time_dict[conf_row.key])
+                                tmp_datetime_pa = pa.array(tmp_loc_time_dict[conf_row.key].tolist())
                                 if not_none_index_pa:
                                     tmp_datetime_pa = tmp_datetime_pa.take(not_none_index_pa)
                                 if tmp_datetime_pa:
                                     if len(message_datetime_np) > 0:
                                         message_datetime_np = message_datetime_np + np.array(tmp_datetime_pa.tolist(), dtype=object)
                                     else:
-                                        message_datetime_np = np.array(tmp_datetime_pa.tolist(), dtype=object)
+                                        message_datetime_np = np.array(tmp_datetime_pa.tolist())
                             elif conf_row.name == 'latitude [degree]':
-                                tmp_latitude_pa = pa.array(tmp_loc_time_dict[conf_row.key], conf_row.datatype)
+                                tmp_latitude_pa = pa.array(tmp_loc_time_dict[conf_row.key].tolist())
                                 if not_none_index_pa:
                                     tmp_latitude_pa = tmp_latitude_pa.take(not_none_index_pa)
                                 if tmp_latitude_pa:
@@ -168,7 +168,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                                     else:
                                         message_latitude_np = np.array(tmp_latitude_pa.tolist(), dtype=object)
                             elif conf_row.name == 'longitude [degree]':
-                                tmp_longitude_pa = pa.array(tmp_loc_time_dict[conf_row.key], conf_row.datatype)
+                                tmp_longitude_pa = pa.array(tmp_loc_time_dict[conf_row.key].tolist())
                                 if not_none_index_pa:
                                     tmp_longitude_pa = tmp_longitude_pa.take(not_none_index_pa)
                                 if tmp_longitude_pa:
@@ -177,7 +177,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                                     else:
                                         message_longitude_np = np.array(tmp_longitude_pa.tolist(), dtype=object)
                             elif conf_row.name == 'height':
-                                tmp_height_pa = pa.array(tmp_loc_time_dict[conf_row.key], conf_row.datatype)
+                                tmp_height_pa = pa.array(tmp_loc_time_dict[conf_row.key].tolist())
                                 if not_none_index_pa:
                                     tmp_height_pa = tmp_height_pa.take(not_none_index_pa)
                                 if tmp_height_pa:
@@ -192,11 +192,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                                 loc_time_dict['location'] = message_loc_id_np.tolist()
                             tmp_datetime_list = []
                             if is_millisecond:
-                                tmp_datetime_list = [datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) for dt_str in message_datetime_np]
+                                tmp_datetime_list = [datetime(int(dt[0]), int(dt[1]), int(dt[2]), int(dt[3]), int(dt[4]), int(dt[5]), int(dt[6]), tzinfo=timezone.utc) for dt in message_datetime_np]
                             if is_second:
-                                tmp_datetime_list = [datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) for dt_str in message_datetime_np]
+                                tmp_datetime_list =[datetime(int(dt[0]), int(dt[1]), int(dt[2]), int(dt[3]), int(dt[4]), int(dt[5]), 0, tzinfo=timezone.utc) for dt in message_datetime_np]
                             else:
-                                tmp_datetime_list =[datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) for dt_str in message_datetime_np]
+                                print(message_datetime_np)
+                                tmp_datetime_list =[datetime(int(dt[0]), int(dt[1]), int(dt[2]), int(dt[3]), int(dt[4]), 0, 0, tzinfo=timezone.utc) for dt in message_datetime_np]
                             if 'datetime' in loc_time_dict:
                                 loc_time_dict['datetime'] = loc_time_dict['datetime'] + tmp_datetime_list
                             elif 'datetime' in conf_loc_time_name_keys_dict.keys():
