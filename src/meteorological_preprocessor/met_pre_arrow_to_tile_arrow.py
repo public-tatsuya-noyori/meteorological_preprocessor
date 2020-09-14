@@ -53,15 +53,15 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
                             new_id_list_dict[tile_x,  tile_y, datetime] = new_df['id'].tolist()
                             new_df.insert(0, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
-                            new_df = new_df.astype({'indicator': 'uint32'}, {'id': 'uint32'})
+                            new_df = new_df.astype({'indicator': 'int32'}, {'id': 'int32'})
                             if os.path.exists(out_file):
                                 if debug:
                                     print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
+                                concat_df = concat_df.astype({'indicator': 'int32'}, {'id': 'int32'})
                                 unique_key_list = new_df.columns.values.tolist()
                                 unique_key_list.pop(1)#del id
-                                print(unique_key_list)
                                 duplicated = concat_df.duplicated(subset=unique_key_list)
                                 keeped = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 new_df_duplicated_id_list = concat_df[duplicated]['id'].tolist()
@@ -96,7 +96,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', prop_short_name, '/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), '/', str(zoom), '/', str(tile_x)])
                                     out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
                                     new_df.insert(0, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
-                                    new_df = new_df.astype({'indicator': 'uint32'}, {'id': 'uint32'})
+                                    new_df = new_df.astype({'indicator': 'int32'}, {'id': 'int32'})
                                     if os.path.exists(out_file):
                                         new_df_duplicated_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][0]
                                         old_df_keeped_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][1]
@@ -107,6 +107,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         updated_df = concat_df[~concat_df.duplicated(subset=['indicator', 'id'])]
+                                        updated_df = updated_df.astype({'indicator': 'int32'}, {'id': 'int32'})
                                         if len(updated_df) > 0:
                                             with open(out_file, 'bw') as out_f:
                                                 writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
