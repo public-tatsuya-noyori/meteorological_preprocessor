@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+
 import argparse
 import os
 import pyarrow as pa
@@ -15,7 +17,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     cccc = ''
     form = ''
     cat_dir = ''
-    date_hour = ''
+    date_hourminute = ''
     creator = ''
     created = ''
     for in_file in in_file_list:
@@ -26,7 +28,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
             cccc = loc_time_match.group(1)
             form = loc_time_match.group(2)
             cat_dir = loc_time_match.group(3)
-            date_hour = loc_time_match.group(4)
+            date_hourminute = loc_time_match.group(4)
             creator = loc_time_match.group(5)
             created = loc_time_match.group(6)
             new_datetime_list_dict = {}
@@ -78,7 +80,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 if not out_file in out_arrows:
                                     out_arrows.append(out_file)
         else:
-            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/([^/]*)/' + date_hour + '/C_' + creator + '_' + created + '\.arrow$', in_file)
+            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/([^/]*)/' + date_hourminute + '/C_' + creator + '_' + created + '\.arrow$', in_file)
             if prop_match:
                 prop_short_name = prop_match.group(1)
                 in_df = pa.ipc.open_file(in_file).read_pandas()
@@ -99,7 +101,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         if len(new_df_duplicated_id_list) > 0:
                                             new_df['id'].replace(new_df_duplicated_id_list, old_df_keeped_id_list, inplace=True)
                                         if debug:
-                                    	    print('Debug', ': old_df', out_file, file=sys.stderr)
+                                            print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         updated_df = concat_df[~concat_df.duplicated(subset=['indicator', 'id'])]

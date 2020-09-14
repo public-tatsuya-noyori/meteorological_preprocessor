@@ -170,7 +170,7 @@ if test -n $8; then
 fi
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
     mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
     running=0
