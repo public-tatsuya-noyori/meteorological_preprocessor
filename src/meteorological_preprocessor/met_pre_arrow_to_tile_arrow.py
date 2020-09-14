@@ -59,7 +59,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
-                                unique_key_list = new_df.columns.values.tolist().remove('id')
+                                unique_key_list = new_df.columns.values.tolist()
+                                unique_key_list.pop(1)#del id
+                                print(unique_key_list)
                                 duplicated = concat_df.duplicated(subset=unique_key_list)
                                 keeped = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 new_df_duplicated_id_list = concat_df[duplicated]['id'].tolist()
