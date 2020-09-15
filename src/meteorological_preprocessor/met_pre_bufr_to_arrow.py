@@ -236,7 +236,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                                             property_dict[conf_row.name] = tmp_property_np
         if 'datetime' in location_datetime_dict:
             id_list = [id_num for id_num in range(0, len(location_datetime_dict['datetime']))]
-            location_datetime_data = [pa.array(id_list, 'uint32')]
+            location_datetime_data = [pa.array(id_list, 'int32')]
             name_list = ['id']
             for key in location_datetime_dict.keys():
                 if key == 'datetime':
@@ -262,7 +262,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, cat, subcat, out_list_file,
                             writer.close()
                             print(out_file, file=out_list_file)
                     for key in property_dict.keys():
-                        datetime_id_list = pa.array(id_list, 'uint32').take(pa.array(datetime_index_list))
+                        datetime_id_list = pa.array(id_list, 'int32').take(pa.array(datetime_index_list))
                         datetime_property_data = property_dict[key][datetime_index_list]
                         value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                         if len(value_index_list) > 0:

@@ -9,4 +9,5 @@ if sys.argv[1] == "-v":
     print(df.values)
 else:
     df = pa.ipc.open_file(sys.argv[1]).read_pandas()
+    print(df.dtypes)
     print(df)
