@@ -7,7 +7,7 @@ import pandas as pd
 import re
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 
 def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     warno = 189
@@ -19,6 +19,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     date_hourminute = ''
     creator = ''
     created = ''
+    created_second = 0
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
@@ -30,9 +31,10 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
             date_hourminute = loc_time_match.group(4)
             creator = loc_time_match.group(5)
             created = loc_time_match.group(6)
+            created_second = int(math.floor(datetime(int(created[0:4]), int(created[4:6]), int(created[6:8]), int(created[8:10]), int(created[10:12]), int(created[12:14]), 0, tzinfo=timezone.utc).timestamp()))
             new_datetime_list_dict = {}
-            new_id_list_dict = {}
-            replace_id_list_dict = {}
+            new_id_etfo_dict = {}
+            del_etfo_id_dict = {}
             in_df = pa.ipc.open_file(in_file).read_pandas()
             for tile_x in range(0, 2**(zoom + 1)):
                 for tile_y in range(0, 2**(zoom)):
@@ -45,29 +47,47 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                     else:
                         tile_df = in_df[(res * tile_x - 180.0 < in_df['longitude [degree]']) & (in_df['longitude [degree]'] <= res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y > in_df['latitude [degree]']) & (in_df['latitude [degree]'] >= 90.0 - res * (tile_y + 1))]
                     new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].unique()
-                    for datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                        new_df = tile_df[(datetime == tile_df['datetime'])]
+                    for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
+                        new_df = tile_df[(new_datetime == tile_df['datetime'])]
                         if len(new_df['id'].tolist()) > 0:
-                            out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/location_datetime/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), str(math.floor(datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x)])
+                            out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/location_datetime/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x)])
                             out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
-                            new_id_list_dict[tile_x,  tile_y, datetime] = new_df['id'].tolist()
-                            new_df.insert(0, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
-                            new_df = new_df.astype({'indicator': 'int32'}, {'id': 'int32'})
+                            new_df = new_df.astype({'id': 'int32'})
+                            new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
+                            new_df = new_df.astype({'indicator': 'int32'})
+                            etfo_df = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
+                            etfo_df = - etfo_df.map(pd.Timestamp.timestamp).astype(int)
+                            new_df.insert(0, 'elapsed time from observation [s]', etfo_df)
+                            new_df = new_df.astype({'elapsed time from observation [s]': 'int32'})
+                            etfo_list = etfo_df.tolist()
+                            id_list = new_df['id'].tolist()
+                            tmp_id_etfo_dict = {}
+                            i = 0
+                            for id in id_list:
+                                tmp_id_etfo_dict[id] = etfo_list[i]
+                                i += 1
+                            new_id_etfo_dict[(tile_x,  tile_y, new_datetime)] = tmp_id_etfo_dict
                             if os.path.exists(out_file):
                                 if debug:
                                     print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                 unique_key_list = new_df.columns.values.tolist()
-                                unique_key_list.pop(1)#del id
-                                duplicated = concat_df.duplicated(subset=unique_key_list)
-                                keeped = concat_df.duplicated(subset=unique_key_list, keep='last')
-                                new_df_duplicated_id_list = concat_df[duplicated]['id'].tolist()
-                                old_df_keeped_id_list = concat_df[keeped]['id'].tolist()
-                                replace_id_list_dict[(tile_x,  tile_y, datetime)] = [new_df_duplicated_id_list, old_df_keeped_id_list]
+                                unique_key_list.pop(2)#del id
+                                unique_key_list.pop(0)#del etfo
+                                duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
+                                del_etfo_id_list = []
+                                del_etfo_list = concat_df[duplicated]['elapsed time from observation [s]']
+                                i = 0
+                                for id in concat_df[duplicated]['id']:
+                                    if not [del_etfo_list[i], id] in del_etfo_id_list:
+                                        del_etfo_id_list.append([del_etfo_list[i], id])
+                                        i += 1
+                                del_etfo_id_dict[(tile_x,  tile_y, new_datetime)] = del_etfo_id_list
                                 updated_df = concat_df[~duplicated]
                                 updated_df = updated_df.astype({'id': 'int32'})
                                 updated_df = updated_df.astype({'indicator': 'int32'})
+                                updated_df = new_df.astype({'elapsed time from observation [s]': 'int32'})
                                 with open(out_file, 'bw') as out_f:
                                     writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
                                     writer.write_table(pa.Table.from_pandas(updated_df))
@@ -89,27 +109,39 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                 in_df = pa.ipc.open_file(in_file).read_pandas()
                 for tile_x in range(0, 2**(zoom + 1)):
                     for tile_y in range(0, 2**(zoom)):
-                        for datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                            if len(new_id_list_dict[tile_x,  tile_y, datetime]) > 0:
-                                intersection_id_list = list(set(new_id_list_dict[tile_x,  tile_y, datetime]) & set(in_df['id'].tolist()))
+                        for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
+                            if len(new_id_etfo_dict[tile_x,  tile_y, new_datetime]) > 0:                                
+                                intersection_id_list = list(set(new_id_etfo_dict[(tile_x,  tile_y, new_datetime)].keys()) & set(in_df['id'].tolist()))
                                 new_df = in_df[in_df['id'].isin(intersection_id_list)]
                                 if len(new_df['id'].tolist()) > 0:
-                                    out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', prop_short_name, '/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), str(math.floor(datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x)])
+                                    out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', prop_short_name, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x)])
                                     out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
-                                    new_df.insert(0, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
-                                    new_df = new_df.astype({'indicator': 'int32'}, {'id': 'int32'})
+                                    new_df = new_df.astype({'id': 'int32'})
+                                    new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
+                                    new_df = new_df.astype({'indicator': 'int32'})
+                                    tmp_etfo_list = []
+                                    tmp_id_etfo_dict = new_id_etfo_dict[(tile_x,  tile_y, new_datetime)]
+                                    for id in new_df['id'].tolist():
+                                        tmp_etfo_list.append(tmp_id_etfo_dict[id])
+                                    new_df.insert(0, 'elapsed time from observation [s]', tmp_etfo_list)
+                                    new_df = new_df.astype({'elapsed time from observation [s]': 'int32'})
                                     if os.path.exists(out_file):
-                                        new_df_duplicated_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][0]
-                                        old_df_keeped_id_list = replace_id_list_dict[(tile_x,  tile_y, datetime)][1]
-                                        if len(new_df_duplicated_id_list) > 0:
-                                            new_df['id'].replace(new_df_duplicated_id_list, old_df_keeped_id_list, inplace=True)
                                         if debug:
                                             print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
-                                        updated_df = concat_df[~concat_df.duplicated(subset=['indicator', 'id'])]
+                                        concat_df = concat_df.astype({'id': 'int32'})
+                                        concat_df = concat_df.astype({'elapsed time from observation [s]': 'int32'})
+                                        for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)]:
+                                            del_index = concat_df.index[(concat_df['elapsed time from observation [s]'] == del_etfo_id[0]) & (concat_df['id'] == del_etfo_id[1])]
+                                            if len(del_index) == 1:
+                                                concat_df = concat_df.drop(del_index)
+                                        unique_key_list = new_df.columns.values.tolist()
+                                        duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
+                                        updated_df = concat_df[~duplicated]
                                         updated_df = updated_df.astype({'id': 'int32'})
                                         updated_df = updated_df.astype({'indicator': 'int32'})
+                                        updated_df = updated_df.astype({'elapsed time from observation [s]': 'int32'})
                                         if len(updated_df) > 0:
                                             with open(out_file, 'bw') as out_f:
                                                 writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
