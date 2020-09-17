@@ -57,8 +57,8 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             new_df = new_df.astype({'indicator': 'int32'})
                             etfo_df = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
                             etfo_df = - etfo_df.map(pd.Timestamp.timestamp).astype(int)
-                            new_df.insert(0, 'elapsed time from observation [s]', etfo_df)
-                            new_df = new_df.astype({'elapsed time from observation [s]': 'int32'})
+                            new_df.insert(0, 'elapsed time [s]', etfo_df)
+                            new_df = new_df.astype({'elapsed time [s]': 'int32'})
                             etfo_list = etfo_df.tolist()
                             id_list = new_df['id'].tolist()
                             tmp_id_etfo_dict = {}
@@ -72,12 +72,15 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
-                                unique_key_list = new_df.columns.values.tolist()
+                                concat_df = concat_df.astype({'id': 'int32'})
+                                concat_df = concat_df.astype({'indicator': 'int32'})
+                                concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
+                                unique_key_list = concat_df.columns.values.tolist()
                                 unique_key_list.pop(2)#del id
                                 unique_key_list.pop(0)#del etfo
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_list = []
-                                del_etfo_list = concat_df[duplicated]['elapsed time from observation [s]']
+                                del_etfo_list = concat_df[duplicated]['elapsed time [s]']
                                 i = 0
                                 for id in concat_df[duplicated]['id']:
                                     if not [del_etfo_list[i], id] in del_etfo_id_list:
@@ -87,11 +90,12 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 updated_df = concat_df[~duplicated]
                                 updated_df = updated_df.astype({'id': 'int32'})
                                 updated_df = updated_df.astype({'indicator': 'int32'})
-                                updated_df = new_df.astype({'elapsed time from observation [s]': 'int32'})
-                                with open(out_file, 'bw') as out_f:
-                                    writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
-                                    writer.write_table(pa.Table.from_pandas(updated_df))
-                                    writer.close()
+                                updated_df = updated_df.astype({'elapsed time [s]': 'int32'})
+                                if len(updated_df) > 0:
+                                    with open(out_file, 'bw') as out_f:
+                                        writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
+                                        writer.write_table(pa.Table.from_pandas(updated_df))
+                                        writer.close()
                                 if not out_file in out_arrows:
                                     out_arrows.append(out_file)
                             else:
@@ -123,17 +127,18 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     tmp_id_etfo_dict = new_id_etfo_dict[(tile_x,  tile_y, new_datetime)]
                                     for id in new_df['id'].tolist():
                                         tmp_etfo_list.append(tmp_id_etfo_dict[id])
-                                    new_df.insert(0, 'elapsed time from observation [s]', tmp_etfo_list)
-                                    new_df = new_df.astype({'elapsed time from observation [s]': 'int32'})
+                                    new_df.insert(0, 'elapsed time [s]', tmp_etfo_list)
+                                    new_df = new_df.astype({'elapsed time [s]': 'int32'})
                                     if os.path.exists(out_file):
                                         if debug:
                                             print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         concat_df = concat_df.astype({'id': 'int32'})
-                                        concat_df = concat_df.astype({'elapsed time from observation [s]': 'int32'})
+                                        concat_df = concat_df.astype({'indicator': 'int32'})
+                                        concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
                                         for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)]:
-                                            del_index = concat_df.index[(concat_df['elapsed time from observation [s]'] == del_etfo_id[0]) & (concat_df['id'] == del_etfo_id[1])]
+                                            del_index = concat_df.index[(concat_df['elapsed time [s]'] == del_etfo_id[0]) & (concat_df['id'] == del_etfo_id[1])]
                                             if len(del_index) == 1:
                                                 concat_df = concat_df.drop(del_index)
                                         unique_key_list = new_df.columns.values.tolist()
@@ -141,7 +146,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         updated_df = concat_df[~duplicated]
                                         updated_df = updated_df.astype({'id': 'int32'})
                                         updated_df = updated_df.astype({'indicator': 'int32'})
-                                        updated_df = updated_df.astype({'elapsed time from observation [s]': 'int32'})
+                                        updated_df = updated_df.astype({'elapsed time [s]': 'int32'})
                                         if len(updated_df) > 0:
                                             with open(out_file, 'bw') as out_f:
                                                 writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))

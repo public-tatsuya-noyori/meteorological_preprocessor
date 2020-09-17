@@ -27,9 +27,18 @@ else
 fi
 if test ${running} -eq 0; then
   {
+    cp /dev/null tile_arrow/pub.txt.tmp
+    cp /dev/null tile_arrow/pub.txt2.tmp
     for i in `ls -1 tile_arrow|grep -v '\.tmp$'|uniq`; do
-      ./pub.sh --cron --rm_list_file cache_tile_arrow tile_arrow tile_arrow/${i} wasabi japan.meteorological.agency.open.data.aws.js.s3.explorer p9 8 2>>log/pub.sh.tile_arrow.log
+      cat tile_arrow/${i} >> tile_arrow/pub.txt.tmp
+      rm -f tile_arrow/${i}
     done
+    if test -s tile_arrow/pub.txt.tmp; then
+      cat tile_arrow/pub.txt.tmp | sort | uniq > tile_arrow/pub.txt2.tmp 
+    fi
+    if test -s tile_arrow/pub.txt2.tmp; then
+      ./pub.sh --cron  --rm_list_file cache_tile_arrow tile_arrow tile_arrow/pub.txt2.tmp wasabi japan.meteorological.agency.open.data p8 8 2>>log/pub.sh.tile_arrow.log
+    fi
   } &
   pid=$!
   echo ${pid} > pid/${sh_name}.txt
