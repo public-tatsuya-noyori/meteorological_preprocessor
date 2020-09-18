@@ -78,9 +78,10 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_list = []
                                 del_etfo_list = concat_df[duplicated]['elapsed time [s]']
-                                for index, id in enumerate(concat_df[duplicated]['id']):
-                                    if not [del_etfo_list[index], id] in del_etfo_id_list:
-                                        del_etfo_id_list.append([del_etfo_list[index], id])
+                                if len(del_etfo_list) > 0:
+                                    for index, id in enumerate(concat_df[duplicated]['id']):
+                                        if not [del_etfo_list[index], id] in del_etfo_id_list:
+                                            del_etfo_id_list.append([del_etfo_list[index], id])
                                 del_etfo_id_dict[(tile_x,  tile_y, new_datetime)] = del_etfo_id_list
                                 updated_df = concat_df[~duplicated]
                                 updated_df = updated_df.astype({'id': 'int32'})

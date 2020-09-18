@@ -28,15 +28,16 @@
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 32 >> log/clone.sh.us_to_eu_p5.log 2>&1
 
 # delete on object storage
-0   0 * * * cd /home/noyori/tests; ./del.sh --cron cache ap       wasabi    japan.meteorological.agency.open.data                      24 8 >> log/del.sh.ap.log 2>&1
-10  * * * * cd /home/noyori/tests; ./del.sh --cron cache ap_index wasabi    japan.meteorological.agency.open.data/4PubSub              24 1 >> log/del.sh.ap_index.log 2>&1
-20  8 * * * cd /home/noyori/tests; ./del.sh --cron cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            24 8 >> log/del.sh.us.log 2>&1
-30  * * * * cd /home/noyori/tests; ./del.sh --cron cache us_index wasabi_us japan.meteorological.agency.open.data.us.east.1/4PubSub    24 1 >> log/del.sh.us_index.log 2>&1
-40 16 * * * cd /home/noyori/tests; ./del.sh --cron cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         24 8 >> log/del.sh.eu.log 2>&1
-50  * * * * cd /home/noyori/tests; ./del.sh --cron cache eu_index wasabi_eu japan.meteorological.agency.open.data.eu.central.1/4PubSub 24 1 >> log/del.sh.eu_index.log 2>&1
+0   0 * * * cd /home/noyori/tests; ./del.sh --cron cache ap       wasabi    japan.meteorological.agency.open.data                      24 32 >> log/del.sh.ap.log 2>&1
+10  * * * * cd /home/noyori/tests; ./del.sh --cron cache ap_index wasabi    japan.meteorological.agency.open.data/4PubSub              24 8 >> log/del.sh.ap_index.log 2>&1
+20  8 * * * cd /home/noyori/tests; ./del.sh --cron cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            24 32 >> log/del.sh.us.log 2>&1
+30  * * * * cd /home/noyori/tests; ./del.sh --cron cache us_index wasabi_us japan.meteorological.agency.open.data.us.east.1/4PubSub    24 8 >> log/del.sh.us_index.log 2>&1
+40 16 * * * cd /home/noyori/tests; ./del.sh --cron cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         24 32 >> log/del.sh.eu.log 2>&1
+50  * * * * cd /home/noyori/tests; ./del.sh --cron cache eu_index wasabi_eu japan.meteorological.agency.open.data.eu.central.1/4PubSub 24 8 >> log/del.sh.eu_index.log 2>&1
 
 # delete on local PC
-55 1,9,17 * * * find /home/noyori/tests/cache* -mindepth 6 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
+55 1,9,17 * * * find /home/noyori/tests/cache_p* -mindepth 6 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
+55 6,14,22 * * * find /home/noyori/tests/cache -mindepth 5 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
 # subscribe from eu
 * * * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache sub_bufr_synop wasabi_eu japan.meteorological.agency.open.data p3 8 bufr_synop_pattern.txt 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr_synop.log; if test -s sub_bufr_synop/${now}.tmp; then mv -f sub_bufr_synop/${now}.tmp sub_bufr_synop/${now}.txt; else rm -f sub_bufr_synop/${now}.tmp; fi
