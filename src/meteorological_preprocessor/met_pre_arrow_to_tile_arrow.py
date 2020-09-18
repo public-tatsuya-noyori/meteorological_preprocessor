@@ -60,12 +60,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             new_df.insert(0, 'elapsed time [s]', etfo_df)
                             new_df = new_df.astype({'elapsed time [s]': 'int32'})
                             etfo_list = etfo_df.tolist()
-                            id_list = new_df['id'].tolist()
                             tmp_id_etfo_dict = {}
-                            i = 0
-                            for id in id_list:
-                                tmp_id_etfo_dict[id] = etfo_list[i]
-                                i += 1
+                            for index, id in enumerate(new_df['id'].tolist()):
+                                tmp_id_etfo_dict[id] = etfo_list[index]
                             new_id_etfo_dict[(tile_x,  tile_y, new_datetime)] = tmp_id_etfo_dict
                             if os.path.exists(out_file):
                                 if debug:
@@ -81,11 +78,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_list = []
                                 del_etfo_list = concat_df[duplicated]['elapsed time [s]']
-                                i = 0
-                                for id in concat_df[duplicated]['id']:
-                                    if not [del_etfo_list[i], id] in del_etfo_id_list:
-                                        del_etfo_id_list.append([del_etfo_list[i], id])
-                                        i += 1
+                                for index, id in enumerate(concat_df[duplicated]['id']):
+                                    if not [del_etfo_list[index], id] in del_etfo_id_list:
+                                        del_etfo_id_list.append([del_etfo_list[index], id])
                                 del_etfo_id_dict[(tile_x,  tile_y, new_datetime)] = del_etfo_id_list
                                 updated_df = concat_df[~duplicated]
                                 updated_df = updated_df.astype({'id': 'int32'})
