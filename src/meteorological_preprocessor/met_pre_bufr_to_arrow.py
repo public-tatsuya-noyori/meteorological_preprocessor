@@ -191,8 +191,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     property_dict[pre_conf_row_name] = message_np
 
             if 'datetime' in location_datetime_dict:
-                print(location_datetime_dict['datetime'])
-
                 id_list = [id_num for id_num in range(0, len(location_datetime_dict['datetime']))]
                 location_datetime_data = [pa.array(id_list, 'int32')]
                 name_list = ['id']
