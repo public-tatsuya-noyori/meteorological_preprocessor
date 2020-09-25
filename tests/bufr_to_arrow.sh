@@ -28,7 +28,7 @@ fi
 if test ${running} -eq 0; then
   {
     for i in `ls -1 sub_bufr_synop|grep -v '\.tmp$'|uniq`; do
-      ./met_pre_bufr_to_arrow.py RJTD sub_bufr_synop/${i} cache_bufr_to_arrow surface synop 1> sub_arrow_synop/${i}.tmp 2>>log/met_pre_bufr_to_arrow.py.log
+      ./met_pre_bufr_to_arrow.py RJTD sub_bufr_synop/${i} cache_bufr_to_arrow 1> sub_arrow_synop/${i}.tmp 2>>log/met_pre_bufr_to_arrow.py.log
       if test -s sub_arrow_synop/${i}.tmp; then
         mv -f sub_arrow_synop/${i}.tmp sub_arrow_synop/${i}
       else

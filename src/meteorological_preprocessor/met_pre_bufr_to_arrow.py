@@ -55,13 +55,14 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             if len(descriptor_conf_df) == 0:
                                 print('Info', ':', unexpanded_descriptors[0], 'not found descriptor.', in_file, file=sys.stderr)
                                 break
+                            number_of_subsets = codes_get_array(bufr, 'numberOfSubsets')
                             conf_location_datetime_list = list(descriptor_conf_df[(descriptor_conf_df['type'] == 'location') | (descriptor_conf_df['type'] == 'datetime')].itertuples())
                             conf_property_list = list(descriptor_conf_df[(descriptor_conf_df['type'] == 'property')].itertuples())
                             for conf_row in conf_location_datetime_list:
                                 values = codes_get_array(bufr, conf_row.key)
                                 if conf_row.slide > -1 and conf_row.step > 0:
                                     values = np.array(values)[conf_row.slide::conf_row.step]
-                                if len(values) > 0:
+                                if len(values) > 0 and len(values) == number_of_subsets:
                                     if values[0] == str:
                                         values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                     else:
@@ -104,6 +105,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         tmp_none_np_choice = np.array([True if value == False else False for value in not_none_np_choice])
                                         none_np = none_np * tmp_none_np_choice
                                 else:
+                                    if len(values) != number_of_subsets:
+                                        print('Info', ':', len(values), number_of_subsets, 'not equals the number of subsets.', in_file, file=sys.stderr)
                                     bufr_dict = {}
                                     break
                             if len(bufr_dict) == 0 or False in none_np.tolist():
@@ -142,18 +145,20 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         else:
                                             location_datetime_dict[pre_conf_row_name] = message_np
                                         message_np = np.array([])
-                                tmp_message_np = bufr_dict[conf_row.key][location_datetime_index_np]
+                                tmp_message_np = bufr_dict[conf_row.key]
                                 if len(tmp_message_np) > 0:
-                                    if len(message_np) > 0:
-                                        if conf_row.multiply != 0:
-                                            message_np = message_np + conf_row.multiply * tmp_message_np
+                                    tmp_message_np = tmp_message_np[location_datetime_index_np]
+                                    if len(tmp_message_np) > 0:
+                                        if len(message_np) > 0:
+                                            if conf_row.multiply != 0:
+                                                message_np = message_np + conf_row.multiply * tmp_message_np
+                                            else:
+                                                message_np = message_np + tmp_message_np
                                         else:
-                                            message_np = message_np + tmp_message_np
-                                    else:
-                                        if conf_row.multiply != 0:
-                                            message_np = conf_row.multiply * tmp_message_np
-                                        else:
-                                            message_np = tmp_message_np
+                                            if conf_row.multiply != 0:
+                                                message_np = conf_row.multiply * tmp_message_np
+                                            else:
+                                                message_np = tmp_message_np
                                 pre_conf_row_name = conf_row.name
                             if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                 if pre_conf_row_name in location_datetime_dict:
@@ -171,18 +176,20 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         else:
                                             property_dict[pre_conf_row_name] = message_np
                                         message_np = np.array([])
-                                tmp_message_np = bufr_dict[conf_row.key][location_datetime_index_np]
+                                tmp_message_np = bufr_dict[conf_row.key]
                                 if len(tmp_message_np) > 0:
-                                    if len(message_np) > 0:
-                                        if conf_row.multiply != 0:
-                                            message_np = message_np + conf_row.multiply * tmp_message_np
+                                    tmp_message_np = tmp_message_np[location_datetime_index_np]
+                                    if len(tmp_message_np) > 0:
+                                        if len(message_np) > 0:
+                                            if conf_row.multiply != 0:
+                                                message_np = message_np + conf_row.multiply * tmp_message_np
+                                            else:
+                                                message_np = message_np + tmp_message_np
                                         else:
-                                            message_np = message_np + tmp_message_np
-                                    else:
-                                        if conf_row.multiply != 0:
-                                            message_np = conf_row.multiply * tmp_message_np
-                                        else:
-                                            message_np = tmp_message_np
+                                            if conf_row.multiply != 0:
+                                                message_np = conf_row.multiply * tmp_message_np
+                                            else:
+                                                message_np = tmp_message_np
                                 pre_conf_row_name = conf_row.name
                             if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                 if pre_conf_row_name in property_dict:
