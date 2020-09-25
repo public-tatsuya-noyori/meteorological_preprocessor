@@ -103,7 +103,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
     warno = 187
     in_file_name = os.path.basename(in_file)
     for conf_row in conf_list:
-        if re.match(conf_row.file_name_pattern, in_file_name):
+        if re.match(r'' + conf_row.file_name_pattern, in_file_name):
             ttaaii = ''
             cccc = ''
             ddhhmm = ''
@@ -112,7 +112,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             out_directory_list = []
             out_directory_list.append(out_dir)
             out_directory_list.append(conf_row.access_control)
-            if re.match('^[A-Z][A-Z][A-Z][A-Z]$', start_char4):
+            if re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', start_char4):
                 ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
             if len(ttaaii_cccc_ddhhmm_bbb_data_date_list) == 5:
                 ttaaii = ttaaii_cccc_ddhhmm_bbb_data_date_list[0]
@@ -128,17 +128,25 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_directory_list.append(cccc)
                 out_directory_list.append(conf_row.format)
                 out_directory_list.append(conf_row.category)
-            else:
-                print('Warning', warno, ':', in_file, 'is not matched on cccc of configuration file. The file is not created', file=sys.stderr)
+            if conf_row.cccc and conf_row.cccc != cccc:
+                continue
+            try:
+                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+                    continue
+            except:
+                print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
-            if conf_row.format == 'grib' or re.match('^GRIB$', start_char4):
+            if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
+                print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
+                return ''
+            if conf_row.format == 'grib' or re.match(r'^GRIB$', start_char4):
                 subdir_list = get_grib_subdir_list(in_file)
                 if len(subdir_list) == 3:
                     out_directory_list.extend(subdir_list)
                     data_date = subdir_list[2][0:8]
                 else:
                     return ''
-            elif not data_date and re.match('^BUFR$', start_char4):
+            elif not data_date and re.match(r'^BUFR$', start_char4):
                 out_directory_list.append(conf_row.subcategory)
                 is_bufr = True
                 with open(in_file, 'rb') as bufr_file_stream:
@@ -164,7 +172,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                             print('Warning', warno, ':', 'BUFR decode error on', in_file, 'has occurred. The file is not created', file=sys.stderr)
                 if not is_bufr:
                     return ''
-            if conf_row.format != 'grib' and not re.match('^GRIB$', start_char4):
+            if conf_row.format != 'grib' and not re.match(r'^GRIB$', start_char4):
                 out_directory_list.append(conf_row.subcategory)
                 out_directory_list.append(data_date + ddhhmm[2:4])
             out_directory = '/'.join(out_directory_list)
@@ -215,11 +223,11 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
     bbb = ttaaii_cccc_ddhhmm_bbb_data_date_list[3]
     data_date = ttaaii_cccc_ddhhmm_bbb_data_date_list[4]
     for conf_row in conf_list:
-        if re.match(conf_row.ttaaii_pattern, ttaaii) and re.match(conf_row.file_name_pattern, os.path.basename(in_file)):
+        if re.match(r'' + conf_row.ttaaii_pattern, ttaaii) and re.match(r'' + conf_row.file_name_pattern, os.path.basename(in_file)):
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
             try:
-                if conf_row.text_pattern and not re.match(conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                     continue
             except:
                 print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
