@@ -23,7 +23,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
-        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/location_datetime/([0-9]*)/C_([A-Z]{4})_([0-9]*)\.arrow$', in_file)
+        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/([0-9]*)/C_([A-Z]{4})_([0-9]*)/location_datetime\.arrow$', in_file)
         if loc_time_match:
             cccc = loc_time_match.group(1)
             form = loc_time_match.group(2)
@@ -50,8 +50,8 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                     for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
                         new_df = tile_df[(new_datetime == tile_df['datetime'])]
                         if len(new_df['id'].tolist()) > 0:
-                            out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/location_datetime/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x)])
-                            out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
+                            out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
+                            out_file = ''.join([out_directory, '/location_datetime.arrow'])
                             new_df = new_df.astype({'id': 'int32'})
                             new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                             new_df = new_df.astype({'indicator': 'int32'})
@@ -103,7 +103,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 if not out_file in out_arrows:
                                     out_arrows.append(out_file)
         else:
-            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/([^/]*)/' + date_hourminute + '/C_' + creator + '_' + created + '\.arrow$', in_file)
+            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/' + date_hourminute + '/C_' + creator + '_' + created + '/([^/]*)\.arrow$', in_file)
             if prop_match:
                 prop_short_name = prop_match.group(1)
                 in_df = pa.ipc.open_file(in_file).read_pandas()
@@ -114,8 +114,8 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 intersection_id_list = list(set(new_id_etfo_dict[(tile_x,  tile_y, new_datetime)].keys()) & set(in_df['id'].tolist()))
                                 new_df = in_df[in_df['id'].isin(intersection_id_list)]
                                 if len(new_df['id'].tolist()) > 0:
-                                    out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', prop_short_name, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x)])
-                                    out_file = ''.join([out_directory, '/', str(tile_y), '.arrow'])
+                                    out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
+                                    out_file = ''.join([out_directory, '/', prop_short_name, '.arrow'])
                                     new_df = new_df.astype({'id': 'int32'})
                                     new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                                     new_df = new_df.astype({'indicator': 'int32'})
