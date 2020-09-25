@@ -76,13 +76,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 unique_key_list.pop(2)#del id
                                 unique_key_list.pop(0)#del etfo
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
-                                del_etfo_id_list = []
-                                del_etfo_list = concat_df[duplicated]['elapsed time [s]']
-                                if len(del_etfo_list) > 0:
-                                    for index, id in enumerate(concat_df[duplicated]['id']):
-                                        if not [del_etfo_list[index], id] in del_etfo_id_list:
-                                            del_etfo_id_list.append([del_etfo_list[index], id])
-                                del_etfo_id_dict[(tile_x,  tile_y, new_datetime)] = del_etfo_id_list
+                                del_etfo_id_dict[(tile_x, tile_y, new_datetime)] = concat_df[duplicated][['elapsed time [s]', 'id']]
                                 updated_df = concat_df[~duplicated]
                                 updated_df = updated_df.astype({'id': 'int32'})
                                 updated_df = updated_df.astype({'indicator': 'int32'})
@@ -133,7 +127,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         concat_df = concat_df.astype({'id': 'int32'})
                                         concat_df = concat_df.astype({'indicator': 'int32'})
                                         concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
-                                        for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)]:
+                                        for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)].itertuples():
                                             del_index = concat_df.index[(concat_df['elapsed time [s]'] == del_etfo_id[0]) & (concat_df['id'] == del_etfo_id[1])]
                                             if len(del_index) == 1:
                                                 concat_df = concat_df.drop(del_index)
