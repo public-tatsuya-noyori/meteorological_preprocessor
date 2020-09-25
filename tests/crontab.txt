@@ -28,11 +28,11 @@
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 32 >> log/clone.sh.us_to_eu_p5.log 2>&1
 
 # delete on object storage
-0   0 * * * cd /home/noyori/tests; ./del.sh --cron cache ap       wasabi    japan.meteorological.agency.open.data                      24 32 >> log/del.sh.ap.log 2>&1
+0   0 * * * cd /home/noyori/tests; ./del.sh        cache ap       wasabi    japan.meteorological.agency.open.data                      24 32 >> log/del.sh.ap.log 2>&1
 10  * * * * cd /home/noyori/tests; ./del.sh --cron cache ap_index wasabi    japan.meteorological.agency.open.data/4PubSub              24 8 >> log/del.sh.ap_index.log 2>&1
-20  8 * * * cd /home/noyori/tests; ./del.sh --cron cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            24 32 >> log/del.sh.us.log 2>&1
+20  8 * * * cd /home/noyori/tests; ./del.sh        cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            24 32 >> log/del.sh.us.log 2>&1
 30  * * * * cd /home/noyori/tests; ./del.sh --cron cache us_index wasabi_us japan.meteorological.agency.open.data.us.east.1/4PubSub    24 8 >> log/del.sh.us_index.log 2>&1
-40 16 * * * cd /home/noyori/tests; ./del.sh --cron cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         24 32 >> log/del.sh.eu.log 2>&1
+40 16 * * * cd /home/noyori/tests; ./del.sh        cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         24 32 >> log/del.sh.eu.log 2>&1
 50  * * * * cd /home/noyori/tests; ./del.sh --cron cache eu_index wasabi_eu japan.meteorological.agency.open.data.eu.central.1/4PubSub 24 8 >> log/del.sh.eu_index.log 2>&1
 
 # delete on local PC
