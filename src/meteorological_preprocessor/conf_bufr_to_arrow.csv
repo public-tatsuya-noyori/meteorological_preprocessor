@@ -176,5 +176,5 @@ surface,synop,307096,property,dewpoint temperature [K],optional,float64,-273.15,
 surface,synop,307096,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
 surface,synop,307096,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
 surface,synop,307096,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307096,property,wind direction [degree],optional,float64,0,360,#1#windDirection,0,0,0
-surface,synop,307096,property,wind speed [m/s],optional,float64,0,32767,#1#windSpeed,0,0,0
+surface,synop,307096,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
+surface,synop,307096,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
