@@ -114,7 +114,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 break
                             bufr_dict['none'] = none_np
                         except CodesInternalError as err:
-                            print('Warning', warno, ':', 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
+                            print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
                             break
                         try:
                             for conf_row in conf_property_list:
@@ -127,9 +127,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     else:
                                         values = np.where(np.isnan(values), None, values)
                                         values = np.where((values < conf_row.min) | (values > conf_row.max), None, values)
-                                    bufr_dict[conf_row.key] = values
+                                    if len(values) > 0:
+                                        bufr_dict[conf_row.key] = values
                         except CodesInternalError as err:
-                            print('Warning', warno, ':', 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
+                            print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
                             break
                         codes_release(bufr)
                         location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
@@ -176,20 +177,23 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         else:
                                             property_dict[pre_conf_row_name] = message_np
                                         message_np = np.array([])
-                                tmp_message_np = bufr_dict[conf_row.key]
-                                if len(tmp_message_np) > 0:
-                                    tmp_message_np = tmp_message_np[location_datetime_index_np]
-                                    if len(tmp_message_np) > 0:
-                                        if len(message_np) > 0:
-                                            if conf_row.multiply != 0:
-                                                message_np = message_np + conf_row.multiply * tmp_message_np
+                                if conf_row.key in bufr_dict:
+                                    tmp_message_np = bufr_dict[conf_row.key]
+                                    if len(tmp_message_np) >= len(location_datetime_index_np):
+                                        tmp_message_np = tmp_message_np[location_datetime_index_np]
+                                        if len(tmp_message_np) > 0:
+                                            if len(message_np) > 0:
+                                                if conf_row.multiply != 0:
+                                                    message_np = message_np + conf_row.multiply * tmp_message_np
+                                                else:
+                                                    message_np = message_np + tmp_message_np
                                             else:
-                                                message_np = message_np + tmp_message_np
-                                        else:
-                                            if conf_row.multiply != 0:
-                                                message_np = conf_row.multiply * tmp_message_np
-                                            else:
-                                                message_np = tmp_message_np
+                                                if conf_row.multiply != 0:
+                                                    message_np = conf_row.multiply * tmp_message_np
+                                                else:
+                                                    message_np = tmp_message_np
+                                    else:
+                                        print('Warning', warno, ':', conf_row.key, len(tmp_message_np), '<', len(location_datetime_index_np), 'location_datetime_index_np is bigger', in_file, file=sys.stderr)
                                 pre_conf_row_name = conf_row.name
                             if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                 if pre_conf_row_name in property_dict:
