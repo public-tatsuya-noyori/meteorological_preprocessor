@@ -1,180 +1,217 @@
-category,subcategory,descriptor,type,name,condition,datatype,min,max,key,slide,step,multiply
-surface,synop,307079,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307079,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307079,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307079,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307079,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307079,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307079,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307079,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307079,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307079,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307079,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307079,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307079,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307079,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307079,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307079,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307079,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307079,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307079,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307079,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307080,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307080,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307080,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307080,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307080,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307080,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307080,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307080,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307080,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307080,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307080,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307080,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307080,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307080,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307080,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307080,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307080,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307080,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307080,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307080,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307081,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307081,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307081,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307081,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307081,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307081,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307081,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307081,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307081,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307081,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307081,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307081,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307081,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307081,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307081,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307081,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307081,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307081,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307081,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307081,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307082,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307082,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307082,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307082,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307082,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307082,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307082,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307082,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307082,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307082,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307082,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307082,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307082,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307082,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307082,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307082,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307082,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307082,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307082,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307082,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307083,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307083,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307083,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307083,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307083,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307083,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307083,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307083,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307083,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307083,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307083,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307083,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307083,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307083,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307083,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307083,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307083,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307083,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307083,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307083,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307084,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307084,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307084,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307084,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307084,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307084,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307084,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307084,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307084,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307084,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307084,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307084,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307084,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307084,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307084,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307084,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307084,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307084,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307084,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307084,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307085,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307085,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307085,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307085,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307085,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307085,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307085,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307085,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307085,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307085,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307085,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307085,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307085,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307085,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307085,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307085,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307085,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307085,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307085,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307085,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307086,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307086,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307086,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307086,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307086,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307086,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307086,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307086,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307086,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307086,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307086,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307086,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307086,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307086,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307086,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307086,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307086,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307086,property,present weather,optional,int32,0,32767,presentWeather,0,0,0
-surface,synop,307086,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307086,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
-surface,synop,307096,location,station number,required,int32,0,99,blockNumber,0,0,1000
-surface,synop,307096,location,station number,required,int32,0,999,stationNumber,0,0,1
-surface,synop,307096,location,latitude [degree],required,float64,-90,90,latitude,0,0,0
-surface,synop,307096,location,longitude [degree],required,float64,-180,180,longitude,0,0,0
-surface,synop,307096,location,height of station ground above mean sea level [m],optional,float64,-32768,32767,heightOfStationGroundAboveMeanSeaLevel,0,0,0
-surface,synop,307096,location,height of barometer above mean sea level [m],optional,float64,-32768,32767,heightOfBarometerAboveMeanSeaLevel,0,0,0
-surface,synop,307096,datetime,datetime,required,timestamp,0,9999,year,0,0,0
-surface,synop,307096,datetime,datetime,required,timestamp,1,12,month,0,0,0
-surface,synop,307096,datetime,datetime,required,timestamp,1,31,day,0,0,0
-surface,synop,307096,datetime,datetime,required,timestamp,0,23,hour,0,0,0
-surface,synop,307096,datetime,datetime,required,timestamp,0,59,minute,0,0,0
-surface,synop,307096,property,pressure reduced to mean sea level [Pa],optional,float64,0,2147483647,pressureReducedToMeanSeaLevel,0,0,0
-surface,synop,307096,property,air temperature [K],optional,float64,-273.15,32767,airTemperature,0,0,0
-surface,synop,307096,property,dewpoint temperature [K],optional,float64,-273.15,32767,dewpointTemperature,0,0,0
-surface,synop,307096,property,relative humidity [%],optional,float64,0,100,relativeHumidity,0,0,0
-surface,synop,307096,property,horizontal visibility [m],optional,float64,0,2147483647,horizontalVisibility,0,0,0
-surface,synop,307096,property,cloud cover total [%],optional,float64,0,100,cloudCoverTotal,0,0,0
-surface,synop,307096,property,wind direction [degree],optional,float64,0,360,windDirection,0,0,0
-surface,synop,307096,property,wind speed [m/s],optional,float64,0,32767,windSpeed,0,0,0
+category,subcategory,descriptor,key,output,name,condition,datatype,min,max,slide,step,multiply
+surface,synop,307079,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307079,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307079,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307079,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307079,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307079,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307079,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307079,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307079,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307079,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307079,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307079,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307079,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307079,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307079,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307079,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307079,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307079,presentWeather,present_weather,present weather,optional,int32,0,32767,0,0,0
+surface,synop,307079,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307079,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307079,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307079,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307079,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307079,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307080,blockNumber,location_datetime,station number,required_with_array,int32,0,99,0,0,1000
+surface,synop,307080,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307080,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307080,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307080,year,location_datetime,datetime,required_with_array,timestamp,0,9999,0,0,0
+surface,synop,307080,month,location_datetime,datetime,required_with_array,timestamp,1,12,0,0,0
+surface,synop,307080,day,location_datetime,datetime,required_with_array,timestamp,1,31,0,0,0
+surface,synop,307080,hour,location_datetime,datetime,required_with_array,timestamp,0,23,0,0,0
+surface,synop,307080,minute,location_datetime,datetime,required_with_array,timestamp,0,59,0,0,0
+surface,synop,307080,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional_with_subset,float64,-32768,32767,0,0,0
+surface,synop,307080,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional_with_subset,float64,-32768,32767,0,0,0
+surface,synop,307080,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional_with_subset,float64,0,16777215,0,0,0
+surface,synop,307080,airTemperature,air_temperature,air temperature [K],optional_with_subset,float64,-273.15,32767,0,0,0
+surface,synop,307080,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional_with_subset,float64,-273.15,32767,0,0,0
+surface,synop,307080,relativeHumidity,relative_humidity,relative humidity [%],optional_with_subset,float64,0,100,0,0,0
+surface,synop,307080,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional_with_subset,float64,0,16777215,0,0,0
+surface,synop,307080,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional_with_subset,float64,0,100,0,0,0
+surface,synop,307080,presentWeather,present_weather,present weather,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307080,windDirection,wind_direction,wind direction [degree],optional_with_subset,float64,0,360,0,0,0
+surface,synop,307080,windSpeed,wind_speed,wind speed [m/s],optional_with_subset,float64,0,32767,0,0,0
+surface,synop,307080,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307080,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307080,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307080,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307081,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307081,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307081,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307081,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307081,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307081,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307081,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307081,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307081,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307081,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307081,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307081,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307081,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307081,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307081,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307081,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307081,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307081,presentWeather,present_weather,present weather,optional,int32,0,32767,0,0,0
+surface,synop,307081,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307081,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307081,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307081,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307081,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307081,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307082,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307082,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307082,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307082,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307082,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307082,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307082,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307082,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307082,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307082,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307082,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307082,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307082,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307082,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307082,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307082,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307082,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307082,presentWeather,present_weather,present weather,optional,int32,0,32767,0,0,0
+surface,synop,307082,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307082,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307082,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307082,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307082,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307082,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307083,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307083,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307083,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307083,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307083,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307083,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307083,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307083,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307083,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307083,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307083,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307083,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307083,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307083,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307083,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307083,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307083,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307083,presentWeather,present_weather,present weather,optional,int32,0,32767,0,0,0
+surface,synop,307083,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307083,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307083,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307083,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307083,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307083,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307084,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307084,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307084,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307084,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307084,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307084,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307084,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307084,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307084,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307084,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307084,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307084,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307084,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307084,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307084,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307084,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307084,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307084,presentWeather,present_weather,present weather,optional,int32,0,32767,0,0,0
+surface,synop,307084,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307084,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307084,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307084,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307084,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307084,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307085,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307085,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307085,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307085,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307085,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307085,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307085,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307085,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307085,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307085,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307085,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307085,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307085,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307085,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307085,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307085,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307085,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307085,presentWeather,present_weather,present weather,optional,int32,0,32767,0,0,0
+surface,synop,307085,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307085,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307085,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307085,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307085,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307085,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307086,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307086,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307086,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307086,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307086,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307086,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307086,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307086,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307086,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307086,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307086,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307086,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307086,airTemperature,air_temperature,air temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307086,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional,float64,-273.15,32767,0,0,0
+surface,synop,307086,relativeHumidity,relative_humidity,relative humidity [%],optional,float64,0,100,0,0,0
+surface,synop,307086,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional,float64,0,16777215,0,0,0
+surface,synop,307086,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional,float64,0,100,0,0,0
+surface,synop,307086,presentWeather,present_weather,present weather,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307086,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307086,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307086,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307086,cloudType,cloud_type,low cloud type,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307086,cloudType,cloud_type,middle cloud type,optional_with_subset,int32,0,32767,1,0,0
+surface,synop,307086,cloudType,cloud_type,high cloud type,optional_with_subset,int32,0,32767,2,0,0
+surface,synop,307080,blockNumber,location_datetime,station number,required_with_array,int32,0,99,0,0,1000
+surface,synop,307096,blockNumber,location_datetime,station number,required,int32,0,99,0,0,1000
+surface,synop,307096,stationNumber,location_datetime,station number,required,int32,0,999,0,0,1
+surface,synop,307096,latitude,location_datetime,latitude [degree],required,float64,-90,90,0,0,0
+surface,synop,307096,longitude,location_datetime,longitude [degree],required,float64,-180,180,0,0,0
+surface,synop,307096,year,location_datetime,datetime,required,timestamp,0,9999,0,0,0
+surface,synop,307096,month,location_datetime,datetime,required,timestamp,1,12,0,0,0
+surface,synop,307096,day,location_datetime,datetime,required,timestamp,1,31,0,0,0
+surface,synop,307096,hour,location_datetime,datetime,required,timestamp,0,23,0,0,0
+surface,synop,307096,minute,location_datetime,datetime,required,timestamp,0,59,0,0,0
+surface,synop,307096,heightOfStationGroundAboveMeanSeaLevel,height_of_station_ground_above_mean_sea_level,height of station ground above mean sea level [m],optional,float64,-32768,32767,0,0,0
+surface,synop,307096,heightOfBarometerAboveMeanSeaLevel,height_of_barometer_above_mean_sea_level,height of barometer above mean sea level[m],optional,float64,-32768,32767,0,0,0
+surface,synop,307096,pressureReducedToMeanSeaLevel,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional,float64,0,16777215,0,0,0
+surface,synop,307096,airTemperature,air_temperature,air temperature [K],optional_with_subset,float64,-273.15,32767,0,0,0
+surface,synop,307096,dewpointTemperature,dewpoint_temperature,dewpoint temperature [K],optional_with_subset,float64,-273.15,32767,0,0,0
+surface,synop,307096,relativeHumidity,relative_humidity,relative humidity [%],optional_with_subset,float64,0,100,0,0,0
+surface,synop,307096,horizontalVisibility,horizontal_visibility,horizontal visibility [m],optional_with_subset,float64,0,16777215,0,0,0
+surface,synop,307096,cloudCoverTotal,cloud_cover_total,cloud cover total [%],optional_with_subset,float64,0,100,0,0,0
+surface,synop,307096,windDirection,wind_direction,wind direction [degree],optional_with_subset,float64,0,360,0,0,0
+surface,synop,307096,windSpeed,wind_speed,wind speed [m/s],optional_with_subset,float64,0,32767,0,0,0
+surface,synop,307096,presentWeather,present_weather,present weather,optional_with_subset,int32,0,32767,0,0,0
+surface,synop,307096,windDirection,wind_direction,wind direction [degree],optional,float64,0,360,0,0,0
+surface,synop,307096,windSpeed,wind_speed,wind speed [m/s],optional,float64,0,32767,0,0,0
+surface,synop,307096,cloudAmount,cloud_amount,cloud amount,optional_with_subset,int32,0,32767,0,0,0

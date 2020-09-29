@@ -1,4 +1,0 @@
-name,datatype,min,max,key,slide,step
-air temperature [K],float64,-273.15,32767,airTemperature,0,0
-dewpoint temperature [K],float64,-273.15,32767,dewpointTemperature,0,0
-one hour maximum wind gust speed [m/s],float64,0,32767,maximumWindGustSpeed,1,2

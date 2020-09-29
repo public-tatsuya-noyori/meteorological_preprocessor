@@ -1,5 +1,0 @@
-name,datatype,min,max,key,slide,step
-pressure reduced to mean sea level [Pa],int32,0,131070,pressureReducedToMeanSeaLevel,0,0
-air temperature [K],float32,-273.15,32767,airTemperature,0,0
-wind direction [degree],int32,0,360,windDirection,0,0
-wind speed [m/s],float64,0,32767,windSpeed,0,0
