@@ -52,7 +52,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                         if len(new_df['id'].tolist()) > 0:
                             out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
                             out_file = ''.join([out_directory, '/location_datetime.arrow'])
-                            new_df = new_df.astype({'id': 'int64'})
+                            new_df = new_df.astype({'id': 'int32'})
                             new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                             new_df = new_df.astype({'indicator': 'int32'})
                             etfo_df = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
@@ -69,7 +69,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
-                                concat_df = concat_df.astype({'id': 'int64'})
+                                concat_df = concat_df.astype({'id': 'int32'})
                                 concat_df = concat_df.astype({'indicator': 'int32'})
                                 concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
                                 unique_key_list = concat_df.columns.values.tolist()
@@ -78,7 +78,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_dict[(tile_x, tile_y, new_datetime)] = concat_df[duplicated][['elapsed time [s]', 'id']]
                                 updated_df = concat_df[~duplicated]
-                                updated_df = updated_df.astype({'id': 'int64'})
+                                updated_df = updated_df.astype({'id': 'int32'})
                                 updated_df = updated_df.astype({'indicator': 'int32'})
                                 updated_df = updated_df.astype({'elapsed time [s]': 'int32'})
                                 if len(updated_df) > 0:
@@ -110,7 +110,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 if len(new_df['id'].tolist()) > 0:
                                     out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
                                     out_file = ''.join([out_directory, '/', prop_short_name, '.arrow'])
-                                    new_df = new_df.astype({'id': 'int64'})
+                                    new_df = new_df.astype({'id': 'int32'})
                                     new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                                     new_df = new_df.astype({'indicator': 'int32'})
                                     tmp_etfo_list = []
@@ -124,7 +124,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                             print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
-                                        concat_df = concat_df.astype({'id': 'int64'})
+                                        concat_df = concat_df.astype({'id': 'int32'})
                                         concat_df = concat_df.astype({'indicator': 'int32'})
                                         concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
                                         for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)].itertuples():
@@ -134,7 +134,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         unique_key_list = new_df.columns.values.tolist()
                                         duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                         updated_df = concat_df[~duplicated]
-                                        updated_df = updated_df.astype({'id': 'int64'})
+                                        updated_df = updated_df.astype({'id': 'int32'})
                                         updated_df = updated_df.astype({'indicator': 'int32'})
                                         updated_df = updated_df.astype({'elapsed time [s]': 'int32'})
                                         if len(updated_df) > 0:

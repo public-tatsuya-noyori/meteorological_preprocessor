@@ -88,7 +88,11 @@ subscribe() {
       if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
         set +e
-        rclone --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+        if test ${pub_dir_list_index} -eq 1; then
+          rclone --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+        else
+          rclone --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+        fi
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -ne 0; then
@@ -118,17 +122,19 @@ subscribe() {
 index_directory=4PubSub
 job_directory=4Sub
 timeout=8s
-cron=0
 cutoff=32M
 job_period=60
 urgent=0
 job_num=1
 job_start_unixtime=`date -u "+%s"`
 job_start_unixtime=`expr 0 + ${job_start_unixtime}`
+cron=0
+pub_dir_list_index=0
 for arg in "$@"; do
   case "${arg}" in
     '--help' ) echo "$0 [--cron] local_work_directory unique_job_name source_rclone_remote source_bucket priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--cron" ) cron=1;shift;;
+    "--pub_dir_list_index" ) pub_dir_list_index=1;shift;;
   esac
 done
 if test -z $6; then

@@ -232,7 +232,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
 
             if 'datetime' in location_datetime_dict:
                 id_list = [id_num for id_num in range(0, len(location_datetime_dict['datetime']))]
-                location_datetime_data = [pa.array(id_list, 'int64')]
+                location_datetime_data = [pa.array(id_list, 'int32')]
                 location_datetime_name_list = ['id']
                 datetime_directory_list = []
                 for key in location_datetime_dict.keys():
@@ -303,7 +303,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             for output in output_property_dict.keys():
                                 property_name_list = ['id']
                                 property_data = []
-                                datetime_id_pa = pa.array(id_list, 'int64').take(pa.array(datetime_index_list))
+                                datetime_id_pa = pa.array(id_list, 'int32').take(pa.array(datetime_index_list))
                                 value_index_list = []
                                 if output_property_dict[output] != None:
                                     datetime_property_data_dict = {}

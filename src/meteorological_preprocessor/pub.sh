@@ -20,8 +20,17 @@
 set -e
 publish(){
   grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+  if test ${pub_dir_list_index} -eq 1; then
+    mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt
+    cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt | xargs -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+    rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt
+  fi
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-    rclone --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+    if test ${pub_dir_list_index} -eq 1; then
+      rclone --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+    else
+      rclone --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+    fi
     exit_code=1
     retry_count=1
     rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
@@ -48,14 +57,16 @@ index_directory=4PubSub
 job_directory=4Pub
 timeout=8s
 retry_num=8
-cron=0
 cutoff=32M
+cron=0
 rm_list_file=0
+pub_dir_list_index=0
 for arg in "$@"; do
   case "${arg}" in
-    "--help" ) echo "$0 [--cron] [--rm_list_file] local_work_directory unique_job_name list_file dest_rclone_remote dest_bucket priority parallel"; exit 0;;
+    "--help" ) echo "$0 [--cron] [--rm_list_file] [--pub_dir_list_index] local_work_directory unique_job_name list_file dest_rclone_remote dest_bucket priority parallel"; exit 0;;
     "--cron" ) cron=1;shift;;
     "--rm_list_file" ) rm_list_file=1;shift;;
+    "--pub_dir_list_index" ) pub_dir_list_index=1;shift;;
   esac
 done
 if test -z $7; then
