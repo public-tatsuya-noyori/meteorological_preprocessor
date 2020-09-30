@@ -109,7 +109,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 not_none_np_choice = not_none_np_choice * tmp_not_none_np
                                             else:
                                                 not_none_np_choice = tmp_not_none_np
-                                        elif not conf_row.condition == 'required_with_array':
+                                        elif conf_row.condition != 'required_with_array':
                                             print('Warning', warno, conf_row.key, 'is not required or required_with_array or choice.', in_file, file=sys.stderr)
                                     if len(not_none_np_choice) > 0:
                                         tmp_none_np_choice = np.array([True if value == False else False for value in not_none_np_choice])
@@ -208,7 +208,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         message_np = np.array([])
                                 if conf_row.key in bufr_dict:
                                     tmp_message_np = bufr_dict[conf_row.key]
-                                    if len(tmp_message_np) >= len(location_datetime_index_np):
+                                    if max(location_datetime_index_np) < len(tmp_message_np):
                                         tmp_message_np = tmp_message_np[location_datetime_index_np]
                                         if len(tmp_message_np) > 0:
                                             if len(message_np) > 0:
