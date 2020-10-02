@@ -37,7 +37,7 @@ if test ${running} -eq 0; then
       cat tile_arrow/pub.txt.tmp | sort | uniq > tile_arrow/pub.txt2.tmp 
     fi
     if test -s tile_arrow/pub.txt2.tmp; then
-      ./pub.sh --cron  --rm_list_file cache_tile_arrow tile_arrow tile_arrow/pub.txt2.tmp wasabi japan.meteorological.agency.open.data p8 8 2>>log/pub.sh.tile_arrow.log
+      ./pub.sh --cron  --rm_list_file --pub_dir_list_index cache_tile_arrow tile_arrow tile_arrow/pub.txt2.tmp wasabi japan.meteorological.agency.open.data p8 8 2>>log/pub.sh.tile_arrow.log
     fi
   } &
   pid=$!

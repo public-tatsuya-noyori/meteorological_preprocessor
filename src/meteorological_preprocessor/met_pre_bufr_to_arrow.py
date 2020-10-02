@@ -60,7 +60,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 if len(descriptor_conf_df) > 0:
                                     break
                             if len(descriptor_conf_df) == 0:
-                                print('Info', ':', unexpanded_descriptors[0], 'not found descriptor.', in_file, file=sys.stderr)
+                                print('Info :', unexpanded_descriptors, 'not found descriptor.', in_file, file=sys.stderr)
+                                break
                             number_of_subsets = codes_get(bufr, 'numberOfSubsets')
                             conf_location_datetime_list = list(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')].itertuples())
                             conf_property_list = list(descriptor_conf_df[(descriptor_conf_df['output'] != 'location_datetime')].itertuples())
@@ -133,55 +134,61 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     bufr_dict = {}
                                     break
                             if len(bufr_dict) == 0 or not True in none_np.tolist():
-                                codes_release(bufr)
+                                print('Info :', 'no location_datetime', in_file, file=sys.stderr)
                                 break
                             bufr_dict['none'] = none_np
                         except CodesInternalError as err:
-                            print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
+                            print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend in', in_file, file=sys.stderr)
                             break
-                        try:
-                            for conf_row in conf_property_list:
-                                if conf_row.condition == 'optional_with_subset':
-                                    values = []
-                                    for i in range(1, number_of_subsets + 1):
-                                        try:
-                                            value = codes_get_array(bufr, "/subsetNumber=" + str(i) + "/" + conf_row.key)[conf_row.slide]
-                                            if value < conf_row.min or value > conf_row.max:
-                                                value = np.nan
-                                        except CodesInternalError as err:
+                        for conf_row in conf_property_list:
+                            if conf_row.condition == 'optional_with_subset':
+                                values = []
+                                for i in range(1, number_of_subsets + 1):
+                                    try:
+                                        value = codes_get_array(bufr, "/subsetNumber=" + str(i) + "/" + conf_row.key)[conf_row.slide]
+                                        if value < conf_row.min or value > conf_row.max:
                                             value = np.nan
-                                        values.append(value)
-                                    values = np.array(values, dtype=float)
-                                elif conf_row.condition == 'optional_with_tail_nan':
+                                    except CodesInternalError as err:
+                                        value = np.nan
+                                    values.append(value)
+                                values = np.array(values, dtype=float)
+                            elif conf_row.condition == 'optional_with_tail_nan':
+                                try:
                                     values = codes_get_array(bufr, conf_row.key).tolist()
-                                    for i in range(len(values), number_of_values):
-                                        values.append(np.nan)
-                                    values = np.array(values, dtype=float)
-                                elif conf_row.condition == 'optional_with_head_nan':
+                                except CodesInternalError as err:
+                                    continue
+                                for i in range(len(values), number_of_values):
+                                    values.append(np.nan)
+                                values = np.array(values, dtype=float)
+                            elif conf_row.condition == 'optional_with_head_nan':
+                                try:
                                     values = codes_get_array(bufr, conf_row.key).tolist()
-                                    tmp_values = []
-                                    for i in range(0, number_of_values - len(values)):
-                                        tmp_values.append(np.nan)
-                                    tmp_values.extend(values)
-                                    values = np.array(tmp_values, dtype=float)
-                                elif conf_row.condition == 'optional':
+                                except CodesInternalError as err:
+                                    continue
+                                tmp_values = []
+                                for i in range(0, number_of_values - len(values)):
+                                    tmp_values.append(np.nan)
+                                tmp_values.extend(values)
+                                values = np.array(tmp_values, dtype=float)
+                            elif conf_row.condition == 'optional':
+                                try:
                                     values = codes_get_array(bufr, conf_row.key)
+                                except CodesInternalError as err:
+                                    continue
+                            else:
+                                print('Warning', warno, conf_row.key, 'is not optional or optional_with_subset or optional_with_tail_nan or optional_with_head_nan.', in_file, file=sys.stderr)
+                            if conf_row.slide > -1 and conf_row.step > 0:
+                                values = np.array(values)[conf_row.slide::conf_row.step]
+                            if (number_of_values > 0 and len(values) == number_of_values) or (number_of_values == 0 and len(values) == number_of_subsets):
+                                if conf_row.datatype == 'string':
+                                    values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                 else:
-                                    print('Warning', warno, conf_row.key, 'is not optional or optional_with_subset or optional_with_tail_nan or optional_with_head_nan.', in_file, file=sys.stderr)
-                                if conf_row.slide > -1 and conf_row.step > 0:
-                                    values = np.array(values)[conf_row.slide::conf_row.step]
-                                if (number_of_values > 0 and len(values) == number_of_values) or (number_of_values == 0 and len(values) == number_of_subsets):
-                                    if conf_row.datatype == 'string':
-                                        values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
-                                    else:
-                                        values = np.where((values < conf_row.min) | (values > conf_row.max), np.nan, values)
-                                        values = np.where(np.isnan(values), None, values)
-                                    bufr_dict[conf_row.key] = values
-                                else:
-                                    print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', in_file, file=sys.stderr)
-                        except CodesInternalError as err:
-                            print('info:', conf_row.descriptor, conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
-                            break
+                                    values = np.where((values < conf_row.min) | (values > conf_row.max), np.nan, values)
+                                    values = np.where(np.isnan(values), None, values)
+                                bufr_dict[conf_row.key] = values
+                            else:
+                                print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', in_file, file=sys.stderr)
+                                break
                         codes_release(bufr)
                         location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
                         if len(location_datetime_index_np) > 0:
@@ -337,15 +344,16 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     datetime_property_data_dict = {}
                                     for property_key in output_property_dict[output]:
                                         property_name_list.append(property_key)
-                                        if max(datetime_index_list) < len(property_dict[property_key]):
-                                            datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
-                                            datetime_property_data_dict[property_key] = datetime_property_data
-                                            if len(value_index_list) > 0:
-                                                value_index_list = list(set(value_index_list) & set([index for index, value in enumerate(datetime_property_data.tolist()) if value != None]))
+                                        if property_key in property_dict:
+                                            if max(datetime_index_list) < len(property_dict[property_key]):
+                                                datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
+                                                datetime_property_data_dict[property_key] = datetime_property_data
+                                                if len(value_index_list) > 0:
+                                                    value_index_list = list(set(value_index_list) & set([index for index, value in enumerate(datetime_property_data.tolist()) if value != None]))
+                                                else:
+                                                    value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                                             else:
-                                                value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
-                                        else:
-                                            print('Info', 'max(datetime_index_list) >= len(property_dict[key]) key :', property_key, file=sys.stderr)
+                                                print('Info', cat_subcat, 'max(datetime_index_list) >= len(property_dict[key]) key :', property_key, max(datetime_index_list), len(property_dict[key]), file=sys.stderr)
                                     if len(value_index_list) > 0:
                                         property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
                                         for property_key in output_property_dict[output]:
