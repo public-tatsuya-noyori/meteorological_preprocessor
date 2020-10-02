@@ -1,0 +1,2 @@
+/bufr/surface/synop/
+/bufr/surface/ship/

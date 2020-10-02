@@ -3,7 +3,7 @@ surface,synop,307079,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307079,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307079,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307079,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307079,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307079,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307079,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307079,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307079,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -28,7 +28,7 @@ surface,synop,307080,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307080,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307080,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307080,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307080,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required_with_subset,float64,-32768,32767
+surface,synop,307080,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required_with_subset,float64,-32768,32767
 surface,synop,307080,year,0,0,0,location_datetime,datetime,required_with_subset,timestamp,0,9999
 surface,synop,307080,month,0,0,0,location_datetime,datetime,required_with_subset,timestamp,1,12
 surface,synop,307080,day,0,0,0,location_datetime,datetime,required_with_subset,timestamp,1,31
@@ -53,7 +53,7 @@ surface,synop,307081,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307081,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307081,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307081,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307081,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307081,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307081,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307081,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307081,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -78,7 +78,7 @@ surface,synop,307082,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307082,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307082,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307082,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307082,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307082,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307082,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307082,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307082,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -103,7 +103,7 @@ surface,synop,307083,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307083,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307083,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307083,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307083,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307083,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307083,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307083,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307083,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -128,7 +128,7 @@ surface,synop,307084,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307084,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307084,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307084,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307084,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307084,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307084,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307084,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307084,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -151,7 +151,7 @@ surface,synop,307084,cloudType,2,0,0,high_cloud_type,high cloud type,optional_wi
 surface,synop,307084,totalPrecipitationPast24Hours,0,0,0,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],optional_with_subset,float64,0,32767
 surface,synop,307085,blockNumber,0,0,1000,location_datetime,station number,required,int32,0,99
 surface,synop,307085,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
-surface,synop,307085,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307085,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307085,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307085,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
 surface,synop,307085,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
@@ -178,7 +178,7 @@ surface,synop,307086,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307086,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307086,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307086,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307086,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307086,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307086,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307086,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307086,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -203,7 +203,7 @@ surface,synop,307096,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307096,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307096,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307096,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307096,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307096,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307096,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307096,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307096,day,0,0,0,location_datetime,datetime,required,timestamp,1,31
@@ -259,7 +259,7 @@ surface,synop,307091,blockNumber,0,0,1000,location_datetime,station number,requi
 surface,synop,307091,stationNumber,0,0,1,location_datetime,station number,required,int32,0,999
 surface,synop,307091,latitude,0,0,0,location_datetime,latitude [degree],required,float64,-90,90
 surface,synop,307091,longitude,0,0,0,location_datetime,longitude [degree],required,float64,-180,180
-surface,synop,307091,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height [m],required,float64,-32768,32767
+surface,synop,307091,heightOfStationGroundAboveMeanSeaLevel,0,0,0,location_datetime,height of station ground above mean sea level [m],required,float64,-32768,32767
 surface,synop,307091,year,0,0,0,location_datetime,datetime,required,timestamp,0,9999
 surface,synop,307091,month,0,0,0,location_datetime,datetime,required,timestamp,1,12
 surface,synop,307091,day,0,0,0,location_datetime,datetime,required,timestamp,1,31

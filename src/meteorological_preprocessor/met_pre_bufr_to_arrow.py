@@ -100,7 +100,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             break
                                     if conf_row.condition == 'required_with_array':
                                         if len(values) == 1:
-                                            values = np.array([values[0] for i in range(0, conf_row.array)], dtype=object)                                    bufr_dict[conf_row.key] = values
+                                            values = np.array([values[0] for i in range(0, conf_row.array)], dtype=object)
+                                    bufr_dict[conf_row.key] = values
                                     if conf_row.output == 'location_datetime':
                                         if conf_row.condition == 'required':
                                             tmp_none_np = np.array([False if value == None else True for value in values])
