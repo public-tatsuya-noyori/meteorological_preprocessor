@@ -353,7 +353,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 else:
                                                     value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                                             else:
-                                                print('Info', cat_subcat, 'max(datetime_index_list) >= len(property_dict[key]) key :', property_key, max(datetime_index_list), len(property_dict[key]), file=sys.stderr)
+                                                print('Info', cat_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
                                     if len(value_index_list) > 0:
                                         property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
                                         for property_key in output_property_dict[output]:
