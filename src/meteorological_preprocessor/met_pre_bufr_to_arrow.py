@@ -52,10 +52,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             none_np = np.array([])
                             not_none_np_choice = np.array([])
                             unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-                            descriptor_conf_df = conf_df[conf_df['descriptor'] == unexpanded_descriptors[0]]
+                            descriptor_conf_df = None
+                            for bufr_descriptor in unexpanded_descriptors:
+                                descriptor_conf_df = conf_df[conf_df['descriptor'] == bufr_descriptor]
+                                if len(descriptor_conf_df) > 0:
+                                    break
                             if len(descriptor_conf_df) == 0:
                                 print('Info', ':', unexpanded_descriptors[0], 'not found descriptor.', in_file, file=sys.stderr)
-                                break
                             number_of_subsets = codes_get(bufr, 'numberOfSubsets')
                             conf_location_datetime_list = list(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')].itertuples())
                             conf_property_list = list(descriptor_conf_df[(descriptor_conf_df['output'] != 'location_datetime')].itertuples())
@@ -64,7 +67,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 if conf_row.slide > -1 and conf_row.step > 0:
                                     values = np.array(values)[conf_row.slide::conf_row.step]
                                 if len(values) > 0:
-                                    if values[0] == str:
+                                    if conf_row.datatype == 'string':
                                         values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                     else:
                                         values = np.where(np.isnan(values), None, values)
@@ -88,14 +91,16 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             values = np.where((values < conf_row.min) | (values > conf_row.max), None, values)
                                         if conf_row.name == 'longitude [degree]':
                                             values = np.where(values == conf_row.min, conf_row.max, values)
-                                    if conf_row.condition == 'required_with_array':
+                                    if conf_row.condition == 'required_with_subset':
                                         if len(values) == 1:
                                             values = np.array([values[0] for i in range(0, number_of_subsets)], dtype=object)
                                         elif len(values) != number_of_subsets:
                                             print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of subsets.', in_file, file=sys.stderr)
                                             bufr_dict = {}
                                             break
-                                    bufr_dict[conf_row.key] = values
+                                    if conf_row.condition == 'required_with_array':
+                                        if len(values) == 1:
+                                            values = np.array([values[0] for i in range(0, conf_row.array)], dtype=object)                                    bufr_dict[conf_row.key] = values
                                     if conf_row.output == 'location_datetime':
                                         if conf_row.condition == 'required':
                                             tmp_none_np = np.array([False if value == None else True for value in values])
@@ -109,8 +114,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 not_none_np_choice = not_none_np_choice * tmp_not_none_np
                                             else:
                                                 not_none_np_choice = tmp_not_none_np
-                                        elif conf_row.condition != 'required_with_array':
-                                            print('Warning', warno, conf_row.key, 'is not required or required_with_array or choice.', in_file, file=sys.stderr)
+                                        elif conf_row.condition != 'required_with_array' and conf_row.condition != 'required_with_subset' :
+                                            print('Warning', warno, conf_row.key, 'is not required or required_with_array or required_with_subset or choice.', in_file, file=sys.stderr)
                                     if len(not_none_np_choice) > 0:
                                         tmp_none_np_choice = np.array([True if value == False else False for value in not_none_np_choice])
                                         none_np = none_np * tmp_none_np_choice
@@ -118,7 +123,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of subsets.', in_file, file=sys.stderr)
                                     bufr_dict = {}
                                     break
-                            if len(bufr_dict) == 0 or False in none_np.tolist():
+                            if len(bufr_dict) == 0 or not True in none_np.tolist():
                                 codes_release(bufr)
                                 break
                             bufr_dict['none'] = none_np
@@ -143,14 +148,14 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 if conf_row.slide > -1 and conf_row.step > 0:
                                     values = np.array(values)[conf_row.slide::conf_row.step]
                                 if len(values) == number_of_subsets:
-                                    if values[0] == str:
+                                    if conf_row.datatype == 'string':
                                         values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                     else:
                                         values = np.where((values < conf_row.min) | (values > conf_row.max), np.nan, values)
                                         values = np.where(np.isnan(values), None, values)
                                     bufr_dict[conf_row.key] = values
                                 else:
-                                    print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, 'is not optional_with_subset.', in_file, file=sys.stderr)
+                                    print('Info', '2 unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, 'is not optional_with_subset.', in_file, file=sys.stderr)
                         except CodesInternalError as err:
                             print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
                             break
@@ -317,7 +322,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             else:
                                                 value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                                         else:
-                                            print('Info', 'max(datetime_index_list) >= len(property_dict[key]) key :', key, file=sys.stderr)
+                                            print('Info', 'max(datetime_index_list) >= len(property_dict[key]) key :', property_key, file=sys.stderr)
                                     if len(value_index_list) > 0:
                                         property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
                                         for property_key in output_property_dict[output]:

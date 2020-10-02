@@ -77,14 +77,11 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 unique_key_list.pop(0)#del etfo
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_dict[(tile_x, tile_y, new_datetime)] = concat_df[duplicated][['elapsed time [s]', 'id']]
-                                updated_df = concat_df[~duplicated]
-                                updated_df = updated_df.astype({'id': 'int32'})
-                                updated_df = updated_df.astype({'indicator': 'int32'})
-                                updated_df = updated_df.astype({'elapsed time [s]': 'int32'})
-                                if len(updated_df) > 0:
+                                concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
+                                if len(concat_df) > 0:
                                     with open(out_file, 'bw') as out_f:
-                                        writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
-                                        writer.write_table(pa.Table.from_pandas(updated_df))
+                                        writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(concat_df))
+                                        writer.write_table(pa.Table.from_pandas(concat_df))
                                         writer.close()
                                 if not out_file in out_arrows:
                                     out_arrows.append(out_file)
@@ -130,17 +127,13 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)].itertuples():
                                             del_index = concat_df.index[(concat_df['elapsed time [s]'] == del_etfo_id[1]) & (concat_df['id'] == del_etfo_id[2])]
                                             if len(del_index) == 1:
-                                                concat_df = concat_df.drop(del_index)
+                                                concat_df = concat_df.drop(del_index[0])
                                         unique_key_list = new_df.columns.values.tolist()
-                                        duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
-                                        updated_df = concat_df[~duplicated]
-                                        updated_df = updated_df.astype({'id': 'int32'})
-                                        updated_df = updated_df.astype({'indicator': 'int32'})
-                                        updated_df = updated_df.astype({'elapsed time [s]': 'int32'})
-                                        if len(updated_df) > 0:
+                                        concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
+                                        if len(concat_df) > 0:
                                             with open(out_file, 'bw') as out_f:
-                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(updated_df))
-                                                writer.write_table(pa.Table.from_pandas(updated_df))
+                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(concat_df))
+                                                writer.write_table(pa.Table.from_pandas(concat_df))
                                                 writer.close()
                                             if not out_file in out_arrows:
                                                 out_arrows.append(out_file)
