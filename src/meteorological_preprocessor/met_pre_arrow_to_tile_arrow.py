@@ -124,10 +124,13 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         concat_df = concat_df.astype({'id': 'int32'})
                                         concat_df = concat_df.astype({'indicator': 'int32'})
                                         concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
+                                        del_index_list = []
                                         for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)].itertuples():
                                             del_index = concat_df.index[(concat_df['elapsed time [s]'] == del_etfo_id[1]) & (concat_df['id'] == del_etfo_id[2])]
                                             if len(del_index) == 1:
-                                                concat_df = concat_df.drop(del_index[0])
+                                                del_index_list.append(del_index[0])
+                                        for del_index in list.sort(del_index_list, reverse=True):
+                                                concat_df = concat_df.drop(del_index)
                                         unique_key_list = new_df.columns.values.tolist()
                                         concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
                                         if len(concat_df) > 0:

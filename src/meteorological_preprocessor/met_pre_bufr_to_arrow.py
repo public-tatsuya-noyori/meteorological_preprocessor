@@ -47,6 +47,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             break
                         bufr_dict = {}
                         datetime_tail = ''
+                        number_of_subsets = 0
+                        number_of_values = 0
                         try:
                             codes_set(bufr, 'unpack', 1)
                             none_np = np.array([])
@@ -67,6 +69,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 if conf_row.slide > -1 and conf_row.step > 0:
                                     values = np.array(values)[conf_row.slide::conf_row.step]
                                 if len(values) > 0:
+                                    if conf_row.condition == 'required_with_values':
+                                        number_of_values = len(values)
                                     if conf_row.datatype == 'string':
                                         values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                     else:
@@ -100,10 +104,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             break
                                     if conf_row.condition == 'required_with_array':
                                         if len(values) == 1:
-                                            values = np.array([values[0] for i in range(0, conf_row.array)], dtype=object)
+                                            values = np.array([values[0] for i in range(0, number_of_values)], dtype=object)
                                     bufr_dict[conf_row.key] = values
                                     if conf_row.output == 'location_datetime':
-                                        if conf_row.condition == 'required':
+                                        if conf_row.condition == 'required' or conf_row.condition == 'required_with_values':
                                             tmp_none_np = np.array([False if value == None else True for value in values])
                                             if len(none_np) > 0:
                                                 none_np = none_np * tmp_none_np
@@ -120,7 +124,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     if len(not_none_np_choice) > 0:
                                         tmp_none_np_choice = np.array([True if value == False else False for value in not_none_np_choice])
                                         none_np = none_np * tmp_none_np_choice
-                                if len(values) != number_of_subsets:
+                                if number_of_values > 0 and len(values) != number_of_values:
+                                    print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of values.', in_file, file=sys.stderr)
+                                    bufr_dict = {}
+                                    break
+                                elif number_of_values == 0 and len(values) != number_of_subsets:
                                     print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of subsets.', in_file, file=sys.stderr)
                                     bufr_dict = {}
                                     break
@@ -144,11 +152,25 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             value = np.nan
                                         values.append(value)
                                     values = np.array(values, dtype=float)
-                                else:
+                                elif conf_row.condition == 'optional_with_tail_nan':
+                                    values = codes_get_array(bufr, conf_row.key).tolist()
+                                    for i in range(len(values), number_of_values):
+                                        values.append(np.nan)
+                                    values = np.array(values, dtype=float)
+                                elif conf_row.condition == 'optional_with_head_nan':
+                                    values = codes_get_array(bufr, conf_row.key).tolist()
+                                    tmp_values = []
+                                    for i in range(0, number_of_values - len(values)):
+                                        tmp_values.append(np.nan)
+                                    tmp_values.extend(values)
+                                    values = np.array(tmp_values, dtype=float)
+                                elif conf_row.condition == 'optional':
                                     values = codes_get_array(bufr, conf_row.key)
+                                else:
+                                    print('Warning', warno, conf_row.key, 'is not optional or optional_with_subset or optional_with_tail_nan or optional_with_head_nan.', in_file, file=sys.stderr)
                                 if conf_row.slide > -1 and conf_row.step > 0:
                                     values = np.array(values)[conf_row.slide::conf_row.step]
-                                if len(values) == number_of_subsets:
+                                if (number_of_values > 0 and len(values) == number_of_values) or (number_of_values == 0 and len(values) == number_of_subsets):
                                     if conf_row.datatype == 'string':
                                         values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                     else:
@@ -156,9 +178,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         values = np.where(np.isnan(values), None, values)
                                     bufr_dict[conf_row.key] = values
                                 else:
-                                    print('Info', '2 unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, 'is not optional_with_subset.', in_file, file=sys.stderr)
+                                    print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', in_file, file=sys.stderr)
                         except CodesInternalError as err:
-                            print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
+                            print('info:', conf_row.descriptor, conf_row.key, 'CodesInternalError is happend at bufr_dict in', in_file, file=sys.stderr)
                             break
                         codes_release(bufr)
                         location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
