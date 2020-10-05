@@ -92,7 +92,7 @@ if test -s download_${priority}/created.txt; then
     fi
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
-    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" > download_${priority}/cached/${now}.txt
+    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | uniq > download_${priority}/cached/${now}.txt
   fi
   rm -f download_${priority}/cached/${now}.txt.tmp
 fi

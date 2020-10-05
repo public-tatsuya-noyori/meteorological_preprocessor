@@ -63,6 +63,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 print('Info :', unexpanded_descriptors, 'not found descriptor.', in_file, file=sys.stderr)
                                 break
                             number_of_subsets = codes_get(bufr, 'numberOfSubsets')
+                            if number_of_subsets == 0:
+                                print('Info :', 'number_of_subsets == 0.', in_file, file=sys.stderr)
+                                break
                             conf_location_datetime_list = list(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')].itertuples())
                             conf_property_list = list(descriptor_conf_df[(descriptor_conf_df['output'] != 'location_datetime')].itertuples())
                             for conf_row in conf_location_datetime_list:
@@ -145,9 +148,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 values = []
                                 for i in range(1, number_of_subsets + 1):
                                     try:
-                                        value = codes_get_array(bufr, "/subsetNumber=" + str(i) + "/" + conf_row.key)[conf_row.slide]
-                                        if value < conf_row.min or value > conf_row.max:
-                                            value = np.nan
+                                        tmp_values = codes_get_array(bufr, "/subsetNumber=" + str(i) + "/" + conf_row.key)
+                                        if len(tmp_values) > conf_row.slide:
+                                            value = tmp_values[conf_row.slide]
+                                            if value < conf_row.min or value > conf_row.max:
+                                                value = np.nan
                                     except CodesInternalError as err:
                                         value = np.nan
                                     values.append(value)

@@ -17,6 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
+set -e
 sh_name=pub_tile_arrow.sh
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 if test -s pid/${sh_name}.txt; then

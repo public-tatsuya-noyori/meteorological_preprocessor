@@ -148,6 +148,7 @@ for arg in "$@"; do
     '--help' ) echo "$0 [--clone] [--pub_dir_list_index] local_work_directory unique_job_name source_rclone_remote source_bucket dest_rclone_remote dest_bucket priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--cron" ) cron=1;shift;;
     "--pub_dir_list_index" ) pub_dir_list_index=1;shift;;
+    "--urgent" ) urgent=1;shift;;
   esac
 done
 if test -z $8; then
@@ -175,8 +176,7 @@ elif test $8 -le 0; then
   echo "ERROR: $8 is not more than 1." >&2
   exit 199
 fi
-if test ${priority} = 'p1'; then
-  urgent=1
+if test ${urgent} -eq 1; then
   job_num=4
   time_limit=`expr ${job_period} / ${job_num}`
   deadline=`expr \( ${job_num} - 1 \) \* ${time_limit}`

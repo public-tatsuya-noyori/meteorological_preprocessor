@@ -131,7 +131,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
             try:
-                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                     continue
             except:
                 print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
@@ -227,7 +227,7 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
             try:
-                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode().replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                     continue
             except:
                 print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)

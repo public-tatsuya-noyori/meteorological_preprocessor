@@ -2,3 +2,4 @@
 /bufr/surface/ship/
 /bufr/surface/buoy/
 /bufr/surface/profiling_float/
+/bufr/surface/gps_pwv/

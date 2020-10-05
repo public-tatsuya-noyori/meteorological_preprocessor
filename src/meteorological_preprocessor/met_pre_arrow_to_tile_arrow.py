@@ -20,6 +20,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     creator = ''
     created = ''
     created_second = 0
+    new_datetime_list_dict = {}
+    new_id_etfo_dict = {}
+    del_etfo_id_dict = {}
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
@@ -126,12 +129,10 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         concat_df = concat_df.astype({'elapsed time [s]': 'int32'})
                                         del_index_list = []
                                         for del_etfo_id in del_etfo_id_dict[(tile_x,  tile_y, new_datetime)].itertuples():
-                                            del_index = concat_df.index[(concat_df['elapsed time [s]'] == del_etfo_id[1]) & (concat_df['id'] == del_etfo_id[2])]
-                                            if len(del_index) == 1:
-                                                del_index_list.append(del_index[0])
+                                            for del_index in concat_df.index[(concat_df['elapsed time [s]'] == del_etfo_id[1]) & (concat_df['id'] == del_etfo_id[2])]:
+                                                del_index_list.append(del_index)
                                         if len(del_index_list) > 0:
-                                            for del_index in sorted(del_index_list, reverse=True):
-                                                concat_df = concat_df.drop(del_index)
+                                            concat_df.drop(concat_df.index[del_index_list], inplace=True)
                                         unique_key_list = new_df.columns.values.tolist()
                                         concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
                                         if len(concat_df) > 0:

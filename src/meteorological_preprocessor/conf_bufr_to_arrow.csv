@@ -288,7 +288,7 @@ surface,gps_pwv,307022,year,0,0,0,location_datetime,datetime,required_with_subse
 surface,gps_pwv,307022,month,0,0,0,location_datetime,datetime,required_with_subset,timestamp,1,12
 surface,gps_pwv,307022,day,0,0,0,location_datetime,datetime,required_with_subset,timestamp,1,31
 surface,gps_pwv,307022,hour,0,0,0,location_datetime,datetime,required_with_subset,timestamp,0,23
-surface,gps_pwv,307022,minute,0,0,0,location_datetime,datetime,required,timestamp,0,59
+surface,gps_pwv,307022,minute,0,0,0,location_datetime,datetime,required_with_subset,timestamp,0,59
 surface,gps_pwv,307022,#1#atmosphericPathDelayInSatelliteSignal,0,0,0,atmospheric_path_delay_in_satellite_signal,atmospheric path delay in satellite signal [m],optional,float64,0,16777215
 surface,gps_pwv,307022,#1#estimatedErrorInAtmosphericPathDelay,0,0,0,estimated_error_in_atmospheric_path_delay,estimated error in atmospheric path delay [m],optional,float64,0,16777215
 surface,buoy,315008,marineObservingPlatformIdentifier,0,0,0,location_datetime,buoy id,required,int32,0,2147483647
@@ -314,8 +314,9 @@ surface,buoy,315009,year,1,2,0,location_datetime,datetime,required_with_subset,t
 surface,buoy,315009,month,1,2,0,location_datetime,datetime,required_with_subset,timestamp,1,12
 surface,buoy,315009,day,1,2,0,location_datetime,datetime,required_with_subset,timestamp,1,31
 surface,buoy,315009,hour,1,2,0,location_datetime,datetime,required_with_subset,timestamp,0,23
-surface,buoy,315009,minute,1,2,0,location_datetime,datetime,required,timestamp,0,59
+surface,buoy,315009,minute,1,2,0,location_datetime,datetime,required_with_subset,timestamp,0,59
 surface,buoy,315009,oceanographicWaterTemperature,0,0,0,oceanographic_water_temperature,oceanographic water temperature [k],optional_with_subset,float64,-273.15,32767
+surface,buoy,315009,pressureReducedToMeanSeaLevel,0,0,0,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],optional_with_subset,float64,0,16777215
 surface,profiling_float,315003,waterPressure,0,0,0,location_datetime,water pressure [Pa],required_with_values,float64,0,2147483647
 surface,profiling_float,315003,marineObservingPlatformIdentifier,0,0,0,location_datetime,profiling float id,required_with_array,int32,0,2147483647
 surface,profiling_float,315003,latitude,0,0,0,location_datetime,latitude [degree],required_with_array,float64,-90,90
