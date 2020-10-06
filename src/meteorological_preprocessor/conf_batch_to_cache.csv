@@ -26,6 +26,8 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,cccc,access_contro
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_I[RUWX]F[A-Z][0-9][0-9].*)$,^I[RUWX]F[A-Z][0-9][0-9]$,,,,open,bufr,satellite,asr,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_I[RUWX]R[A-Z][0-9][0-9].*)$,^I[RUWX]R[A-Z][0-9][0-9]$,,,,open,bufr,satellite,csr,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_I[RUWX]V[A-Z][0-9][0-9].*)$,^I[RUWX]V[A-Z][0-9][0-9]$,,,,open,bufr,satellite,amv,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOB[A-Z][0-9][0-9].*)$,^IOB[A-Z][0-9][0-9]$,,315008,,open,bufr,surface,moored_buoy,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOB[A-Z][0-9][0-9].*)$,^IOB[A-Z][0-9][0-9]$,,315009,,open,bufr,surface,drifting_buoy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOB[A-Z][0-9][0-9].*)$,^IOB[A-Z][0-9][0-9]$,,,,open,bufr,surface,buoy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOPX[0-9][0-9].*)$,^IOPX[0-9][0-9]$,,,,open,bufr,surface,profiling_float,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_ISA[A-Z][0-9][0-9].*)$,^ISA[A-Z][0-9][0-9]$,,,,open,bufr,surface,synop,bin

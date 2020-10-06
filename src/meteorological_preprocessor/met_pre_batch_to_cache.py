@@ -28,6 +28,24 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
+def is_bufr_descriptor(in_file, bufr_descriptor):
+    rc = False
+    with open(in_file, 'r') as in_file_stream:
+        while True:
+            bufr = codes_bufr_new_from_file(in_file_stream)
+            if bufr is None:
+                break
+            try:
+                codes_set(bufr, 'unpack', 1)
+                unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
+                descriptor_conf_df = None
+                if bufr_descriptor in unexpanded_descriptors:
+                    rc = True
+            except CodesInternalError as err:
+                break
+            codes_release(bufr)
+    return rc
+
 def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):
     ttaaii_cccc_ddhhmm_bbb_data_date_list = []
     word = ''
@@ -130,12 +148,10 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_directory_list.append(conf_row.category)
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
-            try:
-                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
-                    continue
-            except:
-                print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
-                return ''
+            if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+                continue
+            if conf_row.bufr_descriptor and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
+                continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
@@ -226,12 +242,10 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
         if re.match(r'' + conf_row.ttaaii_pattern, ttaaii) and re.match(r'' + conf_row.file_name_pattern, os.path.basename(in_file)):
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
-            try:
-                if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
-                    continue
-            except:
-                print('Warning', warno, ':', 'text of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
-                return ''
+            if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+                continue
+            if conf_row.bufr_descriptor and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
+                continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
@@ -397,8 +411,8 @@ def main():
     if os.path.isdir(args.input_directory_or_list_file) and os.access(args.input_directory_or_list_file, os.R_OK) and os.access(args.input_directory_or_list_file, os.X_OK):
         in_dir_entry_list = [f for f in os.scandir(args.input_directory_or_list_file) if os.path.isfile(f) and os.access(f, os.R_OK) and not re.match(r'(^.*\.tmp$|^\..*$)', f.name) and os.path.getsize(f) > 4]
         input_file_list = [in_dir_entry.path for in_dir_entry in sorted(in_dir_entry_list, key=os.path.getmtime)]
-    elif not os.path.isfile(args.input_directory_or_list_file) and os.access(args.input_directory_or_list_file, os.R_OK):
-        with open(input_directory_or_list_file, 'r') as in_list_file_stream:
+    elif os.path.isfile(args.input_directory_or_list_file) and os.access(args.input_directory_or_list_file, os.R_OK):
+        with open(args.input_directory_or_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
     else:
         print('Error', errno, ':', args.input_directory_or_list_file, 'is not directory/file/readable/executable.', file=sys.stderr)

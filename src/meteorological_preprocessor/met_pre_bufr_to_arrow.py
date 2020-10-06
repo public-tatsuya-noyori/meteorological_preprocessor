@@ -2,6 +2,7 @@
 import argparse
 import numpy as np
 import os
+import pandas as pd
 import pkg_resources
 import pyarrow as pa
 import re
@@ -54,10 +55,22 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             none_np = np.array([])
                             not_none_np_choice = np.array([])
                             unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-                            descriptor_conf_df = None
+                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','inner_descriptor'])
                             for bufr_descriptor in unexpanded_descriptors:
-                                descriptor_conf_df = conf_df[conf_df['descriptor'] == bufr_descriptor]
+                                cat = re.sub('/.*$', '', cat_subcat)
+                                subcat = re.sub('^.*/', '', cat_subcat)
+                                descriptor_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
                                 if len(descriptor_conf_df) > 0:
+                                    inner_descriptor_list = set(descriptor_conf_df[['inner_descriptor']].values.flatten())
+                                    if len(inner_descriptor_list) > 0:
+                                        is_inner = False
+                                        for inner_descriptor in inner_descriptor_list:
+                                            if inner_descriptor in unexpanded_descriptors:
+                                                descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['inner_descriptor'] == inner_descriptor]
+                                                is_inner = True
+                                                break
+                                        if not is_inner:
+                                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','inner_descriptor'])
                                     break
                             if len(descriptor_conf_df) == 0:
                                 print('Info :', unexpanded_descriptors, 'not found descriptor.', in_file, file=sys.stderr)
@@ -92,7 +105,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             elif conf_row.key == 'minute':
                                                 values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
                                             elif conf_row.key == 'second':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
+                                                if conf_row.condition == 'optional':
+                                                    values = np.array(['00' if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
+                                                else:
+                                                    values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
                                             elif conf_row.key == 'millisecond':
                                                 values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in values], dtype=object)
                                         else:
@@ -123,8 +139,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 not_none_np_choice = not_none_np_choice * tmp_not_none_np
                                             else:
                                                 not_none_np_choice = tmp_not_none_np
-                                        elif conf_row.condition != 'required_with_array' and conf_row.condition != 'required_with_subset' :
-                                            print('Warning', warno, conf_row.key, 'is not required or required_with_array or required_with_subset or choice.', in_file, file=sys.stderr)
+                                        elif conf_row.condition != 'optional' and conf_row.condition != 'required_with_array' and conf_row.condition != 'required_with_subset' :
+                                            print('Warning', warno, conf_row.key, 'is not optional or required or required_with_array or required_with_subset or choice.', in_file, file=sys.stderr)
                                     if len(not_none_np_choice) > 0:
                                         tmp_none_np_choice = np.array([True if value == False else False for value in not_none_np_choice])
                                         none_np = none_np * tmp_none_np_choice
@@ -142,6 +158,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             bufr_dict['none'] = none_np
                         except CodesInternalError as err:
                             print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend in', in_file, file=sys.stderr)
+                            bufr_dict = {}
                             break
                         for conf_row in conf_property_list:
                             if conf_row.condition == 'optional_with_subset':
@@ -192,8 +209,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     values = np.where(np.isnan(values), None, values)
                                 bufr_dict[conf_row.key] = values
                             else:
-                                print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', in_file, file=sys.stderr)
-                                break
+                                print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', 'len(values):', len(values), 'number_of_subsets:', number_of_subsets, 'number_of_values:', number_of_values, in_file, file=sys.stderr)
+                                if number_of_values == 0:
+                                    values = np.array([None for value in range(0, number_of_subsets)], dtype=object)
+                                else:
+                                    values = np.array([None for value in range(0, number_of_values)], dtype=object)
+                                bufr_dict[conf_row.key] = values
+                                continue
                         codes_release(bufr)
                         location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
                         if len(location_datetime_index_np) > 0:
@@ -361,19 +383,25 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 print('Info', cat_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
                                     if len(value_index_list) > 0:
                                         property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
+                                        is_output = True
                                         for property_key in output_property_dict[output]:
-                                            property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
-                                        out_directory_list = [out_dir, cccc, 'bufr_to_arrow', cat_subcat, datetime_directory, create_datetime_directory]
-                                        out_directory = '/'.join(out_directory_list)
-                                        os.makedirs(out_directory, exist_ok=True)
-                                        out_file_list = [out_directory, output + '.arrow']
-                                        out_file = '/'.join(out_file_list)
-                                        with open(out_file, 'bw') as out_f:
-                                            property_batch = pa.record_batch(property_data, names=property_name_list)
-                                            writer = pa.ipc.new_file(out_f, property_batch.schema)
-                                            writer.write_batch(property_batch)
-                                            writer.close()
-                                            print(out_file, file=out_list_file)
+                                            if property_key in datetime_property_data_dict:
+                                                property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
+                                            else:
+                                                print('Info', cat_subcat, 'key :', property_key, 'no data', file=sys.stderr)
+                                                is_output = False
+                                        if is_output:
+                                            out_directory_list = [out_dir, cccc, 'bufr_to_arrow', cat_subcat, datetime_directory, create_datetime_directory]
+                                            out_directory = '/'.join(out_directory_list)
+                                            os.makedirs(out_directory, exist_ok=True)
+                                            out_file_list = [out_directory, output + '.arrow']
+                                            out_file = '/'.join(out_file_list)
+                                            with open(out_file, 'bw') as out_f:
+                                                property_batch = pa.record_batch(property_data, names=property_name_list)
+                                                writer = pa.ipc.new_file(out_f, property_batch.schema)
+                                                writer.write_batch(property_batch)
+                                                writer.close()
+                                                print(out_file, file=out_list_file)
 
 def main():
     errno=198
