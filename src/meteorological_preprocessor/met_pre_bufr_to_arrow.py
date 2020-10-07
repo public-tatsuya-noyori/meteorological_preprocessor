@@ -8,7 +8,7 @@ import pyarrow as pa
 import re
 import sys
 import traceback
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
@@ -124,7 +124,16 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             break
                                     if conf_row.condition == 'required_with_array':
                                         if len(values) == 1:
-                                            values = np.array([values[0] for i in range(0, number_of_values)], dtype=object)
+                                            if values[0]:
+                                                values = np.array([values[0] for i in range(0, number_of_values)], dtype=object)
+                                            else:
+                                                print('Warning', warno, ':', conf_row.key, 'The values[0] is nan.', in_file, file=sys.stderr)
+                                                bufr_dict = {}
+                                                break                                                
+                                        else:
+                                            print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to 1.', in_file, file=sys.stderr)
+                                            bufr_dict = {}
+                                            break
                                     bufr_dict[conf_row.key] = values
                                     if conf_row.output == 'location_datetime':
                                         if conf_row.condition == 'required' or conf_row.condition == 'required_with_values':
@@ -209,7 +218,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     values = np.where(np.isnan(values), None, values)
                                 bufr_dict[conf_row.key] = values
                             else:
-                                print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', 'len(values):', len(values), 'number_of_subsets:', number_of_subsets, 'number_of_values:', number_of_values, in_file, file=sys.stderr)
+                                print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', 'len(values):', len(values), 'number_of_subsets:', number_of_subsets, 'number_of_values:', number_of_values, 'values:', values, in_file, file=sys.stderr)
                                 if number_of_values == 0:
                                     values = np.array([None for value in range(0, number_of_subsets)], dtype=object)
                                 else:
@@ -297,46 +306,52 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                 location_datetime_data = [pa.array(id_list, 'int32')]
                 location_datetime_name_list = ['id']
                 datetime_directory_list = []
+                del_key_list = []
                 for key in location_datetime_dict.keys():
                     if key == 'datetime':
+                        plus_second_list = [0 for dt in range(0, len(location_datetime_dict[key]))]
+                        if 'time period [s]' in location_datetime_dict:
+                            plus_second_list = location_datetime_dict['time period [s]']
+                            del_key_list.append('time period [s]')
                         if datetime_tail == 'millisecond':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:11] + "0" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:11] + "0")
                         elif datetime_tail == 'second':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:11] + "0" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:11] + "0")
                         elif datetime_tail == 'minute':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:11] + "0" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:11] + "0")
                         elif datetime_tail == 'hour':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:10] + "00" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:10] + "00")
                         elif datetime_tail == 'day':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:8] + "0000" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:8] + "0000")
                         elif datetime_tail == 'month':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:6] + "000000" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:6] + "000000")
                         elif datetime_tail == 'year':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) for dt_str in location_datetime_dict[key]], pa.timestamp('ms', tz='utc')))
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
                             for dt_str in location_datetime_dict[key]:
                                 if not dt_str[0:4] + "00000000" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:4] + "00000000")
-                    else:
+                        location_datetime_name_list.append(key)
+                    elif key != 'time period [s]':
                         location_datetime_data.append(pa.array(location_datetime_dict[key].flatten(), datatype_dict[key]))
-                    location_datetime_name_list.append(key)
+                        location_datetime_name_list.append(key)
                 for datetime_directory in datetime_directory_list:
                     datetime_len = 11
                     if datetime_tail == 'hour':
