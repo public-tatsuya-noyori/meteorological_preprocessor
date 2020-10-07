@@ -72,7 +72,7 @@ if test ! -s download_${priority}/aria2c.log; then
 fi
 grep "ETag:" download_${priority}/aria2c.log | tail -1 | cut -d' ' -f2 > download_${priority}/etag.txt
 if test -s download_${priority}/created.txt; then
-  if ! test -s download_${priority}/created.txt; then
+  if test ! -s download_${priority}/created.txt; then
     exit 0
   fi
   now=`date -u "+%Y%m%d%H%M%S"`
@@ -93,6 +93,9 @@ if test -s download_${priority}/created.txt; then
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
     cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | uniq > download_${priority}/cached/${now}.txt
+    if test ! -s download_${priority}/cached/${now}.txt; then
+      rm -f download_${priority}/cached/${now}.txt
+    fi
   fi
   rm -f download_${priority}/cached/${now}.txt.tmp
 fi

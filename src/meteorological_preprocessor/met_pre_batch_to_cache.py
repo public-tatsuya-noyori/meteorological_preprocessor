@@ -19,6 +19,7 @@
 #
 
 import argparse
+import numpy as np
 import os
 import pkg_resources
 import re
@@ -148,9 +149,9 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_directory_list.append(conf_row.category)
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
-            if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+            if conf_row.file_extension == 'txt' and conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                 continue
-            if conf_row.bufr_descriptor and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
+            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
                 continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
@@ -242,9 +243,9 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
         if re.match(r'' + conf_row.ttaaii_pattern, ttaaii) and re.match(r'' + conf_row.file_name_pattern, os.path.basename(in_file)):
             if conf_row.cccc and conf_row.cccc != cccc:
                 continue
-            if conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
+            if conf_row.file_extension == 'txt' and conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                 continue
-            if conf_row.bufr_descriptor and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
+            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
                 continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)

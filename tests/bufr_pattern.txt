@@ -1,5 +1,8 @@
 /bufr/surface/synop/
 /bufr/surface/ship/
-/bufr/surface/buoy/
+/bufr/surface/moored_buoy/
+/bufr/surface/drifting_buoy/
 /bufr/surface/profiling_float/
 /bufr/surface/gps_pwv/
+/bufr/upper_air/amdar/
+/bufr/upper_air/wind_profiler/

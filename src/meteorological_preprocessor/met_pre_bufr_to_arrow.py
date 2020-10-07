@@ -62,7 +62,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 descriptor_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
                                 if len(descriptor_conf_df) > 0:
                                     descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
-                                    if len(descriptor_2_list) > 0 and descriptor_2_list[0] != '':
+                                    if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
                                         is_descriptor_2 = False
                                         for descriptor_2 in descriptor_2_list:
                                             if descriptor_2 in unexpanded_descriptors:

@@ -17,6 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
+set -e
 sh_name=arrow_to_tile_arrow.sh
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 if test -s pid/${sh_name}.txt; then
@@ -29,9 +30,7 @@ if test ${running} -eq 0; then
   now=`date -u "+%Y%m%d%H%M%S"`
   {
     for i in `ls -1 sub_arrow_synop|grep -v '\.tmp$'|uniq`; do
-      set -e
       ./pub.sh --pub_dir_list_index cache_bufr_to_arrow bufr_synop_arrow_p7 sub_arrow_synop/${i} wasabi japan.meteorological.agency.open.data p7 8 2>>log/pub.sh.bufr_synop_arrow.log
-      set +e
       ./met_pre_arrow_to_tile_arrow.py sub_arrow_synop/${i} cache_tile_arrow/RJTD/tile_arrow_dataset 1 1>>tile_arrow/${now}.txt.tmp 2>>log/met_pre_arrow_to_tile_arrow.py.log
       rm -f sub_arrow_synop/${i}
     done
