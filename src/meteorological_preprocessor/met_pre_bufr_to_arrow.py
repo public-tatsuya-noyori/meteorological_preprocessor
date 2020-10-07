@@ -55,22 +55,22 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             none_np = np.array([])
                             not_none_np_choice = np.array([])
                             unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','inner_descriptor'])
+                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                             for bufr_descriptor in unexpanded_descriptors:
                                 cat = re.sub('/.*$', '', cat_subcat)
                                 subcat = re.sub('^.*/', '', cat_subcat)
                                 descriptor_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
                                 if len(descriptor_conf_df) > 0:
-                                    inner_descriptor_list = set(descriptor_conf_df[['inner_descriptor']].values.flatten())
-                                    if len(inner_descriptor_list) > 0:
-                                        is_inner = False
-                                        for inner_descriptor in inner_descriptor_list:
-                                            if inner_descriptor in unexpanded_descriptors:
-                                                descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['inner_descriptor'] == inner_descriptor]
-                                                is_inner = True
+                                    descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
+                                    if len(descriptor_2_list) > 0 and descriptor_2_list[0] != '':
+                                        is_descriptor_2 = False
+                                        for descriptor_2 in descriptor_2_list:
+                                            if descriptor_2 in unexpanded_descriptors:
+                                                descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['descriptor_2'] == descriptor_2]
+                                                is_descriptor_2 = True
                                                 break
-                                        if not is_inner:
-                                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','inner_descriptor'])
+                                        if not is_descriptor_2:
+                                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                                     break
                             if len(descriptor_conf_df) == 0:
                                 print('Info :', unexpanded_descriptors, 'not found descriptor.', in_file, file=sys.stderr)
