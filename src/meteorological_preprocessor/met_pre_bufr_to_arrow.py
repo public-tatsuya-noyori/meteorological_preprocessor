@@ -50,7 +50,8 @@ def getArray(bufr, key, conf_row, in_file):
             if conf_row.name == 'longitude [degree]':
                 array = np.where(array == conf_row.min, conf_row.max, array)
     except:
-        print('Info', ':', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
+        if conf_row.output == 'location_datetime':
+            print('Info', ': sub ', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
         array = [None]
     return array
 
@@ -162,16 +163,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         continue
                             else:
                                 array = getArray(bufr, conf_row.key, conf_row, in_file)
-                                if len(array) == 1:
-                                    if array[0] == None or number_of_array == 0:
-                                        if conf_row.output == 'location_datetime':
-                                            print('Warning', warno, ':', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
-                                            break
-                                        else:
-                                            continue
-                                    else:
-                                        array = np.array([array[0] for i in range(0, number_of_array)], dtype=object)
-                                elif number_of_array == 0:
+                                if number_of_array == 0:
                                     number_of_array = len(array)
                                 if len(array) != number_of_array:
                                     print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
