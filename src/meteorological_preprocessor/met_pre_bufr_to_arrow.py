@@ -12,6 +12,48 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
+def getArray(bufr, key, conf_row):
+    array = [None]
+    try:
+        array = codes_get_array(bufr, key)
+        if conf_row.slide > -1 and conf_row.step > 0:
+            array = array[conf_row.slide::conf_row.step]
+        if conf_row.datatype == 'string':
+            array = np.array([value.lstrip().rstrip() for value in array], dtype=object)
+        else:
+            array = np.where(np.isnan(array), None, array)
+            if conf_row.name == 'datetime':
+                if conf_row.key == 'year':
+                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in array], dtype=object)
+                elif conf_row.key == 'month':
+                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                elif conf_row.key == 'day':
+                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                elif conf_row.key == 'hour':
+                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                elif conf_row.key == 'minute':
+                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                elif conf_row.key == 'second':
+                    if not np.isnan(conf_row.missing):
+                        array = np.array([str(conf_row.missing).zfill(2) if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                    else:
+                        array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                elif conf_row.key == 'millisecond':
+                    if not np.isnan(conf_row.missing):
+                        array = np.array([str(conf_row.missing).zfill(3) if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
+                    else:
+                        array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
+            elif not np.isnan(conf_row.missing):
+                array = np.array([conf_row.missing if value < conf_row.min or value > conf_row.max else value for value in array], dtype=object)
+            else:
+                array = np.array([None if value < conf_row.min or value > conf_row.max else value for value in array], dtype=object)
+            if conf_row.name == 'longitude [degree]':
+                array = np.where(array == conf_row.min, conf_row.max, array)
+    except:
+        print('Info', ':', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
+        array = [None]
+    return array
+
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
     warno = 189
     out_arrows = []
@@ -22,10 +64,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
     cat_subcat_set = set([re.search(r'^[^/]*/[^/]*/', re.sub('^.*/bufr/', '', in_file)).group().rstrip('/') for in_file in in_file_list])
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
+            descriptor_conf_df = None
             datatype_dict = {}
             property_dict = {}
             output_property_dict = {}
-            datetime_tail = ''
             for in_file in in_file_list:
                 match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
                 if not match:
@@ -46,7 +88,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         bufr = codes_bufr_new_from_file(in_file_stream)
                         if bufr is None:
                             break
-                        bufr_dict = {}
                         codes_set(bufr, 'unpack', 1)
                         unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')                    
                         descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
@@ -67,142 +108,86 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                                 break
                         if len(descriptor_conf_df) == 0:
-                            print('Info:not found descriptor:', unexpanded_descriptors, in_file, file=sys.stderr)
+                            print('Info', ':', 'not found descriptor.', unexpanded_descriptors, in_file, file=sys.stderr)
                             break
                         number_of_subsets = codes_get(bufr, 'numberOfSubsets')
                         if number_of_subsets == 0:
                             break
-                        number_of_array = 0
+                        bufr_dict = {}
                         none_np = np.array([])
+                        number_of_array = 0
                         for conf_row in descriptor_conf_df.itertuples():
-                            values = []
-                            if conf_row.condition == 'values':
-                                try:
-                                    values = codes_get_array(bufr, conf_row.key)
-                                    if conf_row.slide > -1 and conf_row.step > 0:
-                                        values = values[conf_row.slide::conf_row.step]
-                                    if conf_row.datatype == 'string':
-                                        values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
-                                    else:
-                                        values = np.where(np.isnan(values), None, values)
-                                        if conf_row.name == 'datetime':
-                                            datetime_tail = conf_row.key
-                                            if conf_row.key == 'year':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in values], dtype=object)
-                                            elif conf_row.key == 'month':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
-                                            elif conf_row.key == 'day':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
-                                            elif conf_row.key == 'hour':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
-                                            elif conf_row.key == 'minute':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
-                                            elif conf_row.key == 'second':
-                                                if conf_row.missing == 0:
-                                                    values = np.array(['00' if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
-                                                else:
-                                                    values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
-                                            elif conf_row.key == 'millisecond':
-                                                values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in values], dtype=object)
-                                        elif not np.isnan(conf_row.missing):
-                                            values = np.array([conf_row.missing if value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
+                            if conf_row.get_type == 'subset':
+                                for subset_num in range(1, number_of_subsets + 1):
+                                    array = getArray(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key, conf_row)
+                                    if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
+                                        if len(array) > conf_row.array_index:
+                                            value = array[int(conf_row.array_index)]
+                                            if conf_row.convert_type == 'to_value_to_array':
+                                                array = np.array([value for i in range(0, number_of_array)], dtype=object)
+                                            else:
+                                                array = np.array([value], dtype=object)
                                         else:
-                                            values = np.array([None if value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
-                                        if conf_row.name == 'longitude [degree]':
-                                            values = np.where(values == conf_row.min, conf_row.max, values)
+                                            print('Warning', warno, 'conf_row.array_index is more than len(array).', conf_row.key, in_file, file=sys.stderr)
+                                            if conf_row.output == 'location_datetime':
+                                                break
+                                            else:
+                                                continue
+                                    #else:    
+                                        #if len(array) < number_of_array:
+                                        #    array = np.concatenate([array, np.array([None for i in range(0, number_of_array - len(array))])])
+                                        #else:
+                                        #    array = array[0:number_of_array]
                                     if number_of_array == 0:
-                                        number_of_array = len(values)
-                                    if len(values) == 1:
-                                        values = np.array([values[0] for i in range(0, number_of_array)], dtype=object)
-                                except:
-                                    print('Info:not get values:', conf_row.key, in_file, file=sys.stderr)
+                                        number_of_array = len(array)
+
+                                    if len(array) != number_of_array:
+                                        print('Warning', warno, ': subset :', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
+                                        if conf_row.output == 'location_datetime':
+                                            bufr_dict = {}
+                                            break
+                                        else:
+                                            continue
+                                    if conf_row.key in bufr_dict:
+                                        bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], array])
+                                    else:
+                                        bufr_dict[conf_row.key] = array
+                                if conf_row.key in bufr_dict:
+                                    array = bufr_dict[conf_row.key]
+                                else:
                                     if conf_row.output == 'location_datetime':
+                                        bufr_dict = {}
                                         break
                                     else:
                                         continue
                             else:
-                                for subset_num in range(1, number_of_subsets + 1):
-                                    try:
-                                        values_in_subset = codes_get_array(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key)
-                                    except:
-                                        print('Info:not get values_in_subset:', conf_row.key, in_file, file=sys.stderr)
+                                array = getArray(bufr, conf_row.key, conf_row)
+                                if len(array) == 1:
+                                    if array[0] == None or number_of_array == 0:
                                         if conf_row.output == 'location_datetime':
+                                            print('Warning', warno, ':', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
                                             break
                                         else:
                                             continue
-                                    if conf_row.slide > -1 and conf_row.step > 0:
-                                        values_in_subset = values_in_subset[conf_row.slide::conf_row.step]
-                                    if conf_row.datatype == 'string':
-                                        values_in_subset = np.array([value.lstrip().rstrip() for value in values_in_subset], dtype=object)
                                     else:
-                                        values_in_subset = np.where(np.isnan(values_in_subset), None, values_in_subset)
-                                        if conf_row.name == 'datetime':
-                                            datetime_tail = conf_row.key
-                                            if conf_row.key == 'year':
-                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in values_in_subset], dtype=object)
-                                            elif conf_row.key == 'month':
-                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
-                                            elif conf_row.key == 'day':
-                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
-                                            elif conf_row.key == 'hour':
-                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
-                                            elif conf_row.key == 'minute':
-                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
-                                            elif conf_row.key == 'second':
-                                                if conf_row.missing == 0:
-                                                    values_in_subset = np.array(['00' if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
-                                                else:
-                                                    values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
-                                            elif conf_row.key == 'millisecond':
-                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in values_in_subset], dtype=object)
-                                        elif not np.isnan(conf_row.missing):
-                                            values_in_subset = np.array([conf_row.missing if value < conf_row.min or value > conf_row.max else value for value in values_in_subset], dtype=object)
-                                        else:
-                                            values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else value for value in values_in_subset], dtype=object)
-                                        if conf_row.name == 'longitude [degree]':
-                                            values_in_subset = np.where(values_in_subset == conf_row.min, conf_row.max, values_in_subset)
-                                    if number_of_array == 0:
-                                        number_of_array = len(values_in_subset)
-                                    if conf_row.condition == 'value' or conf_row.condition == 'value_to_array':
-                                        if len(values_in_subset) > conf_row.slide:
-                                            value = values_in_subset[conf_row.slide]
-                                            if conf_row.condition == 'value_to_array':
-                                                values = np.array([value for i in range(0, number_of_array)], dtype=object)
-                                            else:
-                                                values = np.array([value], dtype=object)
-                                        else:
-                                            print('Warning', warno, 'conf_row.slide is more than len(values_in_subset).', conf_row.key, in_file, file=sys.stderr)
-                                            if conf_row.output == 'location_datetime':
-                                                bufr_dict = {}
-                                                break
-                                            else:
-                                                continue
-                                    elif conf_row.condition == 'array':
-                                        values = values_in_subset
-                                        #if len(values) < number_of_array:
-                                        #    values = np.concatenate([values_in_subset, np.array([None for i in range(0, number_of_array - len(values_in_subset))])])
-                                        #else:
-                                        #    values = values_in_subset[0:number_of_array]
+                                        array = np.array([array[0] for i in range(0, number_of_array)], dtype=object)
+                                elif number_of_array == 0:
+                                    number_of_array = len(array)
+                                if len(array) != number_of_array:
+                                    print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
+                                    if conf_row.output == 'location_datetime':
+                                        bufr_dict = {}
+                                        break
                                     else:
-                                        print('Warning', warno, ': The condition of', conf_row.key, 'is not value or array or value_to_array.', in_file, file=sys.stderr)
-                                    if conf_row.key in bufr_dict:
-                                        bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], values])
-                                    else:
-                                        bufr_dict[conf_row.key] = values
-                            if len(values) == number_of_array:
-                                bufr_dict[conf_row.key] = values
-                                if conf_row.output == 'location_datetime':
-                                    tmp_none_np = np.array([False if value == None else True for value in values])
-                                    if len(none_np) > 0:
-                                        none_np = none_np * tmp_none_np
-                                    else:
-                                        none_np = tmp_none_np
-                                bufr_dict['none'] = none_np
-                            else:
-                                print('Warning', warno, ':', conf_row.key, len(values), number_of_array, 'The length of values is not equals to the number of array.', in_file, file=sys.stderr)
-                                if conf_row.output == 'location_datetime':
-                                    bufr_dict = {}
-                                    break
+                                        continue
+                            bufr_dict[conf_row.key] = array
+                            if conf_row.output == 'location_datetime':
+                                tmp_none_np = np.array([False if value == None else True for value in array])
+                                if len(none_np) > 0:
+                                    none_np = none_np * tmp_none_np
+                                else:
+                                    none_np = tmp_none_np
+                            bufr_dict['none'] = none_np
                         codes_release(bufr)
                         if len(bufr_dict) == 0:
                             break
@@ -256,6 +241,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                 location_datetime_name_list = ['id']
                 datetime_directory_list = []
                 del_key_list = []
+                datetime_tail = descriptor_conf_df[(descriptor_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
                 for conf_row_name in set(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                     if conf_row_name == 'datetime':
                         plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
@@ -311,7 +297,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         datetime_len = 6
                     elif datetime_tail == 'year':
                         datetime_len = 4
-                    print(property_dict['datetime'])
                     datetime_index_list = [index for index, value in enumerate(property_dict['datetime']) if value[0:datetime_len] == datetime_directory[0:datetime_len]]
                     if len(datetime_index_list) > 0:
                         tmp_location_datetime_data = [location_datetime.take(pa.array(datetime_index_list)) for location_datetime in location_datetime_data]
