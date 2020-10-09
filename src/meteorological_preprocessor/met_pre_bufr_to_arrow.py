@@ -258,8 +258,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                 location_datetime_name_list = ['id']
                 datetime_directory_list = []
                 del_key_list = []
-                datetime_tail = conf_df[(conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
-                for conf_row_name in set(conf_df[(conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
+                cat_subcat_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
+                datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
+                for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                     if conf_row_name == 'datetime':
                         plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
                         if 'time period [s]' in property_dict:
@@ -302,8 +303,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     datetime_directory_list.append(dt_str[0:4] + "00000000")
                         location_datetime_name_list.append(conf_row_name)
                     elif conf_row_name != 'time period [s]':
-                        location_datetime_data.append(pa.array(property_dict[conf_row_name].flatten(), datatype_dict[conf_row_name]))
-                        location_datetime_name_list.append(conf_row_name)
+                        if conf_row_name in property_dict:
+                            location_datetime_data.append(pa.array(property_dict[conf_row_name].flatten(), datatype_dict[conf_row_name]))
+                            location_datetime_name_list.append(conf_row_name)
                 for datetime_directory in datetime_directory_list:
                     datetime_len = 11
                     if datetime_tail == 'hour':
