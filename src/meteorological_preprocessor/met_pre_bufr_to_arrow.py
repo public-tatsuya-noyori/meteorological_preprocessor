@@ -23,11 +23,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
             datatype_dict = {}
-            location_datetime_dict = {}
             property_dict = {}
             output_property_dict = {}
+            datetime_tail = ''
             for in_file in in_file_list:
-                match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '.*$', in_file)
+                match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
                 if not match:
                     continue
                 if not os.access(in_file, os.F_OK):
@@ -47,47 +47,40 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         if bufr is None:
                             break
                         bufr_dict = {}
-                        datetime_tail = ''
-                        number_of_subsets = 0
-                        number_of_values = 0
-                        try:
-                            codes_set(bufr, 'unpack', 1)
-                            none_np = np.array([])
-                            not_none_np_choice = np.array([])
-                            unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
-                            for bufr_descriptor in unexpanded_descriptors:
-                                cat = re.sub('/.*$', '', cat_subcat)
-                                subcat = re.sub('^.*/', '', cat_subcat)
-                                descriptor_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
-                                if len(descriptor_conf_df) > 0:
-                                    descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
-                                    if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
-                                        is_descriptor_2 = False
-                                        for descriptor_2 in descriptor_2_list:
-                                            if descriptor_2 in unexpanded_descriptors:
-                                                descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['descriptor_2'] == descriptor_2]
-                                                is_descriptor_2 = True
-                                                break
-                                        if not is_descriptor_2:
-                                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
-                                    break
-                            if len(descriptor_conf_df) == 0:
-                                print('Info :', unexpanded_descriptors, 'not found descriptor.', in_file, file=sys.stderr)
+                        codes_set(bufr, 'unpack', 1)
+                        unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')                    
+                        descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
+                        for bufr_descriptor in unexpanded_descriptors:
+                            cat = re.sub('/.*$', '', cat_subcat)
+                            subcat = re.sub('^.*/', '', cat_subcat)
+                            descriptor_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
+                            if len(descriptor_conf_df) > 0:
+                                descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
+                                if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
+                                    is_descriptor_2 = False
+                                    for descriptor_2 in descriptor_2_list:
+                                        if descriptor_2 in unexpanded_descriptors:
+                                            descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['descriptor_2'] == descriptor_2]
+                                            is_descriptor_2 = True
+                                            break
+                                    if not is_descriptor_2:
+                                        descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                                 break
-                            number_of_subsets = codes_get(bufr, 'numberOfSubsets')
-                            if number_of_subsets == 0:
-                                print('Info :', 'number_of_subsets == 0.', in_file, file=sys.stderr)
-                                break
-                            conf_location_datetime_list = list(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')].itertuples())
-                            conf_property_list = list(descriptor_conf_df[(descriptor_conf_df['output'] != 'location_datetime')].itertuples())
-                            for conf_row in conf_location_datetime_list:
-                                values = codes_get_array(bufr, conf_row.key)
-                                if conf_row.slide > -1 and conf_row.step > 0:
-                                    values = np.array(values)[conf_row.slide::conf_row.step]
-                                if len(values) > 0:
-                                    if conf_row.condition == 'required_with_values':
-                                        number_of_values = len(values)
+                        if len(descriptor_conf_df) == 0:
+                            print('Info:not found descriptor:', unexpanded_descriptors, in_file, file=sys.stderr)
+                            break
+                        number_of_subsets = codes_get(bufr, 'numberOfSubsets')
+                        if number_of_subsets == 0:
+                            break
+                        number_of_array = 0
+                        none_np = np.array([])
+                        for conf_row in descriptor_conf_df.itertuples():
+                            values = []
+                            if conf_row.condition == 'values':
+                                try:
+                                    values = codes_get_array(bufr, conf_row.key)
+                                    if conf_row.slide > -1 and conf_row.step > 0:
+                                        values = values[conf_row.slide::conf_row.step]
                                     if conf_row.datatype == 'string':
                                         values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
                                     else:
@@ -105,172 +98,129 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             elif conf_row.key == 'minute':
                                                 values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
                                             elif conf_row.key == 'second':
-                                                if conf_row.condition == 'optional':
+                                                if conf_row.missing == 0:
                                                     values = np.array(['00' if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
                                                 else:
                                                     values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values], dtype=object)
                                             elif conf_row.key == 'millisecond':
                                                 values = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in values], dtype=object)
+                                        elif not np.isnan(conf_row.missing):
+                                            values = np.array([conf_row.missing if value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
                                         else:
-                                            values = np.where((values < conf_row.min) | (values > conf_row.max), None, values)
+                                            values = np.array([None if value < conf_row.min or value > conf_row.max else value for value in values], dtype=object)
                                         if conf_row.name == 'longitude [degree]':
                                             values = np.where(values == conf_row.min, conf_row.max, values)
-                                    if conf_row.condition == 'required_with_subset':
-                                        if len(values) == 1:
-                                            values = np.array([values[0] for i in range(0, number_of_subsets)], dtype=object)
-                                        elif len(values) != number_of_subsets:
-                                            print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of subsets.', in_file, file=sys.stderr)
-                                            bufr_dict = {}
-                                            break
-                                    if conf_row.condition == 'required_with_array':
-                                        if len(values) == 1:
-                                            if values[0]:
-                                                values = np.array([values[0] for i in range(0, number_of_values)], dtype=object)
-                                            else:
-                                                print('Warning', warno, ':', conf_row.key, 'The values[0] is nan.', in_file, file=sys.stderr)
-                                                bufr_dict = {}
-                                                break                                                
-                                        else:
-                                            print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to 1.', in_file, file=sys.stderr)
-                                            bufr_dict = {}
-                                            break
-                                    bufr_dict[conf_row.key] = values
+                                    if number_of_array == 0:
+                                        number_of_array = len(values)
+                                    if len(values) == 1:
+                                        values = np.array([values[0] for i in range(0, number_of_array)], dtype=object)
+                                except:
+                                    print('Info:not get values:', conf_row.key, in_file, file=sys.stderr)
                                     if conf_row.output == 'location_datetime':
-                                        if conf_row.condition == 'required' or conf_row.condition == 'required_with_values':
-                                            tmp_none_np = np.array([False if value == None else True for value in values])
-                                            if len(none_np) > 0:
-                                                none_np = none_np * tmp_none_np
-                                            else:
-                                                none_np = tmp_none_np
-                                        elif conf_row.condition == 'choice':
-                                            tmp_not_none_np = np.array([True if value == None else False for value in values])
-                                            if len(not_none_np_choice) > 0:
-                                                not_none_np_choice = not_none_np_choice * tmp_not_none_np
-                                            else:
-                                                not_none_np_choice = tmp_not_none_np
-                                        elif conf_row.condition != 'optional' and conf_row.condition != 'required_with_array' and conf_row.condition != 'required_with_subset' :
-                                            print('Warning', warno, conf_row.key, 'is not optional or required or required_with_array or required_with_subset or choice.', in_file, file=sys.stderr)
-                                    if len(not_none_np_choice) > 0:
-                                        tmp_none_np_choice = np.array([True if value == False else False for value in not_none_np_choice])
-                                        none_np = none_np * tmp_none_np_choice
-                                if number_of_values > 0 and len(values) != number_of_values:
-                                    print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of values.', in_file, file=sys.stderr)
-                                    bufr_dict = {}
-                                    break
-                                elif number_of_values == 0 and len(values) != number_of_subsets:
-                                    print('Warning', warno, ':', conf_row.key, 'The length of values is not equals to the number of subsets.', in_file, file=sys.stderr)
-                                    bufr_dict = {}
-                                    break
-                            if len(bufr_dict) == 0 or not True in none_np.tolist():
-                                print('Info :', 'no location_datetime', in_file, file=sys.stderr)
-                                break
-                            bufr_dict['none'] = none_np
-                        except CodesInternalError as err:
-                            print('Warning', warno, ':', conf_row.key, 'CodesInternalError is happend in', in_file, file=sys.stderr)
-                            bufr_dict = {}
-                            break
-                        for conf_row in conf_property_list:
-                            if conf_row.condition == 'optional_with_subset':
-                                values = []
-                                for i in range(1, number_of_subsets + 1):
+                                        break
+                                    else:
+                                        continue
+                            else:
+                                for subset_num in range(1, number_of_subsets + 1):
                                     try:
-                                        tmp_values = codes_get_array(bufr, "/subsetNumber=" + str(i) + "/" + conf_row.key)
-                                        if len(tmp_values) > conf_row.slide:
-                                            value = tmp_values[conf_row.slide]
-                                            if value < conf_row.min or value > conf_row.max:
-                                                value = np.nan
-                                    except CodesInternalError as err:
-                                        value = np.nan
-                                    values.append(value)
-                                values = np.array(values, dtype=float)
-                            elif conf_row.condition == 'optional_with_tail_nan':
-                                try:
-                                    values = codes_get_array(bufr, conf_row.key).tolist()
-                                except CodesInternalError as err:
-                                    continue
-                                for i in range(len(values), number_of_values):
-                                    values.append(np.nan)
-                                values = np.array(values, dtype=float)
-                            elif conf_row.condition == 'optional_with_head_nan':
-                                try:
-                                    values = codes_get_array(bufr, conf_row.key).tolist()
-                                except CodesInternalError as err:
-                                    continue
-                                tmp_values = []
-                                for i in range(0, number_of_values - len(values)):
-                                    tmp_values.append(np.nan)
-                                tmp_values.extend(values)
-                                values = np.array(tmp_values, dtype=float)
-                            elif conf_row.condition == 'optional':
-                                try:
-                                    values = codes_get_array(bufr, conf_row.key)
-                                except CodesInternalError as err:
-                                    continue
-                            else:
-                                print('Warning', warno, conf_row.key, 'is not optional or optional_with_subset or optional_with_tail_nan or optional_with_head_nan.', in_file, file=sys.stderr)
-                            if conf_row.slide > -1 and conf_row.step > 0:
-                                values = np.array(values)[conf_row.slide::conf_row.step]
-                            if (number_of_values > 0 and len(values) == number_of_values) or (number_of_values == 0 and len(values) == number_of_subsets):
-                                if conf_row.datatype == 'string':
-                                    values = np.array([value.lstrip().rstrip() for value in values], dtype=object)
-                                else:
-                                    values = np.where((values < conf_row.min) | (values > conf_row.max), np.nan, values)
-                                    values = np.where(np.isnan(values), None, values)
+                                        values_in_subset = codes_get_array(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key)
+                                    except:
+                                        print('Info:not get values_in_subset:', conf_row.key, in_file, file=sys.stderr)
+                                        if conf_row.output == 'location_datetime':
+                                            break
+                                        else:
+                                            continue
+                                    if conf_row.slide > -1 and conf_row.step > 0:
+                                        values_in_subset = values_in_subset[conf_row.slide::conf_row.step]
+                                    if conf_row.datatype == 'string':
+                                        values_in_subset = np.array([value.lstrip().rstrip() for value in values_in_subset], dtype=object)
+                                    else:
+                                        values_in_subset = np.where(np.isnan(values_in_subset), None, values_in_subset)
+                                        if conf_row.name == 'datetime':
+                                            datetime_tail = conf_row.key
+                                            if conf_row.key == 'year':
+                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in values_in_subset], dtype=object)
+                                            elif conf_row.key == 'month':
+                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
+                                            elif conf_row.key == 'day':
+                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
+                                            elif conf_row.key == 'hour':
+                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
+                                            elif conf_row.key == 'minute':
+                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
+                                            elif conf_row.key == 'second':
+                                                if conf_row.missing == 0:
+                                                    values_in_subset = np.array(['00' if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
+                                                else:
+                                                    values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in values_in_subset], dtype=object)
+                                            elif conf_row.key == 'millisecond':
+                                                values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in values_in_subset], dtype=object)
+                                        elif not np.isnan(conf_row.missing):
+                                            values_in_subset = np.array([conf_row.missing if value < conf_row.min or value > conf_row.max else value for value in values_in_subset], dtype=object)
+                                        else:
+                                            values_in_subset = np.array([None if value < conf_row.min or value > conf_row.max else value for value in values_in_subset], dtype=object)
+                                        if conf_row.name == 'longitude [degree]':
+                                            values_in_subset = np.where(values_in_subset == conf_row.min, conf_row.max, values_in_subset)
+                                    if number_of_array == 0:
+                                        number_of_array = len(values_in_subset)
+                                    if conf_row.condition == 'value' or conf_row.condition == 'value_to_array':
+                                        if len(values_in_subset) > conf_row.slide:
+                                            value = values_in_subset[conf_row.slide]
+                                            if conf_row.condition == 'value_to_array':
+                                                values = np.array([value for i in range(0, number_of_array)], dtype=object)
+                                            else:
+                                                values = np.array([value], dtype=object)
+                                        else:
+                                            print('Warning', warno, 'conf_row.slide is more than len(values_in_subset).', conf_row.key, in_file, file=sys.stderr)
+                                            if conf_row.output == 'location_datetime':
+                                                bufr_dict = {}
+                                                break
+                                            else:
+                                                continue
+                                    elif conf_row.condition == 'array':
+                                        values = values_in_subset
+                                        #if len(values) < number_of_array:
+                                        #    values = np.concatenate([values_in_subset, np.array([None for i in range(0, number_of_array - len(values_in_subset))])])
+                                        #else:
+                                        #    values = values_in_subset[0:number_of_array]
+                                    else:
+                                        print('Warning', warno, ': The condition of', conf_row.key, 'is not value or array or value_to_array.', in_file, file=sys.stderr)
+                                    if conf_row.key in bufr_dict:
+                                        bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], values])
+                                    else:
+                                        bufr_dict[conf_row.key] = values
+                            if len(values) == number_of_array:
                                 bufr_dict[conf_row.key] = values
+                                if conf_row.output == 'location_datetime':
+                                    tmp_none_np = np.array([False if value == None else True for value in values])
+                                    if len(none_np) > 0:
+                                        none_np = none_np * tmp_none_np
+                                    else:
+                                        none_np = tmp_none_np
+                                bufr_dict['none'] = none_np
                             else:
-                                print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': key :', conf_row.key, 'is not equals to number_of_subsets or number_of_values.', 'len(values):', len(values), 'number_of_subsets:', number_of_subsets, 'number_of_values:', number_of_values, 'values:', values, in_file, file=sys.stderr)
-                                if number_of_values == 0:
-                                    values = np.array([None for value in range(0, number_of_subsets)], dtype=object)
-                                else:
-                                    values = np.array([None for value in range(0, number_of_values)], dtype=object)
-                                bufr_dict[conf_row.key] = values
-                                continue
+                                print('Warning', warno, ':', conf_row.key, len(values), number_of_array, 'The length of values is not equals to the number of array.', in_file, file=sys.stderr)
+                                if conf_row.output == 'location_datetime':
+                                    bufr_dict = {}
+                                    break
                         codes_release(bufr)
+                        if len(bufr_dict) == 0:
+                            break
                         location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
                         if len(location_datetime_index_np) > 0:
                             message_np = np.array([])
                             pre_conf_row_name = ''
-                            for conf_row in conf_location_datetime_list:
+                            for conf_row in descriptor_conf_df.itertuples():
                                 if conf_row.name != pre_conf_row_name:
                                     datatype_dict[conf_row.name] = conf_row.datatype
-                                    if len(message_np) > 0 and len(pre_conf_row_name) > 0:
-                                        if pre_conf_row_name in location_datetime_dict:
-                                            location_datetime_dict[pre_conf_row_name] = np.concatenate([location_datetime_dict[pre_conf_row_name], message_np])
+                                    if conf_row.output != 'location_datetime':
+                                        if conf_row.output in output_property_dict:
+                                            tmp_output_property_list = output_property_dict[conf_row.output]
+                                            if not conf_row.name in tmp_output_property_list:
+                                                tmp_output_property_list.append(conf_row.name)
+                                                output_property_dict[conf_row.output] = tmp_output_property_list
                                         else:
-                                            location_datetime_dict[pre_conf_row_name] = message_np
-                                        message_np = np.array([])
-                                tmp_message_np = bufr_dict[conf_row.key]
-                                if len(tmp_message_np) > 0:
-                                    tmp_message_np = tmp_message_np[location_datetime_index_np]
-                                    if len(tmp_message_np) > 0:
-                                        if len(message_np) > 0:
-                                            if conf_row.multiply != 0:
-                                                message_np = message_np + conf_row.multiply * tmp_message_np
-                                            else:
-                                                message_np = message_np + tmp_message_np
-                                        else:
-                                            if conf_row.multiply != 0:
-                                                message_np = conf_row.multiply * tmp_message_np
-                                            else:
-                                                message_np = tmp_message_np
-                                pre_conf_row_name = conf_row.name
-                            if len(message_np) > 0 and len(pre_conf_row_name) > 0:
-                                if pre_conf_row_name in location_datetime_dict:
-                                    location_datetime_dict[pre_conf_row_name] = np.concatenate([location_datetime_dict[pre_conf_row_name], message_np])
-                                else:
-                                    location_datetime_dict[pre_conf_row_name] = message_np
-                            message_np = np.array([])
-                            pre_conf_row_name = ''
-                            for conf_row in conf_property_list:
-                                if conf_row.name != pre_conf_row_name:
-                                    datatype_dict[conf_row.name] = conf_row.datatype
-                                    if conf_row.output in output_property_dict:
-                                        tmp_output_property_list = output_property_dict[conf_row.output]
-                                        if not conf_row.name in tmp_output_property_list:
-                                            tmp_output_property_list.append(conf_row.name)
-                                            output_property_dict[conf_row.output] = tmp_output_property_list
-                                    else:
-                                        output_property_dict[conf_row.output] = [conf_row.name]
+                                            output_property_dict[conf_row.output] = [conf_row.name]
                                     if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                         if pre_conf_row_name in property_dict:
                                             property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
@@ -293,65 +243,64 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 else:
                                                     message_np = tmp_message_np
                                     else:
-                                        print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, 'is not optional_with_subset.', in_file, file=sys.stderr)
+                                        print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, max(location_datetime_index_np), len(tmp_message_np), in_file, file=sys.stderr)
                                 pre_conf_row_name = conf_row.name
                             if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                 if pre_conf_row_name in property_dict:
                                     property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
                                 else:
                                     property_dict[pre_conf_row_name] = message_np
-
-            if 'datetime' in location_datetime_dict:
-                id_list = [id_num for id_num in range(0, len(location_datetime_dict['datetime']))]
+            if 'datetime' in property_dict:
+                id_list = [id_num for id_num in range(0, len(property_dict['datetime']))]
                 location_datetime_data = [pa.array(id_list, 'int32')]
                 location_datetime_name_list = ['id']
                 datetime_directory_list = []
                 del_key_list = []
-                for key in location_datetime_dict.keys():
-                    if key == 'datetime':
-                        plus_second_list = [0 for dt in range(0, len(location_datetime_dict[key]))]
-                        if 'time period [s]' in location_datetime_dict:
-                            plus_second_list = location_datetime_dict['time period [s]']
+                for conf_row_name in set(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
+                    if conf_row_name == 'datetime':
+                        plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
+                        if 'time period [s]' in property_dict:
+                            plus_second_list = property_dict['time period [s]']
                             del_key_list.append('time period [s]')
                         if datetime_tail == 'millisecond':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:11] + "0" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:11] + "0")
                         elif datetime_tail == 'second':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:11] + "0" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:11] + "0")
                         elif datetime_tail == 'minute':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:11] + "0" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:11] + "0")
                         elif datetime_tail == 'hour':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:10] + "00" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:10] + "00")
                         elif datetime_tail == 'day':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:8] + "0000" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:8] + "0000")
                         elif datetime_tail == 'month':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:6] + "000000" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:6] + "000000")
                         elif datetime_tail == 'year':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(location_datetime_dict[key])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in location_datetime_dict[key]:
+                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                            for dt_str in property_dict[conf_row_name]:
                                 if not dt_str[0:4] + "00000000" in datetime_directory_list:
                                     datetime_directory_list.append(dt_str[0:4] + "00000000")
-                        location_datetime_name_list.append(key)
-                    elif key != 'time period [s]':
-                        location_datetime_data.append(pa.array(location_datetime_dict[key].flatten(), datatype_dict[key]))
-                        location_datetime_name_list.append(key)
+                        location_datetime_name_list.append(conf_row_name)
+                    elif conf_row_name != 'time period [s]':
+                        location_datetime_data.append(pa.array(property_dict[conf_row_name].flatten(), datatype_dict[conf_row_name]))
+                        location_datetime_name_list.append(conf_row_name)
                 for datetime_directory in datetime_directory_list:
                     datetime_len = 11
                     if datetime_tail == 'hour':
@@ -362,7 +311,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         datetime_len = 6
                     elif datetime_tail == 'year':
                         datetime_len = 4
-                    datetime_index_list = [index for index, value in enumerate(location_datetime_dict['datetime']) if value[0:datetime_len] == datetime_directory[0:datetime_len]]
+                    print(property_dict['datetime'])
+                    datetime_index_list = [index for index, value in enumerate(property_dict['datetime']) if value[0:datetime_len] == datetime_directory[0:datetime_len]]
                     if len(datetime_index_list) > 0:
                         tmp_location_datetime_data = [location_datetime.take(pa.array(datetime_index_list)) for location_datetime in location_datetime_data]
                         if len(tmp_location_datetime_data) > 0:

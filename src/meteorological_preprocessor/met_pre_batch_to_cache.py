@@ -29,21 +29,32 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
-def is_bufr_descriptor(in_file, bufr_descriptor):
+def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     rc = False
     with open(in_file, 'r') as in_file_stream:
         while True:
             bufr = codes_bufr_new_from_file(in_file_stream)
             if bufr is None:
                 break
+            unexpanded_descriptors = []
             try:
                 codes_set(bufr, 'unpack', 1)
                 unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-                descriptor_conf_df = None
-                if bufr_descriptor in unexpanded_descriptors:
-                    rc = True
             except CodesInternalError as err:
                 break
+            descriptor_conf_df = None
+            if bufr_descriptor in unexpanded_descriptors:
+                if bufr_key_of_not_missing:
+                    try:
+                        values = codes_get_array(bufr, bufr_key_of_not_missing)
+                        if type(values[0]) == str and len(values[0].lstrip().rstrip()) > 0:
+                            rc = True
+                        elif not np.isnan(values[0]):
+                            rc = True
+                    except:
+                        return False
+                else:
+                    rc = True
             codes_release(bufr)
     return rc
 
@@ -151,7 +162,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 continue
             if conf_row.file_extension == 'txt' and conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                 continue
-            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
+            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_matched(in_file, conf_row.bufr_descriptor, conf_row.bufr_key_of_not_missing):
                 continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
@@ -245,7 +256,7 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                 continue
             if conf_row.file_extension == 'txt' and conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                 continue
-            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_descriptor(in_file, conf_row.bufr_descriptor):
+            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_matched(in_file, conf_row.bufr_descriptor, conf_row.bufr_key_of_not_missing):
                 continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
@@ -315,10 +326,11 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                 if debug:
                     print('Debug', ':', 'start_char4 =', start_char4, file=sys.stderr)
                 message = bytearray()
-                try:
-                    if re.match(r'\d\d\d\d',start_char4):
-                        batch_type = 1
-                        message_length = int(start_char4 + in_file_stream.read(4).decode())
+
+                if re.match(r'\d\d\d\d', start_char4):
+                    batch_type = 1
+                    message_length = int(start_char4 + in_file_stream.read(4).decode())
+                    try:
                         if message_length == 0:
                             break
                         format_identifier = int(in_file_stream.read(2).decode())
@@ -331,28 +343,40 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                         else:
                             print('Warning', warno, ':', 'The format identifier of', in_file, 'is not 00 or 01.', file=sys.stderr)
                             break
-                    elif start_char4 == '####':
+                    except:
+                        print('Warning', warno, ':', 'The bytes of message length on', in_file, 'are not strings.', file=sys.stderr)
+                        break
+                elif start_char4 == '####':
+                    try:
                         batch_type = 2
                         in_file_stream.read(3) # skip '018'
                         message_length = int(in_file_stream.read(6).decode())
                         in_file_stream.read(5) # skip ####\n
-                    elif start_char4 == '****':
+                    except:
+                        print('Warning', warno, ':', 'The bytes of message length on', in_file, 'are not strings.', file=sys.stderr)
+                        break
+                elif start_char4 == '****':
+                    try:
                         batch_type = 3
                         message_length = int(in_file_stream.read(10).decode())
                         in_file_stream.read(5) # skip ****\n
-                    else:
-                        message.extend(start_byte4)
+                    except:
+                        print('Warning', warno, ':', 'The bytes of message length on', in_file, 'are not strings.', file=sys.stderr)
+                        break
+                else:
+                    try:
+                        message.extend(start_char4.encode())
                         message.extend(in_file_stream.read())
-                        out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug)
-                        if out_file:
-                            print(out_file, file=out_list_file)
+                    except:
+                        print('Warning', warno, ':', 'can not encode or read', in_file, file=sys.stderr)
                         break
-                    if message_length <= 0:
-                        if debug:
-                            print('Debug', ':', 'The message length of', in_file, 'is invalid. (<=0)', file=sys.stderr)
-                        break
-                except:
-                    print('Warning', warno, ':', 'The bytes of message length on', in_file, 'are not strings.', file=sys.stderr)
+                    out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug)
+                    if out_file:
+                        print(out_file, file=out_list_file)
+                    break
+                if message_length <= 0:
+                    if debug:
+                        print('Debug', ':', 'The message length of', in_file, 'is invalid. (<=0)', file=sys.stderr)
                     break
                 if debug:
                     print('Debug', ':', 'batch_type =', batch_type, ', message_length =', message_length, file=sys.stderr)
