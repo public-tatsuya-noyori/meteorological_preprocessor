@@ -9,10 +9,13 @@ surface,gps_pwv,307022,,day,0,0,0,,location_datetime,datetime,,,,timestamp,1,31
 surface,gps_pwv,307022,,hour,0,0,0,,location_datetime,datetime,,,,timestamp,0,23
 surface,gps_pwv,307022,,minute,0,0,0,,location_datetime,datetime,,,,timestamp,0,59
 surface,gps_pwv,307022,,precipitableWater,0,0,0,,precipitable_water,precipitable water [kg/m2],,,,float64,0,2147483647
-surface,gps_pwv,307022,,airTemperature,0,0,0,,air_temperature,air temperature [K],,value,,float64,-273.15,32767
-surface,gps_pwv,307022,,relativeHumidity,0,0,0,,relative_humidity,relative humidity [%],,value,,float64,0,100
+surface,gps_pwv,307022,,airTemperature,0,0,0,,air_temperature,air temperature [K],,,,float64,-273.15,32767
+surface,gps_pwv,307022,,relativeHumidity,0,0,0,,relative_humidity,relative humidity [%],,,,float64,0,100
 surface,gps_pwv,307022,,#1#atmosphericPathDelayInSatelliteSignal,0,0,0,,atmospheric_path_delay_in_satellite_signal,atmospheric path delay in satellite signal [m],,,,float64,0,2147483647
 surface,gps_pwv,307022,,#1#estimatedErrorInAtmosphericPathDelay,0,0,0,,estimated_error_in_atmospheric_path_delay,estimated error in atmospheric path delay [m],,,,float64,0,2147483647
+surface,gps_pwv,307022,,#1#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,0,0,,difference_in_path_delays_for_limb_views_at_extremes_of_scan_1,difference in path delays for limb views at extremes of scan 1 [m],,,,float64,0,2147483647
+surface,gps_pwv,307022,,#2#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,0,0,,difference_in_path_delays_for_limb_views_at_extremes_of_scan_2,difference in path delays for limb views at extremes of scan 2 [m],,,,float64,0,2147483647
+surface,gps_pwv,307022,,componentOfZenithPathDelayDueToWaterVapour,0,0,0,,component_of_zenith_path_delay_due_to_water_vapour,component of zenith path delay due to water vapour [m],,,,float64,0,2147483647
 surface,synop,307079,,blockNumber,0,0,1000,,location_datetime,station number,subset,to_value,0,int32,0,99
 surface,synop,307079,,stationNumber,0,0,1,,location_datetime,station number,subset,to_value,0,int32,0,999
 surface,synop,307079,,latitude,0,0,0,,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90

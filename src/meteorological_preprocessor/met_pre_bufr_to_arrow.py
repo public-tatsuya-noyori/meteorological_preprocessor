@@ -16,8 +16,6 @@ def getArray(bufr, key, conf_row, in_file):
     array = [None]
     try:
         array = codes_get_array(bufr, key)
-        if conf_row.slide > -1 and conf_row.step > 0:
-            array = array[conf_row.slide::conf_row.step]
         if conf_row.datatype == 'string':
             array = np.array([value.lstrip().rstrip() for value in array], dtype=object)
         else:
@@ -49,6 +47,8 @@ def getArray(bufr, key, conf_row, in_file):
                 array = np.array([None if value < conf_row.min or value > conf_row.max else value for value in array], dtype=object)
             if conf_row.name == 'longitude [degree]':
                 array = np.where(array == conf_row.min, conf_row.max, array)
+            if conf_row.slide > -1 and conf_row.step > 0:
+                array = array[conf_row.slide::conf_row.step]
     except:
         if conf_row.output == 'location_datetime':
             print('Info', ': sub ', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
@@ -165,9 +165,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 array = getArray(bufr, conf_row.key, conf_row, in_file)
                                 if number_of_array == 0:
                                     number_of_array = len(array)
+                                if len(array) == 1:
+                                    value = array[0]
+                                    array = np.array([value for i in range(0, number_of_array)], dtype=object)
                                 if len(array) != number_of_array:
-                                    print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
                                     if conf_row.output == 'location_datetime':
+                                        print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
                                         bufr_dict = {}
                                         break
                                     else:
