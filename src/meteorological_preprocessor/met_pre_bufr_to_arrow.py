@@ -12,10 +12,32 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
-def getArray(bufr, key, conf_row, in_file):
-    array = [None]
+def getArray(bufr, subset_num, subset_len, conf_row, in_file):
+    array = np.array([None])
+    is_success = True
     try:
-        array = codes_get_array(bufr, key)
+        if subset_num > 0:
+            array = codes_get_array(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key)
+        else:
+            array = codes_get_array(bufr, conf_row.key)
+    except:
+        is_success = False
+    if not is_success and subset_num > 0:
+        try:
+            array = codes_get_array(bufr, conf_row.key)
+            if len(array) == subset_len:
+                value = array[subset_num - 1]
+                array = np.array([value])
+                is_success = True
+            elif len(array) == 1:
+                value = array[0]
+                array = np.array([value])
+                is_success = True
+            else:
+                is_success = False
+        except:
+            is_success = False
+    if is_success:
         if conf_row.datatype == 'string':
             array = np.array([value.lstrip().rstrip() for value in array], dtype=object)
         else:
@@ -33,12 +55,12 @@ def getArray(bufr, key, conf_row, in_file):
                     array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
                 elif conf_row.key == 'second':
                     if not np.isnan(conf_row.missing):
-                        array = np.array([str(conf_row.missing).zfill(2) if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
+                        array = np.array([str(int(conf_row.missing)).zfill(2) if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
                     else:
                         array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
                 elif conf_row.key == 'millisecond':
                     if not np.isnan(conf_row.missing):
-                        array = np.array([str(conf_row.missing).zfill(3) if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
+                        array = np.array([str(int(conf_row.missing)).zfill(3) if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
                     else:
                         array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
             elif not np.isnan(conf_row.missing):
@@ -49,10 +71,10 @@ def getArray(bufr, key, conf_row, in_file):
                 array = np.where(array == conf_row.min, conf_row.max, array)
             if conf_row.slide > -1 and conf_row.step > 0:
                 array = array[conf_row.slide::conf_row.step]
-    except:
+    else:
         if conf_row.output == 'location_datetime':
             print('Info', ': sub ', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
-        array = [None]
+        array = np.array([None])
     return array
 
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
@@ -120,7 +142,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         for conf_row in descriptor_conf_df.itertuples():
                             if conf_row.get_type == 'subset':
                                 for subset_num in range(1, number_of_subsets + 1):
-                                    array = getArray(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key, conf_row, in_file)
+                                    array = getArray(bufr, subset_num, number_of_subsets, conf_row, in_file)
                                     if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
                                         if len(array) > conf_row.array_index:
                                             value = array[int(conf_row.array_index)]
@@ -129,8 +151,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             else:
                                                 array = np.array([value], dtype=object)
                                         else:
-                                            print('Warning', warno, 'conf_row.array_index is more than len(array).', conf_row.key, in_file, file=sys.stderr)
                                             if conf_row.output == 'location_datetime':
+                                                print('Info', ':', 'conf_row.array_index is more than len(array).', conf_row.key, in_file, file=sys.stderr)
                                                 break
                                             else:
                                                 continue
@@ -162,7 +184,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     else:
                                         continue
                             else:
-                                array = getArray(bufr, conf_row.key, conf_row, in_file)
+                                array = getArray(bufr, 0, 0, conf_row, in_file)
                                 if number_of_array == 0:
                                     number_of_array = len(array)
                                 if len(array) == 1:
@@ -174,6 +196,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         bufr_dict = {}
                                         break
                                     else:
+                                        print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
                                         continue
                             bufr_dict[conf_row.key] = array
                             if conf_row.output == 'location_datetime':
