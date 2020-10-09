@@ -58,10 +58,10 @@ surface,synop,307080,,cloudCoverTotal,0,0,0,,cloud_cover_total,cloud cover total
 surface,synop,307080,,presentWeather,0,0,0,,present_weather,present weather,,,0,int32,0,32767
 surface,synop,307080,,windDirection,0,0,0,,wind_direction,wind direction [degree],,,0,float64,0,360
 surface,synop,307080,,windSpeed,0,0,0,,wind_speed,wind speed [m/s],,,0,float64,0,32767
-surface,synop,307080,,#1#cloudAmount,0,0,0,,cloud_amount,cloud amount,,,0,int32,0,32767
-surface,synop,307080,,#1#cloudType,0,0,0,,low_cloud_type,low cloud type,,,0,int32,0,32767
-surface,synop,307080,,#2#cloudType,0,0,0,,middle_cloud_type,middle cloud type,,,0,int32,0,32767
-surface,synop,307080,,#3#cloudType,0,0,0,,high_cloud_type,high cloud type,,,0,int32,0,32767
+surface,synop,307080,,cloudAmount,0,0,0,,cloud_amount,cloud amount,,,0,int32,0,32767
+surface,synop,307080,,cloudType,0,0,0,,low_cloud_type,low cloud type,,,0,int32,0,32767
+surface,synop,307080,,cloudType,0,0,0,,middle_cloud_type,middle cloud type,,,1,int32,0,32767
+surface,synop,307080,,cloudType,0,0,0,,high_cloud_type,high cloud type,,,2,int32,0,32767
 surface,synop,307080,,totalPrecipitationPast24Hours,0,0,0,,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],,,0,float64,0,32767
 surface,synop,307081,,blockNumber,0,0,1000,,location_datetime,station number,subset,to_value,0,int32,0,99
 surface,synop,307081,,stationNumber,0,0,1,,location_datetime,station number,subset,to_value,0,int32,0,999
