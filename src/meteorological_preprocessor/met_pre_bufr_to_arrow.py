@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
-def getArray(bufr, key, conf_row):
+def getArray(bufr, key, conf_row, in_file):
     array = [None]
     try:
         array = codes_get_array(bufr, key)
@@ -119,7 +119,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         for conf_row in descriptor_conf_df.itertuples():
                             if conf_row.get_type == 'subset':
                                 for subset_num in range(1, number_of_subsets + 1):
-                                    array = getArray(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key, conf_row)
+                                    array = getArray(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key, conf_row, in_file)
                                     if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
                                         if len(array) > conf_row.array_index:
                                             value = array[int(conf_row.array_index)]
@@ -161,7 +161,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     else:
                                         continue
                             else:
-                                array = getArray(bufr, conf_row.key, conf_row)
+                                array = getArray(bufr, conf_row.key, conf_row, in_file)
                                 if len(array) == 1:
                                     if array[0] == None or number_of_array == 0:
                                         if conf_row.output == 'location_datetime':
