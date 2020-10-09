@@ -87,7 +87,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
     cat_subcat_set = set([re.search(r'^[^/]*/[^/]*/', re.sub('^.*/bufr/', '', in_file)).group().rstrip('/') for in_file in in_file_list])
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
-            descriptor_conf_df = None
             datatype_dict = {}
             property_dict = {}
             output_property_dict = {}
@@ -259,8 +258,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                 location_datetime_name_list = ['id']
                 datetime_directory_list = []
                 del_key_list = []
-                datetime_tail = descriptor_conf_df[(descriptor_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
-                for conf_row_name in set(descriptor_conf_df[(descriptor_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
+                datetime_tail = conf_df[(conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
+                for conf_row_name in set(conf_df[(conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                     if conf_row_name == 'datetime':
                         plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
                         if 'time period [s]' in property_dict:
