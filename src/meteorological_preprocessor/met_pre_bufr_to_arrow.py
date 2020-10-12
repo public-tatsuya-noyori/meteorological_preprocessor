@@ -162,8 +162,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         #    array = array[0:number_of_array]
                                     if number_of_array == 0:
                                         number_of_array = len(array)
-
-                                    if len(array) != number_of_array:
+                                    if len(array) < number_of_array:
+                                        for padding_count in range(len(array), number_of_array):
+                                            array.append(None)
+                                    elif len(array) > number_of_array:
                                         print('Warning', warno, ': subset :', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
                                         if conf_row.output == 'location_datetime':
                                             bufr_dict = {}
