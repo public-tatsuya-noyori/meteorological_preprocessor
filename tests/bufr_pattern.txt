@@ -6,3 +6,8 @@
 /bufr/surface/gps_pwv/
 /bufr/upper_air/amdar/
 /bufr/upper_air/wind_profiler/
+/bufr/upper_air/temperature_profiler/
+/bufr/upper_air/temp/
+/bufr/upper_air/temp_ship/
+/bufr/upper_air/temp_drop/
+/bufr/upper_air/pilot/
