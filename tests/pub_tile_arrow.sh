@@ -21,7 +21,7 @@ set -e
 sh_name=pub_tile_arrow.sh
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 if test -s pid/${sh_name}.txt; then
-  running=`cat pid/${sh_name}.txt | xargs ps -f --no-headers | grep " $0 " | wc -l`
+  running=`cat pid/${sh_name}.txt | xargs ps -f --no-headers | grep " $0" | wc -l`
 else
   mkdir -p pid
   running=0

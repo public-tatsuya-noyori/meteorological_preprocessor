@@ -304,7 +304,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         location_datetime_name_list.append(conf_row_name)
                     elif conf_row_name != 'time period [s]':
                         if conf_row_name in property_dict:
-                            location_datetime_data.append(pa.array(property_dict[conf_row_name].flatten(), datatype_dict[conf_row_name]))
+                            location_datetime_data.append(pa.array(property_dict[conf_row_name], datatype_dict[conf_row_name]))
                             location_datetime_name_list.append(conf_row_name)
                 for datetime_directory in datetime_directory_list:
                     datetime_len = 11
