@@ -112,8 +112,8 @@ def get_grib_subdir_list(grib_file):
                 gid = codes_grib_new_from_file(grib_file_stream)
                 if gid is None:
                     break
-                i_size = codes_get(gid, 'iDirectionIncrementInDegrees');
-                j_size = codes_get(gid, 'jDirectionIncrementInDegrees');
+                i_size = codes_get(gid, 'iDirectionIncrementInDegrees')
+                j_size = codes_get(gid, 'jDirectionIncrementInDegrees')
                 if i_size <= 0 and j_size > 0:
                     i_size = j_size
                 elif i_size > 0 and j_size <= 0:

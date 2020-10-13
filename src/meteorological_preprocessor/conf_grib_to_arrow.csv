@@ -1,0 +1,2 @@
+category,subcategory,stepRange,typeOfLevel,level,shortName,output,name,name2,value2,datatype,min,max
+gsm,1.25_1.25,"0",surface,"0",t,air_temperature,air temperature [K],hight above ground [m],2,float64,-273.15,32767
