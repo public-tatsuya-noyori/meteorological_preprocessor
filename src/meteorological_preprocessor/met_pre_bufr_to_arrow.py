@@ -157,6 +157,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 array = np.array([value for i in range(0, number_of_array)], dtype=object)
                                             else:
                                                 array = np.array([value], dtype=object)
+                                        elif len(array) == 0:
+                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                         else:
                                             print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
                                             break
@@ -190,16 +192,17 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         break
                                 bufr_dict[conf_row.key] = array
                         for conf_row in descriptor_conf_df.itertuples():
-                            if conf_row.output == 'location_datetime':
+                            if conf_row.output == 'location_datetime' and conf_row.key in bufr_dict:
                                 tmp_none_np = np.array([False if value == None else True for value in bufr_dict[conf_row.key]])
                                 if len(none_np) > 0:
                                     none_np = none_np * tmp_none_np
                                 else:
                                     none_np = tmp_none_np
-                        bufr_dict['none'] = none_np
                         codes_release(bufr)
-                        if len(bufr_dict) == 0:
+                        if len(bufr_dict) == 0 or not True in none_np.tolist():
+                            print('Info', ':', 'len(bufr_dict) == 0 or not True in none_np.tolist().', in_file, file=sys.stderr)
                             break
+                        bufr_dict['none'] = none_np
                         location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
                         if len(location_datetime_index_np) > 0:
                             message_np = np.array([])
