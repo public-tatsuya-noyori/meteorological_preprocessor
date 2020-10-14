@@ -72,6 +72,8 @@ def getArray(bufr, subset_num, subset_len, conf_row, in_file):
             if conf_row.slide > -1 and conf_row.step > 0:
                 array = array[conf_row.slide::conf_row.step]
     else:
+        if conf_row.output == 'location_datetime':
+            print('Info', ': sub ', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
         array = np.array([])
     return array
 
@@ -86,8 +88,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
             datatype_dict = {}
-            property_dict = {}
             output_property_dict = {}
+            property_dict = {}
             for in_file in in_file_list:
                 match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
                 if not match:
@@ -132,20 +134,22 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             break
                         number_of_subsets = codes_get(bufr, 'numberOfSubsets')
                         if number_of_subsets == 0:
+                            print('Info', ':', 'number_of_subsets is 0.', unexpanded_descriptors, in_file, file=sys.stderr)
                             break
                         bufr_dict = {}
                         none_np = np.array([])
-                        number_of_array = 0
-                        for conf_row in descriptor_conf_df.itertuples():
-                            if conf_row.get_type == 'subset':
-                                for subset_num in range(1, number_of_subsets + 1):
+                        if descriptor_conf_df['get_type'].values.flatten()[0] == 'subset':
+                            for subset_num in range(1, number_of_subsets + 1):
+                                number_of_array = 0
+                                for conf_row in descriptor_conf_df.itertuples():
                                     array = getArray(bufr, subset_num, number_of_subsets, conf_row, in_file)
-                                    if len(array) == 0:
-                                        if conf_row.output == 'location_datetime':
-                                            print('Info', ':', 'len(array) == 0.', conf_row.key, in_file, file=sys.stderr)
+                                    if number_of_array == 0:
+                                        number_of_array = len(array)
+                                        if len(array) == 0:
+                                            print('Warning', warno, ':', 'len(array) is 0.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
                                             break
                                         else:
-                                            continue
+                                            number_of_array = len(array)                                    
                                     if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
                                         if len(array) > conf_row.array_index:
                                             value = array[int(conf_row.array_index)]
@@ -154,69 +158,45 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             else:
                                                 array = np.array([value], dtype=object)
                                         else:
-                                            if conf_row.output == 'location_datetime':
-                                                print('Info', ':', 'conf_row.array_index is more than len(array).', conf_row.key, in_file, file=sys.stderr)
-                                                break
-                                            else:
-                                                continue
-                                    #else:    
-                                        #if len(array) < number_of_array:
-                                        #    array = np.concatenate([array, np.array([None for i in range(0, number_of_array - len(array))])])
-                                        #else:
-                                        #    array = array[0:number_of_array]
-                                    if number_of_array == 0:
-                                        number_of_array = len(array)
+                                            print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                            break
+
                                     if len(array) < number_of_array:
                                         for padding_count in range(len(array), number_of_array):
                                             array = np.append(array, None)
                                     elif len(array) > number_of_array:
-                                        print('Warning', warno, ': subset :', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
-                                        if conf_row.output == 'location_datetime':
-                                            bufr_dict = {}
-                                            break
-                                        else:
-                                            continue
+                                        print('Warning', warno, ':', 'len(array) is more than number_of_array.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                        break
                                     if conf_row.key in bufr_dict:
                                         bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], array])
                                     else:
                                         bufr_dict[conf_row.key] = array
-                                if conf_row.key in bufr_dict:
-                                    array = bufr_dict[conf_row.key]
-                                else:
-                                    if conf_row.output == 'location_datetime':
-                                        bufr_dict = {}
-                                        break
-                                    else:
-                                        continue
-                            else:
+                        else:
+                            number_of_array = 0
+                            for conf_row in descriptor_conf_df.itertuples():
                                 array = getArray(bufr, 0, 0, conf_row, in_file)
-                                if len(array) == 0:
-                                    if conf_row.output == 'location_datetime':
-                                        print('Info', ':', 'len(array) == 0.', conf_row.key, in_file, file=sys.stderr)
-                                        break
-                                    else:
-                                        continue
                                 if number_of_array == 0:
-                                    number_of_array = len(array)
-                                if len(array) == 1:
-                                    value = array[0]
-                                    array = np.array([value for i in range(0, number_of_array)], dtype=object)
-                                if len(array) != number_of_array:
-                                    if conf_row.output == 'location_datetime':
-                                        print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
-                                        bufr_dict = {}
+                                    if len(array) == 0:
+                                        print('Warning', warno, ':', 'len(array) is 0.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
                                         break
                                     else:
-                                        print('Warning', warno, ':', conf_row.key, len(array), number_of_array, 'The length of array is not equals to the number of array.', in_file, file=sys.stderr)
-                                        continue
-                            bufr_dict[conf_row.key] = array
+                                        number_of_array = len(array)
+                                elif len(array) != number_of_array:
+                                    if len(array) == 1:
+                                        value = array[0]
+                                        array = np.array([value for i in range(0, number_of_array)], dtype=object)
+                                    else:
+                                        print('Warning', warno, ':', 'len(array) is not equals to number_of_array.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                        break
+                                bufr_dict[conf_row.key] = array
+                        for conf_row in descriptor_conf_df.itertuples():
                             if conf_row.output == 'location_datetime':
-                                tmp_none_np = np.array([False if value == None else True for value in array])
+                                tmp_none_np = np.array([False if value == None else True for value in bufr_dict[conf_row.key]])
                                 if len(none_np) > 0:
                                     none_np = none_np * tmp_none_np
                                 else:
                                     none_np = tmp_none_np
-                            bufr_dict['none'] = none_np
+                        bufr_dict['none'] = none_np
                         codes_release(bufr)
                         if len(bufr_dict) == 0:
                             break
@@ -257,7 +237,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 else:
                                                     message_np = tmp_message_np
                                     else:
-                                        print('Info', 'max(location_datetime_index_np) >= len(tmp_message_np):', cat_subcat, conf_row.key, max(location_datetime_index_np), len(tmp_message_np), in_file, file=sys.stderr)
+                                        print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, max(location_datetime_index_np), len(tmp_message_np), in_file, file=sys.stderr)
                                 pre_conf_row_name = conf_row.name
                             if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                 if pre_conf_row_name in property_dict:
