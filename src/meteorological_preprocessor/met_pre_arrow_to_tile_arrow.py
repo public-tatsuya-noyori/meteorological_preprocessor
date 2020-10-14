@@ -68,8 +68,6 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 tmp_id_etfo_dict[id] = etfo_list[index]
                             new_id_etfo_dict[(tile_x,  tile_y, new_datetime)] = tmp_id_etfo_dict
                             if os.path.exists(out_file):
-                                if debug:
-                                    print('Debug', ': old_df', out_file, file=sys.stderr)
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                 concat_df = concat_df.astype({'id': 'int32'})
@@ -120,8 +118,6 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     new_df.insert(0, 'elapsed time [s]', tmp_etfo_list)
                                     new_df = new_df.astype({'elapsed time [s]': 'int32'})
                                     if os.path.exists(out_file):
-                                        if debug:
-                                            print('Debug', ': old_df', out_file, file=sys.stderr)
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         concat_df = concat_df.astype({'id': 'int32'})

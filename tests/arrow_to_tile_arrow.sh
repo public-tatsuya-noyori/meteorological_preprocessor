@@ -35,7 +35,11 @@ if test ${running} -eq 0; then
     done
     if test -s tile_arrow/${now}.txt.tmp; then
       ./pub.sh --pub_dir_list_index cache_bufr_to_arrow bufr_synop_arrow_p7 tile_arrow/${now}.txt.tmp wasabi japan.meteorological.agency.open.data p7 8 2>>log/pub.sh.bufr_synop_arrow.log
-      ./met_pre_arrow_to_tile_arrow.py tile_arrow/${now}.txt.tmp cache_tile_arrow/RJTD/tile_arrow_dataset 1 1>>tile_arrow/${now}.txt.tmp 2>>log/met_pre_arrow_to_tile_arrow.py.log
+      echo "start"  >>log/met_pre_arrow_to_tile_arrow.py.log
+      date  >>log/met_pre_arrow_to_tile_arrow.py.log
+      ./met_pre_arrow_to_tile_arrow.py --debug tile_arrow/${now}.txt.tmp cache_tile_arrow/RJTD/tile_arrow_dataset 3 1>>tile_arrow/${now}.txt.tmp 2>>log/met_pre_arrow_to_tile_arrow.py.log
+      echo "end"  >>log/met_pre_arrow_to_tile_arrow.py.log
+      date  >>log/met_pre_arrow_to_tile_arrow.py.log
       mv tile_arrow/${now}.txt.tmp tile_arrow/${now}.txt
     else
       rm -f tile_arrow/${now}.txt.tmp

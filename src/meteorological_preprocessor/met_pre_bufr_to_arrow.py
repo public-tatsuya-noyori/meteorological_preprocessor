@@ -161,6 +161,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                         else:
                                             print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                             break
 
                                     if len(array) < number_of_array:
@@ -168,6 +169,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             array = np.append(array, None)
                                     elif len(array) > number_of_array:
                                         print('Warning', warno, ':', 'len(array) is more than number_of_array.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                        array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                         break
                                     if conf_row.key in bufr_dict:
                                         bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], array])
@@ -189,6 +191,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         array = np.array([value for i in range(0, number_of_array)], dtype=object)
                                     else:
                                         print('Warning', warno, ':', 'len(array) is not equals to number_of_array.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                        array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                         break
                                 bufr_dict[conf_row.key] = array
                         for conf_row in descriptor_conf_df.itertuples():
