@@ -371,23 +371,23 @@ upper_air,amdar,311008,,windDirection,0,0,0,,wind_direction,wind direction [degr
 upper_air,amdar,311008,,windSpeed,0,0,0,,wind_speed,wind speed [m/s],subset,to_value,0,float64,0,32767
 upper_air,amdar,311008,,detailedPhaseOfFlight,0,0,0,,detailed_phase_of_flight,detailed phase of flight,subset,to_value,0,int32,0,32767
 upper_air,amdar,311008,,aircraftRollAngleQuality,0,0,0,,aircraft_roll_angle_quality,aircraft roll angle quality,subset,to_value,0,int32,0,32767
-upper_air,amdar,311010,,aircraftRegistrationNumberOrOtherIdentification,0,0,0,,location_datetime,aircraft id,subset,to_value,0,string,,
-upper_air,amdar,311010,,latitude,0,0,0,,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
-upper_air,amdar,311010,,longitude,0,0,0,,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
-upper_air,amdar,311010,,flightLevel,0,0,0,,location_datetime,flight level [m],subset,to_value,0,float64,0,32767
-upper_air,amdar,311010,,year,0,0,0,,location_datetime,datetime,subset,to_value,0,timestamp,0,9999
-upper_air,amdar,311010,,month,0,0,0,,location_datetime,datetime,subset,to_value,0,timestamp,1,12
-upper_air,amdar,311010,,day,0,0,0,,location_datetime,datetime,subset,to_value,0,timestamp,1,31
-upper_air,amdar,311010,,hour,0,0,0,,location_datetime,datetime,subset,to_value,0,timestamp,0,23
-upper_air,amdar,311010,,minute,0,0,0,,location_datetime,datetime,subset,to_value,0,timestamp,0,59
-upper_air,amdar,311010,,second,0,0,0,0,location_datetime,datetime,subset,to_value,0,timestamp,0,59
-upper_air,amdar,311010,,airTemperature,0,0,0,,air_temperature,air temperature [K],subset,to_value,0,float64,-273.15,32767
-upper_air,amdar,311010,,windDirection,0,0,0,,wind_direction,wind direction [degree],subset,to_value,0,float64,0,360
-upper_air,amdar,311010,,windSpeed,0,0,0,,wind_speed,wind speed [m/s],subset,to_value,0,float64,0,32767
-upper_air,amdar,311010,,mixingRatio,0,0,0,,mixing_ratio,mixing ratio [kg/kg],subset,to_value,0,float64,0,32767
-upper_air,amdar,311010,,detailedPhaseOfFlight,0,0,0,,detailed_phase_of_flight,detailed phase of flight,subset,to_value,0,int32,0,32767
-upper_air,amdar,311010,,aircraftRollAngleQuality,0,0,0,,aircraft_roll_angle_quality,aircraft roll angle quality,subset,to_value,0,int32,0,32767
-upper_air,amdar,311010,,moistureQuality,0,0,0,,moisture_quality,moisture quality,subset,to_value,0,int32,0,32767
+upper_air,amdar,311010,,aircraftRegistrationNumberOrOtherIdentification,0,0,0,,location_datetime,aircraft id,,,0,string,,
+upper_air,amdar,311010,,latitude,0,0,0,,location_datetime,latitude [degree],,,0,float64,-90,90
+upper_air,amdar,311010,,longitude,0,0,0,,location_datetime,longitude [degree],,,0,float64,-180,180
+upper_air,amdar,311010,,flightLevel,0,0,0,,location_datetime,flight level [m],,,0,float64,0,32767
+upper_air,amdar,311010,,year,0,0,0,,location_datetime,datetime,,,0,timestamp,0,9999
+upper_air,amdar,311010,,month,0,0,0,,location_datetime,datetime,,,0,timestamp,1,12
+upper_air,amdar,311010,,day,0,0,0,,location_datetime,datetime,,,0,timestamp,1,31
+upper_air,amdar,311010,,hour,0,0,0,,location_datetime,datetime,,,0,timestamp,0,23
+upper_air,amdar,311010,,minute,0,0,0,,location_datetime,datetime,,,0,timestamp,0,59
+upper_air,amdar,311010,,second,0,0,0,0,location_datetime,datetime,,,0,timestamp,0,59
+upper_air,amdar,311010,,airTemperature,0,0,0,,air_temperature,air temperature [K],,,0,float64,-273.15,32767
+upper_air,amdar,311010,,windDirection,0,0,0,,wind_direction,wind direction [degree],,,0,float64,0,360
+upper_air,amdar,311010,,windSpeed,0,0,0,,wind_speed,wind speed [m/s],,,0,float64,0,32767
+upper_air,amdar,311010,,mixingRatio,0,0,0,,mixing_ratio,mixing ratio [kg/kg],,,0,float64,0,32767
+upper_air,amdar,311010,,detailedPhaseOfFlight,0,0,0,,detailed_phase_of_flight,detailed phase of flight,,,0,int32,0,32767
+upper_air,amdar,311010,,aircraftRollAngleQuality,0,0,0,,aircraft_roll_angle_quality,aircraft roll angle quality,,,0,int32,0,32767
+upper_air,amdar,311010,,moistureQuality,0,0,0,,moisture_quality,moisture quality,,,0,int32,0,32767
 upper_air,wind_profiler,301032,007006,heightAboveStation,0,0,0,,location_datetime,height [m],subset,,0,float64,0,32767
 upper_air,wind_profiler,301032,007006,heightOfStation,0,0,0,,location_datetime,height [m],subset,to_value_to_array,0,float64,-32768,32767
 upper_air,wind_profiler,301032,007006,blockNumber,0,0,1000,,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
