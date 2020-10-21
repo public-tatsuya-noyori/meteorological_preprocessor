@@ -110,7 +110,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         bufr = codes_bufr_new_from_file(in_file_stream)
                         if bufr is None:
                             break
-                        codes_set(bufr, 'unpack', 1)
+                        try:
+                            codes_set(bufr, 'unpack', 1)
+                        except:
+                            break
                         unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')                    
                         descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                         for bufr_descriptor in unexpanded_descriptors:

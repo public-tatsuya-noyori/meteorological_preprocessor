@@ -120,7 +120,7 @@ def get_grib_subdir_list(grib_file):
                     j_size = i_size
                 subdir_list.append(str(i_size) + '_' + str(j_size))
                 subdir_list.append(str(codes_get(gid, 'latitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')))
-                subdir_list.append(str(codes_get(gid, 'dataDate')).zfill(8) + str(codes_get(gid, 'dataTime')).zfill(4)[0:2])
+                subdir_list.append(str(codes_get(gid, 'dataDate')).zfill(8) + str(codes_get(gid, 'dataTime')).zfill(4)[0:4])
                 codes_release(gid)
             except:
                 print('Warning', warno, ':', 'GRIB decode error on', grib_file, 'has occurred. The file is not created', file=sys.stderr)
@@ -188,10 +188,11 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                             month = codes_get_array(bufr, 'typicalMonth')[0]
                             day = codes_get_array(bufr, 'typicalDay')[0]
                             hour = codes_get_array(bufr, 'typicalHour')[0]
+                            minute = codes_get_array(bufr, 'typicalMinute')[0]
                             codes_release(bufr)
-                            if month > 0 and month < 13 and day > 0 and day < 32 and hour > -1 and hour < 24:
+                            if month > 0 and month < 13 and day > 0 and day < 32 and hour > -1 and hour < 24 and minute > -1 and minute <60:
                                 data_date = str(year).zfill(4) + str(month).zfill(2) + str(day).zfill(2)
-                                out_directory_list.append(data_date + str(hour).zfill(2))
+                                out_directory_list.append(data_date + str(hour).zfill(2) + str(minute).zfill(2))
                             else:
                                 is_bufr = False
                                 print('Warning', warno, ':', 'BUFR on', in_file, 'is invalid datetime. The file is not created', file=sys.stderr)
@@ -202,7 +203,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                     return ''
             if conf_row.format != 'grib' and not re.match(r'^GRIB$', start_char4):
                 out_directory_list.append(conf_row.subcategory)
-                out_directory_list.append(data_date + ddhhmm[2:4])
+                out_directory_list.append(data_date + ddhhmm[2:6])
             out_directory = '/'.join(out_directory_list)
             os.makedirs(out_directory, exist_ok=True)
             if ttaaii:
@@ -279,7 +280,7 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                         return ''
                 else:
                     out_directory_list.append(conf_row.subcategory)
-                    out_directory_list.append(data_date + ddhhmm[2:4])
+                    out_directory_list.append(data_date + ddhhmm[2:6])
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
                 out_file_list = []

@@ -30,10 +30,9 @@ if test ${running} -eq 0; then
     for i in `ls -1 sub_bufr_synop|grep -v '\.tmp$'|uniq`; do
       ./met_pre_bufr_to_arrow.py RJTD sub_bufr_synop/${i} cache_bufr_to_arrow 1> sub_arrow_synop/${i}.tmp 2>>log/met_pre_bufr_to_arrow.py.log
       if test -s sub_arrow_synop/${i}.tmp; then
-        mv -f sub_arrow_synop/${i}.tmp sub_arrow_synop/${i}
-      else
-        rm -f sub_arrow_synop/${i}.tmp
+        grep -v ecCodes sub_arrow_synop/${i}.tmp > sub_arrow_synop/${i}
       fi
+      rm -f sub_arrow_synop/${i}.tmp
       rm -f sub_bufr_synop/${i}
     done
   } &

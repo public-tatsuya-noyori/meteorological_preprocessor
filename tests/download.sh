@@ -17,6 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
+alias python='/usr/bin/python3'
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
 if test $1 = 'p1'; then
@@ -92,7 +93,7 @@ if test -s download_${priority}/created.txt; then
     fi
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
-    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | uniq > download_${priority}/cached/${now}.txt
+    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
     if test ! -s download_${priority}/cached/${now}.txt; then
       rm -f download_${priority}/cached/${now}.txt
     fi
