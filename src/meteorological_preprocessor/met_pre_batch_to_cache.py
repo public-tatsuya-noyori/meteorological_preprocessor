@@ -33,14 +33,18 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     rc = False
     with open(in_file, 'r') as in_file_stream:
         while True:
-            bufr = codes_bufr_new_from_file(in_file_stream)
+            bufr = None
+            try:
+                bufr = codes_bufr_new_from_file(in_file_stream)
+            except:
+                break
             if bufr is None:
                 break
             unexpanded_descriptors = []
             try:
                 codes_set(bufr, 'unpack', 1)
                 unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-            except CodesInternalError as err:
+            except:
                 break
             descriptor_conf_df = None
             if bufr_descriptor in unexpanded_descriptors:
@@ -142,6 +146,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             out_directory_list = []
             out_directory_list.append(out_dir)
             out_directory_list.append(conf_row.access_control)
+            ttaaii_cccc_ddhhmm_bbb_data_date_list = []
             if re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', start_char4):
                 ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
             if len(ttaaii_cccc_ddhhmm_bbb_data_date_list) == 5:
