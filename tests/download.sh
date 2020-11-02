@@ -52,7 +52,7 @@ elif test $1 = 'p5'; then
   category=''
 fi
 if test -s download_${priority}/pid.txt; then
-  running=`cat download_${priority}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority} " | wc -l`
+  running=`cat download_${priority}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority}" | wc -l`
 else
   mkdir -p download_${priority}/cached
   running=0
@@ -93,7 +93,7 @@ if test -s download_${priority}/created.txt; then
     fi
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
-    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
+    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v "A_ISXX[0-9][0-9]EUSR" | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
     if test ! -s download_${priority}/cached/${now}.txt; then
       rm -f download_${priority}/cached/${now}.txt
     fi

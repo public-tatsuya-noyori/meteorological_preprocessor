@@ -54,7 +54,7 @@ elif test $1 = 'p5'; then
   category=''
 fi
 if test -s download_${priority}_closed/pid.txt; then
-  running=`cat download_${priority}_closed/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority} " | wc -l`
+  running=`cat download_${priority}_closed/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority}" | wc -l`
 else
   mkdir -p download_${priority}_closed/cached
   running=0

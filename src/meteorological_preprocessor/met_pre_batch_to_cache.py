@@ -41,7 +41,6 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
                 print('Warning', warno, ':', 'BUFR of', in_file, 'is not able to be parsed.', file=sys.stderr)
                 break
             if bufr is None:
-                print('Warning', warno, ':', 'BUFR of', in_file, 'is None.', file=sys.stderr)
                 break
             unexpanded_descriptors = []
             try:
@@ -120,7 +119,6 @@ def get_grib_subdir_list(grib_file):
             try:
                 gid = codes_grib_new_from_file(grib_file_stream)
                 if gid is None:
-                    print('Warning', warno, ':', 'GRIB of', in_file, 'is None.', file=sys.stderr)
                     break
                 i_size = codes_get(gid, 'iDirectionIncrementInDegrees')
                 j_size = codes_get(gid, 'jDirectionIncrementInDegrees')
@@ -192,7 +190,6 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                         try:
                             bufr = codes_bufr_new_from_file(bufr_file_stream)
                             if bufr is None:
-                                print('Warning', warno, ':', 'BUFR of', in_file, 'is None.', file=sys.stderr)
                                 break
                             codes_set(bufr, 'unpack', 1)
                             year = codes_get_array(bufr, 'typicalYear')[0]
