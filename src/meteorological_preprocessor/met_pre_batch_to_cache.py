@@ -37,14 +37,17 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
             try:
                 bufr = codes_bufr_new_from_file(in_file_stream)
             except:
+                print('Warning', warno, ':', 'BUFR of', in_file, 'is not able to be parsed.', file=sys.stderr)
                 break
             if bufr is None:
+                print('Warning', warno, ':', 'BUFR of', in_file, 'is None.', file=sys.stderr)
                 break
             unexpanded_descriptors = []
             try:
                 codes_set(bufr, 'unpack', 1)
                 unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
             except:
+                print('Warning', warno, ':', 'BUFR of', in_file, 'is not able to be unpacked.', file=sys.stderr)
                 break
             descriptor_conf_df = None
             if bufr_descriptor in unexpanded_descriptors:
@@ -115,6 +118,7 @@ def get_grib_subdir_list(grib_file):
             try:
                 gid = codes_grib_new_from_file(grib_file_stream)
                 if gid is None:
+                    print('Warning', warno, ':', 'GRIB of', in_file, 'is None.', file=sys.stderr)
                     break
                 i_size = codes_get(gid, 'iDirectionIncrementInDegrees')
                 j_size = codes_get(gid, 'jDirectionIncrementInDegrees')
@@ -186,6 +190,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                         try:
                             bufr = codes_bufr_new_from_file(bufr_file_stream)
                             if bufr is None:
+                                print('Warning', warno, ':', 'BUFR of', in_file, 'is None.', file=sys.stderr)
                                 break
                             codes_set(bufr, 'unpack', 1)
                             year = codes_get_array(bufr, 'typicalYear')[0]
@@ -331,7 +336,6 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                 if debug:
                     print('Debug', ':', 'start_char4 =', start_char4, file=sys.stderr)
                 message = bytearray()
-
                 if re.match(r'\d\d\d\d', start_char4):
                     batch_type = 1
                     message_length = int(start_char4 + in_file_stream.read(4).decode())
