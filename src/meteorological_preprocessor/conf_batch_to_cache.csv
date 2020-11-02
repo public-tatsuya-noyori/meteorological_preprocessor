@@ -1,4 +1,10 @@
 file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_missing,cccc,access_control,format,category,subcategory,file_extension
+^GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD[0-9]\\+_grib2\.bin$,,,,,RJTD,open,grib,gsm,,bin
+^GSM_GPV_Rgl_Gll0p5deg_L-pall_FD[0-9]\\+_grib2\.bin$,,,,,RJTD,open,grib,gsm,,bin
+^GSM_GPV_Rgl_Gll0p5deg_Lsurf_FD[0-9]\\+_grib2\.bin$,,,,,RJTD,open,grib,gsm,,bin
+^GSM_GPV_Rra2_Gll0p25deg_Lsurf_FD[0-9]\\+_grib2\.bin$,,,,,RJTD,open,grib,gsm,,bin
+^GSM_GPV_Rra2_Gll0p5deg_Lp[0-9]\\+_FD[0-9]\\+_grib2\.bin$,,,,,RJTD,open,grib,gsm,,bin
+^GSM_GPV_Rra2_Gll0p5deg_Lsurf_FD[0-9]\\+_grib2\.bin$,,,,,RJTD,open,grib,gsm,,bin
 ^W_jp.*C_RJTD_.*_EPSG_GPV_.*bin$,,,,,RJTD,open,grib,geps,,bin
 ^W_jp.*C_RJTD_.*_GSM_GPV_.*bin$,,,,,RJTD,open,grib,gsm,,bin
 ^Z__C_RJTD_.*_OBS_SAT_PScsr_.*bin$,,,,,RJTD,open,bufr,satellite,csr,bin

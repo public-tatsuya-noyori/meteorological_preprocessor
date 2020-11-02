@@ -30,6 +30,7 @@ from pyarrow import csv
 from eccodes import *
 
 def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
+    warno = 184
     rc = False
     with open(in_file, 'r') as in_file_stream:
         while True:
@@ -66,6 +67,7 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     return rc
 
 def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):
+    warno = 185
     ttaaii_cccc_ddhhmm_bbb_data_date_list = []
     word = ''
     header_num = 0
