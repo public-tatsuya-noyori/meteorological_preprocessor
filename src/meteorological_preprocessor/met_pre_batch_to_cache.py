@@ -122,8 +122,7 @@ def get_grib_subdir_list(grib_file):
                     i_size = j_size
                 elif i_size > 0 and j_size <= 0:
                     j_size = i_size
-                subdir_list.append(str(i_size) + '_' + str(j_size))
-                subdir_list.append(str(codes_get(gid, 'latitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')))
+                subdir_list.append(str(i_size) + '_' + str(j_size) + '_' + str(codes_get(gid, 'latitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfFirstGridPointInDegrees')) + '_' + str(codes_get(gid, 'latitudeOfLastGridPointInDegrees')) + '_' + str(codes_get(gid, 'longitudeOfLastGridPointInDegrees')))
                 subdir_list.append(str(codes_get(gid, 'dataDate')).zfill(8) + str(codes_get(gid, 'dataTime')).zfill(4)[0:4])
                 codes_release(gid)
             except:
@@ -174,9 +173,9 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 return ''
             if conf_row.format == 'grib' or re.match(r'^GRIB$', start_char4):
                 subdir_list = get_grib_subdir_list(in_file)
-                if len(subdir_list) == 3:
+                if len(subdir_list) == 2:
                     out_directory_list.extend(subdir_list)
-                    data_date = subdir_list[2][0:8]
+                    data_date = subdir_list[1][0:8]
                 else:
                     return ''
             elif not data_date and re.match(r'^BUFR$', start_char4):
@@ -278,9 +277,9 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                     with open(tmp_grib_file, 'wb') as tmp_grib_file_stream:
                             tmp_grib_file_stream.write(message)
                     subdir_list = get_grib_subdir_list(in_file)
-                    if len(subdir_list) > 2:
+                    if len(subdir_list) == 2:
                         out_directory_list.extend(subdir_list)
-                        data_date = subdir_list[2][0:8]
+                        data_date = subdir_list[1][0:8]
                     else:
                         return ''
                 else:
