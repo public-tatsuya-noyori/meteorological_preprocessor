@@ -20,7 +20,7 @@
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
 user=`head -1 wis_user_passwd.txt`
-passwd=`head wis_user_passwd.txt | tail -1`
+passwd=`tail -1 wis_user_passwd.txt`
 if test $1 = 'p1'; then
   priority=p1
   parallel=16
