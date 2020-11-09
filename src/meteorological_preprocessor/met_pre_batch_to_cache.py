@@ -38,7 +38,6 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
             try:
                 bufr = codes_bufr_new_from_file(in_file_stream)
             except:
-                print('Warning', warno, ':', 'BUFR of', in_file, 'is not able to be parsed.', file=sys.stderr)
                 break
             if bufr is None:
                 break
