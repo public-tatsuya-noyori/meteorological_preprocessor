@@ -40,7 +40,9 @@ if test ${running} -eq 0; then
       ./met_pre_arrow_to_tile_arrow.py tile_arrow/${now}.txt.tmp cache_tile_arrow/RJTD/tile_arrow_dataset 1 1>>tile_arrow/${now}.txt.tmp2 2>>log/met_pre_arrow_to_tile_arrow.py.log
       echo "end"  >>log/met_pre_arrow_to_tile_arrow.py.log
       date  >>log/met_pre_arrow_to_tile_arrow.py.log
-      grep -v ecCodes tile_arrow/${now}.txt.tmp2 > tile_arrow/${now}.txt
+      if test -s tile_arrow/${now}.txt.tmp2; then
+        grep -v ecCodes tile_arrow/${now}.txt.tmp2 > tile_arrow/${now}.txt
+      fi
     fi
     rm -f tile_arrow/${now}.txt.tmp
     rm -f tile_arrow/${now}.txt.tmp2
