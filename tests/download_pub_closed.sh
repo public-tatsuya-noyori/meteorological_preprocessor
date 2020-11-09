@@ -107,6 +107,9 @@ if test -s download_${priority}_closed/created.txt; then
   done
   if test -s download_${priority}_closed/cached/${now}.txt.tmp; then
     cat download_${priority}_closed/cached/${now}.txt.tmp | grep -v "/A_P"  | grep -v ecCodes | uniq > download_${priority}_closed/cached/${now}.txt
+    if test ! -s download_${priority}/cached/${now}.txt; then
+      rm -f download_${priority}/cached/${now}.txt
+    fi
   fi
   rm -f download_${priority}_closed/cached/${now}.txt.tmp
 fi
