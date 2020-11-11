@@ -17,6 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
+alias python='/usr/bin/python3'
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
 if test $1 = 'p1'; then

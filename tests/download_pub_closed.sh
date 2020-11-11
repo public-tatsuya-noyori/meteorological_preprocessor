@@ -17,6 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
+alias python='/usr/bin/python3'
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
 user=`head -1 wis_user_passwd.txt`
@@ -113,7 +114,7 @@ if test -s download_${priority}_closed/created.txt; then
   fi
   rm -f download_${priority}_closed/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_${priority}_closed/open ap_${priority}_closed ${i} wasabi japan.meteorological.agency.open.data ${priority} 4;done
+for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_${priority}_closed/open ap_${priority}_closed ${i} wasabi japan.meteorological.agency.closed.data ${priority} 4;done
 } &
 pid=$!
 echo ${pid} > download_${priority}_closed/pid.txt
