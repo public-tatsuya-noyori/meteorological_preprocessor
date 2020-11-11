@@ -132,7 +132,7 @@ cron=0
 pub_dir_list_index=0
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "$0 [--cron] local_work_directory unique_job_name source_rclone_remote source_bucket priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--clone] [--pub_dir_list_index] [--urgent] local_work_directory unique_job_name source_rclone_remote source_bucket priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--cron" ) cron=1;shift;;
     "--pub_dir_list_index" ) pub_dir_list_index=1;shift;;
     "--urgent" ) urgent=1;shift;;
