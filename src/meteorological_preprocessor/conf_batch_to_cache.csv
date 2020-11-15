@@ -105,6 +105,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SF[A-Z][A-Z][0-9][0-9].*)$,^SF[A-Z][A-Z][0-9][0-9]$,,,,,open,alphanumeric,surface,atmospheric_data,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SG[A-Z][A-Z][0-9][0-9].*)$,^SG[A-Z][A-Z][0-9][0-9]$,,,,,open,alphanumeric,surface,radrep,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_S[IMN][A-Z][A-Z][0-9][0-9].*)$,^S[IMN][A-Z][A-Z][0-9][0-9]$,( |^)BBXX( |$),,,,open,alphanumeric,surface,ship,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_S[IMN][A-Z][A-Z][0-9][0-9].*)$,^S[IMN][A-Z][A-Z][0-9][0-9]$,( |^)OOXX( |$),,,,open,alphanumeric,surface,synop_mobil,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_S[IMN][A-Z][A-Z][0-9][0-9].*)$,^S[IMN][A-Z][A-Z][0-9][0-9]$,,,,,open,alphanumeric,surface,synop,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SO[A-Z][A-Z][0-9][0-9].*)$,^SO[A-Z][A-Z][0-9][0-9]$,( |^)JJVV( |$),,,,open,alphanumeric,surface,bathy,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SO[A-Z][A-Z][0-9][0-9].*)$,^SO[A-Z][A-Z][0-9][0-9]$,( |^)KKYY( |$),,,,open,alphanumeric,surface,tesac,txt
