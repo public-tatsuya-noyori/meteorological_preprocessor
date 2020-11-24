@@ -46,7 +46,6 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
                 codes_set(bufr, 'unpack', 1)
                 unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
             except:
-                print('Warning', warno, ':', 'BUFR of', in_file, 'is not able to be unpacked.', file=sys.stderr)
                 break
             descriptor_conf_df = None
             if bufr_descriptor in unexpanded_descriptors:
