@@ -155,7 +155,7 @@ clone() {
       else
         if test ${switchable} -ne 0; then
           should_switch=`ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/* | tail -1 | xargs -I{} find {} -type f -mmin +${switch_minutes} | wc -l`
-          if test ${should_switch} -ne 0;then
+          if test ${should_switch} -ne 0 -a ${permit_empty_newly_index} -eq 0;then
             exit_code=222
             job_count=`expr 1 + ${job_count}`
             continue
@@ -184,13 +184,15 @@ switchable=0
 preserved_index_directory=preserved_index
 preserve_index_minutes=180
 switch_minutes=5
+permit_empty_newly_index=0
 for arg in "$@"; do
   case "${arg}" in
-    '--help' ) echo "$0 [--clone] [--pub_dir_list_index] [--urgent] [--switchable] local_work_directory unique_job_name source_rclone_remote source_bucket dest_rclone_remote dest_bucket priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--clone] [--pub_dir_list_index] [--urgent] [--switchable] [--permit_empty_newly_index] local_work_directory unique_job_name source_rclone_remote source_bucket dest_rclone_remote dest_bucket priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--cron" ) cron=1;shift;;
     "--pub_dir_list_index" ) pub_dir_list_index=1;shift;;
     "--urgent" ) urgent=1;shift;;
     "--switchable" ) switchable=1;shift;;
+    "--permit_empty_newly_index" ) permit_empty_newly_index=1;shift;;
   esac
 done
 if test -z $8; then
