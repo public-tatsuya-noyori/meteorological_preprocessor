@@ -97,11 +97,11 @@ elif test $7 -le 0; then
   echo "ERROR: $7 is not more than 1." >&2
   exit 199
 fi
+mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
     running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
-    mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
     running=0
   fi
   if test ${running} -eq 0; then
@@ -114,7 +114,6 @@ if test ${cron} -eq 1; then
     fi
   fi
 else
-  mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
   publish
   if test ${rm_list_file} -eq 1; then
     rm -f ${list_file}

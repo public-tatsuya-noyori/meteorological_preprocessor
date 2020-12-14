@@ -110,9 +110,6 @@ subscribe() {
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
       fi
-    else
-      echo "ERROR: can not get a list of ${priority}." >&2
-      exit 199
     fi
     job_count=`expr 1 + ${job_count}`
   done
@@ -174,11 +171,11 @@ exclusive_pattern_file=''
 if test -n $8; then
   exclusive_pattern_file=$8
 fi
+mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
     running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
-    mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
     running=0
   fi
   if test ${running} -eq 0; then
@@ -188,6 +185,5 @@ if test ${cron} -eq 1; then
     wait ${pid}
   fi
 else
-  mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
   subscribe
 fi
