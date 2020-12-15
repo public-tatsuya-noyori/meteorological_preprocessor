@@ -181,8 +181,8 @@ job_start_unixtime=`expr 0 + ${job_start_unixtime}`
 cron=0
 pub_dir_list_index=0
 switchable=0
-preserve_index_minutes=180
-preserve_index_lines=20
+preserve_index_minutes=360
+preserve_index_lines=16
 switch_minutes=5
 permit_empty_newly_index=0
 for arg in "$@"; do
