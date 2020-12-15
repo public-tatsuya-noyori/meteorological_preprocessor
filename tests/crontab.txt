@@ -27,11 +27,11 @@
 * * * * * cd /home/noyori/tests; for i in `ls -1 download_p5_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_p5_closed/open ap_p5_closed ${i} wasabi japan.meteorological.agency.closed.data p5  16;done >> log/pub.sh.ap_p5_closed.log 2>&1
 
 # clone from ap to us
-* * * * * cd /home/noyori/tests; ./clone.sh --urgent --cron cache ap_to_us_p1 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p1  4 >> log/clone.sh.ap_to_us_p1.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache ap_to_us_p2 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p2  8 >> log/clone.sh.ap_to_us_p2.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache ap_to_us_p3 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p3 16 >> log/clone.sh.ap_to_us_p3.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache ap_to_us_p4 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p4 64 >> log/clone.sh.ap_to_us_p4.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache ap_to_us_p5 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p5 64 >> log/clone.sh.ap_to_us_p5.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --urgent --cron --switchable --permit_empty_newly_index cache ap_to_us_p1 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p1  4 >> log/clone.sh.ap_to_us_p1.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache ap_to_us_p2 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p2  8 >> log/clone.sh.ap_to_us_p2.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache ap_to_us_p3 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p3 16 >> log/clone.sh.ap_to_us_p3.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache ap_to_us_p4 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p4 64 >> log/clone.sh.ap_to_us_p4.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache ap_to_us_p5 wasabi japan.meteorological.agency.open.data wasabi_us japan.meteorological.agency.open.data.us.east.1 p5 64 >> log/clone.sh.ap_to_us_p5.log 2>&1
 
 # clone closed from ap to us
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache ap_to_us_p1_closed wasabi japan.meteorological.agency.closed.data wasabi_us japan.meteorological.agency.closed.data.us.east.1 p1  4 >> log/clone.sh.ap_to_us_p1_closed.log 2>&1
@@ -40,11 +40,11 @@
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache ap_to_us_p4_closed wasabi japan.meteorological.agency.closed.data wasabi_us japan.meteorological.agency.closed.data.us.east.1 p4  16 >> log/clone.sh.ap_to_us_p4_closed.log 2>&1
 
 # clone from us to eu
-* * * * * cd /home/noyori/tests; ./clone.sh --urgent --cron cache us_to_eu_p1 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p1  4 >> log/clone.sh.us_to_eu_p1.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p2 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p2  8 >> log/clone.sh.us_to_eu_p2.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p3 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p3 16 >> log/clone.sh.us_to_eu_p3.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p4 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p4 64 >> log/clone.sh.us_to_eu_p4.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 64 >> log/clone.sh.us_to_eu_p5.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --urgent --cron --switchable cache to_eu_p1 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p1  4 >> log/clone.sh.to_eu_p1.log 2>&1 || ./clone.sh --cron --switchable --permit_empty_newly_index cache to_eu_p1 wasabi japan.meteorological.agency.open.data wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p1 4 >> log/clone.sh.to_eu_p1_bk.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache us_to_eu_p2 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p2  8 >> log/clone.sh.us_to_eu_p2.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache us_to_eu_p3 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p3 16 >> log/clone.sh.us_to_eu_p3.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache us_to_eu_p4 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p4 64 >> log/clone.sh.us_to_eu_p4.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --switchable --permit_empty_newly_index cache us_to_eu_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 64 >> log/clone.sh.us_to_eu_p5.log 2>&1
 
 # clone closed from us to eu
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p1_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1 wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p1  4 >> log/clone.sh.us_to_eu_p1_closed.log 2>&1

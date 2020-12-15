@@ -91,7 +91,7 @@ if test -s download_${priority}/created.txt; then
     fi
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
-    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v "A_ISXX[0-9][0-9]EUSR" | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
+    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
     if test ! -s download_${priority}/cached/${now}.txt; then
       rm -f download_${priority}/cached/${now}.txt
     fi

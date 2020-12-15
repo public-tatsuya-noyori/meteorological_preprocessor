@@ -106,7 +106,7 @@ clone() {
         fi
       fi
       if test ${switchable} -ne 0 -a -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-        ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/*/*/* | grep -v /${source_rclone_remote}/${source_bucket}/ | xargs cat | sort -u > ${local_work_directory}/${job_directory}/${unique_job_name}/preserved_filter.tmp
+        ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/*/*/* | grep -v "^.*\.tmp$" | xargs cat | sort -u > ${local_work_directory}/${job_directory}/${unique_job_name}/preserved_filter.tmp
         grep -F -v -f ${local_work_directory}/${job_directory}/${unique_job_name}/preserved_filter.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp2
         mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp2 ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
       fi
@@ -154,7 +154,7 @@ clone() {
         fi
       else
         if test ${switchable} -ne 0; then
-          should_switch=`ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/* | tail -1 | xargs -I{} find {} -type f -mmin +${switch_minutes} | wc -l`
+          should_switch=`ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/* | grep -v "^.*\.tmp$" | tail -1 | xargs -I{} find {} -type f -mmin +${switch_minutes} | wc -l`
           if test ${should_switch} -ne 0 -a ${permit_empty_newly_index} -eq 0;then
             exit_code=222
             job_count=`expr 1 + ${job_count}`
@@ -181,7 +181,6 @@ job_start_unixtime=`expr 0 + ${job_start_unixtime}`
 cron=0
 pub_dir_list_index=0
 switchable=0
-preserved_index_directory=preserved_index
 preserve_index_minutes=180
 switch_minutes=5
 permit_empty_newly_index=0
@@ -233,10 +232,12 @@ exclusive_pattern_file=''
 if test $# -ge 10; then
   exclusive_pattern_file=$10
 fi
+preserved_index_directory=preserved_${priority}_index
 if test ${switchable} -eq 0; then
   mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
 else
   mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}
+  touch ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/dummy.tmp
 fi
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
