@@ -79,7 +79,9 @@ clone() {
         if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt; then
           diff ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new | grep '>' | cut -c3- | sed -e "s|^|/${index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff
         else
-          tail -${preserve_index_lines} ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new | sed -e "s|^|/${index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff
+          date_hour_0=`date -u "+%Y%m%d%H"`
+          date_hour_1=`date -u "+%Y%m%d%H" -d "1 hour ago"`
+          grep -E "(${date_hour_0}|${date_hour_1})" ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new | sed -e "s|^|/${index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff
         fi
       fi
       if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff; then
@@ -181,8 +183,7 @@ job_start_unixtime=`expr 0 + ${job_start_unixtime}`
 cron=0
 pub_dir_list_index=0
 switchable=0
-preserve_index_minutes=360
-preserve_index_lines=16
+preserve_index_minutes=180 # If changed the value, change date_hour_0, date_hour_1...
 switch_minutes=5
 permit_empty_newly_index=0
 for arg in "$@"; do
