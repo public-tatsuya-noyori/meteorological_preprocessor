@@ -1,79 +1,122 @@
-(A[ABDHMPS][A-Z][A-Z]|Y[ABCDEFGHKLMNOPSTW][A-Z][A-Z]|YRMD): Australia
-AC[A-Z][A-Z]: Cocos Island
-AG[A-Z][A-Z]: Solomon Islands
-AN[A-Z][A-Z]: Nauru
-AY[A-Z][A-Z]: Papua New Guinea
-(B[AOPRS][A-Z][A-Z]|Z[BGHJKLMPSUWY][A-Z][A-Z]): China
-B[GIM][A-Z][A-Z]: Greenland
-BT[A-Z][A-Z]: Bhutan
-C[FWYZ][A-Z][A-Z]: Canada
-CT[A-Z][A-Z]: Haiti
-DA[A-Z][A-Z]: Algeria
-DB[A-Z][A-Z]: Benin
-(DE[A-Z][A-Z]|V[AEIO][A-Z][A-Z]): India
-D[FH][A-Z][A-Z]:Burkina Faso
-DG[A-Z][A-Z]: Ghana
-DI[A-Z][A-Z]: Cote d'Ivoire
-DK[A-Z][A-Z]: Democratic People's Republic of Korea
-DN[A-Z][A-Z]: Nigeria
-DR[A-Z][A-Z]: Niger
-DT[A-Z][A-Z]: Tunisia
-DX[A-Z][A-Z]: Togo
-EB[A-Z][A-Z]: Belgium
-EC[A-Z][A-Z]: ECMWF
-ED[A-Z][A-Z]: Germany
-EE[A-Z][A-Z]: Estonia
-EF[A-Z][A-Z]: Finland
-EG[A-Z][A-Z]: United Kingdom of Great Britain and Northern Ireland
-EH[A-Z][A-Z]: Netherlands
-EI[A-Z][A-Z]: Ireland
-EJ[A-Z][A-Z]: Italy
-EK[A-Z][A-Z]: Denmark and Faroe Islands
-EL[A-Z][A-Z]: Luxembourg
-EN[A-Z][A-Z]: Norway
-(EP|SO)[A-Z][A-Z]: Poland
-ES[A-Z][A-Z]: Sweden
-ET[A-Z][A-Z]: Germany
-EUM[A-Z]: EUMETSAT
-EUS[A-Z]: European Space Research Institute
-EV[A-Z][A-Z]: Latvia
-EY[A-Z][A-Z]: Lithuania
-FA[A-Z][A-Z]: South Africa (Gough & Marion Islands)
-FB[A-Z][A-Z]: Botswana
-FC[A-Z][A-Z]: Congo
-FD[A-Z][A-Z]: Swaziland
-FE[A-Z][A-Z]: Central African Republic
-FG[A-Z][A-Z]: Equatorial Guinea
-FHA[A-Z]: Ascension Island
-FHS[A-Z]: St. Helena Island
-FI[A-Z][A-Z]: Mauritius
-FJ[A-Z][A-Z]: British Indian Ocean Territory
-FK[A-Z][A-Z]: Cameroon
-FL[A-Z][A-Z]: Zambia
-(FMM[DIT]|FMN[MN]): Madagascar
-FMEE: Reunion
-(FMC[A-Z]|FMM[EHOSV]|FMN[ADHLQSV]|FMS[A-Z]): Comoros
-FN[A-Z][A-Z]: Angola
-FO[A-Z][A-Z]: Gabon
-FP[A-Z][A-Z]: Sao Tome and Principe
-FQ[A-Z][A-Z]: Mozambique
-FR[A-Z][A-Z]: Kyrgyzstan
-FS[A-Z][A-Z]: Seychelles
-FT[A-Z][A-Z]: Chad
-FU[A-Z][A-Z]: Burundi
-FV[A-Z][A-Z]: Zimbabwe
-FW[A-Z][A-Z]: Malawi
-FX[A-Z][A-Z]: Lesotho
-FY[^H][^Y]: Namibia
-FYHY: Halley
-FZ[A-Z][A-Z]: Democratic Republic of the Congo
+"location name","indicator pattern"
+"Australia","(A[ABDHMPS][A-Z][A-Z]|Y[ABCDEFGHKLMNOPSTW][A-Z][A-Z]|YR[^B][^K])"
+"Cocos Island","AC[A-Z][A-Z]"
+"Solomon Islands","AG[A-Z][A-Z]"
+"Nauru","AN[A-Z][A-Z]"
+"Papua New Guinea","AY[A-Z][A-Z]"
+"China","(B[AOPRS][A-Z][A-Z]|Z[BGHJKLMPSUWY][A-Z][A-Z])"
+"Greenland","B[GIM][A-Z][A-Z]"
+"Bhutan","BT[A-Z][A-Z]"
+"Canada","C[FWYZ][A-Z][A-Z]"
+"Haiti","CT[A-Z][A-Z]"
+"Algeria","DA[A-Z][A-Z]"
+"Benin","DB[A-Z][A-Z]"
+"India","(DE[A-Z][A-Z]|V[AEIO][A-Z][A-Z])"
+"Burkina Faso","D[FH][A-Z][A-Z]"
+"Ghana","DG[A-Z][A-Z]"
+"Cote d'Ivoire","DI[A-Z][A-Z]" 
+"Democratic People's Republic of Korea","DK[A-Z][A-Z]"
+"Nigeria","DN[A-Z][A-Z]"
+"Niger","DR[A-Z][A-Z]"
+"Tunisia","DT[A-Z][A-Z]"
+"Togo","DX[A-Z][A-Z]"
+"Belgium","EB[A-Z][A-Z]"
+"ECMWF","EC[A-Z][A-Z]"
+"Germany","E[DT][A-Z][A-Z]"
+"Estonia","EE[A-Z][A-Z]"
+"Finland","EF[A-Z][A-Z]"
+"United Kingdom of Great Britain and Northern Ireland","EG[A-Z][A-Z]"
+"Netherlands","EH[A-Z][A-Z]"
+"Ireland","EI[A-Z][A-Z]"
+"Italy","EJ[A-Z][A-Z]"
+"Denmark and Faroe Islands","EK[A-Z][A-Z]"
+"Luxembourg","EL[A-Z][A-Z]"
+"Norway","(EN[A-Z][A-Z]|LDWR)"
+"Poland","(EP|SO)[A-Z][A-Z]"
+"Sweden","ES[A-Z][A-Z]"
+"EUMETSAT","EUM[A-Z]"
+"European Space Research Institute","EUS[A-Z]"
+"Latvia","EV[A-Z][A-Z]"
+"Lithuania","EY[A-Z][A-Z]"
+"South Africa (Gough & Marion Islands)","FA[A-Z][A-Z]"
+"Botswana","FB[A-Z][A-Z]"
+"Congo","FC[A-Z][A-Z]"
+"Swaziland","FD[A-Z][A-Z]"
+"Central African Republic","FE[A-Z][A-Z]"
+"Equatorial Guinea","FG[A-Z][A-Z]"
+"FHA[A-Z]","Ascension Island"
+"St. Helena Island","FHS[A-Z]"
+"Mauritius","FI[A-Z][A-Z]"
+"British Indian Ocean Territory","FJ[A-Z][A-Z]"
+"Cameroon","FK[A-Z][A-Z]"
+"Zambia","FL[A-Z][A-Z]"
+"Madagascar","(FMM[DIT]|FMN[MN])"
+"Reunion","FMEE"
+"Comoros","(FMC[A-Z]|FMM[EHOSV]|FMN[ADHLQSV]|FMS[A-Z])"
+"Angola","FN[A-Z][A-Z]"
+"Gabon","FO[A-Z][A-Z]"
+"Sao Tome and Principe","FP[A-Z][A-Z]"
+"Mozambique","FQ[A-Z][A-Z]"
+"Kyrgyzstan","FR[A-Z][A-Z]"
+"Seychelles","FS[A-Z][A-Z]"
+"Chad","FT[A-Z][A-Z]"
+"Burundi","FU[A-Z][A-Z]"
+"Zimbabwe","FV[A-Z][A-Z]"
+"Malawi","FW[A-Z][A-Z]"
+"Lesotho","FX[A-Z][A-Z]"
+"Namibia","FY[^H][^Y]"
+"Halley","FYHY"
+"Democratic Republic of the Congo","FZ[A-Z][A-Z]"
+"Mali","GA[A-Z][A-Z]"
+"Gambia","GB[A-Z][A-Z]"
+"Canary Islands (Spain)","GC[A-Z][A-Z]"
+"Melilla","GE[A-Z][A-Z]"
+"Sierra Leone","GF[A-Z][A-Z]"
+"Guinea-Bissau","GG[A-Z][A-Z]"
+"Liberia","GL[A-Z][A-Z]"
+"Morocco","GM[A-Z][A-Z]"
+"Senegal","GO[A-Z][A-Z]"
+"Mauritania","GQ[A-Z][A-Z]"
+"Western Sahara","GS[A-Z][A-Z]"
+"Guinea","GU[A-Z][A-Z]"
+"Cabo Verde","GV[A-Z][A-Z]"
+"Ethiopia","(HA[AC-Z][A-Z]|HAB[^MP])"
+"Burundi","HB[A-Z][A-Z]"
+"Somalia","HC[A-Z][A-Z]"
+"Djibouti","HD[A-Z][A-Z]"
+"Egypt","HE[A-Z][A-Z]"
+"Eritrea","HH[A-Z][A-Z]"
+"Kenya","HK[^R][^O]"
+"Libya","HL[A-Z][A-Z]"
+"Rwanda","HR[A-Z][A-Z]"
+"Sudan","HS[A-Z][A-Z]"
+"Tanzania, United Republic of","HT[A-Z][A-Z]"
+"Uganda","HU[A-Z][A-Z]"
+"IAEA","IA[A-Z][A-Z]"
+"United States of America","(K[0-9A-Z][0-9A-Z][0-9A-Z]|LIWX|NZCM|NZIR|NZPG|NZSP|NZWD|P[AH][A-Z][A-Z]|WTEC)"
+"Albania","LA[A-Z][A-Z]"
+"Bulgaria","LB[A-Z][A-Z]"
+"Cyprus","LC[A-Z][A-Z]"
+"Croatia","LD[^W][^R]"
+"Spain","LE[A-Z][A-Z]"
+"France","LF[^V][^P]"
+"St. Pierre and Miquelon","LFVP"
+"Greece","LG[A-Z][A-Z]"
+"Hungary","(LH[A-Z][A-Z]|HABM|HABP)"
+"Italy","LI[^W][^X]"
+"Slovenia","LJ[A-Z][A-Z]"
+"Czech Republic","LK[A-Z][A-Z]"
+"Israel","LL[A-Z][A-Z]"
+"Malta","LM[A-Z][A-Z]"
+"Austria","LO[A-Z][A-Z]"
+"Portugal","LP[A-Z][A-Z]"
+"Bosnia and Herzegovina","LQ[A-Z][A-Z]"
+"Romania","(LR[A-Z][A-Z]|YRBK)"
+"Switzerland","LS[A-Z][A-Z]"
 
-
-
-
-
-(LR[A-Z][A-Z]|YRBK): Romania
-
+"New Zealand","(NZ[ABD-HJ-OQRTUVXYZ][A-Z]|NZC[^M]|NZI[^R]|NZP[^G]|NZS[^P]|NZW[^D])"
+"Hong Kong, China","(VH[A-Z][A-Z]|HKRO)"
+"Macao, China","VM[A-Z][A-Z]"
 
 
 BKPR: PRISTINA
