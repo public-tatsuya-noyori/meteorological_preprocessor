@@ -112,7 +112,7 @@ if test -s download_${priority}/created.txt; then
   fi
   rm -f download_${priority}/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_${priority}/open ap_${priority} ${i} wasabi japan.meteorological.agency.open.data ${priority} 4;done
+for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_${priority} ap_${priority} ${i} wasabi japan.meteorological.agency.open.data ${priority} 4;done
 } &
 pid=$!
 echo ${pid} > download_${priority}/pid.txt

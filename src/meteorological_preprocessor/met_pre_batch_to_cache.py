@@ -146,7 +146,6 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
             data_date = ''
             out_directory_list = []
             out_directory_list.append(out_dir)
-            out_directory_list.append(conf_row.access_control)
             ttaaii_cccc_ddhhmm_bbb_data_date_list = []
             if re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', start_char4):
                 ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
@@ -271,7 +270,6 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
             if data_date and re.match(r'([0-1][0-9]|2[0-4])', ddhhmm[2:4]) and re.match(r'[0-5][0-9]', ddhhmm[4:6]):
                 out_directory_list = []
                 out_directory_list.append(out_dir)
-                out_directory_list.append(conf_row.access_control)
                 out_directory_list.append(cccc)
                 out_directory_list.append(conf_row.format)
                 out_directory_list.append(conf_row.category)
