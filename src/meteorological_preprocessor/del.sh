@@ -24,11 +24,11 @@ delete() {
 job_directory=4Del
 timeout=8s
 retry_num=8
-cron=0
+not_duplicated_running=0
 for arg in "$@"; do
   case "${arg}" in
     "--help" ) echo "$0 local_work_directory unique_job_name rclone_remote bucket/directory hours_ago parallel"; exit 0;;
-    "--cron" ) cron=1;shift;;
+    "--not_duplicated_running" ) not_duplicated_running=1;shift;;
   esac
 done
 if test -z $4; then
@@ -41,7 +41,7 @@ rclone_remote=$3
 bucket_directory=$4
 hours_ago=$5
 parallel=$6
-if test ${cron} -eq 1; then
+if test ${not_duplicated_running} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
     running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
