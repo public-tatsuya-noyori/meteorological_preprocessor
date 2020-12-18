@@ -113,6 +113,20 @@
 "Bosnia and Herzegovina","LQ[A-Z][A-Z]"
 "Romania","(LR[A-Z][A-Z]|YRBK)"
 "Switzerland","LS[A-Z][A-Z]"
+"Turkey","LT[A-Z][A-Z]"
+"Republic of Moldova","LU[A-Z][A-Z]"
+"North Macedonia","LW[^M][^O]"
+"Gibraltar","LXGB"
+"Serbia","LYB[EM]"
+"Montenegro","LYPG"
+"Serbia and Montenegro","LYT[IV]"
+"Slovakia","LZ[A-Z][A-Z]"
+"Turks and Caicos Islands","MB[A-Z][A-Z]"
+"Dominican Republic","MD[A-Z][A-Z]"
+"Guatemala","MG[A-Z][A-Z]"
+
+
+
 
 "New Zealand","(NZ[ABD-HJ-OQRTUVXYZ][A-Z]|NZC[^M]|NZI[^R]|NZP[^G]|NZS[^P]|NZW[^D])"
 "Hong Kong, China","(VH[A-Z][A-Z]|HKRO)"
