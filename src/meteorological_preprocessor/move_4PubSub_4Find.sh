@@ -18,29 +18,36 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
-delete() {
-  rclone --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 3 --retries 1 --stats 0 --timeout ${timeout} delete --min-age "${hours_ago}h" --rmdirs ${rclone_remote}:${bucket_directory}
+move_4PubSub_4Find() {
+  rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --min-age ${hours_ago}h --max-depth 1 ${rclone_remote}:${bucket}/${index_directory}/${priority}/ | xargs -n 1 -I {} rclone move ${rclone_remote}:${bucket}/${index_directory}/${priority}/{} ${rclone_remote}:${bucket}/${find_directory}/${priority}/
 }
-job_directory=4Del
+index_directory=4PubSub
+find_directory=4Find
+job_directory=4Find
 timeout=8s
 retry_num=8
 cron=0
 for arg in "$@"; do
   case "${arg}" in
-    "--help" ) echo "$0 local_work_directory unique_job_name rclone_remote bucket/directory hours_ago parallel"; exit 0;;
+    "--help" ) echo "$0 local_work_directory unique_job_name rclone_remote bucket priority hours_ago"; exit 0;;
     "--cron" ) cron=1;shift;;
   esac
 done
-if test -z $4; then
+if test -z $6; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
 local_work_directory=$1
 unique_job_name=$2
 rclone_remote=$3
-bucket_directory=$4
-hours_ago=$5
-parallel=$6
+bucket=$4
+priority=`echo $5 | grep "^p[0-9]$"`
+set -e
+if test -z ${priority}; then
+  echo "ERROR: $5 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+  exit 199
+fi
+hours_ago=$6
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
     running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
@@ -49,12 +56,12 @@ if test ${cron} -eq 1; then
     running=0
   fi
   if test ${running} -eq 0; then
-    delete &
+    move_4PubSub_4Find &
     pid=$!
     echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
     wait ${pid}
   fi
 else
   mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
-  delete
+  move_4PubSub_4Find
 fi

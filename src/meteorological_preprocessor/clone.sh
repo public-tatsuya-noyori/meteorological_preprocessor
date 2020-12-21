@@ -208,7 +208,7 @@ dest_rclone_remote=$5
 dest_bucket=$6
 set +e
 priority=`echo $7 | grep "^p[0-9]$"`
-parallel=`echo "$8" | grep '^[0-9]\+$'`
+parallel=`echo $8 | grep '^[0-9]\+$'`
 set -e
 if test -z ${priority}; then
   echo "ERROR: $7 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
