@@ -41,7 +41,7 @@ subscribe() {
     fi
     if test ! -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt; then
       set +e
-      rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --quiet lsf --max-depth 1 ${source_rclone_remote}:${source_bucket}/${index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
+      rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --max-depth 1 ${source_rclone_remote}:${source_bucket}/${index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
       tmp_exit_code=$?
       set -e
       if test ${tmp_exit_code} -ne 0; then
@@ -52,7 +52,7 @@ subscribe() {
       fi
     fi
     set +e
-    rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --quiet lsf --max-depth 1 ${source_rclone_remote}:${source_bucket}/${index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new
+    rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --max-depth 1 ${source_rclone_remote}:${source_bucket}/${index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new
     tmp_exit_code=$?
     set -e
     if test ${tmp_exit_code} -ne 0; then
@@ -65,7 +65,7 @@ subscribe() {
       if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff; then
         rm -rf ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}
         set +e
-        rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
+        rclone --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --local-no-set-modtime --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -ne 0; then
@@ -89,9 +89,9 @@ subscribe() {
         rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
         set +e
         if test ${pub_dir_list_index} -eq 1; then
-          rclone --cutoff-mode=cautious --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+          rclone --cutoff-mode=cautious --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --local-no-set-modtime --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
         else
-          rclone --cutoff-mode=cautious --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+          rclone --cutoff-mode=cautious --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --transfers ${parallel} --no-check-dest --log-level INFO --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --local-no-set-modtime --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${source_rclone_remote}:${source_bucket} ${local_work_directory}
         fi
         tmp_exit_code=$?
         set -e
