@@ -27,9 +27,9 @@ publish(){
   fi
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
     if test ${pub_dir_list_index} -eq 1; then
-      rclone --cutoff-mode=cautious --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+      rclone --cutoff-mode=cautious --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --checkers ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
     else
-      rclone --cutoff-mode=cautious --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+      rclone --cutoff-mode=cautious --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --checkers ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
     fi
     exit_code=1
     retry_count=1
