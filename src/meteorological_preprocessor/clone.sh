@@ -98,17 +98,17 @@ clone() {
         if test -n "${inclusive_pattern_file}"; then
           set +e
           if test -n "${exclusive_pattern_file}"; then
-            ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}/* | xargs cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+            ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
           else
-            ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}/* | xargs cat | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+            ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
           fi
           set -e
         else
-          ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}/* | xargs cat > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+          ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${index_directory}/${priority}/* | xargs -r cat > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
         fi
       fi
       if test ${switchable} -ne 0 -a -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-        ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/*/*/* | grep -v "^.*\.tmp$" | xargs cat | sort -u > ${local_work_directory}/${job_directory}/${unique_job_name}/preserved_filter.tmp
+        ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/*/*/* | grep -v "^.*\.tmp$" | xargs -r cat | sort -u > ${local_work_directory}/${job_directory}/${unique_job_name}/preserved_filter.tmp
         grep -F -v -f ${local_work_directory}/${job_directory}/${unique_job_name}/preserved_filter.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp2
         mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp2 ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
       fi
@@ -243,7 +243,7 @@ else
 fi
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
     running=0
   fi

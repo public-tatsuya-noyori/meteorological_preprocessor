@@ -22,7 +22,7 @@ publish(){
   grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
   if test ${pub_dir_list_index} -eq 1; then
     mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt
-    cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt | xargs -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+    cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
     rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt
   fi
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
@@ -100,7 +100,7 @@ fi
 mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
     running=0
   fi

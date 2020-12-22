@@ -24,7 +24,7 @@ del_4Find() {
     sed -e "s|^|/${find_directory}/${priority}/|g" ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old.tmp
     mv ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old 
     rclone --checkers ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --local-no-set-modtime --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old ${rclone_remote}:${bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
-    ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${find_directory}/${priority}/* | xargs cat > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_files.tmp
+    ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${find_directory}/${priority}/* | xargs -r cat > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_files.tmp
     if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_files.tmp; then
       rclone --checkers ${parallel} --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} delete --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_files.tmp --rmdirs ${rclone_remote}:${bucket}
       rclone --checkers ${parallel} --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} delete --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old --rmdirs ${rclone_remote}:${bucket}
@@ -69,7 +69,7 @@ elif test $7 -le 0; then
 fi
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
     mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
     running=0
