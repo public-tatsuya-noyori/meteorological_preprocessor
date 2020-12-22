@@ -74,7 +74,7 @@ clone() {
         diff ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new | grep '>' | cut -c3- | sed -e "s|^|/${index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff
       else
         if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt; then
-          find ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt -type f -mmin +${preserve_index_minutes} | xargs rm -f
+          find ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt -type f -mmin +${preserve_index_minutes} | xargs -r rm -f
         fi
         if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt; then
           diff ${local_work_directory}/${job_directory}/${unique_job_name}/${source_rclone_remote}_${source_bucket}_${priority}_index.txt ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.new | grep '>' | cut -c3- | sed -e "s|^|/${index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.diff
@@ -152,11 +152,11 @@ clone() {
         else
           now=`date -u "+%Y%m%d%H%M%S"`
           mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/${now}.txt
-          find ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory} -mindepth 3 -maxdepth 3 -type f -mmin +${preserve_index_minutes} | xargs rm -f > /dev/null 2>&1
+          find ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory} -mindepth 3 -maxdepth 3 -type f -mmin +${preserve_index_minutes} | xargs -r rm -f > /dev/null 2>&1
         fi
       else
         if test ${switchable} -ne 0; then
-          should_switch=`ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/* | grep -v "^.*\.tmp$" | tail -1 | xargs -I{} find {} -type f -mmin +${switch_minutes} | wc -l`
+          should_switch=`ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${preserved_index_directory}/${source_rclone_remote}/${source_bucket}/* | grep -v "^.*\.tmp$" | tail -1 | xargs -r -I{} find {} -type f -mmin +${switch_minutes} | wc -l`
           if test ${should_switch} -ne 0 -a ${permit_empty_newly_index} -eq 0;then
             exit_code=222
             job_count=`expr 1 + ${job_count}`

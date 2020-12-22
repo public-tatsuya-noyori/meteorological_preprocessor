@@ -19,7 +19,7 @@
 #
 set -e
 move_4PubSub_4Find() {
-  rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --min-age ${hours_ago}h --max-depth 1 ${rclone_remote}:${bucket}/${index_directory}/${priority}/ | xargs -n 1 -I {} rclone move ${rclone_remote}:${bucket}/${index_directory}/${priority}/{} ${rclone_remote}:${bucket}/${find_directory}/${priority}/
+  rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --min-age ${hours_ago}h --max-depth 1 ${rclone_remote}:${bucket}/${index_directory}/${priority}/ | xargs -r -n 1 -I {} rclone move ${rclone_remote}:${bucket}/${index_directory}/${priority}/{} ${rclone_remote}:${bucket}/${find_directory}/${priority}/
 }
 index_directory=4PubSub
 find_directory=4Find

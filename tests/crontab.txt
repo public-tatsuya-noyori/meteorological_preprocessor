@@ -52,20 +52,79 @@
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p3_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1 wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p3  16 >> log/clone.sh.us_to_eu_p3_closed.log 2>&1
 * * * * * cd /home/noyori/tests; ./clone.sh --cron cache us_to_eu_p4_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1 wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p4  16 >> log/clone.sh.us_to_eu_p4_closed.log 2>&1
 
-
 # delete on object storage
-0   0 * * * cd /home/noyori/tests; ./del.sh        cache ap       wasabi    japan.meteorological.agency.open.data                      24 32 >> log/del.sh.ap.log 2>&1
-10  * * * * cd /home/noyori/tests; ./del.sh        cache ap_index wasabi    japan.meteorological.agency.open.data/4PubSub              24 8 >> log/del.sh.ap_index.log 2>&1
-20  8 * * * cd /home/noyori/tests; ./del.sh        cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            24 32 >> log/del.sh.us.log 2>&1
-30  * * * * cd /home/noyori/tests; ./del.sh        cache us_index wasabi_us japan.meteorological.agency.open.data.us.east.1/4PubSub    24 8 >> log/del.sh.us_index.log 2>&1
-40 16 * * * cd /home/noyori/tests; ./del.sh        cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         24 32 >> log/del.sh.eu.log 2>&1
-50  * * * * cd /home/noyori/tests; ./del.sh        cache eu_index wasabi_eu japan.meteorological.agency.open.data.eu.central.1/4PubSub 24 8 >> log/del.sh.eu_index.log 2>&1
-0   0 * * * cd /home/noyori/tests; ./del.sh        cache ap       wasabi    japan.meteorological.agency.closed.data                      24 32 >> log/del.sh.ap.log 2>&1
-10  * * * * cd /home/noyori/tests; ./del.sh        cache ap_index wasabi    japan.meteorological.agency.closed.data/4PubSub              24 8 >> log/del.sh.ap_index.log 2>&1
-20  8 * * * cd /home/noyori/tests; ./del.sh        cache us       wasabi_us japan.meteorological.agency.closed.data.us.east.1            24 32 >> log/del.sh.us.log 2>&1
-30  * * * * cd /home/noyori/tests; ./del.sh        cache us_index wasabi_us japan.meteorological.agency.closed.data.us.east.1/4PubSub    24 8 >> log/del.sh.us_index.log 2>&1
-40 16 * * * cd /home/noyori/tests; ./del.sh        cache eu       wasabi_eu japan.meteorological.agency.closed.data.eu.central.1         24 32 >> log/del.sh.eu.log 2>&1
-50  * * * * cd /home/noyori/tests; ./del.sh        cache eu_index wasabi_eu japan.meteorological.agency.closed.data.eu.central.1/4PubSub 24 8 >> log/del.sh.eu_index.log 2>&1
+0 0 * * * cd /home/noyori/tests; ./del.sh --cron cache ap       wasabi    japan.meteorological.agency.open.data                      32 16 >> log/del.sh.ap.log 2>&1
+0 0 * * * cd /home/noyori/tests; ./del.sh --cron cache us       wasabi_us japan.meteorological.agency.open.data.us.east.1            32 16 >> log/del.sh.us.log 2>&1
+0 0 * * * cd /home/noyori/tests; ./del.sh --cron cache eu       wasabi_eu japan.meteorological.agency.open.data.eu.central.1         32 16 >> log/del.sh.eu.log 2>&1
+0 0 * * * cd /home/noyori/tests; ./del.sh --cron cache ap       wasabi    japan.meteorological.agency.closed.data                    32 16 >> log/del.sh.ap_closed.log 2>&1
+0 0 * * * cd /home/noyori/tests; ./del.sh --cron cache us       wasabi_us japan.meteorological.agency.closed.data.us.east.1          32 16 >> log/del.sh.us_closed.log 2>&1
+0 0 * * * cd /home/noyori/tests; ./del.sh --cron cache eu       wasabi_eu japan.meteorological.agency.closed.data.eu.central.1       32 16 >> log/del.sh.eu_closed.log 2>&1
+
+# move
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p1 wasabi    japan.meteorological.agency.open.data              p1 6 >> log/move.sh.ap_p1.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p2 wasabi    japan.meteorological.agency.open.data              p2 6 >> log/move.sh.ap_p2.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p3 wasabi    japan.meteorological.agency.open.data              p3 6 >> log/move.sh.ap_p3.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p4 wasabi    japan.meteorological.agency.open.data              p4 6 >> log/move.sh.ap_p4.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p5 wasabi    japan.meteorological.agency.open.data              p5 6 >> log/move.sh.ap_p5.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p1 wasabi_us japan.meteorological.agency.open.data.us.east.1    p1 6 >> log/move.sh.us_p1.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p2 wasabi_us japan.meteorological.agency.open.data.us.east.1    p2 6 >> log/move.sh.us_p2.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p3 wasabi_us japan.meteorological.agency.open.data.us.east.1    p3 6 >> log/move.sh.us_p3.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p4 wasabi_us japan.meteorological.agency.open.data.us.east.1    p4 6 >> log/move.sh.us_p4.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1    p5 6 >> log/move.sh.us_p5.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p1 6 >> log/move.sh.eu_p1.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p2 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p2 6 >> log/move.sh.eu_p2.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p3 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p3 6 >> log/move.sh.eu_p3.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p4 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p4 6 >> log/move.sh.eu_p4.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p5 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 6 >> log/move.sh.eu_p5.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p1_closed wasabi    japan.meteorological.agency.closed.data              p1 6 >> log/move.sh.ap_p1_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p2_closed wasabi    japan.meteorological.agency.closed.data              p2 6 >> log/move.sh.ap_p2_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p3_closed wasabi    japan.meteorological.agency.closed.data              p3 6 >> log/move.sh.ap_p3_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p4_closed wasabi    japan.meteorological.agency.closed.data              p4 6 >> log/move.sh.ap_p4_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_ap_p5_closed wasabi    japan.meteorological.agency.closed.data              p5 6 >> log/move.sh.ap_p5_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p1_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p1 6 >> log/move.sh.us_p1_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p2_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p2 6 >> log/move.sh.us_p2_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p3_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p3 6 >> log/move.sh.us_p3_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p4_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p4 6 >> log/move.sh.us_p4_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_us_p5_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p5 6 >> log/move.sh.us_p5_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p1_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p1 6 >> log/move.sh.eu_p1_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p2_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p2 6 >> log/move.sh.eu_p2_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p3_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p3 6 >> log/move.sh.eu_p3_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p4_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p4 6 >> log/move.sh.eu_p4_closed.log 2>&1
+* * * * * cd /home/noyori/tests; ./move_4PubSub_4Find.sh --cron cache mv_eu_p5_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p5 6 >> log/move.sh.eu_p5_closed.log 2>&1
+
+
+# del 4Find
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p1 wasabi    japan.meteorological.agency.open.data              p1 30 16 >> log/del_4Find.sh.ap_p1.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p2 wasabi    japan.meteorological.agency.open.data              p2 30 16 >> log/del_4Find.sh.ap_p2.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p3 wasabi    japan.meteorological.agency.open.data              p3 30 16 >> log/del_4Find.sh.ap_p3.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p4 wasabi    japan.meteorological.agency.open.data              p4 30 16 >> log/del_4Find.sh.ap_p4.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p5 wasabi    japan.meteorological.agency.open.data              p5 30 16 >> log/del_4Find.sh.ap_p5.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p1 wasabi_us japan.meteorological.agency.open.data.us.east.1    p1 30 16 >> log/del_4Find.sh.us_p1.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p2 wasabi_us japan.meteorological.agency.open.data.us.east.1    p2 30 16 >> log/del_4Find.sh.us_p2.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p3 wasabi_us japan.meteorological.agency.open.data.us.east.1    p3 30 16 >> log/del_4Find.sh.us_p3.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p4 wasabi_us japan.meteorological.agency.open.data.us.east.1    p4 30 16 >> log/del_4Find.sh.us_p4.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p5 wasabi_us japan.meteorological.agency.open.data.us.east.1    p5 30 16 >> log/del_4Find.sh.us_p5.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p1 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p1 30 16 >> log/del_4Find.sh.eu_p1.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p2 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p2 30 16 >> log/del_4Find.sh.eu_p2.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p3 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p3 30 16 >> log/del_4Find.sh.eu_p3.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p4 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p4 30 16 >> log/del_4Find.sh.eu_p4.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p5 wasabi_eu japan.meteorological.agency.open.data.eu.central.1 p5 30 16 >> log/del_4Find.sh.eu_p5.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p1_closed wasabi    japan.meteorological.agency.closed.data              p1 30 16 >> log/del_4Find.sh.ap_p1_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p2_closed wasabi    japan.meteorological.agency.closed.data              p2 30 16 >> log/del_4Find.sh.ap_p2_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p3_closed wasabi    japan.meteorological.agency.closed.data              p3 30 16 >> log/del_4Find.sh.ap_p3_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p4_closed wasabi    japan.meteorological.agency.closed.data              p4 30 16 >> log/del_4Find.sh.ap_p4_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_ap_p5_closed wasabi    japan.meteorological.agency.closed.data              p5 30 16 >> log/del_4Find.sh.ap_p5_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p1_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p1 30 16 >> log/del_4Find.sh.us_p1_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p2_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p2 30 16 >> log/del_4Find.sh.us_p2_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p3_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p3 30 16 >> log/del_4Find.sh.us_p3_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p4_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p4 30 16 >> log/del_4Find.sh.us_p4_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_us_p5_closed wasabi_us japan.meteorological.agency.closed.data.us.east.1    p5 30 16 >> log/del_4Find.sh.us_p5_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p1_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p1 30 16 >> log/del_4Find.sh.eu_p1_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p2_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p2 30 16 >> log/del_4Find.sh.eu_p2_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p3_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p3 30 16 >> log/del_4Find.sh.eu_p3_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p4_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p4 30 16 >> log/del_4Find.sh.eu_p4_closed.log
+* * * * * cd /home/noyori/tests; ./del_4Find.sh --cron cache del_4find_eu_p5_closed wasabi_eu japan.meteorological.agency.closed.data.eu.central.1 p5 30 16 >> log/del_4Find.sh.eu_p5_closed.log
+
 
 # delete on local PC
 55 1,9,17 * * * find /home/noyori/tests/cache_p* -mindepth 6 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1

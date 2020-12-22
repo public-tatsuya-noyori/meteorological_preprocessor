@@ -17,7 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -evx
+set -e
 del_4Find() {
   rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --min-age ${hours_ago}h --max-depth 1 ${rclone_remote}:${bucket}/${find_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.old; then
