@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright 2020 Japan Meteorological Agency.
+# Copyright 2020-2021 Japan Meteorological Agency.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@
 #
 set -e
 delete() {
-  rclone --checkers ${parallel} --transfers ${parallel} --quiet --contimeout ${timeout} --low-level-retries 3 --retries 1 --stats 0 --timeout ${timeout} delete --min-age "${hours_ago}h" --rmdirs ${rclone_remote}:${bucket_directory}
+  rclone delete --checkers ${parallel} --contimeout ${timeout} --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 1 --rmdirs --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket}
 }
+cron=0
 job_directory=4Del
 timeout=8s
-retry_num=8
-cron=0
 for arg in "$@"; do
   case "${arg}" in
-    "--help" ) echo "$0 local_work_directory unique_job_name rclone_remote bucket/directory hours_ago parallel"; exit 0;;
     "--cron" ) cron=1;shift;;
+    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote bucket days_ago parallel"; exit 0;;
   esac
 done
 if test -z $4; then
@@ -38,9 +37,25 @@ fi
 local_work_directory=$1
 unique_job_name=$2
 rclone_remote=$3
-bucket_directory=$4
-hours_ago=$5
-parallel=$6
+bucket=$4
+set +e
+days_ago=`echo $5 | grep "^[0-9]\+$"`
+parallel=`echo $6 | grep "^[0-9]\+$"`
+set -e
+if test -z ${days_ago}; then
+  echo "ERROR: $5 is not integer." >&2
+  exit 199
+elif test $5 -le 0; then
+  echo "ERROR: $5 is not more than 1." >&2
+  exit 199
+fi
+if test -z ${parallel}; then
+  echo "ERROR: $6 is not integer." >&2
+  exit 199
+elif test $6 -le 0; then
+  echo "ERROR: $6 is not more than 1." >&2
+  exit 199
+fi
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
     running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`

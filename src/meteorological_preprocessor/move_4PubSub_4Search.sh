@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright 2020 Japan Meteorological Agency.
+# Copyright 2020-2021 Japan Meteorological Agency.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,22 +18,22 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
-move_4PubSub_4Find() {
-  rclone --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --quiet lsf --min-age ${hours_ago}h --max-depth 1 ${rclone_remote}:${bucket}/${index_directory}/${priority}/ | xargs -r -n 1 -I {} rclone move ${rclone_remote}:${bucket}/${index_directory}/${priority}/{} ${rclone_remote}:${bucket}/${find_directory}/${priority}/
+move_4PubSub_4Search() {
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minutes_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote}:${bucket}/${pubsub_index_directory}/${priority}/ | head -n -1 | xargs -r -n 1 -I {} rclone move --contimeout ${timeout} --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote}:${bucket}/${pubsub_index_directory}/${priority}/{} ${rclone_remote}:${bucket}/${search_index_directory}/${priority}/
 }
-index_directory=4PubSub
-find_directory=4Find
-job_directory=4Find
-timeout=8s
-retry_num=8
 cron=0
+job_directory=4Search
+minutes_ago=15
+pubsub_index_directory=4PubSub
+search_index_directory=4Search
+timeout=8s
 for arg in "$@"; do
   case "${arg}" in
-    "--help" ) echo "$0 local_work_directory unique_job_name rclone_remote bucket priority hours_ago"; exit 0;;
     "--cron" ) cron=1;shift;;
+    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote bucket priority"; exit 0;;
   esac
 done
-if test -z $6; then
+if test -z $5; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
@@ -41,13 +41,13 @@ local_work_directory=$1
 unique_job_name=$2
 rclone_remote=$3
 bucket=$4
-priority=`echo $5 | grep "^p[0-9]$"`
+set +e
+priority=`echo $5 | grep "^p[1-9]$"`
 set -e
 if test -z ${priority}; then
   echo "ERROR: $5 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-hours_ago=$6
 if test ${cron} -eq 1; then
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
     running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
@@ -56,12 +56,12 @@ if test ${cron} -eq 1; then
     running=0
   fi
   if test ${running} -eq 0; then
-    move_4PubSub_4Find &
+    move_4PubSub_4Search &
     pid=$!
     echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
     wait ${pid}
   fi
 else
   mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
-  move_4PubSub_4Find
+  move_4PubSub_4Search
 fi

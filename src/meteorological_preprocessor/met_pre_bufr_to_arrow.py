@@ -383,8 +383,8 @@ def main():
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     config = pkg_resources.resource_filename(__name__, 'conf_bufr_to_arrow.csv')
-    if not re.match(r'^[A-Z]{4}$', args.my_cccc):
-        print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z]{4}$).', file=sys.stderr)
+    if not re.match(r'^[A-Z][A-Z0-9]{3}$', args.my_cccc):
+        print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z][A-Z0-9]{3}$).', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.input_list_file, os.F_OK):
         print('Error', errno, ':', args.input_list_file, 'does not exist.', file=sys.stderr)

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright 2020 Japan Meteorological Agency.
+# Copyright 2020-2021 Japan Meteorological Agency.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,17 +19,16 @@
 #
 set -e
 publish(){
-  grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
-  if test ${pub_dir_list_index} -eq 1; then
-    mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt
-    cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
-    rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.txt
+  if test ${pub_with_wildcard} -eq 1; then
+    grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+  else
+    grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
   fi
   if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-    if test ${pub_dir_list_index} -eq 1; then
-      rclone --cutoff-mode=cautious --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --checkers ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+    if test ${pub_with_wildcard} -eq 1; then
+      rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --s3-upload-concurrency ${parallel} --s3-upload-cutoff ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
     else
-      rclone --cutoff-mode=cautious --s3-upload-cutoff ${cutoff} --s3-upload-concurrency ${parallel} --checkers ${parallel} --transfers ${parallel} --no-check-dest --quiet --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copy --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+      rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp --ignore-checksum --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --s3-upload-concurrency ${parallel} --s3-upload-cutoff ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
     fi
     exit_code=1
     retry_count=1
@@ -37,7 +36,7 @@ publish(){
     while test ${exit_code} -ne 0; do
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
-      rclone --immutable --quiet --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --ignore-checksum --contimeout ${timeout} --low-level-retries 3 --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} copyto ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${dest_rclone_remote}:${dest_bucket}/${index_directory}/${priority}/${now}.txt
+      rclone copyto --contimeout ${timeout} --ignore-checksum --immutable --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp ${dest_rclone_remote}:${dest_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
@@ -53,20 +52,20 @@ publish(){
     exit 199
   fi
 }
-index_directory=4PubSub
-job_directory=4Pub
-timeout=8s
-retry_num=8
-cutoff=32M
 cron=0
+cutoff=32M
+job_directory=4Pub
+pub_with_wildcard=0
+pubsub_index_directory=4PubSub
+retry_num=8
 rm_list_file=0
-pub_dir_list_index=0
+timeout=8s
 for arg in "$@"; do
   case "${arg}" in
-    "--help" ) echo "$0 [--cron] [--rm_list_file] [--pub_dir_list_index] local_work_directory unique_job_name list_file dest_rclone_remote dest_bucket priority parallel"; exit 0;;
     "--cron" ) cron=1;shift;;
+    "--help" ) echo "$0 [--cron] [--pub_with_wildcard] [--rm_list_file] local_work_directory unique_job_name list_file dest_rclone_remote dest_bucket priority parallel"; exit 0;;
+    "--pub_with_wildcard" ) pub_with_wildcard=1;shift;;
     "--rm_list_file" ) rm_list_file=1;shift;;
-    "--pub_dir_list_index" ) pub_dir_list_index=1;shift;;
   esac
 done
 if test -z $7; then
@@ -83,7 +82,7 @@ fi
 dest_rclone_remote=$4
 dest_bucket=$5
 set +e
-priority=`echo $6 | grep "^p[0-9]$"`
+priority=`echo $6 | grep "^p[1-9]$"`
 parallel=`echo $7 | grep "^[0-9]\+$"`
 set -e
 if test -z ${priority}; then
