@@ -56,20 +56,20 @@ elif test $6 -le 0; then
   echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
+work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
+mkdir -p ${work_directory}
 if test ${cron} -eq 1; then
-  if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+  if test -s ${work_directory}/pid.txt; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
-    mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
     running=0
   fi
   if test ${running} -eq 0; then
     delete &
     pid=$!
-    echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
+    echo ${pid} > ${work_directory}/pid.txt
     wait ${pid}
   fi
 else
-  mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
   delete
 fi

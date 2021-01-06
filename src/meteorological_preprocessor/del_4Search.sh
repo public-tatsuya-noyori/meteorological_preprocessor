@@ -19,24 +19,24 @@
 #
 set -e
 delete_4Search() {
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${hours_ago}h --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote}:${bucket}/${search_index_directory}/${priority} | head -n -1 | sed -e "s|^|/${search_index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_index.tmp
-  if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_index.tmp; then
-    rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_index.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --min-age ${hours_ago}h --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote}:${bucket}/${search_index_directory}/${priority} | head -n -1 | sed -e "s|^|/${search_index_directory}/${priority}/|g" > ${work_directory}/${priority}_old_index.tmp
+  if test -s ${work_directory}/${priority}_old_index.tmp; then
+    rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_old_index.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket} ${work_directory}
     set +e
     if test -n "${exclusive_pattern_file}"; then
-      ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${search_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_file.tmp
+      ls -1 ${work_directory}/${search_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} > ${work_directory}/${priority}_old_file.tmp
     else
-      ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${search_index_directory}/${priority}/* | xargs -r cat > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_file.tmp
+      ls -1 ${work_directory}/${search_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${priority}_old_file.tmp
     fi
     set -e
-    if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_file.tmp; then
+    if test -s ${work_directory}/${priority}_old_file.tmp; then
       set +e
-      rclone delete --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_file.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket}
+      rclone delete --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_old_file.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket}
       set -e
-      rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_file.tmp
+      rm -f ${work_directory}/${priority}_old_file.tmp
     fi
-    rclone delete --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_index.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket}
-    rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_old_index.tmp
+    rclone delete --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_old_index.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket}
+    rm -f ${work_directory}/${priority}_old_index.tmp
   fi
 }
 cron=0
@@ -84,20 +84,20 @@ exclusive_pattern_file=''
 if test -n $8; then
   exclusive_pattern_file=$8
 fi
+work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
+mkdir -p ${work_directory}
 if test ${cron} -eq 1; then
-  if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+  if test -s ${work_directory}/pid.txt; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
-    mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
     running=0
   fi
   if test ${running} -eq 0; then
     delete_4Search &
     pid=$!
-    echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
+    echo ${pid} > ${work_directory}/pid.txt
     wait ${pid}
   fi
 else
-  mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
   delete_4Search
 fi

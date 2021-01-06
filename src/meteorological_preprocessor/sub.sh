@@ -39,20 +39,20 @@ subscribe() {
         sleep ${sleep_time}
       fi
     fi
-    if test ! -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt; then
+    if test ! -f ${work_directory}/${priority}_index.txt; then
       set +e
-      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${pubsub_index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
+      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/${priority}_index.txt
       tmp_exit_code=$?
       set -e
       if test ${tmp_exit_code} -ne 0; then
         exit_code=${tmp_exit_code}
-        rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
+        rm -f ${work_directory}/${priority}_index.txt
         job_count=`expr 1 + ${job_count}`
         continue
       fi
     fi
     set +e
-    rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${pubsub_index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp
+    rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/${priority}_new_index.tmp
     tmp_exit_code=$?
     set -e
     if test ${tmp_exit_code} -ne 0; then
@@ -60,14 +60,16 @@ subscribe() {
       job_count=`expr 1 + ${job_count}`
       continue
     fi
-    if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp; then
-      diff ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp | grep '>' | cut -c3- | sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index_diff.tmp
-      if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index_diff.tmp; then
-        cmp -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index_diff.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp
+    if test -s ${work_directory}/${priority}_new_index.tmp; then
+      diff ${work_directory}/${priority}_index.txt ${work_directory}/${priority}_new_index.tmp | grep '>' | cut -c3- > ${work_directory}/${priority}_index_diff.tmp
+      if test -s ${work_directory}/${priority}_index_diff.tmp; then
+        set +e
+        cmp -s ${work_directory}/${priority}_index_diff.tmp ${work_directory}/${priority}_new_index.tmp
         cmp_exit_code=$?
+        set -e
         if test ${cmp_exit_code} -eq 0; then
           set +e
-          rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${search_index_directory}/${priority} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index_2.tmp
+          rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${search_index_directory}/${priority} > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp
           tmp_exit_code=$?
           set -e
           if test ${tmp_exit_code} -ne 0; then
@@ -75,12 +77,36 @@ subscribe() {
             job_count=`expr 1 + ${job_count}`
             continue
           fi
-          cat ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp >> ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index_2.tmp
-          diff ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index_2.tmp | grep '>' | cut -c3- | sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index_diff.tmp
+          if test -s ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp; then
+            mv -f ${work_directory}/${priority}_new_index.tmp ${work_directory}/${priority}_new_index_last_part.tmp
+            for date_hour_directory in `tac ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp`; do
+              set +e
+              rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote}:${source_bucket}/${search_index_directory}/${priority}/${date_hour_directory} > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory_index.tmp
+              tmp_exit_code=$?
+              set -e
+              if test ${tmp_exit_code} -ne 0; then
+                exit_code=${tmp_exit_code}
+                job_count=`expr 1 + ${job_count}`
+                continue
+              fi
+              cat ${work_directory}/${priority}_${search_index_directory}_date_hour_directory_index.tmp ${work_directory}/${priority}_new_index_last_part.tmp | sort -u > ${work_directory}/${priority}_new_index.tmp
+              diff ${work_directory}/${priority}_index.txt ${work_directory}/${priority}_new_index.tmp | grep '>' | cut -c3- > ${work_directory}/${priority}_index_diff.tmp
+              if test -s ${work_directory}/${priority}_index_diff.tmp; then
+                set +e
+                cmp -s ${work_directory}/${priority}_index_diff.tmp ${work_directory}/${priority}_new_index.tmp
+                cmp_exit_code=$?
+                set -e
+                if test ${cmp_exit_code} -eq 1; then
+                  break
+                fi
+              fi
+            done
+          fi
         fi
-        rm -rf ${local_work_directory}/${job_directory}/${unique_job_name}/${pubsub_index_directory}/${priority}
+        rm -rf ${work_directory}/${pubsub_index_directory}/${priority}
+        sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" ${work_directory}/${priority}_index_diff.tmp > ${work_directory}/${priority}_newly_created_indexs.tmp
         set +e
-        rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index_diff.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote}:${source_bucket} ${local_work_directory}/${job_directory}/${unique_job_name}
+        rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_newly_created_indexs.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote}:${source_bucket} ${work_directory}
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -ne 0; then
@@ -91,48 +117,56 @@ subscribe() {
         if test -n "${inclusive_pattern_file}"; then
           set +e
           if test -n "${exclusive_pattern_file}"; then
-            ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+            ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${priority}_newly_created_files.tmp
           else
-            ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+            ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${priority}_newly_created_files.tmp
           fi
           set -e
         else
-          ls -1 ${local_work_directory}/${job_directory}/${unique_job_name}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+          ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${priority}_newly_created_files.tmp
         fi
       fi
-      if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp; then
-        rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
+      if test -s ${work_directory}/${priority}_newly_created_files.tmp; then
+        rm -f ${work_directory}/${priority}_log.tmp
         set +e
         if test ${pub_with_wildcard} -eq 1; then
-          rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+          rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${work_directory}/${priority}_newly_created_files.tmp --log-file ${work_directory}/${priority}_log.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote}:${source_bucket} ${local_work_directory}
         else
-          rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp --ignore-checksum --log-file ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote}:${source_bucket} ${local_work_directory}
+          rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${priority}_newly_created_files.tmp --ignore-checksum --log-file ${work_directory}/${priority}_log.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote}:${source_bucket} ${local_work_directory}
         fi
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -ne 0; then
           exit_code=${tmp_exit_code}
           set +e
-          grep ERROR ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp >&2
+          grep ERROR ${work_directory}/${priority}_log.tmp >&2
           set -e
         fi
         if test ${tmp_exit_code} -eq 0; then
-          if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp; then
-            sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_work_directory}/\1|g" ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
+          if test -s ${work_directory}/${priority}_log.tmp; then
+            sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_work_directory}/\1|g" ${work_directory}/${priority}_log.tmp
           fi
-          mv -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index.txt
+          index_preserve_days_regex_pattern="("
+          index_preserve_days_count=0
+          while test ${index_preserve_days_count} -le ${index_preserve_days}; do
+            index_preserve_days_regex_pattern="${index_preserve_days_regex_pattern}|"`date -u "+%Y%m%d" -d "${index_preserve_days_count} day ago"`
+            index_preserve_days_count=`expr 1 + ${index_preserve_days_count}`
+          done
+          index_preserve_days_regex_pattern="${index_preserve_days_regex_pattern})"
+          cat ${work_directory}/${priority}_index.tmp ${work_directory}/${priority}_index_diff.tmp | grep -E ${index_preserve_days_regex_pattern} | sort -u | ${work_directory}/${priority}_new_index.txt
         fi
-        rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_log.tmp
-        rm -f ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_newly_created_index.tmp
+        rm -f ${work_directory}/${priority}_log.tmp
+        rm -f ${work_directory}/${priority}_newly_created_files.tmp
       fi
     fi
     job_count=`expr 1 + ${job_count}`
   done
-  rm -rf ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_index_diff.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${priority}_new_index_2.tmp ${local_work_directory}/${job_directory}/${unique_job_name}/${pubsub_index_directory}/${priority}
+  rm -rf ${work_directory}/${priority}_new_index.tmp ${work_directory}/${priority}_index_diff.tmp ${work_directory}/${priority}_${search_index_directory}_index.tmp ${work_directory}/${pubsub_index_directory}/${priority}
   return ${exit_code}
 }
 cron=0
-cutoff=32M
+cutoff=16M
+index_preserve_days=1
 job_directory=4Sub
 job_num=1
 job_period=60
@@ -187,17 +221,18 @@ exclusive_pattern_file=''
 if test -n $8; then
   exclusive_pattern_file=$8
 fi
-mkdir -p ${local_work_directory}/${job_directory}/${unique_job_name}
+work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
+mkdir -p ${work_directory}
 if test ${cron} -eq 1; then
-  if test -s ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt; then
-    running=`cat ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+  if test -s ${work_directory}/pid.txt; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
   else
     running=0
   fi
   if test ${running} -eq 0; then
     subscribe &
     pid=$!
-    echo ${pid} > ${local_work_directory}/${job_directory}/${unique_job_name}/pid.txt
+    echo ${pid} > ${work_directory}/pid.txt
     wait ${pid}
   fi
 else
