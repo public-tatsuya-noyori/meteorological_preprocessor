@@ -19,7 +19,7 @@
 #
 set -e
 delete() {
-  rclone delete --checkers ${parallel} --contimeout ${timeout} --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 1 --rmdirs --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote}:${bucket}
+  rclone delete --contimeout ${timeout} --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 1 --rmdirs --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
 }
 cron=0
 job_directory=4Del
@@ -27,7 +27,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
-    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote bucket days_ago parallel"; exit 0;;
+    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket days_ago"; exit 0;;
   esac
 done
 if test -z $4; then
@@ -36,24 +36,15 @@ if test -z $4; then
 fi
 local_work_directory=$1
 unique_job_name=$2
-rclone_remote=$3
-bucket=$4
+rclone_remote_bucket=$3
 set +e
-days_ago=`echo $5 | grep "^[0-9]\+$"`
-parallel=`echo $6 | grep "^[0-9]\+$"`
+days_ago=`echo $4 | grep "^[0-9]\+$"`
 set -e
 if test -z ${days_ago}; then
-  echo "ERROR: $5 is not integer." >&2
+  echo "ERROR: $4 is not integer." >&2
   exit 199
-elif test $5 -le 0; then
-  echo "ERROR: $5 is not more than 1." >&2
-  exit 199
-fi
-if test -z ${parallel}; then
-  echo "ERROR: $6 is not integer." >&2
-  exit 199
-elif test $6 -le 0; then
-  echo "ERROR: $6 is not more than 1." >&2
+elif test $4 -le 0; then
+  echo "ERROR: $4 is not more than 1." >&2
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}

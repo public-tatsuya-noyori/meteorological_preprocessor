@@ -26,10 +26,10 @@ delete_4Search() {
     hour_pattern="${hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`
     hour_count=`expr 1 + ${hour_count}`
   done
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ | grep -v -E "^(${hour_pattern})/$" > ${work_directory}/${priority}_old_directory.tmp
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ | grep -v -E "^(${hour_pattern})/$" > ${work_directory}/${priority}_old_directory.tmp
   if test -s ${work_directory}/${priority}_old_directory.tmp; then
     for old_directory in `cat ${work_directory}/${priority}_old_directory.tmp`; do
-      rclone lsf --contimeout ${timeout} --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${old_directory} | sed -e "s|^|/${search_index_directory}/${priority}/${old_directory}|g" > ${work_directory}/${priority}_old_index.tmp
+      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${old_directory} | sed -e "s|^|/${search_index_directory}/${priority}/${old_directory}|g" > ${work_directory}/${priority}_old_index.tmp
       rclone copy --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_old_index.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
       ls -1 ${work_directory}/${search_index_directory}/${priority}/${old_directory}/* | xargs -r cat > ${work_directory}/${priority}_old_file.tmp
       if test -s ${work_directory}/${priority}_old_file.tmp; then
