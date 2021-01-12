@@ -55,11 +55,11 @@ publish(){
 cron=0
 cutoff=16M
 job_directory=4Pub
-wildcard_index=0
 pubsub_index_directory=4PubSub
 retry_num=8
 rm_list_file=0
 timeout=8s
+wildcard_index=0
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
