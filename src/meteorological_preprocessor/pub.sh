@@ -19,16 +19,16 @@
 #
 set -e
 publish(){
-  if test ${pub_with_wildcard} -eq 1; then
+  if test ${wildcard_index} -eq 1; then
     grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/${priority}_newly_created_index.tmp
   else
     grep ^${local_work_directory}/ ${list_file} | sed -e "s|^${local_work_directory}/|/|g" > ${work_directory}/${priority}_newly_created_index.tmp
   fi
   if test -s ${work_directory}/${priority}_newly_created_index.tmp; then
-    if test ${pub_with_wildcard} -eq 1; then
-      rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${work_directory}/${priority}_newly_created_index.tmp --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+    if test ${wildcard_index} -eq 1; then
+      rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${work_directory}/${priority}_newly_created_index.tmp --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     else
-      rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${priority}_newly_created_index.tmp --ignore-checksum --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${dest_rclone_remote}:${dest_bucket}
+      rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${priority}_newly_created_index.tmp --ignore-checksum --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     fi
     exit_code=1
     retry_count=1
@@ -36,7 +36,7 @@ publish(){
     while test ${exit_code} -ne 0; do
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
-      rclone copyto --contimeout ${timeout} --ignore-checksum --immutable --log-file ${work_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${work_directory}/${priority}_newly_created_index.tmp ${dest_rclone_remote}:${dest_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+      rclone copyto --contimeout ${timeout} --ignore-checksum --immutable --log-file ${work_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${work_directory}/${priority}_newly_created_index.tmp ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
@@ -55,7 +55,7 @@ publish(){
 cron=0
 cutoff=16M
 job_directory=4Pub
-pub_with_wildcard=0
+wildcard_index=0
 pubsub_index_directory=4PubSub
 retry_num=8
 rm_list_file=0
@@ -63,12 +63,12 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
-    "--help" ) echo "$0 [--cron] [--pub_with_wildcard] [--rm_list_file] local_work_directory unique_job_name list_file dest_rclone_remote dest_bucket priority parallel"; exit 0;;
-    "--pub_with_wildcard" ) pub_with_wildcard=1;shift;;
+    "--help" ) echo "$0 [--cron] [--wildcard_index] [--rm_list_file] local_work_directory unique_job_name list_file destination_rclone_remote_bucket priority parallel"; exit 0;;
+    "--wildcard_index" ) wildcard_index=1;shift;;
     "--rm_list_file" ) rm_list_file=1;shift;;
   esac
 done
-if test -z $7; then
+if test -z $6; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
@@ -79,21 +79,20 @@ if test ! -s ${list_file}; then
   echo "ERROR: ${list_file} is not a file or empty." >&2
   exit 199
 fi
-dest_rclone_remote=$4
-dest_bucket=$5
+destination_rclone_remote_bucket=$4
 set +e
-priority=`echo $6 | grep "^p[1-9]$"`
-parallel=`echo $7 | grep "^[0-9]\+$"`
+priority=`echo $5 | grep "^p[1-9]$"`
+parallel=`echo $6 | grep "^[0-9]\+$"`
 set -e
 if test -z ${priority}; then
-  echo "ERROR: $6 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+  echo "ERROR: $5 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
 if test -z ${parallel}; then
-  echo "ERROR: $7 is not integer." >&2
+  echo "ERROR: $6 is not integer." >&2
   exit 199
-elif test $7 -le 0; then
-  echo "ERROR: $7 is not more than 1." >&2
+elif test $6 -le 0; then
+  echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}

@@ -206,7 +206,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                             print('Warning', warno, ':', 'BUFR decode error on', in_file, 'has occurred. The file is not created', file=sys.stderr)
                 if not is_bufr:
                     return ''
-            if conf_row.format != 'grib' and not re.match(r'^GRIB$', start_char4):
+            else:
                 out_directory_list.append(conf_row.subcategory)
                 out_directory_list.append(data_date + ddhhmm[2:6])
             out_directory = '/'.join(out_directory_list)

@@ -31,8 +31,8 @@ elif test $1 = 'p2'; then
   format=Alphanumeric
   category='!Warning'
 elif test $1 = 'p2_crex'; then
-  priority=p2
-  parallel=16
+  priority=p2_crex
+  parallel=4
   format=CREX
   category='!Warning'
 elif test $1 = 'p3'; then
@@ -45,14 +45,14 @@ elif test $1 = 'p4'; then
   parallel=16
   format=BUFR
   category='Satellite'
-elif test $1 = 'p4'; then
+elif test $1 = 'p5'; then
   priority=p5
   parallel=16
   format=GRIB
   category=''
 fi
 if test -s download_${priority}/pid.txt; then
-  running=`cat download_${priority}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority} " | wc -l`
+  running=`cat download_${priority}/pid.txt | xargs ps -f --no-headers | grep " $0 " | grep " ${priority}" | wc -l`
 else
   mkdir -p download_${priority}/cached
   running=0
@@ -73,19 +73,7 @@ if test ! -s download_${priority}/aria2c.log; then
 fi
 grep "ETag:" download_${priority}/aria2c.log | tail -1 | cut -d' ' -f2 > download_${priority}/etag.txt
 if test -s download_${priority}/created.txt; then
-  set +e
-  if test -n "${ex_pattern}" -a -n "${in_pattern}"; then
-    grep -v -E "${ex_pattern}" download_${priority}/created.txt | grep "${in_pattern}" > download_${priority}/tmp_created.txt
-    mv -f download_${priority}/tmp_created.txt download_${priority}/created.txt
-  elif test -n "${in_pattern}"; then
-    grep -E "${ex_pattern}" download_${priority}/created.txt > download_${priority}/tmp_created.txt
-    mv -f download_${priority}/tmp_created.txt download_${priority}/created.txt
-  elif test -n "${ex_pattern}"; then
-    grep -v -E "${ex_pattern}" download_${priority}/created.txt > download_${priority}/tmp_created.txt
-    mv -f download_${priority}/tmp_created.txt download_${priority}/created.txt
-  fi
-  set -e
-  if ! test -s download_${priority}/created.txt; then
+  if test ! -s download_${priority}/created.txt; then
     exit 0
   fi
   now=`date -u "+%Y%m%d%H%M%S"`
@@ -93,10 +81,8 @@ if test -s download_${priority}/created.txt; then
   while test ${created_num} -gt 0; do
     rm -rf download_${priority}/downloaded download_${priority}/aria2c.log download_${priority}/get_file_stdout.txt
     mkdir -p download_${priority}/downloaded
-    set +e
     aria2c --check-certificate=false -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l download_${priority}/aria2c.log -i download_${priority}/created.txt -d download_${priority}/downloaded >> download_${priority}/get_file_stdout.txt
-    set -e
-    ./met_pre_batch_to_cache.py RJTD download_${priority}/downloaded cache_o 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
+    ./met_pre_batch_to_cache.py RJTD download_${priority}/downloaded cache_p2 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
     grep -F '[ERROR]' download_${priority}/aria2c.log | grep 'URI=' | sed -e 's/^.*URI=//g' | grep -v '^ *$' | sort -u > download_${priority}/created.txt
     if test -s download_${priority}/created.txt; then
       created_num=`cat download_${priority}/created.txt | wc -l`
@@ -112,7 +98,6 @@ if test -s download_${priority}/created.txt; then
   fi
   rm -f download_${priority}/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_o iij12_o_${priority} ${i} iij1:japan.meteorological.agency.1.open.data.i ${priority} 4 || ./pub.sh --cron --rm_list_file cache_o iij12_o_${priority} ${i} iij2:japan.meteorological.agency.2.open.data.i ${priority} 4;done
 } &
 pid=$!
 echo ${pid} > download_${priority}/pid.txt

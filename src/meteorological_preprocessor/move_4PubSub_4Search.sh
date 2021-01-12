@@ -19,34 +19,32 @@
 #
 set -e
 move_4PubSub_4Search() {
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minutes_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote}:${bucket}/${pubsub_index_directory}/${priority}/ | head -n -1 | sed -e "s/^\([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)[0-9][0-9][0-9][0-9]\.txt$/\1 \0/g" | xargs -r -n 2 -I {} sh -c 'date_hour_directory=`echo {} | cut -d" " -f1`;index_file_to_move=`echo {} | cut -d" " -f2`;rclone move --contimeout ${timeout} --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote}:${bucket}/${pubsub_index_directory}/${priority}/${index_file_to_mov
-e} ${rclone_remote}:${bucket}/${search_index_directory}/${priority}/${date_hour_directory}/'
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minute_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={}; rclone moveto --contimeout '${timeout}' --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file:0:10}/${index_file:10}'
 }
 cron=0
 job_directory=4Search
-minutes_ago=15
+minute_ago=10
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
-    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote bucket priority"; exit 0;;
+    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
   esac
 done
-if test -z $5; then
+if test -z $4; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
   exit 199
 fi
 local_work_directory=$1
 unique_job_name=$2
-rclone_remote=$3
-bucket=$4
+rclone_remote_bucket=$3
 set +e
-priority=`echo $5 | grep "^p[1-9]$"`
+priority=`echo $4 | grep "^p[1-9]$"`
 set -e
 if test -z ${priority}; then
-  echo "ERROR: $5 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+  echo "ERROR: $4 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
