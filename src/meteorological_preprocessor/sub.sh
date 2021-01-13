@@ -19,9 +19,10 @@
 #
 set -e
 subscribe() {
-  exit_code=0
+  exit_code=-1
   job_count=1
   while test ${job_count} -le ${job_num}; do
+    job_exit_code=-1
     if test ${urgent} -eq 1 -a ${job_count} -ne 1; then
       now_unixtime=`date -u "+%s"`
       now_unixtime=`expr 0 + ${now_unixtime}`
@@ -215,23 +216,39 @@ subscribe() {
             if test ${switchable} -eq 1; then
               is_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
             fi
-            mv -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt.old
-            mv -f ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
             ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/index/* | grep -v -E "^${work_directory}/${source_rclone_remote_bucket_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
             if test ${switchable} -eq 1 -a ${is_switch} -eq 1; then
               source_rclone_remote_bucket_exit_code=255
-              echo "ERROR: Index file list has not been updated for 5 minutes." >&2
+              echo "WARNING: Index file list has not been updated for 5 minutes." >&2
               continue
             fi
           fi
         fi
       fi
-      if test ${source_rclone_remote_bucket_exit_code} -ne 0; then
-        exit_code=${source_rclone_remote_bucket_exit_code}
+      if test ${job_exit_code} -eq -1; then
+        job_exit_code=${source_rclone_remote_bucket_exit_code}
+      elif test ${job_exit_code} -eq 0; then
+        if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
+          job_exit_code=0
+        elif test ${source_rclone_remote_bucket_exit_code} -eq 255; then
+          job_exit_code=0
+        else
+          job_exit_code=${source_rclone_remote_bucket_exit_code}
+        fi
+      else
+        if test ${source_rclone_remote_bucket_exit_code} -ne 0 -a test ${source_rclone_remote_bucket_exit_code} -lt ${job_exit_code}; then
+          job_exit_code=${source_rclone_remote_bucket_exit_code}
+        fi
       fi
     done
+    if test ${job_exit_code} -ne 0; then
+      exit_code=${job_exit_code}
+    fi
     job_count=`expr 1 + ${job_count}`
   done
+  if test ${exit_code} -eq -1; then
+    return 0
+  fi
   return ${exit_code}
 }
 cron=0
