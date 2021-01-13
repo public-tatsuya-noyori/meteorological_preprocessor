@@ -220,6 +220,7 @@ subscribe() {
             is_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
             if test ${is_switch} -eq 1; then
               source_rclone_remote_bucket_exit_code=255
+              echo "ERROR: Index list has not been updated for 5 minutes." >&2
               continue
             fi
           fi
