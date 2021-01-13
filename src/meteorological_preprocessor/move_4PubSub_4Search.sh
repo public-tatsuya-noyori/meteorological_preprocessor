@@ -19,7 +19,7 @@
 #
 set -e
 move_4PubSub_4Search() {
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minute_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={}; rclone moveto --contimeout '${timeout}' --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file:0:10}/${index_file:10}'
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minute_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;rclone moveto --contimeout '${timeout}' --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file_date_hour}/${index_file_minute_second_extension}'
 }
 cron=0
 job_directory=4Search

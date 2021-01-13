@@ -22,8 +22,7 @@ delete_4Search() {
   hour_pattern=`date -u "+%Y%m%d%H"`
   hour_count=1
   while test ${hour_count} -le ${hour_ago}; do
-    hour_pattern="${hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`
-    hour_pattern="${hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`
+    hour_pattern="${hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`"|"`date -u "+%Y%m%d%H" -d -"${hour_count} hour ago"`
     hour_count=`expr 1 + ${hour_count}`
   done
   rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ | grep -v -E "^(${hour_pattern})/$" > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp
