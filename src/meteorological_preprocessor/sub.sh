@@ -212,15 +212,15 @@ subscribe() {
           fi
         else
           if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
+            if test ${switchable} -eq 1; then
+              is_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
+            fi
             mv -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt.old
             mv -f ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
             ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/index/* | grep -v -E "^${work_directory}/${source_rclone_remote_bucket_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-          fi
-          if test ${switchable} -eq 1; then
-            is_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
-            if test ${is_switch} -eq 1; then
+            if test ${switchable} -eq 1 -a ${is_switch} -eq 1; then
               source_rclone_remote_bucket_exit_code=255
-              echo "ERROR: Index list has not been updated for 5 minutes." >&2
+              echo "ERROR: Index file list has not been updated for 5 minutes." >&2
               continue
             fi
           fi
