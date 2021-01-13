@@ -18,20 +18,10 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
-update_job_exit_code() {
-  if test ${job_exit_code} -le 0; then
-    job_exit_code=${source_rclone_remote_bucket_exit_code}
-  else
-    if test ${source_rclone_remote_bucket_exit_code} -ne 0 -a test ${source_rclone_remote_bucket_exit_code} -lt ${job_exit_code}; then
-      job_exit_code=${source_rclone_remote_bucket_exit_code}
-    fi
-  fi
-}
 subscribe() {
-  exit_code=-1
+  exit_code=0
   job_count=1
   while test ${job_count} -le ${job_num}; do
-    job_exit_code=-1
     if test ${urgent} -eq 1 -a ${job_count} -ne 1; then
       now_unixtime=`date -u "+%s"`
       now_unixtime=`expr 0 + ${now_unixtime}`
@@ -57,15 +47,19 @@ subscribe() {
       fi
       cp /dev/null ${work_directory}/${source_rclone_remote_bucket_directory}/index/dummy.tmp
       if test ! -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt; then
-        set +e
-        rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
-        tmp_exit_code=$?
-        set -e
-        if test ${tmp_exit_code} -ne 0; then
-          source_rclone_remote_bucket_exit_code=${tmp_exit_code}
-          rm -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
-          update_job_exit_code
-          continue
+        if test ${sub} -eq 1; then
+          cp /dev/null ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
+        else
+          set +e
+          rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
+          tmp_exit_code=$?
+          set -e
+          if test ${tmp_exit_code} -ne 0; then
+            source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+            exit_code=${source_rclone_remote_bucket_exit_code}
+            rm -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
+            continue
+          fi
         fi
       fi
       set +e
@@ -74,7 +68,7 @@ subscribe() {
       set -e
       if test ${tmp_exit_code} -ne 0; then
         source_rclone_remote_bucket_exit_code=${tmp_exit_code}
-        update_job_exit_code
+        exit_code=${source_rclone_remote_bucket_exit_code}
         continue
       fi
       if test -s ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp; then
@@ -93,10 +87,10 @@ subscribe() {
             set -e
             if test ${tmp_exit_code} -ne 0; then
               source_rclone_remote_bucket_exit_code=${tmp_exit_code}
-              update_job_exit_code
+              exit_code=${source_rclone_remote_bucket_exit_code}
               continue
             fi
-            if test ${backup} -eq 1; then
+            if test ${sub} -eq 1; then
               grep -E "^(${date_hour_pattern})" ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp | sed -e 's|/$||g' > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp
             else
               sed -e 's|/$||g' ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp
@@ -111,13 +105,13 @@ subscribe() {
                 set -e
                 if test ${tmp_exit_code} -ne 0; then
                   source_rclone_remote_bucket_exit_code=${tmp_exit_code}
-                  update_job_exit_code
+                  exit_code=${source_rclone_remote_bucket_exit_code}
                   continue
                 fi
                 sed -e "s|^|${date_hour_directory}|g" ${work_directory}/${priority}_${search_index_directory}_minute_second_index.tmp >> ${work_directory}/${priority}_${search_index_directory}_index.tmp
                 cat ${work_directory}/${priority}_${search_index_directory}_index.tmp ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp | sort -u > ${work_directory}/${priority}_${pubsub_index_directory}_${search_index_directory}_new_index.tmp
-                is_former_index_file_first_line=`grep ${former_index_file_first_line} ${work_directory}/${priority}_${pubsub_index_directory}_${search_index_directory}_new_index.tmp | wc -l`
-                if test ${is_former_index_file_first_line} -eq 0; then
+                former_index_file_first_line_count=`grep ${former_index_file_first_line} ${work_directory}/${priority}_${pubsub_index_directory}_${search_index_directory}_new_index.tmp | wc -l`
+                if test ${former_index_file_first_line_count} -eq 0; then
                   diff ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt ${work_directory}/${priority}_${pubsub_index_directory}_${search_index_directory}_new_index.tmp | grep '>' | cut -c3- > ${work_directory}/${priority}_index_diff.tmp
                 else
                   sed -ne "/${former_index_file_first_line}/,\$p" ${work_directory}/${priority}_${pubsub_index_directory}_${search_index_directory}_new_index.tmp > ${work_directory}/${priority}_${pubsub_index_directory}_${search_index_directory}_filtered_new_index.tmp
@@ -132,7 +126,7 @@ subscribe() {
                 fi
               done
               grep -f ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${work_directory}/${priority}_index_diff.tmp | sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" > ${work_directory}/${priority}_newly_created_index.tmp
-              if test ${backup} -eq 1; then
+              if test ${sub} -eq 1; then
                 date_hour_ten_minute_pattern=`date -u "+%Y%m%d%H%M" | cut -c1-11`
                 ten_minute_ago=`expr 60 \* ${hour_ago}`
                 ten_minute_count=10
@@ -150,7 +144,7 @@ subscribe() {
           fi
           if test ${cmp_exit_code} -ne 0 -a ${cmp_exit_code} -ne 1; then
             source_rclone_remote_bucket_exit_code=${cmp_exit_code}
-            update_job_exit_code
+            exit_code=${source_rclone_remote_bucket_exit_code}
             continue
           fi
           if test -s ${work_directory}/${priority}_newly_created_index.tmp; then
@@ -161,7 +155,7 @@ subscribe() {
             set -e
             if test ${tmp_exit_code} -ne 0; then
               source_rclone_remote_bucket_exit_code=${tmp_exit_code}
-              update_job_exit_code
+              exit_code=${source_rclone_remote_bucket_exit_code}
               continue
             fi
             cp /dev/null ${work_directory}/${priority}_newly_created_file.tmp
@@ -188,7 +182,7 @@ subscribe() {
                 ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${priority}_newly_created_file.tmp
               fi
             fi
-            if test -s ${work_directory}/${priority}_newly_created_file.tmp -a ${backup} -eq 1; then
+            if test -s ${work_directory}/${priority}_newly_created_file.tmp -a ${filter} -eq 1; then
               ls -1 ${work_directory}/*/index/* | grep "^${work_directory}/[^/]*/index/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\.txt$" | xargs -r cat | sort -u > ${work_directory}/${priority}_file_filter.tmp
               set +e
               grep -v -f ${work_directory}/${priority}_file_filter.tmp ${work_directory}/${priority}_newly_created_file.tmp > ${work_directory}/${priority}_filtered_newly_created_file.tmp
@@ -207,6 +201,7 @@ subscribe() {
               set -e
               if test ${tmp_exit_code} -ne 0; then
                 source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+                exit_code=${source_rclone_remote_bucket_exit_code}
                 set +e
                 grep ERROR ${work_directory}/${priority}_log.tmp >&2
                 set -e
@@ -224,39 +219,45 @@ subscribe() {
           if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
             mv -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt.old
             mv -f ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
-            ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/index/* | grep -v -E "^${work_directory}/${source_rclone_remote_bucket_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-          fi
-        else
-          if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
-            is_switch=0
-            if test ${switchable} -eq 1; then
-              is_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
-            fi
-            ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/index/* | grep -v -E "^${work_directory}/${source_rclone_remote_bucket_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-            if test ${switchable} -eq 1 -a ${is_switch} -eq 1; then
-              source_rclone_remote_bucket_exit_code=255
-              echo "WARNING: Index file list has not been updated for 5 minutes." >&2
-              update_job_exit_code
-              continue
-            fi
           fi
         fi
       fi
-      update_job_exit_code
+      ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/index/* | grep -v -E "^${work_directory}/${source_rclone_remote_bucket_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
     done
-    if test ${job_exit_code} -ne 0; then
-      exit_code=${job_exit_code}
-    fi
     job_count=`expr 1 + ${job_count}`
   done
-  if test ${exit_code} -eq -1; then
-    return 0
+  if test ${exit_code} -eq 0 -a ${switchable} -eg 1; then
+    switch=1
+    for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
+      source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
+      tmp_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
+      set +e
+      switch=`expr ${tmp_switch} \* ${switch}`
+      set -e
+    done
+    if test ${switch} -eq 1; then
+      if test ${switchable} -eq 1; then
+        echo "ERROR: Index file list has not been updated for 5 minutes." >&2
+        return 255
+      elif test ${switchable} -eq 2; then
+        echo "WARNING: Index file list has not been updated for 5 minutes." >&2
+        return 0
+      fi
+    fi
   fi
   return ${exit_code}
 }
+filter=0
 cron=0
 cutoff=16M
+date_hour_pattern=`date -u "+%Y%m%d%H"`
+filter=0
 hour_ago=1
+hour_count=1
+while test ${hour_count} -le ${hour_ago}; do
+  date_hour_pattern="${date_hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`"|"`date -u "+%Y%m%d%H" -d -"${hour_count} hour ago"`
+  hour_count=`expr 1 + ${hour_count}`
+done
 job_directory=4Sub
 job_num=1
 job_period=60
@@ -264,25 +265,20 @@ job_start_unixtime=`date -u "+%s"`
 job_start_unixtime=`expr 0 + ${job_start_unixtime}`
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
+sub=0
 switchable=0
 switchable_minute=5
 timeout=8s
-backup=0
 urgent=0
 wildcard_index=0
-date_hour_pattern=`date -u "+%Y%m%d%H"`
-hour_count=1
-while test ${hour_count} -le ${hour_ago}; do
-  date_hour_pattern="${date_hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`"|"`date -u "+%Y%m%d%H" -d -"${hour_count} hour ago"`
-  hour_count=`expr 1 + ${hour_count}`
-done
 for arg in "$@"; do
   case "${arg}" in
-    "--backup" ) backup=1;shift;;
     "--cron" ) cron=1;shift;;
-    '--help' ) echo "$0 [--backup] [--cron] [--wildcard_index] [--switchable] [--urgent] local_work_directory unique_job_name 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--cron] [--wildcard_index] [--switchable_main/--switchable_sub/--switchable_sub_end] [--urgent] local_work_directory unique_job_name 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--wildcard_index" ) wildcard_index=1;shift;;
-    "--switchable" ) switchable=1;shift;;
+    "--switchable_main" ) filter=1;switchable=1;shift;;
+    "--switchable_sub" ) filter=1;sub=1;switchable=1;shift;;
+    "--switchable_sub_end" ) filter=1;sub=1;switchable=2;shift;;
     "--urgent" ) urgent=1;shift;;
   esac
 done
