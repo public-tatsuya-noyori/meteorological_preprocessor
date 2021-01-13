@@ -238,7 +238,7 @@ subscribe() {
     done
     job_count=`expr 1 + ${job_count}`
   done
-  if test ${exit_code} -eq 0 -a ${switchable} -eg 1; then
+  if test ${exit_code} -eq 0 -a ${switchable} -gt 0; then
     switch=1
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
       source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`

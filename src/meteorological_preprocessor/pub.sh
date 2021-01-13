@@ -40,6 +40,7 @@ publish(){
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
+        echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
         cat ${work_directory}/${priority}_log.tmp >&2
         exit ${exit_code}
       fi
