@@ -18,6 +18,15 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+update_job_exit_code() {
+  if test ${job_exit_code} -le 0; then
+    job_exit_code=${source_rclone_remote_bucket_exit_code}
+  else
+    if test ${source_rclone_remote_bucket_exit_code} -ne 0 -a test ${source_rclone_remote_bucket_exit_code} -lt ${job_exit_code}; then
+      job_exit_code=${source_rclone_remote_bucket_exit_code}
+    fi
+  fi
+}
 subscribe() {
   exit_code=-1
   job_count=1
@@ -55,6 +64,7 @@ subscribe() {
         if test ${tmp_exit_code} -ne 0; then
           source_rclone_remote_bucket_exit_code=${tmp_exit_code}
           rm -f ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt
+          update_job_exit_code
           continue
         fi
       fi
@@ -64,6 +74,7 @@ subscribe() {
       set -e
       if test ${tmp_exit_code} -ne 0; then
         source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+        update_job_exit_code
         continue
       fi
       if test -s ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp; then
@@ -82,6 +93,7 @@ subscribe() {
             set -e
             if test ${tmp_exit_code} -ne 0; then
               source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+              update_job_exit_code
               continue
             fi
             if test ${backup} -eq 1; then
@@ -99,6 +111,7 @@ subscribe() {
                 set -e
                 if test ${tmp_exit_code} -ne 0; then
                   source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+                  update_job_exit_code
                   continue
                 fi
                 sed -e "s|^|${date_hour_directory}|g" ${work_directory}/${priority}_${search_index_directory}_minute_second_index.tmp >> ${work_directory}/${priority}_${search_index_directory}_index.tmp
@@ -137,6 +150,7 @@ subscribe() {
           fi
           if test ${cmp_exit_code} -ne 0 -a ${cmp_exit_code} -ne 1; then
             source_rclone_remote_bucket_exit_code=${cmp_exit_code}
+            update_job_exit_code
             continue
           fi
           if test -s ${work_directory}/${priority}_newly_created_index.tmp; then
@@ -147,6 +161,7 @@ subscribe() {
             set -e
             if test ${tmp_exit_code} -ne 0; then
               source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+              update_job_exit_code
               continue
             fi
             cp /dev/null ${work_directory}/${priority}_newly_created_file.tmp
@@ -213,6 +228,7 @@ subscribe() {
           fi
         else
           if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
+            is_switch=0
             if test ${switchable} -eq 1; then
               is_switch=`find ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
             fi
@@ -220,26 +236,13 @@ subscribe() {
             if test ${switchable} -eq 1 -a ${is_switch} -eq 1; then
               source_rclone_remote_bucket_exit_code=255
               echo "WARNING: Index file list has not been updated for 5 minutes." >&2
+              update_job_exit_code
               continue
             fi
           fi
         fi
       fi
-      if test ${job_exit_code} -eq -1; then
-        job_exit_code=${source_rclone_remote_bucket_exit_code}
-      elif test ${job_exit_code} -eq 0; then
-        if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
-          job_exit_code=0
-        elif test ${source_rclone_remote_bucket_exit_code} -eq 255; then
-          job_exit_code=0
-        else
-          job_exit_code=${source_rclone_remote_bucket_exit_code}
-        fi
-      else
-        if test ${source_rclone_remote_bucket_exit_code} -ne 0 -a test ${source_rclone_remote_bucket_exit_code} -lt ${job_exit_code}; then
-          job_exit_code=${source_rclone_remote_bucket_exit_code}
-        fi
-      fi
+      update_job_exit_code
     done
     if test ${job_exit_code} -ne 0; then
       exit_code=${job_exit_code}
