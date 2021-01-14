@@ -23,11 +23,11 @@ move_4PubSub_4Search() {
   for index_file in `echo "${index_file_list}" | head -n -1`; do
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
-    rclone copyto --contimeout '${timeout}' --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
+    rclone copyto --contimeout ${timeout} --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
   done
   sleep ${sleep_seconds}
   for index_file in `echo "${index_file_list}" | head -n -1`; do
-    rclone delete --contimeout '${timeout}' --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file}
+    rclone delete --contimeout ${timeout} --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file}
   done
 }
 cron=0
