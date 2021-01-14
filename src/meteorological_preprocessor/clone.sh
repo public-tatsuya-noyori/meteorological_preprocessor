@@ -175,9 +175,9 @@ clone() {
             continue
           fi
           if test -s ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_index.tmp; then
-            rm -rf ${work_directory}/${pubsub_index_directory}/${priority} ${work_directory}/${search_index_directory}/${priority}
+            rm -rf ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority} ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}
             set +e
-            rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_index.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${work_directory}
+            rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_index.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${work_directory}/${source_rclone_remote_bucket_directory}
             tmp_exit_code=$?
             set -e
             if test ${tmp_exit_code} -ne 0; then
@@ -189,24 +189,24 @@ clone() {
             if test -n "${inclusive_pattern_file}"; then
               set +e
               if test -n "${exclusive_pattern_file}"; then
-                if test -d ${work_directory}/${search_index_directory}/${priority}; then
-                  ls -1 ${work_directory}/${search_index_directory}/${priority}/*/* ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
+                if test -d ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}; then
+                  ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}/*/* ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
                 else
-                  ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
+                  ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
                 fi
               else
-                if test -d ${work_directory}/${search_index_directory}/${priority}; then
-                  ls -1 ${work_directory}/${search_index_directory}/${priority}/*/* ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
+                if test -d ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}; then
+                  ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}/*/* ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
                 else
-                  ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
+                  ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat | grep -E -f ${inclusive_pattern_file} > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
                 fi
               fi
               set -e
             else
-              if test -d ${work_directory}/${search_index_directory}/${priority}; then
-                ls -1 ${work_directory}/${search_index_directory}/${priority}/*/* ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
+              if test -d ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}; then
+                ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}/*/* ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
               else
-                ls -1 ${work_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
+                ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* | xargs -r cat > ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_newly_created_file.tmp
               fi
             fi
             cp /dev/null ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_file.tmp
@@ -249,10 +249,10 @@ clone() {
               done
             fi
             if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
-              if test -d ${work_directory}/${search_index_directory}/${priority}; then
-                ls -1 ${work_directory}/${search_index_directory}/${priority}/*/* | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_name=`echo ${index_file} | sed -e "s|'${work_directory}/${search_index_directory}/${priority}/'||g" -e "s|/||g"`;mv -f ${index_file} '${work_directory}/${source_rclone_remote_bucket_directory}'/index/${index_file_name}'
+              if test -d ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}; then
+                ls -1 ${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}/*/* | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_name=`echo ${index_file} | sed -e "s|'${work_directory}/${source_rclone_remote_bucket_directory}/${search_index_directory}/${priority}/'||g" -e "s|/||g"`;mv -f ${index_file} '${work_directory}/${source_rclone_remote_bucket_directory}'/index/${index_file_name}'
               fi
-              mv -f ${work_directory}/${pubsub_index_directory}/${priority}/* ${work_directory}/${source_rclone_remote_bucket_directory}/index/
+              mv -f ${work_directory}/${source_rclone_remote_bucket_directory}/${pubsub_index_directory}/${priority}/* ${work_directory}/${source_rclone_remote_bucket_directory}/index/
             fi
           fi
           if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
