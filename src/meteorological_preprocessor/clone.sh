@@ -51,7 +51,7 @@ clone() {
         break
       fi
     done
-    if test ${destination_rclone_remote_bucket_exit_code} -ne 0;
+    if test ${destination_rclone_remote_bucket_exit_code} -ne 0; then
       exit_code=${destination_rclone_remote_bucket_exit_code}
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_list}." >&2
       break
