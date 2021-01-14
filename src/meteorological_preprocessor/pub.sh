@@ -32,7 +32,7 @@ publish(){
     fi
     exit_code=1
     retry_count=1
-    rm -f ${work_directory}/${priority}_log.tmp
+    cp /dev/null ${work_directory}/${priority}_log.tmp
     while test ${exit_code} -ne 0; do
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
@@ -40,14 +40,12 @@ publish(){
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
-        echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
         cat ${work_directory}/${priority}_log.tmp >&2
+        echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
         exit ${exit_code}
       fi
       retry_count=`expr 1 + ${retry_count}`
     done
-    rm -f ${work_directory}/${priority}_log.tmp
-    rm -f ${work_directory}/${priority}_newly_created_index.tmp
   else
     echo "ERROR: can not match ^${local_work_directory}/ on ${list_file}." >&2
     exit 199

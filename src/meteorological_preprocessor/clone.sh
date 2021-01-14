@@ -229,9 +229,24 @@ clone() {
                 source_rclone_remote_bucket_exit_code=${tmp_exit_code}
                 exit_code=${source_rclone_remote_bucket_exit_code}
                 echo "ERROR: can not get index file from ${source_rclone_remote_bucket}." >&2
-              elif test -s ${work_directory}/${priority}_log.tmp; then
-                sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_work_directory}/\1|g" ${work_directory}/${priority}_log.tmp
               fi
+              tmp_exit_code=1
+              retry_count=1
+              cp /dev/null ${work_directory}/${priority}_log.tmp
+              while test ${tmp_exit_code} -ne 0; do
+                now=`date -u "+%Y%m%d%H%M%S"`
+                set +e
+                rclone copyto --contimeout ${timeout} --ignore-checksum --immutable --log-file ${work_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${work_directory}/${priority}_filtered_newly_created_index.tmp ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+                tmp_exit_code=$?
+                set -e
+                if test ${tmp_exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
+                  source_rclone_remote_bucket_exit_code=${tmp_exit_code}
+                  exit_code=${source_rclone_remote_bucket_exit_code}
+                  cat ${work_directory}/${priority}_log.tmp >&2
+                  echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
+                fi
+                retry_count=`expr 1 + ${retry_count}`
+              done
             fi
             if test ${source_rclone_remote_bucket_exit_code} -eq 0; then
               if test -d ${work_directory}/${search_index_directory}/${priority}; then
