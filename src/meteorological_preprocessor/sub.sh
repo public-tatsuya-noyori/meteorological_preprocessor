@@ -144,9 +144,9 @@ subscribe() {
                   date_hour_ten_minute_pattern="${date_hour_ten_minute_pattern}|"`date -u "+%Y%m%d%H%M" -d "${ten_minute_count} minute ago" | cut -c1-11`"|"`date -u "+%Y%m%d%H%M" -d -"${ten_minute_count} minute ago" | cut -c1-11`
                   ten_minute_count=`expr 10 + ${ten_minute_count}`
                 done
-                grep -f ${work_directory}/${priority}_${search_index_directory}_index.tmp ${work_directory}/${priority}_index_diff.tmp | grep -E "^(${date_hour_ten_minute_pattern})" | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' >> ${work_directory}/${priority}_newly_created_index.tmp
+                grep -v -f ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${work_directory}/${priority}_index_diff.tmp | grep -f ${work_directory}/${priority}_${search_index_directory}_index.tmp | grep -E "^(${date_hour_ten_minute_pattern})" | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' >> ${work_directory}/${priority}_newly_created_index.tmp
               else
-                grep -f ${work_directory}/${priority}_${search_index_directory}_index.tmp ${work_directory}/${priority}_index_diff.tmp | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' >> ${work_directory}/${priority}_newly_created_index.tmp
+                grep -v -f ${work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${work_directory}/${priority}_index_diff.tmp | grep -f ${work_directory}/${priority}_${search_index_directory}_index.tmp | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' >> ${work_directory}/${priority}_newly_created_index.tmp
               fi
             fi
           elif test ${cmp_exit_code} -eq 1; then
@@ -212,11 +212,10 @@ subscribe() {
               if test ${tmp_exit_code} -ne 0; then
                 source_rclone_remote_bucket_exit_code=${tmp_exit_code}
                 exit_code=${source_rclone_remote_bucket_exit_code}
-                echo "ERROR: can not get index file from ${source_rclone_remote_bucket}." >&2
                 set +e
                 grep ERROR ${work_directory}/${priority}_log.tmp >&2
                 set -e
-
+                echo "ERROR: can not get index file from ${source_rclone_remote_bucket}." >&2
               elif test -s ${work_directory}/${priority}_log.tmp; then
                 sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_work_directory}/\1|g" ${work_directory}/${priority}_log.tmp
               fi
