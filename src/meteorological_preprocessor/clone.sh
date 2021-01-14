@@ -44,7 +44,7 @@ clone() {
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_list} | tr ';' '\n'`; do
       destination_rclone_remote_bucket_directory=`echo ${destination_rclone_remote_bucket} | tr ':' '_'`
       set +e
-      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${dest_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
+      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
       destination_rclone_remote_bucket_exit_code=$?
       set -e
       if test ${destination_rclone_remote_bucket_exit_code} -eq 0; then
@@ -219,9 +219,9 @@ clone() {
             if test -s ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_file.tmp; then
               set +e
               if test ${wildcard_index} -eq 1; then
-                rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_index.tmp --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --quiet --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+                rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --ignore-checksum --include-from ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_file.tmp --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --quiet --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
               else
-                rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_index.tmp --ignore-checksum --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --quiet --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+                rclone copy --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_file.tmp --ignore-checksum --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --quiet --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
               fi
               tmp_exit_code=$?
               set -e
@@ -236,7 +236,7 @@ clone() {
               while test ${tmp_exit_code} -ne 0; do
                 now=`date -u "+%Y%m%d%H%M%S"`
                 set +e
-                rclone copyto --contimeout ${timeout} --ignore-checksum --immutable --log-file ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_index.tmp ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+                rclone copyto --contimeout ${timeout} --ignore-checksum --immutable --log-file ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${work_directory}/${source_rclone_remote_bucket_directory}/${priority}_filtered_newly_created_file.tmp ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
                 tmp_exit_code=$?
                 set -e
                 if test ${tmp_exit_code} -ne 0 -a ${retry_count} -ge ${retry_num}; then
@@ -295,12 +295,13 @@ while test ${hour_count} -le ${hour_ago}; do
   date_hour_pattern="${date_hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`"|"`date -u "+%Y%m%d%H" -d -"${hour_count} hour ago"`
   hour_count=`expr 1 + ${hour_count}`
 done
-job_directory=4Sub
+job_directory=4Clone
 job_num=1
 job_period=60
 job_start_unixtime=`date -u "+%s"`
 job_start_unixtime=`expr 0 + ${job_start_unixtime}`
 pubsub_index_directory=4PubSub
+retry_num=8
 search_index_directory=4Search
 sub=0
 switchable=0
