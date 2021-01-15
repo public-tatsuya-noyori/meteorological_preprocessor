@@ -140,12 +140,12 @@ subscribe() {
                   break
                 fi
                 sed -e "s|^|${date_hour_directory}|g" ${source_work_directory}/${priority}_${search_index_directory}_minute_second_index.tmp > ${source_work_directory}/${priority}_${search_index_directory}_index.tmp
-                former_index_file_first_line_count=`grep ${source_work_directory}/${priority}_${search_index_directory}_index.tmp | wc -l`
+                former_index_file_first_line_count=`grep ${former_index_file_first_line} ${source_work_directory}/${priority}_${search_index_directory}_index.tmp | wc -l`
                 if test ${former_index_file_first_line_count} -eq 0; then
                   grep -v -f ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp ${source_work_directory}/${priority}_${search_index_directory}_index.tmp >> ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp
-                  continue
                 else
                   sed -ne "/${former_index_file_first_line}/,\$p" ${source_work_directory}/${priority}_${search_index_directory}_index.tmp | grep -v -f ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp
+                  break
                 fi
               done
               if test ${source_rclone_remote_bucket_exit_code} -ne 0; then
@@ -159,9 +159,9 @@ subscribe() {
                   date_hour_ten_minute_pattern="${date_hour_ten_minute_pattern}|"`date -u "+%Y%m%d%H%M" -d "${ten_minute_count} minute ago" | cut -c1-11`"|"`date -u "+%Y%m%d%H%M" -d -"${ten_minute_count} minute ago" | cut -c1-11`
                   ten_minute_count=`expr 10 + ${ten_minute_count}`
                 done
-                grep -E "^(${date_hour_ten_minute_pattern})" ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' >> ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp
+                grep -E "^(${date_hour_ten_minute_pattern})" ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp
               else
-                cat ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' >> ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp
+                cat ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp
               fi
               set +e
               rclone copy --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp --ignore-checksum --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${work_directory}/${source_rclone_remote_bucket_directory}
