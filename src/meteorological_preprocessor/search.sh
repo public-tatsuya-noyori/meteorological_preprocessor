@@ -18,6 +18,8 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+pubsub_index_directory=4PubSub
+search_index_directory=4Search
 for arg in "$@"; do
   case "${arg}" in
     "--debug" ) set -evx;shift;;
@@ -61,26 +63,45 @@ if test -n "$5"; then
 fi
 if test ${end_yyyymmddhh} -eq 0; then
   if test ${start_yyyymmddhh} -eq 0; then
-    for index_directory in `rclone lsf ${rclone_remote_bucket}/4Search/${priority}`; do
+    for index_directory in `rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+    done
+    for index_file in `rclone lsf ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
+      yyyymmddhh=`echo ${index_file} | cut -c1-10`
+      yyyymmddhh=`expr 0 + ${yyyymmddhh}`
+      rclone cat ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep ${keyword}
     done
   else
-    for index_directory in `rclone lsf ${rclone_remote_bucket}/4Search/${priority}`; do
+    for index_directory in `rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
       if test ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-        rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+        rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      fi
+    done
+    for index_file in `rclone lsf ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
+      yyyymmddhh=`echo ${index_file} | cut -c1-10`
+      yyyymmddhh=`expr 0 + ${yyyymmddhh}`
+      if test ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
+        rclone cat ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep ${keyword}
       fi
     done
   fi
 else
-  for index_directory in `rclone lsf ${rclone_remote_bucket}/4Search/${priority}`; do
+  for index_directory in `rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
     yyyymmddhh=`echo ${index_directory} | cut -c1-10`
     yyyymmddhh=`expr 0 + ${yyyymmddhh}`
     if test ${yyyymmddhh} -le ${end_yyyymmddhh} -a ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-      rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+    fi
+  done
+  for index_file in `rclone lsf ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
+    yyyymmddhh=`echo ${index_file} | cut -c1-10`
+    yyyymmddhh=`expr 0 + ${yyyymmddhh}`
+    if test ${yyyymmddhh} -le ${end_yyyymmddhh} -a ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
+      rclone cat ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep ${keyword}
     fi
   done
 fi
