@@ -128,7 +128,7 @@
 #55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
 # subscribe
-*/30 * * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr.log; if test -s sub_bufr/${now}.tmp; then mv -f sub_bufr/${now}.tmp sub_bufr/${now}.txt; else rm -f sub_bufr/${now}.tmp; fi
+0 */2 * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr.log; if test -s sub_bufr/${now}.tmp; then mv -f sub_bufr/${now}.tmp sub_bufr/${now}.txt; else rm -f sub_bufr/${now}.tmp; fi
 
 # convert bufr synop to arrow
 #* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
