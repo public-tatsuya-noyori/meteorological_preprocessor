@@ -19,16 +19,7 @@
 #
 set -e
 move_4PubSub_4Search() {
-  index_file_list=`rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minute_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/`
-  for index_file in `echo "${index_file_list}" | head -n -1`; do
-    index_file_date_hour=`echo ${index_file} | cut -c1-10`
-    index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
-    rclone copyto --contimeout ${timeout} --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
-  done
-  sleep ${sleep_seconds}
-  for index_file in `echo "${index_file_list}" | head -n -1`; do
-    rclone delete --contimeout ${timeout} --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file}
-  done
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --min-age ${minute_ago}m --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;rclone moveto --contimeout '${timeout}' --ignore-checksum --low-level-retries 3 --no-traverse --quiet --retries 1 --size-only --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file_date_hour}/${index_file_minute_second_extension}'
 }
 cron=0
 job_directory=4Search
@@ -40,6 +31,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
+    "--debug" ) set -evx;shift;;
     "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
   esac
 done

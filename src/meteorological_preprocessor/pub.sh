@@ -62,6 +62,7 @@ wildcard_index=0
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
+    "--debug" ) set -evx;shift;;
     "--help" ) echo "$0 [--cron] [--wildcard_index] [--rm_list_file] local_work_directory unique_job_name list_file destination_rclone_remote_bucket priority parallel"; exit 0;;
     "--wildcard_index" ) wildcard_index=1;shift;;
     "--rm_list_file" ) rm_list_file=1;shift;;

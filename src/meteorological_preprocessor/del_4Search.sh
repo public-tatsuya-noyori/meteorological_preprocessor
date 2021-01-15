@@ -49,6 +49,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
+    "--debug" ) set -evx;shift;;
     "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
   esac
 done

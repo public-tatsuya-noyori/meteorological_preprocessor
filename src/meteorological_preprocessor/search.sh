@@ -20,6 +20,7 @@
 set -e
 for arg in "$@"; do
   case "${arg}" in
+    "--debug" ) set -evx;shift;;
     "--help" ) echo "$0 rclone_remote_bucket priority keyword [end_published_yyyymmddhh] [start_published_yyyymmddhh]"; exit 0;;
   esac
 done
@@ -63,14 +64,14 @@ if test ${start_yyyymmddhh} -eq 0; then
     for index_directory in `rclone lsf ${rclone_remote_bucket}/4Search/${priority} | tac`; do
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | tac | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | tac | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword} | tac
     done
   else
     for index_directory in `rclone lsf ${rclone_remote_bucket}/4Search/${priority} | tac`; do
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
       if test ${yyyymmddhh} -le ${end_yyyymmddhh}; then
-        rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | tac | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+        rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | tac | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword} | tac
       fi
     done
   fi
@@ -79,7 +80,7 @@ else
     yyyymmddhh=`echo ${index_directory} | cut -c1-10`
     yyyymmddhh=`expr 0 + ${yyyymmddhh}`
     if test ${yyyymmddhh} -le ${end_yyyymmddhh} -a ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-      rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | tac | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      rclone lsf ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh} | tac | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/4Search/${priority}/${yyyymmddhh}/{} | grep ${keyword} | tac
     fi
   done
 fi
