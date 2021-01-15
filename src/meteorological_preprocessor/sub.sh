@@ -235,6 +235,7 @@ subscribe() {
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
       source_rclone_remote_bucket_exit_code=0
       source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
+      source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
       if test -s ${source_work_directory}/${priority}_ok.tmp; then
         mv -f ${source_work_directory}/${priority}_index.txt ${source_work_directory}/${priority}_index.txt.old
         mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_index.txt
@@ -245,7 +246,7 @@ subscribe() {
           mv -f ${source_work_directory}/${pubsub_index_directory}/${priority}/* ${source_work_directory}/index/
         fi
       fi
-      ls -1 ${source_work_directory}/index/* | grep -v -E "^${source_work_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+      ls -1 ${source_work_directory}/index/* | grep -v "^${source_work_directory}/index/dummy\.tmp$" | grep -v -E "^${source_work_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
     done
     job_count=`expr 1 + ${job_count}`
   done
@@ -253,6 +254,7 @@ subscribe() {
     switch=1
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
       source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
+      source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
       tmp_switch=`find ${source_work_directory}/${priority}_index.txt -type f -mmin +${switchable_minute} | wc -l`
       set +e
       switch=`expr ${tmp_switch} \* ${switch}`
