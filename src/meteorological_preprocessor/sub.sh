@@ -229,6 +229,12 @@ subscribe() {
             cat ${source_work_directory}/${priority}_filtered_newly_created_file.tmp >> ${work_directory}/${priority}_merged_filtered_newly_created_file.tmp
             echo 1 > ${source_work_directory}/${priority}_ok.tmp
           fi
+          if test -d ${source_work_directory}/${search_index_directory}/${priority}; then
+            ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_name=`echo ${index_file} | sed -e "s|'${source_work_directory}/${search_index_directory}/${priority}/'||g" -e "s|/||g"`;mv -f ${index_file} '${work_directory}/${source_rclone_remote_bucket_directory}'/index/${index_file_name}'
+          fi
+          if test -d ${source_work_directory}/${pubsub_index_directory}/${priority}; then
+            mv -f ${source_work_directory}/${pubsub_index_directory}/${priority}/* ${source_work_directory}/index/
+          fi
         fi
       fi
     done
@@ -239,12 +245,6 @@ subscribe() {
       if test -s ${source_work_directory}/${priority}_ok.tmp; then
         mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt.old
         mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
-        if test -d ${source_work_directory}/${search_index_directory}/${priority}; then
-          ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_name=`echo ${index_file} | sed -e "s|'${source_work_directory}/${search_index_directory}/${priority}/'||g" -e "s|/||g"`;mv -f ${index_file} '${work_directory}/${source_rclone_remote_bucket_directory}'/index/${index_file_name}'
-        fi
-        if test -d ${source_work_directory}/${pubsub_index_directory}/${priority}; then
-          mv -f ${source_work_directory}/${pubsub_index_directory}/${priority}/* ${source_work_directory}/index/
-        fi
       fi
       ls -1 ${source_work_directory}/index/* | grep -v "^${source_work_directory}/index/dummy\.tmp$" | grep -v -E "^${source_work_directory}/index/(${date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
     done
