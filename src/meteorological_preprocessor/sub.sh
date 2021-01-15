@@ -39,7 +39,6 @@ subscribe() {
         sleep ${sleep_time}
       fi
     fi
-    cp /dev/null ${work_directory}/${priority}_merged_filtered_newly_created_file.tmp
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
       source_rclone_remote_bucket_exit_code=0
       source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
@@ -142,9 +141,13 @@ subscribe() {
                 sed -e "s|^|${date_hour_directory}|g" ${source_work_directory}/${priority}_${search_index_directory}_minute_second_index.tmp > ${source_work_directory}/${priority}_${search_index_directory}_index.tmp
                 former_index_file_first_line_count=`grep ${former_index_file_first_line} ${source_work_directory}/${priority}_${search_index_directory}_index.tmp | wc -l`
                 if test ${former_index_file_first_line_count} -eq 0; then
+                  set +e
                   grep -v -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt ${source_work_directory}/${priority}_${search_index_directory}_index.tmp | grep -v -f ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp
+                  set -e
                 else
+                  set +e
                   sed -ne "/${former_index_file_first_line}/,\$p" ${source_work_directory}/${priority}_${search_index_directory}_index.tmp | grep -v -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt | grep -v -f ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp
+                  set -e
                   break
                 fi
               done
@@ -226,7 +229,6 @@ subscribe() {
               continue
             fi
             sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|${local_work_directory}/\1|g" ${source_work_directory}/${priority}_log.tmp
-            cat ${source_work_directory}/${priority}_filtered_newly_created_file.tmp >> ${work_directory}/${priority}_merged_filtered_newly_created_file.tmp
             echo 1 > ${source_work_directory}/${priority}_ok.tmp
           fi
           if test -d ${source_work_directory}/${search_index_directory}/${priority}; then
