@@ -36,15 +36,19 @@ for arg in "$@"; do
   esac
 done
 if test -z $4; then
-  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
+  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
 local_work_directory=$1
 unique_job_name=$2
-rclone_remote_bucket=$3
 set +e
+rclone_remote_bucket=`echo $3 | grep ':'`
 priority=`echo $4 | grep "^p[1-9]$"`
 set -e
+if test -z "${rclone_remote_bucket}"; then
+  echo "ERROR: $3 is not rclone_remote:bucket." >&2
+  exit 199
+fi
 if test -z ${priority}; then
   echo "ERROR: $4 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199

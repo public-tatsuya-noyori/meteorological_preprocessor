@@ -27,20 +27,24 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
-    "--debug" ) set -evx;shift;;
-    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket days_ago"; exit 0;;
+    "--debug_shell" ) set -evx;shift;;
+    "--help" ) echo "$0 [--cron] [--debug_shell] local_work_directory unique_job_name rclone_remote_bucket days_ago"; exit 0;;
   esac
 done
 if test -z $4; then
-  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
+  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
 local_work_directory=$1
 unique_job_name=$2
-rclone_remote_bucket=$3
 set +e
+rclone_remote_bucket=`echo $3 | grep ':'`
 days_ago=`echo $4 | grep "^[0-9]\+$"`
 set -e
+if test -z "${rclone_remote_bucket}"; then
+  echo "ERROR: $3 is not rclone_remote:bucket." >&2
+  exit 199
+fi
 if test -z ${days_ago}; then
   echo "ERROR: $4 is not integer." >&2
   exit 199

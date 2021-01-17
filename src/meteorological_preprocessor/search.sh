@@ -20,88 +20,99 @@
 set -e
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
+timeout=8s
 for arg in "$@"; do
   case "${arg}" in
-    "--debug" ) set -evx;shift;;
-    "--help" ) echo "$0 rclone_remote_bucket priority keyword [start_published_yyyymmddhh] [end_published_yyyymmddhh]"; exit 0;;
+    "--debug_shell" ) set -evx;shift;;
+    "--help" ) echo "$0 [--debug_shell] rclone_remote_bucket priority keyword_pattern [start_yyyymmddhhmm] [end_yyyymmddhhmm]"; exit 0;;
   esac
 done
 if test -z $3; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-rclone_remote_bucket=$1
+set +e
+rclone_remote_bucket=`echo $1 | grep ':'`
 priority=`echo $2 | grep "^p[1-9]$"`
+set -e
+if test -z "${rclone_remote_bucket}"; then
+  echo "ERROR: $1 is not rclone_remote:bucket." >&2
+  exit 199
+fi
 if test -z ${priority}; then
   echo "ERROR: $2 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-keyword=$3
-start_yyyymmddhh=0
+keyword_pattern=$3
+start_yyyymmddhhmm=0
 if test -n "$4"; then
-  start_yyyymmddhh=`echo $4 | grep "^[0-9]\+$"`
-  if test -z ${start_yyyymmddhh}; then
-    echo "ERROR: $4 is not integer." >&2
-    exit 199
-  elif test $4 -le 0; then
-    echo "ERROR: $4 is not more than 1." >&2
+  start_yyyymmddhhmm=`echo $4 | grep "^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$"`
+  if test -z ${start_yyyymmddhhmm}; then
+    echo "ERROR: $4 is not yyyymmddhh." >&2
     exit 199
   fi
-  start_yyyymmddhh=`expr 0 + $4`
+  start_yyyymmddhhmm=`expr 0 + $4`
 fi
-end_yyyymmddhh=0
+end_yyyymmddhhmm=0
 if test -n "$5"; then
-  end_yyyymmddhh=`echo $5 | grep "^[0-9]\+$"`
-  if test -z ${end_yyyymmddhh}; then
-    echo "ERROR: $5 is not integer." >&2
-    exit 199
-  elif test $5 -le 0; then
-    echo "ERROR: $5 is not more than 1." >&2
+  end_yyyymmddhhmm=`echo $5 | grep "^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$"`
+  if test -z ${end_yyyymmddhhmm}; then
+    echo "ERROR: $5 is not yyyymmddhh." >&2
     exit 199
   fi
-  end_yyyymmddhh=`expr 0 + $5`
+  end_yyyymmddhhmm=`expr 0 + $5`
 fi
-if test ${end_yyyymmddhh} -eq 0; then
-  if test ${start_yyyymmddhh} -eq 0; then
-    for index_directory in `rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
+if test ${end_yyyymmddhhmm} -eq 0; then
+  if test ${start_yyyymmddhhmm} -eq 0; then
+    for index_directory in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep -E ${keyword_pattern}
     done
-    for index_file in `rclone lsf ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
-      yyyymmddhh=`echo ${index_file} | cut -c1-10`
-      yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      rclone cat ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep ${keyword}
+    for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
+      rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern}
     done
   else
-    for index_directory in `rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
+    for index_directory in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
-      yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      if test ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-        rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+      yyyymmddhh00=`expr 100 \* ${yyyymmddhh}`
+      if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm}; then
+        for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}`; do
+          mm=`echo ${index_file} | cut -c1-2`
+          yymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
+          if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
+            rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern}
+          fi
+        done
       fi
     done
-    for index_file in `rclone lsf ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
-      yyyymmddhh=`echo ${index_file} | cut -c1-10`
-      yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      if test ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-        rclone cat ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep ${keyword}
+    for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
+      yyyymmddhhmm=`echo ${index_file} | cut -c1-12`
+      yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
+      if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
+        rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern}
       fi
     done
   fi
 else
-  for index_directory in `rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
+  for index_directory in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
     yyyymmddhh=`echo ${index_directory} | cut -c1-10`
-    yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-    if test ${yyyymmddhh} -le ${end_yyyymmddhh} -a ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-      rclone lsf ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep ${keyword}
+    yyyymmddhh00=`expr 100 \* ${yyyymmddhh}`
+    if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhh00} -le ${end_yyyymmddhhmm}; then
+      for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}`; do
+        mm=`echo ${index_file} | cut -c1-2`
+        yymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
+        if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
+          rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern}
+        fi
+      done
     fi
   done
-  for index_file in `rclone lsf ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
-    yyyymmddhh=`echo ${index_file} | cut -c1-10`
-    yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-    if test ${yyyymmddhh} -le ${end_yyyymmddhh} -a ${yyyymmddhh} -ge ${start_yyyymmddhh}; then
-      rclone cat ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep ${keyword}
+  for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
+    yyyymmddhhmm=`echo ${index_file} | cut -c1-12`
+    yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
+    if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
+      rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern}
     fi
   done
 fi

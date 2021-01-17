@@ -19,13 +19,7 @@
 #
 set -e
 delete_4Search() {
-  hour_pattern=`date -u "+%Y%m%d%H"`
-  hour_count=1
-  while test ${hour_count} -le ${hour_ago}; do
-    hour_pattern="${hour_pattern}|"`date -u "+%Y%m%d%H" -d "${hour_count} hour ago"`"|"`date -u "+%Y%m%d%H" -d -"${hour_count} hour ago"`
-    hour_count=`expr 1 + ${hour_count}`
-  done
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ | grep -v -E "^(${hour_pattern})/$" > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ | grep -v -E "^(${delete_index_date_hour_pattern})/$" > ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp
   if test -s ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp; then
     rm -rf ${work_directory}/${search_index_directory}/${priority}
     for date_hour_directory in `cat ${work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp`; do
@@ -42,27 +36,38 @@ delete_4Search() {
   fi
 }
 cron=0
+datetime=`date -u "+%Y%m%d%H%M%S"`
+datetime_date=`echo ${datetime} | cut -c1-8`
+datetime_hour=`echo ${datetime} | cut -c9-10`
+delete_index_date_hour_pattern=${datetime}${datetime_hour}
+delete_index_hour=24
+for hour_count in `seq ${delete_index_hour}`; do
+  delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -d "${datetime_date} ${datetime_hour}:00 -${hour_count} hour ago" "+%Y%m%d%H"`
+done
 job_directory=4Del_4Search
-hour_ago=24
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--cron" ) cron=1;shift;;
-    "--debug" ) set -evx;shift;;
-    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
+    "--debug_shell" ) set -evx;shift;;
+    "--help" ) echo "$0 [--cron] [--debug_shell] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
   esac
 done
 if test -z $4; then
-  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information."
+  echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
 local_work_directory=$1
 unique_job_name=$2
-rclone_remote_bucket=$3
 set +e
+rclone_remote_bucket=`echo $3 | grep ':'`
 priority=`echo $4 | grep "^p[1-9]$"`
 set -e
+if test -z "${rclone_remote_bucket}"; then
+  echo "ERROR: $3 is not rclone_remote:bucket." >&2
+  exit 199
+fi
 if test -z ${priority}; then
   echo "ERROR: $4 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
