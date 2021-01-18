@@ -42,7 +42,7 @@ datetime_hour=`echo ${datetime} | cut -c9-10`
 delete_index_date_hour_pattern=${datetime}${datetime_hour}
 delete_index_hour=24
 for hour_count in `seq ${delete_index_hour}`; do
-  delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -d "${datetime_date} ${datetime_hour}:00 -${hour_count} hour ago" "+%Y%m%d%H"`
+  delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
 job_directory=4Del_4Search
 search_index_directory=4Search

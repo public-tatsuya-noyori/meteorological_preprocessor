@@ -275,7 +275,7 @@ datetime_hour=`echo ${datetime} | cut -c9-10`
 delete_index_date_hour_pattern=${datetime}${datetime_hour}
 delete_index_hour=25
 for hour_count in `seq ${delete_index_hour}`; do
-  delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -d "${datetime_date} ${datetime_hour}:00 -${hour_count} hour ago" "+%Y%m%d%H"`
+  delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
 job_directory=4Sub
 job_num=1
@@ -290,12 +290,12 @@ switchable=0
 switchable_backup_date_hour_pattern=${datetime}${datetime_hour}
 switchable_backup_hour=1
 for hour_count in `seq ${switchable_backup_hour}`; do
-  switchable_backup_date_hour_pattern="${switchable_backup_date_hour_pattern}|"`date -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -d "${datetime_date} ${datetime_hour}:00 -${hour_count} hour ago" "+%Y%m%d%H"`
+  switchable_backup_date_hour_pattern="${switchable_backup_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
 switchable_date_hour_ten_minute_pattern=${datetime}${datetime_hour}`echo ${datetime} | cut -c11`
 ten_minute_ago=`expr 60 \* ${switchable_backup_hour}`
 for ${ten_minute_count} in `seq 10 10 ${ten_minute_ago}`; do
-  switchable_date_hour_ten_minute_pattern="${switchable_date_hour_ten_minute_pattern}|"`date -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -d "${datetime_date} ${datetime_hour}:00 -${ten_minute_count} minute ago" "+%Y%m%d%H%M"`
+  switchable_date_hour_ten_minute_pattern="${switchable_date_hour_ten_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute" "+%Y%m%d%H%M"`
 done
 switchable_minute=5
 timeout=8s
