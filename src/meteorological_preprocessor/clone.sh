@@ -306,7 +306,7 @@ debug_index_file=DEBUG
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
-delete_index_date_hour_pattern=${datetime}${datetime_hour}
+delete_index_date_hour_pattern=${datetime_date}${datetime_hour}
 delete_index_hour=25
 for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
@@ -322,12 +322,12 @@ search_index_directory=4Search
 standard_output_processed_file=0
 sub=0
 switchable=0
-switchable_backup_date_hour_pattern=${datetime}${datetime_hour}
+switchable_backup_date_hour_pattern=${datetime_date}${datetime_hour}
 switchable_backup_hour=1
 for hour_count in `seq ${switchable_backup_hour}`; do
   switchable_backup_date_hour_pattern="${switchable_backup_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
-switchable_date_hour_ten_minute_pattern=${datetime}${datetime_hour}`echo ${datetime} | cut -c11`
+switchable_date_hour_ten_minute_pattern=${datetime_date}${datetime_hour}`echo ${datetime} | cut -c11`
 ten_minute_ago=`expr 60 \* ${switchable_backup_hour}`
 for ${ten_minute_count} in `seq 10 10 ${ten_minute_ago}`; do
   switchable_date_hour_ten_minute_pattern="${switchable_date_hour_ten_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute" "+%Y%m%d%H%M"`
