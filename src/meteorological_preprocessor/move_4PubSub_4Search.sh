@@ -25,11 +25,12 @@ cron=0
 job_directory=4Search
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
-datetime_hour_minute=`echo ${datetime} | cut -c9-10`':'`echo ${datetime} | cut -c11-12`
-move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour_minute}
+datetime_hour=`echo ${datetime} | cut -c9-10`
+datetime_minute=`echo ${datetime} | cut -c11-12`
+move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
 move_index_minute=10
 for minute_count in `seq ${move_index_minute}`; do
-  move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour_minute} ${minute_count} minute ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour_minute} ${minute_count} minute" "+%Y%m%d%H"`
+  move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H"`
 done
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
