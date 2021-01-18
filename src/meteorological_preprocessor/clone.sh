@@ -55,7 +55,6 @@ clone() {
       break
     fi
     cp /dev/null ${work_directory}/${priority}_processed_file.tmp
-    mkdir -p ${work_directory}/${priority}
     cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
     source_rclone_remote_bucket_exit_code_list='0'
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
@@ -395,7 +394,7 @@ if test -n $8; then
   exclusive_pattern_file=$8
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
-mkdir -p ${work_directory}
+mkdir -p ${work_directory}/${priority}_processed
 if test ${cron} -eq 1; then
   if test -s ${work_directory}/pid.txt; then
     running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
