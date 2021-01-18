@@ -200,7 +200,7 @@ subscribe() {
           cp /dev/null ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
           if test -s ${source_work_directory}/${priority}_newly_created_file.tmp; then
             set +e
-            grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/${priority}_newly_created_file.tmp | grep -v -F -f ${work_directory}/${priority}_processed_file.tmp > ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
+            grep -v -F -f ${work_directory}/${priority}_all_processed_file.txt ${source_work_directory}/${priority}_newly_created_file.tmp | grep -v -F -f ${work_directory}/${priority}_processed_file.tmp > ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
             set -e
           fi
           if test -s ${source_work_directory}/${priority}_filtered_newly_created_file.tmp; then
@@ -241,7 +241,7 @@ subscribe() {
       source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
     done
     ls -1 ${work_directory}/${priority}/* | grep -v "^${work_directory}/${priority}/dummy\.tmp$" | grep -v -E "^${work_directory}/${priority}/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-    ls -1 ${work_directory}/${priority}/* | xargs -r cat > ${work_directory}/all_processed_file.txt
+    ls -1 ${work_directory}/${priority}/* | xargs -r cat > ${work_directory}/${priority}_all_processed_file.txt
   done
   if test ${exit_code} -eq 0 -a ${switchable} -gt 0; then
     switch=1
@@ -294,7 +294,7 @@ for hour_count in `seq ${switchable_backup_hour}`; do
 done
 switchable_date_hour_ten_minute_pattern=${datetime_date}${datetime_hour}`echo ${datetime} | cut -c11`
 ten_minute_ago=`expr 60 \* ${switchable_backup_hour}`
-for ${ten_minute_count} in `seq 10 10 ${ten_minute_ago}`; do
+for ten_minute_count in `seq 10 10 ${ten_minute_ago}`; do
   switchable_date_hour_ten_minute_pattern="${switchable_date_hour_ten_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute ago" "+%Y%m%d%H%M" | cut -c1-11`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute" "+%Y%m%d%H%M" | cut -c1-11`
 done
 switchable_minute=5

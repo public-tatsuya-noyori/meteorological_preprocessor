@@ -20,6 +20,7 @@
 alias python='/usr/bin/python3'
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
+rclone_remote_bucket_list=$2
 if test $1 = 'p1'; then
   priority=p1
   parallel=16
@@ -112,7 +113,7 @@ if test -s download_${priority}/created.txt; then
   fi
   rm -f download_${priority}/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_o iij12_o_${priority} ${i} iij1:japan.meteorological.agency.1.open.data.i ${priority} 4 || ./pub.sh --cron --rm_list_file cache_o iij12_o_${priority} ${i} iij2:japan.meteorological.agency.2.open.data.i ${priority} 4;done
+for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oi${priority} ${i} "${rclone_remote_bucket_list}" ${priority} 4;done
 } &
 pid=$!
 echo ${pid} > download_${priority}/pid.txt

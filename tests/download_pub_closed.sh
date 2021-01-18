@@ -22,6 +22,7 @@ export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
 user=`head -1 wis_user_passwd.txt`
 passwd=`tail -1 wis_user_passwd.txt`
+rclone_remote_bucket_list=$2
 if test $1 = 'p1'; then
   priority=p1
   parallel=16
@@ -114,7 +115,7 @@ if test -s download_${priority}_closed/created.txt; then
   fi
   rm -f download_${priority}_closed/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_c iij12_c_${priority} ${i} iij1:japan.meteorological.agency.1.closed.data.i ${priority} 4||./pub.sh --cron --rm_list_file cache_c iij12_c_${priority} ${i} iij2:japan.meteorological.agency.2.closed.data.i ${priority} 4;done
+for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12ci${priority} ${i} ${rclone_remote_bucket_list} ${priority} 4;done
 } &
 pid=$!
 echo ${pid} > download_${priority}_closed/pid.txt

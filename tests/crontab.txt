@@ -1,6 +1,8 @@
 # download from WIS-JMA
-* * * * * cd /home/noyori/tests; ./download_pub.sh p1          >> log/download_pub.sh.iij1_o_p1.log 2>&1
-* * * * * cd /home/noyori/tests; ./download_pub_closed.sh p1   >> log/download_pub_closed.sh.iij1_c_p1.log 2>&1
+* 0,2,4,6,8,10,12,14,16,18,20,22 * * * cd /home/noyori/tests; ./download_pub.sh p1 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i'         >> log/download_pub.sh.iij12iop1.log 2>&1
+* 1,3,5,7,9,11,13,15,17,19,21,23 * * * cd /home/noyori/tests; ./download_pub.sh p1 'iij2:japan.meteorological.agency.2.open.data.i;iij1:japan.meteorological.agency.1.open.data.i'         >> log/download_pub.sh.iij12iop1.log 2>&1
+* 0,2,4,6,8,10,12,14,16,18,20,22 * * * cd /home/noyori/tests; ./download_pub_closed.sh p1 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i'  >> log/download_pub_closed.sh.iij12cp1.log 2>&1
+* 1,3,5,7,9,11,13,15,17,19,21,23 * * * cd /home/noyori/tests; ./download_pub_closed.sh p1 'iij2:japan.meteorological.agency.2.closed.data.i;iij1:japan.meteorological.agency.1.closed.data.i'  >> log/download_pub_closed.sh.iij12cp1.log 2>&1
 * * * * * cd /home/noyori/tests; ./download.sh p2              >> log/download.sh.p2.log 2>&1
 * * * * * cd /home/noyori/tests; ./download_p2_crex.sh p2_crex >> log/download.sh.p2_crex.log 2>&1
 * * * * * cd /home/noyori/tests; ./download_closed.sh p2       >> log/download_closed.sh.p2.log 2>&1
@@ -12,115 +14,162 @@
 * * * * * cd /home/noyori/tests; ./download_closed.sh p5       >> log/download_closed.sh.p5.log 2>&1
 
 # pub
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2/cached/* download_p2_crex/cached/* | grep -v '\.tmp$' | uniq`;do cat ${i} >> download_p2/index.txt; rm -r ${i};done; if test -s download_p2/index.txt;then ./pub.sh --cron --rm_list_file cache_o iij12_o_p2 download_p2/index.txt iij1:japan.meteorological.agency.1.open.data.i p2  16 || ./pub.sh --cron --rm_list_file cache_o iij12_o_p2 download_p2/index.txt iij2:japan.meteorological.agency.2.open.data.i p2  16;fi >> log/pub.sh.iij12_o_p2.log 2>&1
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_c iij12_c_p2 ${i} iij1:japan.meteorological.agency.1.closed.data.i p2  4 || ./pub.sh --cron --rm_list_file cache_c iij12_c_p2 ${i} iij2:japan.meteorological.agency.2.closed.data.i p2  4;done >> log/pub.sh.iij12_c_p2.log 2>&1
-0-9,20-29,40-49 * * * * cd /home/noyori/tests; for i in `ls -1 download_p3/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_o iij12_o_p3 ${i} iij1:japan.meteorological.agency.1.open.data.i p3 16 || ./pub.sh --cron --rm_list_file cache_o iij12_o_p3 ${i} iij2:japan.meteorological.agency.2.open.data.i p3 16;done >> log/pub.sh.iij12_o_p3.log 2>&1
-10-19,30-39,50-59 * * * * cd /home/noyori/tests; for i in `ls -1 download_p3/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_o iij12_o_p3 ${i} iij2:japan.meteorological.agency.2.open.data.i p3 16 || ./pub.sh --cron --rm_list_file cache_o iij12_o_p3 ${i} iij1:japan.meteorological.agency.1.open.data.i p3 16;done >> log/pub.sh.iij12_o_p3.log 2>&1
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_c iij12_c_p3 ${i} iij1:japan.meteorological.agency.1.closed.data.i p3  8;done || ./pub.sh --cron --rm_list_file cache_c iij12_c_p3 ${i} iij2:japan.meteorological.agency.2.closed.data.i p3  8>> log/pub.sh.iij12_c_p3.log 2>&1
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p4/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_o iij12_o_p4 ${i} iij1:japan.meteorological.agency.1.open.data.i p4 64 || ./pub.sh --cron --rm_list_file cache_o iij12_o_p4 ${i} iij2:japan.meteorological.agency.2.open.data.i p4 64;done >> log/pub.sh.iij12_o_p4.log 2>&1
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p4_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_c iij12_c_p4 ${i} iij1:japan.meteorological.agency.1.closed.data.i p4  16 || ./pub.sh --cron --rm_list_file cache_c iij12_c_p4 ${i} iij2:japan.meteorological.agency.2.closed.data.i p4  16;done >> log/pub.sh.iij12_c_p4.log 2>&1
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p5/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_o iij12_o_p5 ${i} iij1:japan.meteorological.agency.1.open.data.i p5 64 || ./pub.sh --cron --rm_list_file cache_o iij12_o_p5 ${i} iij2:japan.meteorological.agency.2.open.data.i p5 64;done >> log/pub.sh.iij12_o_p5.log 2>&1
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p5_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_list_file cache_c iij12_c_p5 ${i} iij1:japan.meteorological.agency.1.closed.data.i p5  16 || ./pub.sh --cron --rm_list_file cache_c iij12_c_p5 ${i} iij2:japan.meteorological.agency.2.closed.data.i p5  16;done >> log/pub.sh.iij12_c_p5.log 2>&1
+0-4,10-14,20-24,30-34,40-44,50-54 * * * * cd /home/noyori/tests; for i in `ls -1 download_p2/cached/* download_p2_crex/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p2/index.txt; rm -r ${i};done; if test -s download_p2/index.txt;then ./pub.sh --cron --rm_index_file cache_o pub_iij12oip2 download_p2/index.txt 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p2  16;fi
+5-9,15-19,25-29,35-39,45-49,55-59 * * * * cd /home/noyori/tests; for i in `ls -1 download_p2/cached/* download_p2_crex/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p2/index.txt; rm -r ${i};done; if test -s download_p2/index.txt;then ./pub.sh --cron --rm_index_file cache_o pub_iij12oip2 download_p2/index.txt 'iij2:japan.meteorological.agency.2.open.data.i;iij1:japan.meteorological.agency.1.open.data.i' p2  16;fi
+0-4,10-14,20-24,30-34,40-44,50-54 * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip2 ${i} 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p2  4;done
+5-9,15-19,25-29,35-39,45-49,55-59 * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip2 ${i} 'iij2:japan.meteorological.agency.2.closed.data.i;iij1:japan.meteorological.agency.1.closed.data.i' p2  4;done
+0-19,40-59                        * * * * cd /home/noyori/tests; for i in `ls -1 download_p3/cached/*       |grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oip3 ${i} 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i'     p3 16;done
+20-39                             * * * * cd /home/noyori/tests; for i in `ls -1 download_p3/cached/*       |grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oip3 ${i} 'iij2:japan.meteorological.agency.2.open.data.i;iij1:japan.meteorological.agency.1.open.data.i'     p3 16;done
+0-19,40-59                        * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip3 ${i} 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p3  8;done
+20-39                             * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip3 ${i} 'iij2:japan.meteorological.agency.2.closed.data.i;iij1:japan.meteorological.agency.1.closed.data.i' p3  8;done
+* 0,2,4,6,8,10,12,14,16,18,20,22    * * * cd /home/noyori/tests; for i in `ls -1 download_p4/cached/*       |grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oip4 ${i} 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i'     p4 64;done
+* 1,3,5,7,9,11,13,15,17,19,21,23    * * * cd /home/noyori/tests; for i in `ls -1 download_p4/cached/*       |grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oip4 ${i} 'iij2:japan.meteorological.agency.2.open.data.i;iij1:japan.meteorological.agency.1.open.data.i'     p4 64;done
+* 0,2,4,6,8,10,12,14,16,18,20,22    * * * cd /home/noyori/tests; for i in `ls -1 download_p4_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip4 ${i} 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p4 16;done
+* 1,3,5,7,9,11,13,15,17,19,21,23    * * * cd /home/noyori/tests; for i in `ls -1 download_p4_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip4 ${i} 'iij2:japan.meteorological.agency.2.closed.data.i;iij1:japan.meteorological.agency.1.closed.data.i' p4 16;done
+* 0,1,2,3,4,5,12,13,14,15,16,17     * * * cd /home/noyori/tests; for i in `ls -1 download_p5/cached/*       |grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oip5 ${i} 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i'     p5 64;done
+* 6,7,8,9,10,11,18,19,20,21,22,23   * * * cd /home/noyori/tests; for i in `ls -1 download_p5/cached/*       |grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oip5 ${i} 'iij2:japan.meteorological.agency.2.open.data.i;iij1:japan.meteorological.agency.1.open.data.i'     p5 64;done
+* 0,1,2,3,4,5,12,13,14,15,16,17     * * * cd /home/noyori/tests; for i in `ls -1 download_p5_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip5 ${i} 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p5 16;done
+* 6,7,8,9,10,11,18,19,20,21,22,23   * * * cd /home/noyori/tests; for i in `ls -1 download_p5_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_c pub_iij12cip5 ${i} 'iij2:japan.meteorological.agency.2.closed.data.i;iij1:japan.meteorological.agency.1.closed.data.i' p5 16;done
 
 # move
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_o_p1 iij1:japan.meteorological.agency.1.open.data.i   p1 >> log/move.sh.iij1_o_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_c_p1 iij1:japan.meteorological.agency.1.closed.data.i p1 >> log/move.sh.iij1_c_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_o_p2 iij1:japan.meteorological.agency.1.open.data.i   p2 >> log/move.sh.iij1_o_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_c_p2 iij1:japan.meteorological.agency.1.closed.data.i p2 >> log/move.sh.iij1_c_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_o_p3 iij1:japan.meteorological.agency.1.open.data.i   p3 >> log/move.sh.iij1_o_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_c_p3 iij1:japan.meteorological.agency.1.closed.data.i p3 >> log/move.sh.iij1_c_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_o_p4 iij1:japan.meteorological.agency.1.open.data.i   p4 >> log/move.sh.iij1_o_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_c_p4 iij1:japan.meteorological.agency.1.closed.data.i p4 >> log/move.sh.iij1_c_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_o_p5 iij1:japan.meteorological.agency.1.open.data.i   p5 >> log/move.sh.iij1_o_p5.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1_c_p5 iij1:japan.meteorological.agency.1.closed.data.i p5 >> log/move.sh.iij1_c_p5.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_o_p1 iij2:japan.meteorological.agency.2.open.data.i   p1 >> log/move.sh.iij2_o_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_c_p1 iij2:japan.meteorological.agency.2.closed.data.i p1 >> log/move.sh.iij2_c_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_o_p2 iij2:japan.meteorological.agency.2.open.data.i   p2 >> log/move.sh.iij2_o_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_c_p2 iij2:japan.meteorological.agency.2.closed.data.i p2 >> log/move.sh.iij2_c_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_o_p3 iij2:japan.meteorological.agency.2.open.data.i   p3 >> log/move.sh.iij2_o_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_c_p3 iij2:japan.meteorological.agency.2.closed.data.i p3 >> log/move.sh.iij2_c_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_o_p4 iij2:japan.meteorological.agency.2.open.data.i   p4 >> log/move.sh.iij2_o_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_c_p4 iij2:japan.meteorological.agency.2.closed.data.i p4 >> log/move.sh.iij2_c_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_o_p5 iij2:japan.meteorological.agency.2.open.data.i   p5 >> log/move.sh.iij2_o_p5.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2_c_p5 iij2:japan.meteorological.agency.2.closed.data.i p5 >> log/move.sh.iij2_c_p5.log 2>&1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oip1 iij1:japan.meteorological.agency.1.open.data.i   p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cip1 iij1:japan.meteorological.agency.1.closed.data.i p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oip2 iij1:japan.meteorological.agency.1.open.data.i   p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cip2 iij1:japan.meteorological.agency.1.closed.data.i p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oip3 iij1:japan.meteorological.agency.1.open.data.i   p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cip3 iij1:japan.meteorological.agency.1.closed.data.i p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oip4 iij1:japan.meteorological.agency.1.open.data.i   p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cip4 iij1:japan.meteorological.agency.1.closed.data.i p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oip5 iij1:japan.meteorological.agency.1.open.data.i   p5
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cip5 iij1:japan.meteorological.agency.1.closed.data.i p5
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oip1 iij2:japan.meteorological.agency.2.open.data.i   p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cip1 iij2:japan.meteorological.agency.2.closed.data.i p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oip2 iij2:japan.meteorological.agency.2.open.data.i   p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cip2 iij2:japan.meteorological.agency.2.closed.data.i p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oip3 iij2:japan.meteorological.agency.2.open.data.i   p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cip3 iij2:japan.meteorological.agency.2.closed.data.i p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oip4 iij2:japan.meteorological.agency.2.open.data.i   p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cip4 iij2:japan.meteorological.agency.2.closed.data.i p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oip5 iij2:japan.meteorological.agency.2.open.data.i   p5
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cip5 iij2:japan.meteorological.agency.2.closed.data.i p5
 
 # del 4Search
-5 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_o_p1 iij1:japan.meteorological.agency.1.open.data.i   p1 >> log/del_4Search.sh.iij1_o_p1.log 2>&1
-10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_c_p1 iij1:japan.meteorological.agency.1.closed.data.i p1 >> log/del_4Search.sh.iij1_c_p1.log 2>&1
-15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_o_p2 iij1:japan.meteorological.agency.1.open.data.i   p2 >> log/del_4Search.sh.iij1_o_p2.log 2>&1
-20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_c_p2 iij1:japan.meteorological.agency.1.closed.data.i p2 >> log/del_4Search.sh.iij1_c_p2.log 2>&1
-25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_o_p3 iij1:japan.meteorological.agency.1.open.data.i   p3 >> log/del_4Search.sh.iij1_o_p3.log 2>&1
-30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_c_p3 iij1:japan.meteorological.agency.1.closed.data.i p3 >> log/del_4Search.sh.iij1_c_p3.log 2>&1
-35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_o_p4 iij1:japan.meteorological.agency.1.open.data.i   p4 >> log/del_4Search.sh.iij1_o_p4.log 2>&1
-40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_c_p4 iij1:japan.meteorological.agency.1.closed.data.i p4 >> log/del_4Search.sh.iij1_c_p4.log 2>&1
-45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_o_p5 iij1:japan.meteorological.agency.1.open.data.i   p5 >> log/del_4Search.sh.iij1_o_p5.log 2>&1
-50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1_c_p5 iij1:japan.meteorological.agency.1.closed.data.i p5 >> log/del_4Search.sh.iij1_c_p5.log 2>&1
-5 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_o_p1 iij2:japan.meteorological.agency.2.open.data.i   p1 >> log/del_4Search.sh.iij2_o_p1.log 2>&1
-10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_c_p1 iij2:japan.meteorological.agency.2.closed.data.i p1 >> log/del_4Search.sh.iij2_c_p1.log 2>&1
-15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_o_p2 iij2:japan.meteorological.agency.2.open.data.i   p2 >> log/del_4Search.sh.iij2_o_p2.log 2>&1
-20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_c_p2 iij2:japan.meteorological.agency.2.closed.data.i p2 >> log/del_4Search.sh.iij2_c_p2.log 2>&1
-25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_o_p3 iij2:japan.meteorological.agency.2.open.data.i   p3 >> log/del_4Search.sh.iij2_o_p3.log 2>&1
-30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_c_p3 iij2:japan.meteorological.agency.2.closed.data.i p3 >> log/del_4Search.sh.iij2_c_p3.log 2>&1
-35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_o_p4 iij2:japan.meteorological.agency.2.open.data.i   p4 >> log/del_4Search.sh.iij2_o_p4.log 2>&1
-40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_c_p4 iij2:japan.meteorological.agency.2.closed.data.i p4 >> log/del_4Search.sh.iij2_c_p4.log 2>&1
-45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_o_p5 iij2:japan.meteorological.agency.2.open.data.i   p5 >> log/del_4Search.sh.iij2_o_p5.log 2>&1
-50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2_c_p5 iij2:japan.meteorological.agency.2.closed.data.i p5 >> log/del_4Search.sh.iij2_c_p5.log 2>&1
+5  * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oip1 iij1:japan.meteorological.agency.1.open.data.i   p1
+10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cip1 iij1:japan.meteorological.agency.1.closed.data.i p1
+15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oip2 iij1:japan.meteorological.agency.1.open.data.i   p2
+20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cip2 iij1:japan.meteorological.agency.1.closed.data.i p2
+25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oip3 iij1:japan.meteorological.agency.1.open.data.i   p3
+30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cip3 iij1:japan.meteorological.agency.1.closed.data.i p3
+35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oip4 iij1:japan.meteorological.agency.1.open.data.i   p4
+40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cip4 iij1:japan.meteorological.agency.1.closed.data.i p4
+45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oip5 iij1:japan.meteorological.agency.1.open.data.i   p5
+50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cip5 iij1:japan.meteorological.agency.1.closed.data.i p5
+5  * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oip1 iij2:japan.meteorological.agency.2.open.data.i   p1
+10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cip1 iij2:japan.meteorological.agency.2.closed.data.i p1
+15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oip2 iij2:japan.meteorological.agency.2.open.data.i   p2
+20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cip2 iij2:japan.meteorological.agency.2.closed.data.i p2
+25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oip3 iij2:japan.meteorological.agency.2.open.data.i   p3
+30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cip3 iij2:japan.meteorological.agency.2.closed.data.i p3
+35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oip4 iij2:japan.meteorological.agency.2.open.data.i   p4
+40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cip4 iij2:japan.meteorological.agency.2.closed.data.i p4
+45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oip5 iij2:japan.meteorological.agency.2.open.data.i   p5
+50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cip5 iij2:japan.meteorological.agency.2.closed.data.i p5
 
 # clone i to o
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_o_p1 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p1 8 >> log/clone.sh.i_o_o_p1.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_c_p1 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p1 8 >> log/clone.sh.i_o_c_p1.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_o_p2 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p2 16 >> log/clone.sh.i_o_o_p2.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_c_p2 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p2 16 >> log/clone.sh.i_o_c_p2.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_o_p3 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p3 16 >> log/clone.sh.i_o_o_p3.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_c_p3 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p3 16 >> log/clone.sh.i_o_c_p3.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_o_p4 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p4 64 >> log/clone.sh.i_o_o_p4.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_c_p4 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p4 64 >> log/clone.sh.i_o_c_p4.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_o_p5 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p5 64 >> log/clone.sh.i_o_o_p5.log 2>&1
-* * * * * cd /home/noyori/tests; ./clone.sh --cron cache clone_i_o_c_p5 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p5 64 >> log/clone.sh.i_o_c_p5.log 2>&1
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_ioop1 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p1 8 2>> log/clone.sh.ioop1.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_iocp1 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p1 8 2>> log/clone.sh.iocp1.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_ioop2 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p2 16 2>> log/clone.sh.ioop2.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_iocp2 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p2 16 2>> log/clone.sh.iocp2.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_ioop3 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p3 16 2>> log/clone.sh.ioop3.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_iocp3 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p3 16 2>> log/clone.sh.iocp3.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_ioop4 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p4 64 2>> log/clone.sh.ioop4.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_iocp4 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p4 64 2>> log/clone.sh.iocp4.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_ioop5 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' 'iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' p5 64 2>> log/clone.sh.ioop5.log
+* * * * * cd /home/noyori/tests; ./clone.sh --cron --debug_index_file cache clone_iocp5 'iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' 'iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o' p5 64 2>> log/clone.sh.iocp5.log
 
 # move
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_o_p1 iij1:japan.meteorological.agency.1.open.data.o   p1 >> log/move.sh.iij1o_o_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_c_p1 iij1:japan.meteorological.agency.1.closed.data.o p1 >> log/move.sh.iij1o_c_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_o_p2 iij1:japan.meteorological.agency.1.open.data.o   p2 >> log/move.sh.iij1o_o_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_c_p2 iij1:japan.meteorological.agency.1.closed.data.o p2 >> log/move.sh.iij1o_c_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_o_p3 iij1:japan.meteorological.agency.1.open.data.o   p3 >> log/move.sh.iij1o_o_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_c_p3 iij1:japan.meteorological.agency.1.closed.data.o p3 >> log/move.sh.iij1o_c_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_o_p4 iij1:japan.meteorological.agency.1.open.data.o   p4 >> log/move.sh.iij1o_o_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_c_p4 iij1:japan.meteorological.agency.1.closed.data.o p4 >> log/move.sh.iij1o_c_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_o_p5 iij1:japan.meteorological.agency.1.open.data.o   p5 >> log/move.sh.iij1o_o_p5.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1o_c_p5 iij1:japan.meteorological.agency.1.closed.data.o p5 >> log/move.sh.iij1o_c_p5.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_o_p1 iij2:japan.meteorological.agency.2.open.data.o   p1 >> log/move.sh.iij2o_o_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_c_p1 iij2:japan.meteorological.agency.2.closed.data.o p1 >> log/move.sh.iij2o_c_p1.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_o_p2 iij2:japan.meteorological.agency.2.open.data.o   p2 >> log/move.sh.iij2o_o_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_c_p2 iij2:japan.meteorological.agency.2.closed.data.o p2 >> log/move.sh.iij2o_c_p2.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_o_p3 iij2:japan.meteorological.agency.2.open.data.o   p3 >> log/move.sh.iij2o_o_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_c_p3 iij2:japan.meteorological.agency.2.closed.data.o p3 >> log/move.sh.iij2o_c_p3.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_o_p4 iij2:japan.meteorological.agency.2.open.data.o   p4 >> log/move.sh.iij2o_o_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_c_p4 iij2:japan.meteorological.agency.2.closed.data.o p4 >> log/move.sh.iij2o_c_p4.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_o_p5 iij2:japan.meteorological.agency.2.open.data.o   p5 >> log/move.sh.iij2o_o_p5.log 2>&1
-*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2o_c_p5 iij2:japan.meteorological.agency.2.closed.data.o p5 >> log/move.sh.iij2o_c_p5.log 2>&1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oop1 iij1:japan.meteorological.agency.1.open.data.o   p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cop1 iij1:japan.meteorological.agency.1.closed.data.o p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oop2 iij1:japan.meteorological.agency.1.open.data.o   p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cop2 iij1:japan.meteorological.agency.1.closed.data.o p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oop3 iij1:japan.meteorological.agency.1.open.data.o   p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cop3 iij1:japan.meteorological.agency.1.closed.data.o p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oop4 iij1:japan.meteorological.agency.1.open.data.o   p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cop4 iij1:japan.meteorological.agency.1.closed.data.o p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1oop5 iij1:japan.meteorological.agency.1.open.data.o   p5
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij1cop5 iij1:japan.meteorological.agency.1.closed.data.o p5
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oop1 iij2:japan.meteorological.agency.2.open.data.o   p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cop1 iij2:japan.meteorological.agency.2.closed.data.o p1
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oop2 iij2:japan.meteorological.agency.2.open.data.o   p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cop2 iij2:japan.meteorological.agency.2.closed.data.o p2
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oop3 iij2:japan.meteorological.agency.2.open.data.o   p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cop3 iij2:japan.meteorological.agency.2.closed.data.o p3
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oop4 iij2:japan.meteorological.agency.2.open.data.o   p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cop4 iij2:japan.meteorological.agency.2.closed.data.o p4
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2oop5 iij2:japan.meteorological.agency.2.open.data.o   p5
+*/5 * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh --cron cache mv_iij2cop5 iij2:japan.meteorological.agency.2.closed.data.o p5
 
 # del 4Search
-5 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_o_p1 iij1:japan.meteorological.agency.1.open.data.o   p1 >> log/del_4Search.sh.iij1o_o_p1.log 2>&1
-10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_c_p1 iij1:japan.meteorological.agency.1.closed.data.o p1 >> log/del_4Search.sh.iij1o_c_p1.log 2>&1
-15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_o_p2 iij1:japan.meteorological.agency.1.open.data.o   p2 >> log/del_4Search.sh.iij1o_o_p2.log 2>&1
-20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_c_p2 iij1:japan.meteorological.agency.1.closed.data.o p2 >> log/del_4Search.sh.iij1o_c_p2.log 2>&1
-25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_o_p3 iij1:japan.meteorological.agency.1.open.data.o   p3 >> log/del_4Search.sh.iij1o_o_p3.log 2>&1
-30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_c_p3 iij1:japan.meteorological.agency.1.closed.data.o p3 >> log/del_4Search.sh.iij1o_c_p3.log 2>&1
-35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_o_p4 iij1:japan.meteorological.agency.1.open.data.o   p4 >> log/del_4Search.sh.iij1o_o_p4.log 2>&1
-40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_c_p4 iij1:japan.meteorological.agency.1.closed.data.o p4 >> log/del_4Search.sh.iij1o_c_p4.log 2>&1
-45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_o_p5 iij1:japan.meteorological.agency.1.open.data.o   p5 >> log/del_4Search.sh.iij1o_o_p5.log 2>&1
-50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij1o_c_p5 iij1:japan.meteorological.agency.1.closed.data.o p5 >> log/del_4Search.sh.iij1o_c_p5.log 2>&1
-5 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_o_p1 iij2:japan.meteorological.agency.2.open.data.o   p1 >> log/del_4Search.sh.iij2o_o_p1.log 2>&1
-10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_c_p1 iij2:japan.meteorological.agency.2.closed.data.o p1 >> log/del_4Search.sh.iij2o_c_p1.log 2>&1
-15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_o_p2 iij2:japan.meteorological.agency.2.open.data.o   p2 >> log/del_4Search.sh.iij2o_o_p2.log 2>&1
-20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_c_p2 iij2:japan.meteorological.agency.2.closed.data.o p2 >> log/del_4Search.sh.iij2o_c_p2.log 2>&1
-25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_o_p3 iij2:japan.meteorological.agency.2.open.data.o   p3 >> log/del_4Search.sh.iij2o_o_p3.log 2>&1
-30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_c_p3 iij2:japan.meteorological.agency.2.closed.data.o p3 >> log/del_4Search.sh.iij2o_c_p3.log 2>&1
-35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_o_p4 iij2:japan.meteorological.agency.2.open.data.o   p4 >> log/del_4Search.sh.iij2o_o_p4.log 2>&1
-40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_c_p4 iij2:japan.meteorological.agency.2.closed.data.o p4 >> log/del_4Search.sh.iij2o_c_p4.log 2>&1
-45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_o_p5 iij2:japan.meteorological.agency.2.open.data.o   p5 >> log/del_4Search.sh.iij2o_o_p5.log 2>&1
-50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_s_iij2o_c_p5 iij2:japan.meteorological.agency.2.closed.data.o p5 >> log/del_4Search.sh.iij2o_c_p5.log 2>&1
+5  * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oop1 iij1:japan.meteorological.agency.1.open.data.o   p1
+10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cop1 iij1:japan.meteorological.agency.1.closed.data.o p1
+15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oop2 iij1:japan.meteorological.agency.1.open.data.o   p2
+20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cop2 iij1:japan.meteorological.agency.1.closed.data.o p2
+25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oop3 iij1:japan.meteorological.agency.1.open.data.o   p3
+30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cop3 iij1:japan.meteorological.agency.1.closed.data.o p3
+35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oop4 iij1:japan.meteorological.agency.1.open.data.o   p4
+40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cop4 iij1:japan.meteorological.agency.1.closed.data.o p4
+45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1oop5 iij1:japan.meteorological.agency.1.open.data.o   p5
+50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij1cop5 iij1:japan.meteorological.agency.1.closed.data.o p5
+5  * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oop1 iij2:japan.meteorological.agency.2.open.data.o   p1
+10 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cop1 iij2:japan.meteorological.agency.2.closed.data.o p1
+15 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oop2 iij2:japan.meteorological.agency.2.open.data.o   p2
+20 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cop2 iij2:japan.meteorological.agency.2.closed.data.o p2
+25 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oop3 iij2:japan.meteorological.agency.2.open.data.o   p3
+30 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cop3 iij2:japan.meteorological.agency.2.closed.data.o p3
+35 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oop4 iij2:japan.meteorological.agency.2.open.data.o   p4
+40 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cop4 iij2:japan.meteorological.agency.2.closed.data.o p4
+45 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2oop5 iij2:japan.meteorological.agency.2.open.data.o   p5
+50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cop5 iij2:japan.meteorological.agency.2.closed.data.o p5
+
+# del
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1oi iij1:japan.meteorological.agency.1.open.data.i   2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1ci iij1:japan.meteorological.agency.1.closed.data.i 2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2oi iij2:japan.meteorological.agency.2.open.data.i   2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2ci iij2:japan.meteorological.agency.2.closed.data.i 2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1oo iij1:japan.meteorological.agency.1.open.data.o   2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1co iij1:japan.meteorological.agency.1.closed.data.o 2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2oo iij2:japan.meteorological.agency.2.open.data.o   2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2co iij2:japan.meteorological.agency.2.closed.data.o 2
+
+# sub
+* * * * * cd /home/noyori/tests; ./sub.sh --cron cache_s sub_iij12oip3 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 2>>log/sub.sh.iij12oip3.log
+
+# high-stress test
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p1/ 2>> /home/noyori/tests/log/hst/lstp1_01.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_01.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p3/ 2>> /home/noyori/tests/log/hst/lstp3_01.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p4/ 2>> /home/noyori/tests/log/hst/lstp4_01.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p5/ 2>> /home/noyori/tests/log/hst/lstp5_01.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p1/ 2>> /home/noyori/tests/log/hst/lstp1_02.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_02.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p3/ 2>> /home/noyori/tests/log/hst/lstp3_02.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p4/ 2>> /home/noyori/tests/log/hst/lstp4_02.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p5/ 2>> /home/noyori/tests/log/hst/lstp5_02.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p1/ 2>> /home/noyori/tests/log/hst/lstp1_03.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_03.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p3/ 2>> /home/noyori/tests/log/hst/lstp3_03.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p4/ 2>> /home/noyori/tests/log/hst/lstp4_03.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p5/ 2>> /home/noyori/tests/log/hst/lstp5_03.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p1/ 2>> /home/noyori/tests/log/hst/lstp1_04.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_04.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p3/ 2>> /home/noyori/tests/log/hst/lstp3_04.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p4/ 2>> /home/noyori/tests/log/hst/lstp4_04.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p5/ 2>> /home/noyori/tests/log/hst/lstp5_04.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p1/ 2>> /home/noyori/tests/log/hst/lstp1_05.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_05.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p3/ 2>> /home/noyori/tests/log/hst/lstp3_05.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p4/ 2>> /home/noyori/tests/log/hst/lstp4_05.log 1>/dev/null
+* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p5/ 2>> /home/noyori/tests/log/hst/lstp5_05.log 1>/dev/null
 
 # delete on local PC
 55 1,9,17 * * * find /home/noyori/tests/cache_o /home/noyori/tests/cache_c /home/noyori/tests/cache_s -mindepth 5 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
@@ -128,7 +177,8 @@
 #55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
 # subscribe
-0 */2 * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr.log; if test -s sub_bufr/${now}.tmp; then mv -f sub_bufr/${now}.tmp sub_bufr/${now}.txt; else rm -f sub_bufr/${now}.tmp; fi
+#* * * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 2>>log/sub.sh.bufr.log
+#0 */2 * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr.log; if test -s sub_bufr/${now}.tmp; then mv -f sub_bufr/${now}.tmp sub_bufr/${now}.txt; else rm -f sub_bufr/${now}.tmp; fi
 
 # convert bufr synop to arrow
 #* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
