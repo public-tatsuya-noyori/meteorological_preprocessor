@@ -56,7 +56,7 @@ clone() {
     fi
     cp /dev/null ${work_directory}/${priority}_processed_file.tmp
     mkdir -p ${work_directory}/${priority}
-    cp /dev/null ${work_directory}/${priority}/dummy.tmp
+    cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
     source_rclone_remote_bucket_exit_code_list='0'
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
       if test "${source_rclone_remote_bucket_exit_code_list}" != '0'; then
@@ -222,7 +222,7 @@ clone() {
           if test -s ${source_work_directory}/${priority}_filtered_newly_created_file.tmp; then
             cp /dev/null ${source_work_directory}/${priority}_log.tmp
             set +e
-            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/${priority}_filtered_newly_created_file.tmp --ignore-checksum --low-level-retries 3 --log-file ${source_work_directory}/${priority}_log.tmp --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/${priority}_filtered_newly_created_file.tmp --ignore-checksum --log-file ${source_work_directory}/${priority}_log.tmp --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -248,7 +248,7 @@ clone() {
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -eq 0; then
-          cp ${work_directory}/${priority}_processed_file.tmp ${work_directory}/${priority}/${now}.txt
+          cp ${work_directory}/${priority}_processed_file.tmp ${work_directory}/${priority}_processed/${now}.txt
           if test ${standard_output_processed_file} -eq 1; then
             cat ${work_directory}/${priority}_processed_file.tmp
           fi
@@ -269,13 +269,12 @@ clone() {
       source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
       source_rclone_remote_bucket_exit_code=`echo "${source_rclone_remote_bucket_exit_code_list}" | cut -d' ' -f${source_rclone_remote_bucket_count}`
       if test ${source_rclone_remote_bucket_exit_code} = '0'; then
-        mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt.old
         mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
       fi
       source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
     done
-    ls -1 ${work_directory}/${priority}/* | grep -v "^${work_directory}/${priority}/dummy\.tmp$" | grep -v -E "^${work_directory}/${priority}/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-    ls -1 ${work_directory}/${priority}/* | xargs -r cat > ${work_directory}/${priority}_all_processed_file.txt
+    ls -1 ${work_directory}/${priority}_processed/* | grep -v "^${work_directory}/${priority}_processed/dummy\.tmp$" | grep -v -E "^${work_directory}/${priority}_processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+    ls -1 ${work_directory}/${priority}_processed/* | xargs -r cat > ${work_directory}/${priority}_all_processed_file.txt
   done
   if test ${exit_code} -eq 0 -a ${switchable} -gt 0; then
     switch=1
@@ -302,7 +301,7 @@ clone() {
 bandwidth_limit_k_bytes_per_s=0
 cron=0
 cutoff=16M
-debug_index_file=DEBUG
+debug_index_file=ERROR
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`

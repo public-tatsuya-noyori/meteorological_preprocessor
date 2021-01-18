@@ -40,7 +40,7 @@ subscribe() {
     fi
     cp /dev/null ${work_directory}/${priority}_processed_file.tmp
     mkdir -p ${work_directory}/${priority}
-    cp /dev/null ${work_directory}/${priority}/dummy.tmp
+    cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
     source_rclone_remote_bucket_exit_code_list='0'
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
       if test "${source_rclone_remote_bucket_exit_code_list}" != '0'; then
@@ -224,7 +224,7 @@ subscribe() {
     done
     if test -s ${work_directory}/${priority}_processed_file.tmp; then
       now=`date -u "+%Y%m%d%H%M%S"`
-      cp ${work_directory}/${priority}_processed_file.tmp ${work_directory}/${priority}/${now}.txt
+      cp ${work_directory}/${priority}_processed_file.tmp ${work_directory}/${priority}_processed/${now}.txt
       if test ${standard_output_processed_file} -eq 1; then
         cat ${work_directory}/${priority}_processed_file.tmp
       fi
@@ -235,13 +235,12 @@ subscribe() {
       source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
       source_rclone_remote_bucket_exit_code=`echo "${source_rclone_remote_bucket_exit_code_list}" | cut -d' ' -f${source_rclone_remote_bucket_count}`
       if test ${source_rclone_remote_bucket_exit_code} = '0'; then
-        mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt.old
         mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
       fi
       source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
     done
-    ls -1 ${work_directory}/${priority}/* | grep -v "^${work_directory}/${priority}/dummy\.tmp$" | grep -v -E "^${work_directory}/${priority}/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-    ls -1 ${work_directory}/${priority}/* | xargs -r cat > ${work_directory}/${priority}_all_processed_file.txt
+    ls -1 ${work_directory}/${priority}_processed/* | grep -v "^${work_directory}/${priority}_processed/dummy\.tmp$" | grep -v -E "^${work_directory}/${priority}_processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+    ls -1 ${work_directory}/${priority}_processed/* | xargs -r cat > ${work_directory}/${priority}_all_processed_file.txt
   done
   if test ${exit_code} -eq 0 -a ${switchable} -gt 0; then
     switch=1
@@ -268,7 +267,7 @@ subscribe() {
 bandwidth_limit_k_bytes_per_s=0
 cron=0
 cutoff=16M
-debug_index_file=DEBUG
+debug_index_file=ERROR
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
