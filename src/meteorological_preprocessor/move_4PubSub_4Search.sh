@@ -28,13 +28,12 @@ datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 datetime_minute=`echo ${datetime} | cut -c11-12`
 move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
-move_index_minute=10
+move_index_minute=9
 for minute_count in `seq ${move_index_minute}`; do
   move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H%M"`
 done
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
-sleep_seconds=180
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
