@@ -295,7 +295,7 @@ done
 switchable_date_hour_ten_minute_pattern=${datetime_date}${datetime_hour}`echo ${datetime} | cut -c11`
 ten_minute_ago=`expr 60 \* ${switchable_backup_hour}`
 for ${ten_minute_count} in `seq 10 10 ${ten_minute_ago}`; do
-  switchable_date_hour_ten_minute_pattern="${switchable_date_hour_ten_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute" "+%Y%m%d%H%M"`
+  switchable_date_hour_ten_minute_pattern="${switchable_date_hour_ten_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute ago" "+%Y%m%d%H%M" | cut -c1-11`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${ten_minute_count} minute" "+%Y%m%d%H%M" | cut -c1-11`
 done
 switchable_minute=5
 timeout=8s
