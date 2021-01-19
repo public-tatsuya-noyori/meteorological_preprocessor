@@ -39,7 +39,7 @@ subscribe() {
       fi
     fi
     touch ${work_directory}/${priority}_all_processed_file.txt
-    cp /dev/null ${work_directory}/${priority}_processed_file.tmp
+    cp /dev/null ${work_directory}/${priority}_processed_file.txt
     cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
     source_rclone_remote_bucket_exit_code_list='0'
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
@@ -51,6 +51,7 @@ subscribe() {
       if test ! -d ${source_work_directory}/${priority}; then
         mkdir -p ${source_work_directory}/${priority}
       fi
+      cp /dev/null ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt
       rm -rf ${source_work_directory}/${pubsub_index_directory}/${priority}
       rm -rf ${source_work_directory}/${search_index_directory}/${priority}
       if test ! -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt; then
@@ -200,7 +201,7 @@ subscribe() {
           cp /dev/null ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
           if test -s ${source_work_directory}/${priority}_newly_created_file.tmp; then
             set +e
-            grep -v -F -f ${work_directory}/${priority}_all_processed_file.txt ${source_work_directory}/${priority}_newly_created_file.tmp | grep -v -F -f ${work_directory}/${priority}_processed_file.tmp > ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
+            grep -v -F -f ${work_directory}/${priority}_all_processed_file.txt ${source_work_directory}/${priority}_newly_created_file.tmp | grep -v -F -f ${work_directory}/${priority}_processed_file.txt > ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
             set -e
           fi
           if test -s ${source_work_directory}/${priority}_filtered_newly_created_file.tmp; then
@@ -217,16 +218,16 @@ subscribe() {
               echo "ERROR: can not get file from ${source_rclone_remote_bucket}." >&2
               continue
             fi
-            sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|/\1|g" ${source_work_directory}/${priority}_log.tmp >> ${work_directory}/${priority}_processed_file.tmp
+            sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|/\1|g" ${source_work_directory}/${priority}_log.tmp >> ${work_directory}/${priority}_processed_file.txt
           fi
         fi
       fi
     done
-    if test -s ${work_directory}/${priority}_processed_file.tmp; then
+    if test -s ${work_directory}/${priority}_processed_file.txt; then
       now=`date -u "+%Y%m%d%H%M%S"`
-      cp ${work_directory}/${priority}_processed_file.tmp ${work_directory}/${priority}_processed/${now}.txt
+      cp ${work_directory}/${priority}_processed_file.txt ${work_directory}/${priority}_processed/${now}.txt
       if test ${standard_output_processed_file} -eq 1; then
-        cat ${work_directory}/${priority}_processed_file.tmp
+        cat ${work_directory}/${priority}_processed_file.txt
       fi
     fi
     source_rclone_remote_bucket_count=1

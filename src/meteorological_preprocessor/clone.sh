@@ -55,7 +55,7 @@ clone() {
       break
     fi
     touch ${work_directory}/${priority}_all_processed_file.txt
-    cp /dev/null ${work_directory}/${priority}_processed_file.tmp
+    cp /dev/null ${work_directory}/${priority}_processed_file.txt
     cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
     source_rclone_remote_bucket_exit_code_list='0'
     for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_list} | tr ';' '\n'`; do
@@ -67,6 +67,7 @@ clone() {
       if test ! -d ${source_work_directory}/${priority}; then
         mkdir -p ${source_work_directory}/${priority}
       fi
+      cp /dev/null ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt
       rm -rf ${source_work_directory}/${pubsub_index_directory}/${priority}
       rm -rf ${source_work_directory}/${search_index_directory}/${priority}
       if test ! -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt; then
@@ -216,7 +217,7 @@ clone() {
           cp /dev/null ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
           if test -s ${source_work_directory}/${priority}_newly_created_file.tmp; then
             set +e
-            grep -v -F -f ${work_directory}/${priority}_all_processed_file.txt ${source_work_directory}/${priority}_newly_created_file.tmp | grep -v -F -f ${work_directory}/${priority}_processed_file.tmp > ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
+            grep -v -F -f ${work_directory}/${priority}_all_processed_file.txt ${source_work_directory}/${priority}_newly_created_file.tmp | grep -v -F -f ${work_directory}/${priority}_processed_file.txt > ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
             set -e
           fi
           if test -s ${source_work_directory}/${priority}_filtered_newly_created_file.tmp; then
@@ -233,24 +234,24 @@ clone() {
               echo "ERROR: can not copy file from ${source_rclone_remote_bucket} to ${destination_rclone_remote_bucket}." >&2
               continue
             fi
-            sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|/\1|g" ${source_work_directory}/${priority}_log.tmp >> ${work_directory}/${priority}_processed_file.tmp
+            sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|/\1|g" ${source_work_directory}/${priority}_log.tmp >> ${work_directory}/${priority}_processed_file.txt
           fi
         fi
       fi
     done
-    if test -s ${work_directory}/${priority}_processed_file.tmp; then
+    if test -s ${work_directory}/${priority}_processed_file.txt; then
       tmp_exit_code=1
       cp /dev/null ${work_directory}/${priority}_log.tmp
       for retry_count in `seq ${retry_num}`; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e
-        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.tmp ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
         tmp_exit_code=$?
         set -e
         if test ${tmp_exit_code} -eq 0; then
-          cp ${work_directory}/${priority}_processed_file.tmp ${work_directory}/${priority}_processed/${now}.txt
+          cp ${work_directory}/${priority}_processed_file.txt ${work_directory}/${priority}_processed/${now}.txt
           if test ${standard_output_processed_file} -eq 1; then
-            cat ${work_directory}/${priority}_processed_file.tmp
+            cat ${work_directory}/${priority}_processed_file.txt
           fi
           break
         else
