@@ -54,6 +54,7 @@ clone() {
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_list}." >&2
       break
     fi
+    touch ${work_directory}/${priority}_all_processed_file.txt
     cp /dev/null ${work_directory}/${priority}_processed_file.tmp
     cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
     source_rclone_remote_bucket_exit_code_list='0'
