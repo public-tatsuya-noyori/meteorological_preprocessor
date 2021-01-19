@@ -258,7 +258,6 @@ subscribe() {
         echo "ERROR: All index file list has not been updated for 5 minutes on ${source_rclone_remote_bucket_list}." >&2
         return 255
       elif test ${switchable} -eq 2; then
-        echo "WARNING: All index file list has not been updated for 5 minutes on ${source_rclone_remote_bucket_list}." >&2
         return 0
       fi
     fi
