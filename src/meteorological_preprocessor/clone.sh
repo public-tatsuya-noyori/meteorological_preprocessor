@@ -289,7 +289,6 @@ clone() {
     done
     if test ${switch} -eq 1; then
       if test ${switchable} -eq 1; then
-        echo "ERROR: All index file list has not been updated for 5 minutes on ${source_rclone_remote_bucket_list}." >&2
         return 255
       elif test ${switchable} -eq 2; then
         return 0
