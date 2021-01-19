@@ -95,9 +95,9 @@ clone() {
         continue
       fi
       if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp; then
-        diff ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp | grep '>' | cut -c3- > ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.tmp
-        if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.tmp; then
-          sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.tmp > ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp
+        diff ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp | grep '>' | cut -c3- > ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt
+        if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
+          sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt > ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp
           set +e
           rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp --ignore-checksum --log-level ${debug_index_file} --local-no-set-modtime --low-level-retries 3 --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
           exit_code=$?
@@ -109,7 +109,7 @@ clone() {
           fi
           ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority} > ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp
           set +e
-          cmp -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp
+          cmp -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_gotten_new_index.tmp
           cmp_exit_code_1=$?
           set -e
           if test ${cmp_exit_code_1} -gt 1; then
@@ -117,7 +117,7 @@ clone() {
             continue
           fi
           set +e
-          cmp -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp
+          cmp -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp
           cmp_exit_code_2=$?
           set -e
           if test ${cmp_exit_code_2} -gt 1; then
@@ -268,7 +268,7 @@ clone() {
       source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
       source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
       source_rclone_remote_bucket_exit_code=`echo "${source_rclone_remote_bucket_exit_code_list}" | cut -d' ' -f${source_rclone_remote_bucket_count}`
-      if test ${source_rclone_remote_bucket_exit_code} = '0'; then
+      if test ${source_rclone_remote_bucket_exit_code} = '0' -a -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
         mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
       fi
       source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
