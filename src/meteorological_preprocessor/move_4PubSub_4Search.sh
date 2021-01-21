@@ -49,7 +49,7 @@ fi
 local_work_directory=$1
 unique_job_name=$2
 set +e
-rclone_remote_bucket=`echo $3 | grep ':'`
+rclone_remote_bucket=`echo $3 | grep -F ':'`
 priority=`echo $4 | grep "^p[1-9]$"`
 set -e
 if test -z "${rclone_remote_bucket}"; then
@@ -64,7 +64,7 @@ work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
 mkdir -p ${work_directory}
 if test ${cron} -eq 1; then
   if test -s ${work_directory}/pid.txt; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep " $0 " | grep " ${unique_job_name} " | wc -l`
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | wc -l`
   else
     running=0
   fi

@@ -39,7 +39,7 @@ if test -z $3; then
   exit 199
 fi
 set +e
-rclone_remote_bucket=`echo $1 | grep ':'`
+rclone_remote_bucket=`echo $1 | grep -F ':'`
 priority=`echo $2 | grep "^p[1-9]$"`
 set -e
 if test -z "${rclone_remote_bucket}"; then
@@ -94,14 +94,18 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       set +e
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      set -e
       rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} | xargs -r -n 1 -I {} rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/{} | grep -E ${keyword_pattern}
+      set -e
     done
     for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
       if test -z "${out_local_directory}"; then
+        set +e
         rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern}
+        set -e
       else
+        set +e
         rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
+        set -e
         rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
       fi
     done
@@ -120,9 +124,13 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           set -e
           if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
             if test -z "${out_local_directory}"; then
+              set +e
               rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern}
+              set -e
             else
+              set +e
               rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
+              set -e
               rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
             fi
           fi
@@ -136,9 +144,13 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       set -e
       if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
         if test -z "${out_local_directory}"; then
+          set +e
           rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern}
+          set -e
         else
+          set +e
           rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
+          set -e
           rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
         fi
       fi
@@ -159,9 +171,13 @@ else
         set -e
         if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
           if test -z "${out_local_directory}"; then
+            set +e
             rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern}
+            set -e
           else
+            set +e
             rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
+            set -e
             rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
           fi
         fi
@@ -175,9 +191,13 @@ else
     set -e
     if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
       if test -z "${out_local_directory}"; then
+        set +e
         rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern}
+        set -e
       else
+        set +e
         rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
+        set -e
         rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
       fi
     fi
