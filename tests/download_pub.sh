@@ -94,6 +94,7 @@ if test -s download_${priority}/created.txt; then
   while test ${created_num} -gt 0; do
     rm -rf download_${priority}/downloaded download_${priority}/aria2c.log download_${priority}/get_file_stdout.txt
     mkdir -p download_${priority}/downloaded
+    sleep 60
     set +e
     aria2c --check-certificate=false -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l download_${priority}/aria2c.log -i download_${priority}/created.txt -d download_${priority}/downloaded >> download_${priority}/get_file_stdout.txt
     set -e
@@ -113,7 +114,7 @@ if test -s download_${priority}/created.txt; then
   fi
   rm -f download_${priority}/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_index_file cache_o pub_iij12oi${priority} ${i} "${rclone_remote_bucket_list}" ${priority} 4;done
+for i in `ls -1 download_${priority}/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_input_index_file cache_o pub_iij12oi${priority} ${i} "${rclone_remote_bucket_list}" ${priority} 4;done
 } &
 pid=$!
 echo ${pid} > download_${priority}/pid.txt

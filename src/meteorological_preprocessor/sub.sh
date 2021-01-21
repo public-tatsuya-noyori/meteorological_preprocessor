@@ -336,7 +336,7 @@ source_rclone_remote_bucket_main_sub_list=`echo $3 | grep -F ':'`
 priority=`echo $4 | grep "^p[1-9]$"`
 parallel=`echo $5 | grep '^[0-9]\+$'`
 set -e
-if test -z "${source_rclone_remote_bucket_main_sub}"; then
+if test -z "${source_rclone_remote_bucket_main_sub_list}"; then
   echo "ERROR: $3 is not rclone_remote:bucket." >&2
   exit 199
 fi
