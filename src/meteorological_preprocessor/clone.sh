@@ -287,7 +287,7 @@ clone() {
         source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
         source_rclone_remote_bucket_exit_code=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e 's|^ ||g' | cut -d' ' -f${source_rclone_remote_bucket_count}`
         if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
-          if test ${source_rclone_remote_bucket_exit_code} = '0'; then
+          if test "${source_rclone_remote_bucket_exit_code}" = '0'; then
             mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
           else
             echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: no move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
