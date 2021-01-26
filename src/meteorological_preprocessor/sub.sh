@@ -281,6 +281,8 @@ subscribe() {
         elif test ${source_rclone_remote_bucket_main_sub_counter} -eq ${source_rclone_remote_bucket_main_sub_list_length}; then
           return_code=0
         fi
+      else
+        return_code=${exit_code}
       fi
     done
     if test ${return_code} -eq 0;then
