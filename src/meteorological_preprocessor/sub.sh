@@ -259,7 +259,7 @@ subscribe() {
           if test ${source_rclone_remote_bucket_exit_code} = '0'; then
             mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
           else
-            echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: do not move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
+            echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: no move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
           fi
         fi
         source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
