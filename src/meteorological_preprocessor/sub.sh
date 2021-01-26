@@ -109,6 +109,7 @@ subscribe() {
             cmp_exit_code_1=$?
             set -e
             if test ${cmp_exit_code_1} -gt 1; then
+              exit_code=${cmp_exit_code_1}
               source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\)[^ ]\+$|\1 ${cmp_exit_code_1}|g" -e 's|^ ||g'`
               echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not compare." >> ${work_directory}/${priority}_err_log.tmp
               source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
@@ -119,6 +120,7 @@ subscribe() {
             cmp_exit_code_2=$?
             set -e
             if test ${cmp_exit_code_2} -gt 1; then
+              exit_code=${cmp_exit_code_2}
               source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\)[^ ]\+$|\1 ${cmp_exit_code_2}|g" -e 's|^ ||g'`
               echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not compare." >> ${work_directory}/${priority}_err_log.tmp
               source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
@@ -280,6 +282,8 @@ subscribe() {
           return_code=0
         elif test ${source_rclone_remote_bucket_main_sub_counter} -eq ${source_rclone_remote_bucket_main_sub_list_length}; then
           return_code=0
+        else
+          return_code=255
         fi
       else
         return_code=${exit_code}
