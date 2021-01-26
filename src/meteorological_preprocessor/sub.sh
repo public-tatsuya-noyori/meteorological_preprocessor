@@ -229,7 +229,7 @@ subscribe() {
                 echo "ERROR: can not get file from ${source_rclone_remote_bucket}." >> ${work_directory}/${priority}_err_log.tmp
                 continue
               fi
-              sed -e "s|^.* INFO *: *\(.*\) *: Copied .*$|/\1|g" ${source_work_directory}/${priority}_info_log.tmp >> ${work_directory}/${priority}_processed_file.txt
+              grep "^.* INFO *: *.* *:.* Copied .*$" ${source_work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\(.*\) *:.* Copied .*$|/\1|g" >> ${work_directory}/${priority}_processed_file.txt
             fi
           fi
         fi
