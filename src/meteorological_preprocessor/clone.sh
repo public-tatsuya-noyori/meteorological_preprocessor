@@ -85,7 +85,7 @@ clone() {
             set -e
             if test ${exit_code} -ne 0; then
               source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${exit_code}|g"`
-              echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
+              echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
               rm -f ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
               source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
               continue
@@ -98,7 +98,7 @@ clone() {
         set -e
         if test ${exit_code} -ne 0; then
           source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${exit_code}|g"`
-          echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
+          echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
           source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
           continue
         fi
@@ -114,7 +114,7 @@ clone() {
             set -e
             if test ${exit_code} -ne 0; then
               source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${exit_code}|g"`
-              echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not get index file from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
+              echo "ERROR: ${exit_code}: can not get index file from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
               source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
               continue
             fi
@@ -126,7 +126,7 @@ clone() {
             if test ${cmp_exit_code_1} -gt 1; then
               exit_code=${cmp_exit_code_1}
               source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${cmp_exit_code_1}|g"`
-              echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not compare." >> ${work_directory}/${priority}_err_log.tmp
+              echo "ERROR: ${exit_code}: can not compare." >> ${work_directory}/${priority}_err_log.tmp
               source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
               continue
             fi
@@ -137,7 +137,7 @@ clone() {
             if test ${cmp_exit_code_2} -gt 1; then
               exit_code=${cmp_exit_code_2}
               source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${cmp_exit_code_2}|g"`
-              echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not compare." >> ${work_directory}/${priority}_err_log.tmp
+              echo "ERROR: ${exit_code}: can not compare." >> ${work_directory}/${priority}_err_log.tmp
               source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
               continue
             fi
@@ -149,7 +149,7 @@ clone() {
               set -e
               if test ${exit_code} -ne 0; then
                 source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${exit_code}|g"`
-                echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not get index directory list from ${source_rclone_remote_bucket}/${search_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
+                echo "ERROR: ${exit_code}: can not get index directory list from ${source_rclone_remote_bucket}/${search_index_directory}/${priority}." >> ${work_directory}/${priority}_err_log.tmp
                 source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
                 continue
               fi
@@ -169,7 +169,7 @@ clone() {
                   if test ${exit_code} -ne 0; then
                     search_index_directory_exit_code=${exit_code}
                     source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${exit_code}|g"`
-                    echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not get index file list from ${source_rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}." >> ${work_directory}/${priority}_err_log.tmp
+                    echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}." >> ${work_directory}/${priority}_err_log.tmp
                     source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
                     break
                   fi
@@ -203,7 +203,7 @@ clone() {
                 set -e
                 if test ${exit_code} -ne 0; then
                   source_rclone_remote_bucket_exit_code_list=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e "s|^\(.*\) \([0-9]\+\)$|\1 ${exit_code}|g"`
-                  echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not get index file from ${source_rclone_remote_bucket}/${search_index_directory}." >> ${work_directory}/${priority}_err_log.tmp
+                  echo "ERROR: ${exit_code}: can not get index file from ${source_rclone_remote_bucket}/${search_index_directory}." >> ${work_directory}/${priority}_err_log.tmp
                   source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
                   continue
                 fi
@@ -250,7 +250,7 @@ clone() {
                 set +e
                 grep -F ERROR ${source_work_directory}/${priority}_info_log.tmp >> ${work_directory}/${priority}_err_log.tmp
                 set -e
-                echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not clone file from ${source_rclone_remote_bucket} to ${destination_rclone_remote_bucket}." >> ${work_directory}/${priority}_err_log.tmp
+                echo "ERROR: ${exit_code}: can not clone file from ${source_rclone_remote_bucket} to ${destination_rclone_remote_bucket}." >> ${work_directory}/${priority}_err_log.tmp
                 source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
                 continue
               fi
@@ -278,7 +278,7 @@ clone() {
           fi
         done
         if test ${exit_code} -ne 0; then
-          echo "ERROR: ${source_rclone_remote_bucket_exit_code_list}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >> ${work_directory}/${priority}_err_log.tmp
+          echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >> ${work_directory}/${priority}_err_log.tmp
         fi
       fi
       source_rclone_remote_bucket_count=1
@@ -289,8 +289,11 @@ clone() {
         if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
           if test "${source_rclone_remote_bucket_exit_code}" = '0'; then
             mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
+            if test -s ${work_directory}/${priority}_err_log.tmp; then
+              echo "INFO: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: moved ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
+            fi
           else
-            echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: no move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
+            echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: not move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
           fi
         fi
         source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
