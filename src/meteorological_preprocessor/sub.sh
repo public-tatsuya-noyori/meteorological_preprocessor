@@ -235,7 +235,7 @@ subscribe() {
                 set +e
                 grep -F ERROR ${source_work_directory}/${priority}_info_log.tmp >> ${work_directory}/${priority}_err_log.tmp
                 set -e
-                echo "ERROR: ${exit_code}: can not get file from ${source_rclone_remote_bucket}." >> ${work_directory}/${priority}_err_log.tmp
+                echo "ERROR: ${exit_code}: can not get file from ${source_rclone_remote_bucket} ${priority}." >> ${work_directory}/${priority}_err_log.tmp
                 source_rclone_remote_bucket_exit_code_list="${source_rclone_remote_bucket_exit_code_list} 0"
                 continue
               fi

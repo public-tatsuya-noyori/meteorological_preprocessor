@@ -47,7 +47,7 @@ publish(){
     set -e
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/${priority}_err_log.tmp >&2
-      echo "ERROR: can not put to ${destination_rclone_remote_bucket}." >&2
+      echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${priority}." >&2
       return ${exit_code}
     fi
     for retry_count in `seq ${retry_num}`; do
