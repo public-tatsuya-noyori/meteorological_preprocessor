@@ -18,6 +18,7 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+bandwidth_limit_k_bytes_per_s=0
 cutoff=16M
 end_yyyymmddhhmm=0
 out_local_directory=''
@@ -25,11 +26,13 @@ pubsub_index_directory=4PubSub
 search_index_directory=4Search
 start_yyyymmddhhmm=0
 timeout=8s
+parallel=64
 for arg in "$@"; do
   case "${arg}" in
+    "--bnadwidth_limit") shift;bandwidth_limit_k_bytes_per_s=$1;shift;;
     "--debug_shell" ) set -evx;shift;;
     "--end" ) end_yyyymmddhhmm=$2;shift;shift;;
-    "--help" ) echo "$0 [--debug_shell] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out local_directory] rclone_remote_bucket priority keyword_pattern/inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out local_directory] rclone_remote_bucket priority keyword_pattern/inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
     "--out" ) out_local_directory=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;
   esac
@@ -106,7 +109,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
         set +e
         rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
         set -e
-        rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
+        rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${out_local_directory}
       fi
     done
   else
@@ -131,7 +134,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
               set +e
               rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
               set -e
-              rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
+              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${out_local_directory}
             fi
           fi
         done
@@ -151,7 +154,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           set +e
           rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
           set -e
-          rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
+          rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${out_local_directory}
         fi
       fi
     done
@@ -178,7 +181,7 @@ else
             set +e
             rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
             set -e
-            rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
+            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${out_local_directory}
           fi
         fi
       done
@@ -198,7 +201,7 @@ else
         set +e
         rclone cat --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} | grep -E ${keyword_pattern} > ${out_local_directory}/4search.tmp
         set -e
-        rclone copy --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --ignore-checksum --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${out_local_directory}
+        rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${out_local_directory}/4search.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${out_local_directory}
       fi
     fi
   done
