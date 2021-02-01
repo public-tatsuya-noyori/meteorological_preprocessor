@@ -25,6 +25,7 @@ out=0
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
 start_yyyymmddhhmm=0
+suffix=.`id -un`.`date -u +"%Y%m%d%H%M%S%3N"`
 timeout=8s
 parallel=64
 for arg in "$@"; do
@@ -100,41 +101,41 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
       set -e
       for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}`; do
-        rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${local_work_directory}/search_index.tmp
+        rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${local_work_directory}/search_index.tmp${suffix}
         set +e
         if test -n "${exclusive_pattern_file}"; then
-          grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp
+          grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp${suffix}
         elif test -n "${inclusive_pattern_file}"; then
-          grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+          grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
         else
-          grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+          grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
         fi
         set -e
-        if test -s ${local_work_directory}/search_file.tmp; then
+        if test -s ${local_work_directory}/search_file.tmp${suffix}; then
           if test ${out} -eq 0; then
-            cat ${local_work_directory}/search_file.tmp
+            cat ${local_work_directory}/search_file.tmp${suffix}
           else
-            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp${suffix} --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
           fi
         fi
       done
     done
     for index_file in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}`; do
-      rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${local_work_directory}/search_index.tmp
+      rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${local_work_directory}/search_index.tmp${suffix}
       set +e
       if test -n "${exclusive_pattern_file}"; then
-        grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp
+        grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp${suffix}
       elif test -n "${inclusive_pattern_file}"; then
-        grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+        grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
       else
-        grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+        grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
       fi
       set -e
-      if test -s ${local_work_directory}/search_file.tmp; then
+      if test -s ${local_work_directory}/search_file.tmp${suffix}; then
         if test ${out} -eq 0; then
-          cat ${local_work_directory}/search_file.tmp
+          cat ${local_work_directory}/search_file.tmp${suffix}
         else
-          rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+          rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp${suffix} --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
         fi
       fi
     done
@@ -152,21 +153,21 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           yyyymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
           set -e
           if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
-            rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${local_work_directory}/search_index.tmp
+            rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${local_work_directory}/search_index.tmp${suffix}
             set +e
             if test -n "${exclusive_pattern_file}"; then
-              grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp
+              grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp${suffix}
             elif test -n "${inclusive_pattern_file}"; then
-              grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+              grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
             else
-              grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+              grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
             fi
             set -e
-            if test -s ${local_work_directory}/search_file.tmp; then
+            if test -s ${local_work_directory}/search_file.tmp${suffix}; then
               if test ${out} -eq 0; then
-                cat ${local_work_directory}/search_file.tmp
+                cat ${local_work_directory}/search_file.tmp${suffix}
               else
-                rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+                rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp${suffix} --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
               fi
             fi
           fi
@@ -179,21 +180,21 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
       set -e
       if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
-        rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${local_work_directory}/search_index.tmp
+        rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${local_work_directory}/search_index.tmp${suffix}
         set +e
         if test -n "${exclusive_pattern_file}"; then
-          grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp
+          grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp${suffix}
         elif test -n "${inclusive_pattern_file}"; then
-          grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+          grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
         else
-          grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+          grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
         fi
         set -e
-        if test -s ${local_work_directory}/search_file.tmp; then
+        if test -s ${local_work_directory}/search_file.tmp${suffix}; then
           if test ${out} -eq 0; then
-            cat ${local_work_directory}/search_file.tmp
+            cat ${local_work_directory}/search_file.tmp${suffix}
           else
-            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp${suffix} --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
           fi
         fi
       fi
@@ -213,21 +214,21 @@ else
         yyyymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
         set -e
         if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
-          rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${local_work_directory}/search_index.tmp
+          rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${local_work_directory}/search_index.tmp${suffix}
           set +e
           if test -n "${exclusive_pattern_file}"; then
-            grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp
+            grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp${suffix}
           elif test -n "${inclusive_pattern_file}"; then
-            grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+            grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
           else
-            grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+            grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
           fi
           set -e
-          if test -s ${local_work_directory}/search_file.tmp; then
+          if test -s ${local_work_directory}/search_file.tmp${suffix}; then
             if test ${out} -eq 0; then
-              cat ${local_work_directory}/search_file.tmp
+              cat ${local_work_directory}/search_file.tmp${suffix}
             else
-              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp${suffix} --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
             fi
           fi
         fi
@@ -240,23 +241,24 @@ else
     yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
     set -e
     if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
-      rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${local_work_directory}/search_index.tmp
+      rclone copyto --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${local_work_directory}/search_index.tmp${suffix}
       set +e
       if test -n "${exclusive_pattern_file}"; then
-        grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp
+        grep -v -E -f ${exclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} | grep -E -f ${inclusive_pattern_file} > ${local_work_directory}/search_file.tmp${suffix}
       elif test -n "${inclusive_pattern_file}"; then
-        grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+        grep -E -f ${inclusive_pattern_file} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
       else
-        grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp > ${local_work_directory}/search_file.tmp
+        grep -E ${keyword_pattern} ${local_work_directory}/search_index.tmp${suffix} > ${local_work_directory}/search_file.tmp${suffix}
       fi
       set -e
-      if test -s ${local_work_directory}/search_file.tmp; then
+      if test -s ${local_work_directory}/search_file.tmp${suffix}; then
         if test ${out} -eq 0; then
-          cat ${local_work_directory}/search_file.tmp
+          cat ${local_work_directory}/search_file.tmp${suffix}
         else
-          rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+          rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${local_work_directory}/search_file.tmp${suffix} --local-no-set-modtime --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
         fi
       fi
     fi
   done
 fi
+rm -f ${local_work_directory}/search_index.tmp${suffix} ${local_work_directory}/search_file.tmp${suffix}
