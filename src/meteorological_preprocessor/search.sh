@@ -69,7 +69,7 @@ if test -n "${start_yyyymmddhhmm}"; then
   start_yyyymmddhhmm=`echo "${start_yyyymmddhhmm}" | grep -E "^([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]|0)$"`
   set -e
   if test -z ${start_yyyymmddhhmm}; then
-    echo "ERROR: ${start_yyyymmddhhmm} is not yyyymmddhh." >&2
+    echo "ERROR: start_yyyymmddhhmm is not yyyymmddhhmm." >&2
     exit 199
   fi
   set +e
@@ -81,7 +81,7 @@ if test -n "${end_yyyymmddhhmm}"; then
   end_yyyymmddhhmm=`echo "${end_yyyymmddhhmm}" | grep -E "^([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]|0)$"`
   set -e
   if test -z ${end_yyyymmddhhmm}; then
-    echo "ERROR: ${end_yyyymmddhhmm} is not yyyymmddhh." >&2
+    echo "ERROR: end_yyyymmddhhmm is not yyyymmddhhmm." >&2
     exit 199
   fi
   set +e
