@@ -25,7 +25,7 @@ out=0
 pubsub_index_directory=4PubSub
 search_index_directory=4Search
 start_yyyymmddhhmm=0
-suffix=.`id -un`.`date -u +"%Y%m%d%H%M%S%3N"`
+suffix=.`id -un`.`date -u +"%Y%m%d%H%M%S%N"`
 timeout=8s
 parallel=64
 for arg in "$@"; do
