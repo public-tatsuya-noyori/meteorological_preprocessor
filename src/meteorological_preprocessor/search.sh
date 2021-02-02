@@ -93,6 +93,10 @@ fi
 if test -n "${local_work_directory}"; then
   mkdir -p "${local_work_directory}"
 fi
+if test -f ${local_work_directory}/search_index.tmp${suffix} -o -f ${local_work_directory}/search_file.tmp${suffix}; then
+  echo "ERROR: exist ${local_work_directory}/search_index.tmp${suffix} or ${local_work_directory}/search_file.tmp${suffix}." >&2
+  exit 199
+fi
 if test ${end_yyyymmddhhmm} -eq 0; then
   if test ${start_yyyymmddhhmm} -eq 0; then
     for index_directory in `rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}`; do
