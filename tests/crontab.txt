@@ -132,241 +132,41 @@
 50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache del_iij2cop5 iij2:japan.meteorological.agency.2.closed.data.o p5
 
 # del
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1oi iij1:japan.meteorological.agency.1.open.data.i   2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1ci iij1:japan.meteorological.agency.1.closed.data.i 2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2oi iij2:japan.meteorological.agency.2.open.data.i   2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2ci iij2:japan.meteorological.agency.2.closed.data.i 2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1oo iij1:japan.meteorological.agency.1.open.data.o   2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1co iij1:japan.meteorological.agency.1.closed.data.o 2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2oo iij2:japan.meteorological.agency.2.open.data.o   2 > /dev/null 2>&1
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2co iij2:japan.meteorological.agency.2.closed.data.o 2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1oi iij1:japan.meteorological.agency.1.open.data.i   2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1ci iij1:japan.meteorological.agency.1.closed.data.i 2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2oi iij2:japan.meteorological.agency.2.open.data.i   2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2ci iij2:japan.meteorological.agency.2.closed.data.i 2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1oo iij1:japan.meteorological.agency.1.open.data.o   2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij1co iij1:japan.meteorological.agency.1.closed.data.o 2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2oo iij2:japan.meteorological.agency.2.open.data.o   2 > /dev/null 2>&1
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache del_iij2co iij2:japan.meteorological.agency.2.closed.data.o 2 > /dev/null 2>&1
 
 # sub
-*    * * * * cd /home/noyori/tests; ./sub.sh --cron --urgent cache_s sub_iij12oip1 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p1  8
-*    * * * * cd /home/noyori/tests; ./sub.sh --cron --urgent cache_s sub_iij12cip1 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p1  8 
-*/10 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip2 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p2 16
-*/10 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip2 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p2 16
-*/30 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 16
-*/30 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p3 16
+*/30    * * * * cd /home/noyori/tests; ./sub.sh --cron --urgent cache_s sub_iij12oip1 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p1  8 >> /home/noyori/tests/log//sub.sh.p1.log 2>&1
+*/30    * * * * cd /home/noyori/tests; ./sub.sh --cron --urgent cache_s sub_iij12cip1 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p1  8
+*/10 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip2 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p2 16 >> /home/noyori/tests/log/sub.sh.p2.log 2>&1
+#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip2 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p2 16 >> /home/noyori/tests/log/sub.sh.p2.log 2>&1
+*/10 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip2 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p2 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip2 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p2 16
+* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 16
+* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip3 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p3 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip3 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p3 16
 55   * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip4 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p4 64
-55   * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip4 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p4 64
+#*   * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip4 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p4 64
+55   * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip4 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p4 64
+#*   * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip4 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p4 64
 55 */6 * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip5 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p5 64
-55 */6 * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip5 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p5 64
-
-# high-stress test
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_000.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_001.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_002.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_003.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_004.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_005.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_006.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_007.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_008.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_009.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_010.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_011.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_012.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_013.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_014.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_015.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_016.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_017.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_018.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_019.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_020.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_021.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_022.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_023.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_024.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_025.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_026.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_027.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_028.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_029.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_030.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_031.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_032.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_033.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_034.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_035.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_036.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_037.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_038.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_039.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_040.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_041.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_042.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_043.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_044.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_045.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_046.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_047.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_048.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_049.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_050.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_051.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_052.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_053.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_054.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_055.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_056.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_057.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_058.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_059.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_060.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_061.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_062.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_063.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_064.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_065.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_066.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_067.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_068.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_069.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_070.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_071.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_072.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_073.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_074.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_075.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_076.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_077.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_078.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_079.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_080.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_081.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_082.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_083.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_084.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_085.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_086.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_087.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_088.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_089.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_090.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_091.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_092.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_093.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_094.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_095.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_096.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_097.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_098.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_099.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_100.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_101.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_102.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_103.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_104.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_105.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_106.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_107.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_108.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_109.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_110.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_111.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_112.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_113.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_114.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_115.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_116.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_117.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_118.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_119.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_120.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_121.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_122.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_123.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_124.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_125.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_126.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_127.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_128.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_129.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_130.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_131.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_132.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_133.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_134.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_135.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_136.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_137.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_138.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_139.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_140.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_141.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_142.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_143.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_144.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_145.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_146.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_147.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_148.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_149.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_150.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_151.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_152.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_153.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_154.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_155.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_156.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_157.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_158.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_159.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_160.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_161.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_162.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_163.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_164.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_165.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_166.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_167.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_168.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_169.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_170.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_171.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_172.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_173.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_174.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_175.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_176.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_177.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_178.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_179.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_180.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_181.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_182.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_183.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_184.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_185.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_186.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_187.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_188.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_189.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_190.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_191.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_192.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_193.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_194.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_195.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_196.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_197.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_198.log 1>/dev/null
-* * * * * rclone lsf --dry-run --quiet iij1:japan.meteorological.agency.1.open.data.i/4PubSub/p2/ 2>> /home/noyori/tests/log/hst/lstp2_199.log 1>/dev/null
-
+#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12oip5 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p5 64
+55 */6 * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip5 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p5 64
+#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s sub_iij12cip5 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.i;iij2:japan.meteorological.agency.2.closed.data.i' p5 64
 
 # delete on local PC
 55 1,9,17 * * * find /home/noyori/tests/cache_o /home/noyori/tests/cache_c /home/noyori/tests/cache_s -mindepth 5 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
-#55 6,14,22 * * * find /home/noyori/tests/cache -mindepth 5 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 #55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
-# subscribe
-#* * * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 2>>log/sub.sh.bufr.log
-#0 */2 * * * cd /home/noyori/tests; now=`date -u --iso-8601=seconds | tr -d '\-T:' | sed -e 's|+.*||g'`; ./sub.sh --cron cache_s sub_bufr 'iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p3 64 1> sub_bufr_synop/${now}.tmp 2>>log/sub.sh.bufr.log; if test -s sub_bufr/${now}.tmp; then mv -f sub_bufr/${now}.tmp sub_bufr/${now}.txt; else rm -f sub_bufr/${now}.tmp; fi
-
 # convert bufr synop to arrow
-#* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
+* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
 
 # convert arrow to tile arrow
 #* * * * * cd /home/noyori/tests; ./arrow_to_tile_arrow.sh >> log/arrow_to_tile_arrow.sh.log 2>&1
