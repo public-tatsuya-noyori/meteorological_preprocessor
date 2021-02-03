@@ -60,23 +60,25 @@ publish(){
       echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${priority}." >&2
       return ${exit_code}
     fi
-    for retry_count in `seq ${retry_num}`; do
-      now=`date -u "+%Y%m%d%H%M%S"`
-      set +e
-      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
-      exit_code=$?
-      set -e
-      if test ${exit_code} -eq 0; then
-        cp ${work_directory}/${priority}_processed_file.txt ${work_directory}/${priority}_processed/${now}.txt
-        break
-      else
-        sleep 1
+    if test -s ${work_directory}/${priority}_processed_file.txt; then
+      for retry_count in `seq ${retry_num}`; do
+        now=`date -u "+%Y%m%d%H%M%S"`
+        set +e
+        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+        exit_code=$?
+        set -e
+        if test ${exit_code} -eq 0; then
+          cp ${work_directory}/${priority}_processed_file.txt ${work_directory}/${priority}_processed/${now}.txt
+          break
+        else
+          sleep 1
+        fi
+      done
+      if test ${exit_code} -ne 0; then
+        cat ${work_directory}/${priority}_err_log.tmp >&2
+        echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
+        return ${exit_code}
       fi
-    done
-    if test ${exit_code} -ne 0; then
-      cat ${work_directory}/${priority}_err_log.tmp >&2
-      echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
-      return ${exit_code}
     fi
     ls -1 ${work_directory}/${priority}_processed/* | grep -v -F "${work_directory}/${priority}_processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}_processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
   else
