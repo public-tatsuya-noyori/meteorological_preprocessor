@@ -251,6 +251,7 @@ clone() {
           fi
         fi
       done
+      index_exit_code=0
       if test -s ${work_directory}/${priority}_processed_file.txt; then
         for retry_count in `seq ${retry_num}`; do
           now=`date -u "+%Y%m%d%H%M%S"`
@@ -269,26 +270,29 @@ clone() {
           fi
         done
         if test ${exit_code} -ne 0; then
+          index_exit_code=${exit_code}
           echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >> ${work_directory}/${priority}_err_log.tmp
         fi
       fi
-      source_rclone_remote_bucket_count=1
-      for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
-        source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
-        source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
-        source_rclone_remote_bucket_exit_code=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e 's|^ ||g' | cut -d' ' -f${source_rclone_remote_bucket_count}`
-        if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
-          if test "${source_rclone_remote_bucket_exit_code}" = '0'; then
-            mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
-            if test -s ${work_directory}/${priority}_err_log.tmp; then
-              echo "INFO: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: moved ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
+      if test ${index_exit_code} -eq 0; then
+        source_rclone_remote_bucket_count=1
+        for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
+          source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
+          source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
+          source_rclone_remote_bucket_exit_code=`echo "${source_rclone_remote_bucket_exit_code_list}" | sed -e 's|^ ||g' | cut -d' ' -f${source_rclone_remote_bucket_count}`
+          if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
+            if test "${source_rclone_remote_bucket_exit_code}" = '0'; then
+              mv -f ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
+              if test -s ${work_directory}/${priority}_err_log.tmp; then
+                echo "INFO: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: moved ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
+              fi
+            else
+              echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: not move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
             fi
-          else
-            echo "ERROR: ${source_rclone_remote_bucket} ${source_rclone_remote_bucket_exit_code}: not move ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp" >> ${work_directory}/${priority}_err_log.tmp
           fi
-        fi
-        source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
-      done
+          source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
+        done
+      fi
       ls -1 ${work_directory}/${priority}_processed/* | grep -v -F "${work_directory}/${priority}_processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}_processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
       ls -1 ${work_directory}/${priority}_processed/* | xargs -r cat > ${work_directory}/${priority}_all_processed_file.txt
       if test ${exit_code} -eq 0; then
