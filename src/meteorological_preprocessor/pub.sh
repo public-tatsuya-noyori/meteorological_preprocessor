@@ -49,8 +49,8 @@ publish(){
     set -e
     if test ${exit_code} -eq 0; then
       set +e
-      grep "^.* DEBUG *: *.* *:.* Unchanged skipping.*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\(.*\) *:.* Unchanged skipping.*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
-      grep "^.* INFO *: *.* *:.* Copied .*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\(.*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+      grep "^.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+      grep "^.* INFO *: *[^ ]* *:.* Copied .*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
       set -e
     else
       set +e

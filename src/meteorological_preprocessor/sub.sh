@@ -232,7 +232,7 @@ subscribe() {
                 continue
               fi
               set +e
-              grep "^.* INFO *: *.* *:.* Copied .*$" ${source_work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\(.*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+              grep "^.* INFO *: *[^ ]* *:.* Copied .*$" ${source_work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
               set -e
             fi
           fi
