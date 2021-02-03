@@ -246,7 +246,9 @@ clone() {
                 echo "ERROR: ${exit_code}: can not clone file from ${source_rclone_remote_bucket} ${priority} to ${destination_rclone_remote_bucket} ${priority}." >> ${work_directory}/${priority}_err_log.tmp
                 continue
               fi
+              set +e
               grep "^.* INFO *: *.* *:.* Copied .*$" ${source_work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\(.*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+              set -e
             fi
           fi
         fi
