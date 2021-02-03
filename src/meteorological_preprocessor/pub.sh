@@ -21,6 +21,7 @@ set -e
 publish(){
   cp /dev/null ${work_directory}/${priority}_err_log.tmp
   exit_code=255
+  cp /dev/null ${work_directory}/${priority}_processed_file.txt
   if test ${wildcard_index} -eq 1; then
     grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/${priority}_newly_created_index.tmp
   else
@@ -41,11 +42,20 @@ publish(){
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
       return ${exit_code}
     fi
+    cp /dev/null ${work_directory}/${priority}_info_log.tmp
     set +e
-    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}_newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}_newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
-    if test ${exit_code} -ne 0; then
+    if test ${exit_code} -eq 0; then
+      set +e
+      grep "^.* DEBUG *: *.* *:.* Unchanged skipping.*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\(.*\) *:.* Unchanged skipping.*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+      grep "^.* INFO *: *.* *:.* Copied .*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\(.*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+      set -e
+    else
+      set +e
+      grep -F ERROR ${work_directory}/${priority}_info_log.tmp >> ${work_directory}/${priority}_err_log.tmp
+      set -e
       cat ${work_directory}/${priority}_err_log.tmp >&2
       echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${priority}." >&2
       return ${exit_code}
@@ -53,11 +63,11 @@ publish(){
     for retry_count in `seq ${retry_num}`; do
       now=`date -u "+%Y%m%d%H%M%S"`
       set +e
-      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_newly_created_index.tmp ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp ${work_directory}/${priority}_newly_created_index.tmp ${work_directory}/${priority}_processed/${now}.txt
+        cp ${work_directory}/${priority}_processed_file.txt ${work_directory}/${priority}_processed/${now}.txt
         break
       else
         sleep 1
