@@ -110,7 +110,7 @@ timeout=8s
 wildcard_index=0
 for arg in "$@"; do
   case "${arg}" in
-    "--bnadwidth_limit") shift;bandwidth_limit_k_bytes_per_s=$1;shift;;
+    "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--cron" ) cron=1;shift;;
     "--debug_shell" ) set -evx;shift;;
     "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] [--rm_input_index_file] [--wildcard_index] local_work_directory unique_job_name input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' priority parallel"; exit 0;;

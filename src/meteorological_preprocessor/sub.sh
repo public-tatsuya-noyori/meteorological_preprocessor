@@ -330,7 +330,7 @@ urgent=0
 wildcard_index=0
 for arg in "$@"; do
   case "${arg}" in
-    "--bnadwidth_limit") shift;bandwidth_limit_k_bytes_per_s=$1;shift;;
+    "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--cron" ) cron=1;shift;;
     "--debug_shell" ) set -evx;shift;;
     "--debug_index_file" ) debug_index_file=INFO;shift;;

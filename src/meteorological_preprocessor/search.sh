@@ -30,11 +30,12 @@ timeout=8s
 parallel=64
 for arg in "$@"; do
   case "${arg}" in
-    "--bnadwidth_limit") shift;bandwidth_limit_k_bytes_per_s=$1;shift;;
+    "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
     "--end" ) end_yyyymmddhhmm=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory rclone_remote_bucket priority keyword_pattern/inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--parallel the_number_of_parallel_transfer] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory rclone_remote_bucket priority keyword_pattern/inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
     "--out" ) out=1;shift;;
+    "--parallel" ) parallel=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;
   esac
 done
