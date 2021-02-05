@@ -58,6 +58,8 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_J[A-Z][A-Z][A-Z][0-9][0-9].*)$,^J[A-Z][A-Z][A-Z][0-9][0-9]$,,,,KNES,bufr,satellite,amv,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_I[A-Z][A-Z][A-Z][0-9][0-9].*)$,^[IJ][A-Z][A-Z][A-Z][0-9][0-9]$,,,,,bufr,unknown,unknown,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_KS[A-Z][A-Z][0-9][0-9].*)$,^KS[A-Z][A-Z][0-9][0-9]$,,,,,crex,surface,unknown,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_KU[A-Z][A-Z][0-9][0-9].*)$,^KU[A-Z][A-Z][0-9][0-9]$,( |^)D0704[1-4]\+\+( |$),,,,crex,upper_air,total_ozon,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_KU[A-Z][A-Z][0-9][0-9].*)$,^KU[A-Z][A-Z][0-9][0-9]$,,,,,crex,upper_air,unknown,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_K[A-Z][A-Z][A-Z][0-9][0-9].*)$,^K[A-Z][A-Z][A-Z][0-9][0-9]$,,,,,crex,unknown,unknown,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_LA[A-Z][A-Z][0-9][0-9].*)$,^LA[A-Z][A-Z][0-9][0-9]$,,,,,iwxxm,metar,unknown,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_AC[A-Z][A-Z][0-9][0-9].*)$,^AC[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,analysis,cyclone,txt
@@ -126,7 +128,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SW[A-Z][A-Z][0-9][0-9].*)$,^SW[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,waveob,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SX[A-Z][A-Z][0-9][0-9].*)$,^SX[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,miscellaneous,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SY[A-Z][A-Z][0-9][0-9].*)$,^SY[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,seismic_wave_data,txt
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SZ[A-Z][A-Z][0-9][0-9].*)$,^SZ[A-Z][A-Z][0-9][0-9]$,( |^)CREX\+\+( |$),,,,crex,surface,unknown,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SZ[A-Z][A-Z][0-9][0-9].*)$,^SZ[A-Z][A-Z][0-9][0-9]$,( |^)CREX\+\+( |$),,,,crex,surface,sea_level_data,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SZ[A-Z][A-Z][0-9][0-9].*)$,^SZ[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,sea_level_data,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_TB[A-Z][A-Z][0-9][0-9].*)$,^TB[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,satellite,orbit_parameter,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_TC[A-Z][A-Z][0-9][0-9].*)$,^TC[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,satellite,sarep,txt
