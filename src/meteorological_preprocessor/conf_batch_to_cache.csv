@@ -35,7 +35,8 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOB[A-Z][0-9][0-9].*)$,^IOB[A-Z][0-9][0-9]$,,315008,,,bufr,surface,moored_buoy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOB[A-Z][0-9][0-9].*)$,^IOB[A-Z][0-9][0-9]$,,315009,,,bufr,surface,drifting_buoy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOB[A-Z][0-9][0-9].*)$,^IOB[A-Z][0-9][0-9]$,,,,,bufr,surface,buoy,bin
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOP[A-Z][0-9][0-9].*)$,^IOP[A-Z][0-9][0-9]$,,,,,bufr,surface,profiling_float,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOP[A-Z][0-9][0-9].*)$,^IOP[A-Z][0-9][0-9]$,,,,,bufr,surface,tesac,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOR[A-Z][0-9][0-9].*)$,^IOR[A-Z][0-9][0-9]$,,,,,bufr,surface,trackob,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOS[A-Z][0-9][0-9].*)$,^IOS[A-Z][0-9][0-9]$,,,,,bufr,surface,bathy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_ISA[A-Z][0-9][0-9].*)$,^ISA[A-Z][0-9][0-9]$,,,,,bufr,surface,synop,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IS[IMN][A-Z][0-9][0-9].*)$,^IS[IMN][A-Z][0-9][0-9]$,,,,,bufr,surface,synop,bin

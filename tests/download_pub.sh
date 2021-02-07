@@ -94,9 +94,7 @@ if test -s download_${priority}/created.txt; then
   while test ${created_num} -gt 0; do
     rm -rf download_${priority}/downloaded download_${priority}/aria2c.log download_${priority}/get_file_stdout.txt
     mkdir -p download_${priority}/downloaded
-    set +e
     aria2c --check-certificate=false -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l download_${priority}/aria2c.log -i download_${priority}/created.txt -d download_${priority}/downloaded >> download_${priority}/get_file_stdout.txt
-    set -e
     ./met_pre_batch_to_cache.py RJTD download_${priority}/downloaded cache_o 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
     grep -F '[ERROR]' download_${priority}/aria2c.log | grep 'URI=' | sed -e 's/^.*URI=//g' | grep -v '^ *$' | sort -u > download_${priority}/created.txt
     if test -s download_${priority}/created.txt; then

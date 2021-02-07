@@ -93,7 +93,7 @@ subscribe() {
           if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
             sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt > ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp
             set +e
-            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -177,7 +177,7 @@ subscribe() {
                   cat ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp | sort -u | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp
                 fi
                 set +e
-                rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+                rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
                 exit_code=$?
                 set -e
                 if test ${exit_code} -ne 0; then
@@ -220,7 +220,7 @@ subscribe() {
             if test -s ${source_work_directory}/${priority}_filtered_newly_created_file.tmp; then
               cp /dev/null ${source_work_directory}/${priority}_info_log.tmp
               set +e
-              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/${priority}_filtered_newly_created_file.tmp --local-no-set-modtime --log-file ${source_work_directory}/${priority}_info_log.tmp --log-level INFO --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-check-dest --no-traverse --retries 1 --size-only --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${local_work_directory}
+              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/${priority}_filtered_newly_created_file.tmp --immutable --local-no-set-modtime --log-file ${source_work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-traverse --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${local_work_directory}
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then
@@ -232,6 +232,7 @@ subscribe() {
                 continue
               fi
               set +e
+              grep "^.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*$" ${source_work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
               grep "^.* INFO *: *[^ ]* *:.* Copied .*$" ${source_work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
               set -e
             fi
