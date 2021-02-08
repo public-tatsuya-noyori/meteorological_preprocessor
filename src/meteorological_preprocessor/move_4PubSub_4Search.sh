@@ -19,7 +19,7 @@
 #
 set -e
 move_4PubSub_4Search() {
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt$"| head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;rclone moveto --checksum --contimeout '${timeout}' --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file_date_hour}/${index_file_minute_second_extension}'
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt$" | head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;rclone moveto --checksum --contimeout '${timeout}' --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file_date_hour}/${index_file_minute_second_extension}'
 }
 cron=0
 job_directory=4Move
