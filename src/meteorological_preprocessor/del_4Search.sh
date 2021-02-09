@@ -26,9 +26,7 @@ delete_4Search() {
       rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${priority}/${date_hour_directory}/|g" > ${work_directory}/${priority}_${search_index_directory}_index.tmp
       if test -s ${work_directory}/${priority}_${search_index_directory}_index.tmp; then
         rclone copy --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --immutable --local-no-set-modtime --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
-        set +e
-        ls -1 ${work_directory}/${search_index_directory}/${priority}/${date_hour_directory}/* > ${work_directory}/${priority}_${search_index_directory}_file.tmp
-        set -e
+        ls -1 ${work_directory}/${search_index_directory}/${priority}/${date_hour_directory}/* | cat > ${work_directory}/${priority}_${search_index_directory}_file.tmp
         if test -s ${work_directory}/${priority}_${search_index_directory}_file.tmp; then
           rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_file.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
         fi

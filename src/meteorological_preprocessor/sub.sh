@@ -192,23 +192,23 @@ subscribe() {
               set +e
               if test -n "${exclusive_pattern_file}"; then
                 if test -d ${source_work_directory}/${search_index_directory}/${priority}; then
-                  ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* ${source_work_directory}/${pubsub_index_directory}/${priority}/* | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
+                  ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* ${source_work_directory}/${pubsub_index_directory}/${priority}/* | cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
                 else
-                  ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority}/* | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
+                  ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority}/* | cat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
                 fi
               else
                 if test -d ${source_work_directory}/${search_index_directory}/${priority}; then
-                  ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* ${source_work_directory}/${pubsub_index_directory}/${priority}/* | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
+                  ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* ${source_work_directory}/${pubsub_index_directory}/${priority}/* | cat | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
                 else
-                  ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority}/* | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
+                  ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority}/* | cat | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/${priority}_newly_created_file.tmp
                 fi
               fi
               set -e
             else
               if test -d ${source_work_directory}/${search_index_directory}/${priority}; then
-                ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* ${source_work_directory}/${pubsub_index_directory}/${priority}/* > ${source_work_directory}/${priority}_newly_created_file.tmp
+                ls -1 ${source_work_directory}/${search_index_directory}/${priority}/*/* ${source_work_directory}/${pubsub_index_directory}/${priority}/* | cat > ${source_work_directory}/${priority}_newly_created_file.tmp
               else
-                ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority}/* > ${source_work_directory}/${priority}_newly_created_file.tmp
+                ls -1 ${source_work_directory}/${pubsub_index_directory}/${priority}/* | cat > ${source_work_directory}/${priority}_newly_created_file.tmp
               fi
             fi
             cp /dev/null ${source_work_directory}/${priority}_filtered_newly_created_file.tmp
@@ -264,7 +264,7 @@ subscribe() {
         source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
       done
       ls -1 ${work_directory}/${priority}_processed/* | grep -v -F "${work_directory}/${priority}_processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}_processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-      ls -1 ${work_directory}/${priority}_processed/* > ${work_directory}/${priority}_all_processed_file.txt
+      ls -1 ${work_directory}/${priority}_processed/* | cat > ${work_directory}/${priority}_all_processed_file.txt
       if test ${exit_code} -eq 0; then
         backup=1
         for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
