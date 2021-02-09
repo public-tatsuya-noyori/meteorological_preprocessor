@@ -30,7 +30,7 @@ publish(){
   if test -s ${work_directory}/${priority}_newly_created_index.tmp; then
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
       set +e
-      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
+      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
@@ -44,7 +44,7 @@ publish(){
     fi
     cp /dev/null ${work_directory}/${priority}_info_log.tmp
     set +e
-    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}_newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 1 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}_newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -64,7 +64,7 @@ publish(){
       for retry_count in `seq ${retry_num}`; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e
-        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then

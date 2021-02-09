@@ -24,7 +24,7 @@ clone() {
   exit_code=255
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     set +e
-    rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
+    rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -81,7 +81,7 @@ clone() {
             cp /dev/null ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
           else
             set +e
-            rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
+            rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${source_work_directory}/${priority}_${pubsub_index_directory}_index.txt
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -93,7 +93,7 @@ clone() {
           fi
         fi
         set +e
-        rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp
+        rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${source_work_directory}/${priority}_${pubsub_index_directory}_new_index.tmp
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -108,7 +108,7 @@ clone() {
           if test -s ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt; then
             sed -e "s|^|/${pubsub_index_directory}/${priority}/|g" ${source_work_directory}/${priority}_${pubsub_index_directory}_index_diff.txt > ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp
             set +e
-            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+            rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${pubsub_index_directory}_newly_created_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-traverse --retries 3 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -140,7 +140,7 @@ clone() {
             cp /dev/null ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp
             if test ${cmp_exit_code_1} -eq 1 -o ${cmp_exit_code_2} -eq 0; then
               set +e
-              rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${priority} > ${source_work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp
+              rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${priority} > ${source_work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then
@@ -158,7 +158,7 @@ clone() {
                 search_index_directory_exit_code=0
                 for date_hour_directory in `tac ${source_work_directory}/${priority}_${search_index_directory}_date_hour_directory.tmp`; do
                   set +e
-                  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory} > ${source_work_directory}/${priority}_${search_index_directory}_minute_second_index.tmp
+                  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory} > ${source_work_directory}/${priority}_${search_index_directory}_minute_second_index.tmp
                   exit_code=$?
                   set -e
                   if test ${exit_code} -ne 0; then
@@ -192,7 +192,7 @@ clone() {
                   cat ${source_work_directory}/${priority}_${search_index_directory}_new_index.tmp | sort -u | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${priority}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp
                 fi
                 set +e
-                rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-traverse --retries 1 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+                rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${priority}_${search_index_directory}_newly_created_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --log-level ${debug_index_file} --low-level-retries 3 --no-traverse --retries 3 --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
                 exit_code=$?
                 set -e
                 if test ${exit_code} -ne 0; then
@@ -235,7 +235,7 @@ clone() {
             if test -s ${source_work_directory}/${priority}_filtered_newly_created_file.tmp; then
               cp /dev/null ${source_work_directory}/${priority}_info_log.tmp
               set +e
-              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/${priority}_filtered_newly_created_file.tmp --immutable --log-file ${source_work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-traverse --retries 1 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/${priority}_filtered_newly_created_file.tmp --immutable --log-file ${source_work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then
@@ -259,7 +259,7 @@ clone() {
         for retry_count in `seq ${retry_num}`; do
           now=`date -u "+%Y%m%d%H%M%S"`
           set +e
-          rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+          rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then

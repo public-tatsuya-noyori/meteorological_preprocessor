@@ -19,13 +19,13 @@
 #
 set -e
 delete_4Search() {
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ > ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp
+  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ > ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp
   if test -s ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp; then
     rm -rf ${work_directory}/${search_index_directory}/${priority}
     for date_hour_directory in `grep -v -E "^(${delete_index_date_hour_pattern})/$" ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp | sed -e 's|/$||g'`; do
-      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${priority}/${date_hour_directory}/|g" > ${work_directory}/${priority}_${search_index_directory}_index.tmp
+      rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${priority}/${date_hour_directory}/|g" > ${work_directory}/${priority}_${search_index_directory}_index.tmp
       if test -s ${work_directory}/${priority}_${search_index_directory}_index.tmp; then
-        rclone copy --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --immutable --local-no-set-modtime --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+        rclone copy --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --immutable --local-no-set-modtime --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
         ls -1 ${work_directory}/${search_index_directory}/${priority}/${date_hour_directory}/* | xargs -r cat > ${work_directory}/${priority}_${search_index_directory}_file.tmp
         if test -s ${work_directory}/${priority}_${search_index_directory}_file.tmp; then
           rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_file.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
