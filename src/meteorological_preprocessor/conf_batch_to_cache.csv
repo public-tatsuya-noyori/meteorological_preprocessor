@@ -60,7 +60,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOW[A-Z][0-9][0-9].*)$,^IOW[A-Z][0-9][0-9]$,,,,,bufr,surface,buoy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IXC[A-Z][0-9][0-9].*)$,^IXC[A-Z][0-9][0-9]$,,,,,bufr,satellite,cloud_analysis,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_J[A-Z][A-Z][A-Z][0-9][0-9].*)$,^J[A-Z][A-Z][A-Z][0-9][0-9]$,,,,KNES,bufr,satellite,amv,bin
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_I[A-Z][A-Z][A-Z][0-9][0-9].*)$,^[IJ][A-Z][A-Z][A-Z][0-9][0-9]$,,,,,bufr,unknown,unknown,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_[IJ][A-Z][A-Z][A-Z][0-9][0-9].*)$,^[IJ][A-Z][A-Z][A-Z][0-9][0-9]$,,,,,bufr,unknown,unknown,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_KS[A-Z][A-Z][0-9][0-9].*)$,^KS[A-Z][A-Z][0-9][0-9]$,,,,,crex,surface,unknown,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_KU[A-Z][A-Z][0-9][0-9].*)$,^KU[A-Z][A-Z][0-9][0-9]$,( |^)D0704[1-4]\+\+( |$),,,,crex,upper_air,total_ozon,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_KU[A-Z][A-Z][0-9][0-9].*)$,^KU[A-Z][A-Z][0-9][0-9]$,,,,,crex,upper_air,unknown,txt
@@ -110,7 +110,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_NP[A-Z][A-Z][0-9][0-9].*)$,^NP[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,notice,product_generation_delay,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_NT[A-Z][A-Z][0-9][0-9].*)$,^NT[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,notice,test,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_NW[A-Z][A-Z][0-9][0-9].*)$,^NW[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,notice,warning_related_cancellation,txt
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SA[A-Z][A-Z][0-9][0-9].*)$,^SA[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,metar,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SA[A-Z][A-Z][0-9]*[0-9]*.*)$,^SA[A-Z][A-Z][0-9]*[0-9]*$,,,,,alphanumeric,surface,metar,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_S[BCD][A-Z][A-Z][0-9][0-9].*)$,^S[BCD][A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,radob,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SE[A-Z][A-Z][0-9][0-9].*)$,^SE[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,seismic_data,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SF[A-Z][A-Z][0-9][0-9].*)$,^SF[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,atmospheric_data,txt
@@ -121,7 +121,8 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SO[A-Z][A-Z][0-9][0-9].*)$,^SO[A-Z][A-Z][0-9][0-9]$,( |^)JJVV( |$),,,,alphanumeric,surface,bathy,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SO[A-Z][A-Z][0-9][0-9].*)$,^SO[A-Z][A-Z][0-9][0-9]$,( |^)KKYY( |$),,,,alphanumeric,surface,tesac,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SO[A-Z][A-Z][0-9][0-9].*)$,^SO[A-Z][A-Z][0-9][0-9]$,( |^)NNXX( |$),,,,alphanumeric,surface,trackob,txt
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SP[A-Z][A-Z][0-9][0-9].*)$,^SP[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,speci,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SO[A-Z][A-Z][0-9][0-9].*)$,^SO[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,oceanographic_data,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SP[A-Z][A-Z][0-9]*[0-9]*.*)$,^SP[A-Z][A-Z][0-9]*[0-9]*$,,,,,alphanumeric,surface,speci,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SR[A-Z][A-Z][0-9][0-9].*)$,^SR[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,surface,hydra,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SS[A-Z][A-Z][0-9][0-9].*)$,^SS[A-Z][A-Z][0-9][0-9]$,( |^)ZZYY  *..[5-9][0-9][0-9]( |$),,,,alphanumeric,surface,drifting_buoy,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_SS[A-Z][A-Z][0-9][0-9].*)$,^SS[A-Z][A-Z][0-9][0-9]$,( |^)ZZYY  *..[0-4][0-9][0-9]( |$),,,,alphanumeric,surface,moored_buoy,txt
@@ -155,13 +156,13 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_UX[A-Z][A-Z][0-9][0-9].*)$,^UX[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,upper_air,miscellaneous,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_UZ[A-Z][A-Z][0-9][0-9].*)$,^UZ[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,upper_air,temp_drop,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WA[A-Z][A-Z][0-9][0-9].*)$,^WA[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,airmet,txt
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WC[A-Z][A-Z][0-9][0-9].*)$,^WC[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,tropical_cyclone_sigmet,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WC[A-Z][A-Z][0-9]*[0-9]*.*)$,^WC[A-Z][A-Z][0-9]*[0-9]*$,,,,,alphanumeric,warning,tropical_cyclone_sigmet,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WE[A-Z][A-Z][0-9][0-9].*)$,^WE[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,tsunami,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WF[A-Z][A-Z][0-9][0-9].*)$,^WF[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,tornado,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WG[A-Z][A-Z][0-9][0-9].*)$,^WG[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,hydrological_flood,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WH[A-Z][A-Z][0-9][0-9].*)$,^WH[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,marine_flood,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WO[A-Z][A-Z][0-9][0-9].*)$,^WO[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,other,txt
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WS[A-Z][A-Z][0-9][0-9].*)$,^WS[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,sigmet,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WS[A-Z][A-Z][0-9]*[0-9]*.*)$,^WS[A-Z][A-Z][0-9]*[0-9]*$,,,,,alphanumeric,warning,sigmet,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WT[A-Z][A-Z][0-9][0-9].*)$,^WT[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,tropical_cyclone,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WU[A-Z][A-Z][0-9][0-9].*)$,^WU[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,severe_thunderstorm,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_WV[A-Z][A-Z][0-9][0-9].*)$,^WV[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,warning,volcanic_ash_clouds_sigmet,txt
