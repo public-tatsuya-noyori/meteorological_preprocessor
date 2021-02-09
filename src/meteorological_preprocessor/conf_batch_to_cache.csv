@@ -25,7 +25,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INK[A-Z][0-9][0-9].*|W_.*mwhs.*bin)$,^INK[A-Z][0-9][0-9]$,,,,,bufr,satellite,mwhs,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INM[A-Z][0-9][0-9].*|W_.*mhs.*bin)$,^INM[A-Z][0-9][0-9]$,,,,,bufr,satellite,mhs,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INQ[A-Z][0-9][0-9].*|W_.*iasi.*bin)$,^INQ[A-Z][0-9][0-9]$,,,,,bufr,satellite,iasi,bin
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INR[A-Z][0-9][0-9].*|W_.*airs.*bin)$,^INR[A-Z][0-9][0-9]$,,,,,bufr,satellite,airs,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INR[A-Z][0-9][0-9].*|W_.*airs.*bin)$,^INR[A-Z][0-9][0-9]$,,310050,,,bufr,satellite,airs,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INS[A-Z][0-9][0-9].*|W_.*atms.*bin)$,^INS[A-Z][0-9][0-9]$,,,,,bufr,satellite,atms,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INT[A-Z][0-9][0-9].*|W_.*mwts.*bin)$,^INT[A-Z][0-9][0-9]$,,,,,bufr,satellite,mwts,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INV[A-Z][0-9][0-9].*)$,^INV[A-Z][0-9][0-9]$,,,,,bufr,satellite,amv,bin
