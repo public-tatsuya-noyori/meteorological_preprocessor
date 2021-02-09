@@ -19,7 +19,7 @@
 #
 set -e
 delete() {
-  rclone delete --contimeout ${timeout} --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 1 --rmdirs --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+  rclone delete --contimeout ${timeout} --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --rmdirs --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
 }
 cron=0
 job_directory=4Del

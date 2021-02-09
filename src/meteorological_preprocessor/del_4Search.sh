@@ -28,9 +28,9 @@ delete_4Search() {
         rclone copy --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --immutable --local-no-set-modtime --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
         ls -1 ${work_directory}/${search_index_directory}/${priority}/${date_hour_directory}/* | xargs -r cat > ${work_directory}/${priority}_${search_index_directory}_file.tmp
         if test -s ${work_directory}/${priority}_${search_index_directory}_file.tmp; then
-          rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_file.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+          rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_file.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
         fi
-        rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --low-level-retries 3 --no-traverse --quiet --retries 1 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+        rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
       fi
     done
   fi
