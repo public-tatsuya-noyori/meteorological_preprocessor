@@ -21,7 +21,7 @@ set -e
 move_4PubSub_4Search() {
   cp /dev/null ${work_directory}/${priority}_err_log.tmp
   set +e
-  rclone lsf --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ > ${work_directory}/${priority}_${pubsub_index_directory}_index.tmp
+  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ > ${work_directory}/${priority}_${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -eq 0; then
@@ -35,7 +35,7 @@ move_4PubSub_4Search() {
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
     set +e
-    rclone moveto --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
+    rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -48,6 +48,7 @@ move_4PubSub_4Search() {
   done
   return ${exit_code}
 }
+bandwidth_limit_k_bytes_per_s=0
 cron=0
 job_directory=4Move
 datetime=`date -u "+%Y%m%d%H%M%S"`
@@ -64,9 +65,10 @@ search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
+    "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--cron" ) cron=1;shift;;
-    "--debug" ) set -evx;shift;;
-    "--help" ) echo "$0 [--cron] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
+    "--debug_shell" ) set -evx;shift;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
   esac
 done
 if test -z $4; then
