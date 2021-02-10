@@ -36,10 +36,12 @@ publish(){
       if test ${exit_code} -eq 0; then
         cp /dev/null ${work_directory}/${priority}_err_log.tmp
         break
+      else
+        cat ${work_directory}/${priority}_err_log.tmp >&2
+        echo "WARNING: can not access on ${destination_rclone_remote_bucket}." >&2
       fi
     done
     if test ${exit_code} -ne 0; then
-      cat ${work_directory}/${priority}_err_log.tmp >&2
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
       return ${exit_code}
     fi
@@ -48,20 +50,16 @@ publish(){
     rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}_newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-upload-concurrency ${parallel} --s3-chunk-size ${cutoff} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
-    if test ${exit_code} -eq 0; then
-      cp /dev/null ${work_directory}/${priority}_err_log.tmp
+    if test ${exit_code} -ne 0; then
       set +e
-      grep "^.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
-      grep "^.* INFO *: *[^ ]* *:.* Copied .*$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' >> ${work_directory}/${priority}_processed_file.txt
+      grep -F ERROR ${work_directory}/${priority}_info_log.tmp >&2
       set -e
-    else
-      set +e
-      grep -F ERROR ${work_directory}/${priority}_info_log.tmp >> ${work_directory}/${priority}_err_log.tmp
-      set -e
-      cat ${work_directory}/${priority}_err_log.tmp >&2
       echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${priority}." >&2
       return ${exit_code}
     fi
+    set +e
+    grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' > ${work_directory}/${priority}_processed_file.txt
+    set -e
     if test -s ${work_directory}/${priority}_processed_file.txt; then
       for retry_count in `seq ${retry_num}`; do
         now=`date -u "+%Y%m%d%H%M%S"`
