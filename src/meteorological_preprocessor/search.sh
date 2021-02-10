@@ -99,17 +99,17 @@ if test -f ${work_directory}/search_index_dir_list.tmp${suffix} -o -f ${work_dir
   echo "ERROR: exist${work_directory}/search_index_dir_list.tmp${suffix} or ${work_directory}/search_index_list.tmp${suffix} or ${work_directory}/search_index.tmp${suffix} or ${work_directory}/search_file.tmp${suffix}." >&2
   exit 199
 fi
-cp /dev/null ${work_directory}/${priority}_err_log.tmp
+cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
 set +e
-rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority} > ${work_directory}/search_index_dir_list.tmp${suffix}
+rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority} > ${work_directory}/search_index_dir_list.tmp${suffix}
 exit_code=$?
 set -e
 if test ${exit_code} -eq 0; then
-  cp /dev/null ${work_directory}/${priority}_err_log.tmp
+  cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
 else
-  cat ${work_directory}/${priority}_err_log.tmp >&2
+  cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
   echo "ERROR: can not get index directory list from ${rclone_remote_bucket}/${search_index_directory}/${priority}." >&2
-  rm -f ${work_directory}/search_index_dir_list.tmp${suffix}
+  rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
   exit ${exit_code}
 fi
 if test ${end_yyyymmddhhmm} -eq 0; then
@@ -118,28 +118,28 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       yyyymmddhh=`echo ${index_directory} | cut -c1-10`
       set +e
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp${suffix}
+      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp${suffix}
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp /dev/null ${work_directory}/${priority}_err_log.tmp
+        cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
       else
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
         echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}." >&2
-        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
         exit ${exit_code}
       fi
       for index_file in `cat ${work_directory}/search_index_list.tmp${suffix}`; do
         set +e
-        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp${suffix}
+        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp${suffix}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/${priority}_err_log.tmp
+          cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
         else
-          cat ${work_directory}/${priority}_err_log.tmp >&2
+          cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
           echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file}." >&2
-          rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+          rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
           exit ${exit_code}
         fi
         set +e
@@ -161,7 +161,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
             set -e
             if test ${exit_code} -ne 0; then
               echo "ERROR: can not get file from ${rclone_remote_bucket} ${priority}." >&2
-              rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+              rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
               exit ${exit_code}
             fi
           fi
@@ -169,28 +169,28 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       done
     done
     set +e
-    rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/search_index_list.tmp${suffix}
+    rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/search_index_list.tmp${suffix}
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
-      cp /dev/null ${work_directory}/${priority}_err_log.tmp
+      cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
     else
-      cat ${work_directory}/${priority}_err_log.tmp >&2
+      cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
       echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >&2
-      rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+      rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
       exit ${exit_code}
     fi
     for index_file in `cat ${work_directory}/search_index_list.tmp${suffix}`; do
       set +e
-      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${work_directory}/search_index.tmp${suffix}
+      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${work_directory}/search_index.tmp${suffix}
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp /dev/null ${work_directory}/${priority}_err_log.tmp
+        cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
       else
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
         echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file}." >&2
-        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
         exit ${exit_code}
       fi
       set +e
@@ -212,7 +212,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           set -e
           if test ${exit_code} -ne 0; then
             echo "ERROR: can not get file from ${rclone_remote_bucket} ${priority}." >&2
-            rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+            rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
             exit ${exit_code}
           fi
         fi
@@ -226,15 +226,15 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       set -e
       if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm}; then
         set +e
-        rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp${suffix}
+        rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp${suffix}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/${priority}_err_log.tmp
+          cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
         else
-          cat ${work_directory}/${priority}_err_log.tmp >&2
+          cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
           echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}." >&2
-          rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+          rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
           exit ${exit_code}
         fi
         for index_file in `cat ${work_directory}/search_index_list.tmp${suffix}`; do
@@ -245,15 +245,15 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           set -e
           if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
             set +e
-            rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp${suffix}
+            rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp${suffix}
             exit_code=$?
             set -e
             if test ${exit_code} -eq 0; then
-              cp /dev/null ${work_directory}/${priority}_err_log.tmp
+              cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
             else
-              cat ${work_directory}/${priority}_err_log.tmp >&2
+              cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
               echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file}." >&2
-              rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+              rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
               exit ${exit_code}
             fi
             set +e
@@ -275,7 +275,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
                 set -e
                 if test ${exit_code} -ne 0; then
                   echo "ERROR: can not get file from ${rclone_remote_bucket} ${priority}." >&2
-                  rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+                  rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
                   exit ${exit_code}
                 fi
               fi
@@ -285,15 +285,15 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       fi
     done
     set +e
-    rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/search_index_list.tmp${suffix}
+    rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/search_index_list.tmp${suffix}
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
-      cp /dev/null ${work_directory}/${priority}_err_log.tmp
+      cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
     else
-      cat ${work_directory}/${priority}_err_log.tmp >&2
+      cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
       echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >&2
-      rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+      rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
       exit ${exit_code}
     fi
     for index_file in `cat ${work_directory}/search_index_list.tmp${suffix}`; do
@@ -303,15 +303,15 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       set -e
       if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
         set +e
-        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${work_directory}/search_index.tmp${suffix}
+        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${work_directory}/search_index.tmp${suffix}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/${priority}_err_log.tmp
+          cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
         else
-          cat ${work_directory}/${priority}_err_log.tmp >&2
+          cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
           echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file}." >&2
-          rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+          rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
           exit ${exit_code}
         fi
         set +e
@@ -333,7 +333,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
             set -e
             if test ${exit_code} -ne 0; then
               echo "ERROR: can not get file from ${rclone_remote_bucket} ${priority}." >&2
-              rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+              rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
               exit ${exit_code}
             fi
           fi
@@ -349,15 +349,15 @@ else
     set -e
     if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhh00} -le ${end_yyyymmddhhmm}; then
       set +e
-      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp${suffix}
+      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp${suffix}
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp /dev/null ${work_directory}/${priority}_err_log.tmp
+        cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
       else
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
         echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}." >&2
-        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
         exit ${exit_code}
       fi
       for index_file in `cat ${work_directory}/search_index_list.tmp${suffix}`; do
@@ -368,15 +368,15 @@ else
         set -e
         if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
           set +e
-          rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp${suffix}
+          rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp${suffix}
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then
-            cp /dev/null ${work_directory}/${priority}_err_log.tmp
+            cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
           else
-            cat ${work_directory}/${priority}_err_log.tmp >&2
+            cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
             echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${yyyymmddhh}/${index_file}." >&2
-            rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+            rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
             exit ${exit_code}
           fi
           set +e
@@ -398,7 +398,7 @@ else
               set -e
               if test ${exit_code} -ne 0; then
                 echo "ERROR: can not get file from ${rclone_remote_bucket} ${priority}." >&2
-                rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+                rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
                 exit ${exit_code}
               fi
             fi
@@ -408,15 +408,15 @@ else
     fi
   done
   set +e
-  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/search_index_list.tmp${suffix}
+  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority} > ${work_directory}/search_index_list.tmp${suffix}
   exit_code=$?
   set -e
   if test ${exit_code} -eq 0; then
-    cp /dev/null ${work_directory}/${priority}_err_log.tmp
+    cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
   else
-    cat ${work_directory}/${priority}_err_log.tmp >&2
+    cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
     echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >&2
-    rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+    rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
     exit ${exit_code}
   fi
   for index_file in `cat ${work_directory}/search_index_list.tmp${suffix}`; do
@@ -426,15 +426,15 @@ else
     set -e
     if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
       set +e
-      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${work_directory}/search_index.tmp${suffix}
+      rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp${suffix} --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${work_directory}/search_index.tmp${suffix}
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp /dev/null ${work_directory}/${priority}_err_log.tmp
+        cp /dev/null ${work_directory}/${priority}_err_log.tmp${suffix}
       else
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/${priority}_err_log.tmp${suffix} >&2
         echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file}." >&2
-        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+        rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
         exit ${exit_code}
       fi
       set +e
@@ -456,7 +456,7 @@ else
           set -e
           if test ${exit_code} -ne 0; then
             echo "ERROR: can not get file from ${rclone_remote_bucket} ${priority}." >&2
-            rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix}
+            rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
             exit ${exit_code}
           fi
         fi
@@ -464,4 +464,4 @@ else
     fi
   done
 fi
-rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix}
+rm -f ${work_directory}/search_index_dir_list.tmp${suffix} ${work_directory}/search_index_list.tmp${suffix} ${work_directory}/search_index.tmp${suffix} ${work_directory}/search_file.tmp${suffix} ${work_directory}/${priority}_err_log.tmp${suffix}
