@@ -19,7 +19,16 @@
 #
 set -e
 delete() {
-  rclone delete --contimeout ${timeout} --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --rmdirs --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+  cp /dev/null ${work_directory}/err_log.tmp
+  set +e
+  rclone delete --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --rmdirs --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+  exit_code=$?
+  set -e
+  if test ${exit_code} -ne 0; then
+    cat ${work_directory}/err_log.tmp >&2
+    echo "ERROR: can not delete on ${rclone_remote_bucket}." >&2
+  fi
+  return ${exit_code}
 }
 cron=0
 job_directory=4Del

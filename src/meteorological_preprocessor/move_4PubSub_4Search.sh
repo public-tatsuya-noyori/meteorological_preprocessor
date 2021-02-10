@@ -19,7 +19,34 @@
 #
 set -e
 move_4PubSub_4Search() {
-  rclone lsf --contimeout ${timeout} --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ | grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt$" | head -n -1 | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;rclone moveto --checksum --contimeout '${timeout}' --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout '${timeout}' '${rclone_remote_bucket}/${pubsub_index_directory}/${priority}'/${index_file} '${rclone_remote_bucket}/${search_index_directory}/${priority}/'${index_file_date_hour}/${index_file_minute_second_extension}'
+  cp /dev/null ${work_directory}/${priority}_err_log.tmp
+  set +e
+  rclone lsf --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ > ${work_directory}/${priority}_${pubsub_index_directory}_index.tmp
+  exit_code=$?
+  set -e
+  if test ${exit_code} -eq 0; then
+    cp /dev/null ${work_directory}/${priority}_err_log.tmp
+  else
+    cat ${work_directory}/${priority}_err_log.tmp >&2
+    echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >&2
+    return ${exit_code}
+  fi
+  for index_file in `grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt$" ${work_directory}/${priority}_${pubsub_index_directory}_index.tmp | head -n -1`; do
+    index_file_date_hour=`echo ${index_file} | cut -c1-10`
+    index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
+    set +e
+    rclone moveto --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
+    exit_code=$?
+    set -e
+    if test ${exit_code} -eq 0; then
+      cp /dev/null ${work_directory}/${priority}_err_log.tmp
+    else
+      cat ${work_directory}/${priority}_err_log.tmp >&2
+      echo "ERROR: can not move ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}." >&2
+      return ${exit_code}
+    fi
+  done
+  return ${exit_code}
 }
 cron=0
 job_directory=4Move
