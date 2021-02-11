@@ -20,24 +20,24 @@
 set -e
 publish(){
   exit_code=255
-  cp /dev/null ${work_directory}/${priority}_processed_file.txt
+  cp /dev/null ${work_directory}/${priority}/processed_file.txt
   if test ${wildcard_index} -eq 1; then
-    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/${priority}_newly_created_index.tmp
+    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/${priority}/newly_created_index.tmp
   else
-    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" > ${work_directory}/${priority}_newly_created_index.tmp
+    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" > ${work_directory}/${priority}/newly_created_index.tmp
   fi
-  if test -s ${work_directory}/${priority}_newly_created_index.tmp; then
-    cp /dev/null ${work_directory}/${priority}_err_log.tmp
+  if test -s ${work_directory}/${priority}/newly_created_index.tmp; then
+    cp /dev/null ${work_directory}/${priority}/err_log.tmp
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
       set +e
-      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
+      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp /dev/null ${work_directory}/${priority}_err_log.tmp
+        cp /dev/null ${work_directory}/${priority}/err_log.tmp
         break
       else
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/${priority}/err_log.tmp >&2
         echo "WARNING: can not access on ${destination_rclone_remote_bucket}." >&2
       fi
     done
@@ -45,43 +45,43 @@ publish(){
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
       return ${exit_code}
     fi
-    cp /dev/null ${work_directory}/${priority}_info_log.tmp
+    cp /dev/null ${work_directory}/${priority}/info_log.tmp
     set +e
-    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}_newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}_info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}/newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
       set +e
-      grep -F ERROR ${work_directory}/${priority}_info_log.tmp >&2
+      grep -F ERROR ${work_directory}/${priority}/info_log.tmp >&2
       set -e
       echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${priority}." >&2
       return ${exit_code}
     fi
     set +e
-    grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${work_directory}/${priority}_info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' > ${work_directory}/${priority}_processed_file.txt
+    grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${work_directory}/${priority}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' > ${work_directory}/${priority}/processed_file.txt
     set -e
-    if test -s ${work_directory}/${priority}_processed_file.txt; then
+    if test -s ${work_directory}/${priority}/processed_file.txt; then
       for retry_count in `seq ${retry_num}`; do
         now=`date -u "+%Y%m%d%H%M%S"`
         set +e
-        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${work_directory}/${priority}_processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/${priority}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${work_directory}/${priority}/processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/${priority}_err_log.tmp
-          cp ${work_directory}/${priority}_processed_file.txt ${work_directory}/${priority}_processed/${now}.txt
+          cp /dev/null ${work_directory}/${priority}/err_log.tmp
+          cp ${work_directory}/${priority}/processed_file.txt ${work_directory}/${priority}/processed/${now}.txt
           break
         else
           sleep 1
         fi
       done
       if test ${exit_code} -ne 0; then
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/${priority}/err_log.tmp >&2
         echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
         return ${exit_code}
       fi
     fi
-    ls -1 ${work_directory}/${priority}_processed/* | grep -v -F "${work_directory}/${priority}_processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}_processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+    ls -1 ${work_directory}/${priority}/processed/* | grep -v -F "${work_directory}/${priority}/processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}/processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
   else
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
@@ -151,18 +151,18 @@ elif test $6 -le 0; then
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
-mkdir -p ${work_directory}/${priority}_processed
-cp /dev/null ${work_directory}/${priority}_processed/dummy.tmp
+mkdir -p ${work_directory}/${priority}/processed
+cp /dev/null ${work_directory}/${priority}/processed/dummy.tmp
 if test ${cron} -eq 1; then
-  if test -s ${work_directory}/pid.txt; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | wc -l`
+  if test -s ${work_directory}/${priority}/pid.txt; then
+    running=`cat ${work_directory}/${priority}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
   else
     running=0
   fi
   if test ${running} -eq 0; then
     publish &
     pid=$!
-    echo ${pid} > ${work_directory}/pid.txt
+    echo ${pid} > ${work_directory}/${priority}/pid.txt
     wait ${pid}
   fi
 else
