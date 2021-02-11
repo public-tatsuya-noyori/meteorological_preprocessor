@@ -45,9 +45,12 @@ publish(){
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
       return ${exit_code}
     fi
+    set +e
+    grep -v -F -f ${work_directory}/${priority}/all_processed_file.txt ${work_directory}/${priority}/newly_created_file.tmp > ${work_directory}/${priority}/filtered_newly_created_file.tmp
+    set -e
     cp /dev/null ${work_directory}/${priority}/info_log.tmp
     set +e
-    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}/newly_created_index.tmp --immutable --log-file ${work_directory}/${priority}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/${priority}/filtered_newly_created_file.tmp --immutable --log-file ${work_directory}/${priority}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -82,6 +85,7 @@ publish(){
       fi
     fi
     ls -1 ${work_directory}/${priority}/processed/* | grep -v -F "${work_directory}/${priority}/processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}/processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+    ls -1 ${work_directory}/${priority}_processed/* | xargs -r cat > ${work_directory}/${priority}/all_processed_file.txt
   else
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
@@ -153,6 +157,7 @@ fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
 mkdir -p ${work_directory}/${priority}/processed
 cp /dev/null ${work_directory}/${priority}/processed/dummy.tmp
+touch ${work_directory}/${priority}/all_processed_file.txt
 if test ${cron} -eq 1; then
   if test -s ${work_directory}/${priority}/pid.txt; then
     running=`cat ${work_directory}/${priority}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
