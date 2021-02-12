@@ -132,14 +132,14 @@
 50 * * * * cd /home/noyori/tests; ./del_4Search.sh --cron cache iij2co iij2:japan.meteorological.agency.2.closed.data.o p5
 
 # del
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1oi iij1:japan.meteorological.agency.1.open.data.i   2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1ci iij1:japan.meteorological.agency.1.closed.data.i 2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2oi iij2:japan.meteorological.agency.2.open.data.i   2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2ci iij2:japan.meteorological.agency.2.closed.data.i 2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1oo iij1:japan.meteorological.agency.1.open.data.o   2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1co iij1:japan.meteorological.agency.1.closed.data.o 2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2oo iij2:japan.meteorological.agency.2.open.data.o   2
-55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2co iij2:japan.meteorological.agency.2.closed.data.o 2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1oi iij1:japan.meteorological.agency.1.open.data.i   2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1ci iij1:japan.meteorological.agency.1.closed.data.i 2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2oi iij2:japan.meteorological.agency.2.open.data.i   2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2ci iij2:japan.meteorological.agency.2.closed.data.i 2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1oo iij1:japan.meteorological.agency.1.open.data.o   2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1co iij1:japan.meteorological.agency.1.closed.data.o 2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2oo iij2:japan.meteorological.agency.2.open.data.o   2
+#55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2co iij2:japan.meteorological.agency.2.closed.data.o 2
 
 # sub
 * * * * * cd /home/noyori/tests; ./sub.sh --cron --urgent cache_s iij12oi 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.i;iij2:japan.meteorological.agency.2.open.data.i' p1 64
