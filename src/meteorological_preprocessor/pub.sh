@@ -85,7 +85,7 @@ publish(){
       fi
     fi
     ls -1 ${work_directory}/${priority}/processed/* | grep -v -F "${work_directory}/${priority}/processed/dummy.tmp" | grep -v -E "^${work_directory}/${priority}/processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-    ls -1 ${work_directory}/${priority}_processed/* | xargs -r cat > ${work_directory}/${priority}/all_processed_file.txt
+    ls -1 ${work_directory}/${priority}/processed/* | xargs -r cat > ${work_directory}/${priority}/all_processed_file.txt
   else
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
