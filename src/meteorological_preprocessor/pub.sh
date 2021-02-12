@@ -26,8 +26,8 @@ publish(){
     grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" > ${work_directory}/newly_created_file.tmp
   fi
   if test -s ${work_directory}/newly_created_file.tmp; then
-    cp /dev/null ${work_directory}/err_log.tmp
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
+      cp /dev/null ${work_directory}/err_log.tmp
       set +e
       rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
       exit_code=$?
