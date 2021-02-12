@@ -20,7 +20,6 @@
 set -e
 publish(){
   exit_code=255
-  cp /dev/null ${work_directory}/processed_file.txt
   if test ${wildcard_index} -eq 1; then
     grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/newly_created_file.tmp
   else
