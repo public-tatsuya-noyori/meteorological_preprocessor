@@ -19,66 +19,66 @@
 #
 set -e
 delete_4Search() {
-  cp /dev/null ${work_directory}/${priority}_err_log.tmp
+  cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ > ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp
+  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/ > ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -eq 0; then
-    cp /dev/null ${work_directory}/${priority}_err_log.tmp
+    cp /dev/null ${work_directory}/err_log.tmp
   else
-    cat ${work_directory}/${priority}_err_log.tmp >&2
+    cat ${work_directory}/err_log.tmp >&2
     echo "ERROR: can not get index directory list from ${rclone_remote_bucket}/${search_index_directory}/${priority}." >&2
     return ${exit_code}
   fi
-  if test -s ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp; then
+  if test -s ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp; then
     rm -rf ${work_directory}/${search_index_directory}/${priority}
-    for date_hour_directory in `grep -v -E "^(${delete_index_date_hour_pattern})/$" ${work_directory}/${priority}_${search_index_directory}_date_hour_slash_directory.tmp | sed -e 's|/$||g'`; do
+    for date_hour_directory in `grep -v -E "^(${delete_index_date_hour_pattern})/$" ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp | sed -e 's|/$||g'`; do
       set +e
-      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${priority}/${date_hour_directory}/|g" > ${work_directory}/${priority}_${search_index_directory}_index.tmp
+      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${priority}/${date_hour_directory}/|g" > ${work_directory}/${search_index_directory}_index.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        cp /dev/null ${work_directory}/${priority}_err_log.tmp
+        cp /dev/null ${work_directory}/err_log.tmp
       else
-        cat ${work_directory}/${priority}_err_log.tmp >&2
+        cat ${work_directory}/err_log.tmp >&2
         echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${priority}/${date_hour_directory}." >&2
         return ${exit_code}
       fi
-      if test -s ${work_directory}/${priority}_${search_index_directory}_index.tmp; then
+      if test -s ${work_directory}/${search_index_directory}_index.tmp; then
         set +e
-        rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+        rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --cutoff-mode=cautious --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --immutable --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/${priority}_err_log.tmp
+          cp /dev/null ${work_directory}/err_log.tmp
         else
-          cat ${work_directory}/${priority}_err_log.tmp >&2
+          cat ${work_directory}/err_log.tmp >&2
           echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${priority}." >&2
           return ${exit_code}
         fi
-        ls -1 ${work_directory}/${search_index_directory}/${priority}/${date_hour_directory}/* | xargs -r cat > ${work_directory}/${priority}_${search_index_directory}_file.tmp
-        if test -s ${work_directory}/${priority}_${search_index_directory}_file.tmp; then
+        ls -1 ${work_directory}/${search_index_directory}/${priority}/${date_hour_directory}/* | xargs -r cat > ${work_directory}/${search_index_directory}_file.tmp
+        if test -s ${work_directory}/${search_index_directory}_file.tmp; then
           set +e
-          rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_file.tmp --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+          rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_file.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then
-            cp /dev/null ${work_directory}/${priority}_err_log.tmp
+            cp /dev/null ${work_directory}/err_log.tmp
           else
-            cat ${work_directory}/${priority}_err_log.tmp >&2
+            cat ${work_directory}/err_log.tmp >&2
             echo "ERROR: can not delete file on ${rclone_remote_bucket}." >&2
             return ${exit_code}
           fi
         fi
         set +e
-        rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${priority}_${search_index_directory}_index.tmp --log-file ${work_directory}/${priority}_err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+        rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/${priority}_err_log.tmp
+          cp /dev/null ${work_directory}/err_log.tmp
         else
-          cat ${work_directory}/${priority}_err_log.tmp >&2
+          cat ${work_directory}/err_log.tmp >&2
           echo "ERROR: can not delete index file on ${rclone_remote_bucket}/${search_index_directory}/${priority}." >&2
           return ${exit_code}
         fi
@@ -126,11 +126,11 @@ if test -z ${priority}; then
   echo "ERROR: $4 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
+work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${priority}
 mkdir -p ${work_directory}
 if test ${cron} -eq 1; then
   if test -s ${work_directory}/pid.txt; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | wc -l`
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
   else
     running=0
   fi
