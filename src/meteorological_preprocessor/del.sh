@@ -21,7 +21,7 @@ set -e
 delete() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  rclone delete --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --rmdirs --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+  rclone delete --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
