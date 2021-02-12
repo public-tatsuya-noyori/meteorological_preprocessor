@@ -56,7 +56,7 @@ if test -z ${priority}; then
   echo "ERROR: $3 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-temporary_directory=/`id -un`/`date -u +"%Y%m%d%H%M%S%N"`/${priority}
+temporary_directory=`id -un`/${priority}/`date -u +"%Y%m%d%H%M%S%N"`
 keyword_pattern=''
 inclusive_pattern_file=''
 if test -f $4; then
