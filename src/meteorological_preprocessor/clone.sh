@@ -381,7 +381,7 @@ for arg in "$@"; do
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--cron" ) cron=1;shift;;
     "--debug_shell" ) set -evx;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] [--standard_output_processed_file] [--urgent] [--wildcard_index] local_work_directory unique_job_name 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub][;;backup_source_rclone_remote_bucket_main[;backup_source_rclone_remote_bucket_sub]]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' priority parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] [--standard_output_processed_file] [--urgent] [--wildcard_index] local_work_directory unique_job_name priority 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub][;;backup_source_rclone_remote_bucket_main[;backup_source_rclone_remote_bucket_sub]]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--standard_output_processed_file" ) standard_output_processed_file=1;shift;;
     "--urgent" ) urgent=1;shift;;
     "--wildcard_index" ) wildcard_index=1;file_from_option=--include-from;shift;;
@@ -394,21 +394,21 @@ fi
 local_work_directory=$1
 unique_job_name=$2
 set +e
-source_rclone_remote_bucket_main_sub_list=`echo $3 | grep -F ':'`
-destination_rclone_remote_bucket_main_sub=`echo $4 | grep -F ':'`
-priority=`echo $5 | grep "^p[1-9]$"`
+priority=`echo $3 | grep "^p[1-9]$"`
+source_rclone_remote_bucket_main_sub_list=`echo $4 | grep -F ':'`
+destination_rclone_remote_bucket_main_sub=`echo $5 | grep -F ':'`
 parallel=`echo $6 | grep '^[0-9]\+$'`
 set -e
-if test -z "${source_rclone_remote_bucket_main_sub_list}"; then
-  echo "ERROR: $3 is not rclone_remote:bucket." >&2
+if test -z "${priority}"; then
+  echo "ERROR: $3 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-if test -z "${destination_rclone_remote_bucket_main_sub}"; then
+if test -z "${source_rclone_remote_bucket_main_sub_list}"; then
   echo "ERROR: $4 is not rclone_remote:bucket." >&2
   exit 199
 fi
-if test -z "${priority}"; then
-  echo "ERROR: $5 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+if test -z "${destination_rclone_remote_bucket_main_sub}"; then
+  echo "ERROR: $5 is not rclone_remote:bucket." >&2
   exit 199
 fi
 if test -z "${parallel}"; then

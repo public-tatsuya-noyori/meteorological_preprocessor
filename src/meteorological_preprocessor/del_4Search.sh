@@ -105,7 +105,7 @@ for arg in "$@"; do
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--cron" ) cron=1;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] local_work_directory unique_job_name rclone_remote_bucket priority"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] local_work_directory unique_job_name priority rclone_remote_bucket"; exit 0;;
   esac
 done
 if test -z $4; then
@@ -115,22 +115,22 @@ fi
 local_work_directory=$1
 unique_job_name=$2
 set +e
-rclone_remote_bucket=`echo $3 | grep -F ':'`
-priority=`echo $4 | grep "^p[1-9]$"`
+priority=`echo $3 | grep "^p[1-9]$"`
+rclone_remote_bucket=`echo $4 | grep -F ':'`
 set -e
-if test -z "${rclone_remote_bucket}"; then
-  echo "ERROR: $3 is not rclone_remote:bucket." >&2
+if test -z ${priority}; then
+  echo "ERROR: $3 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-if test -z ${priority}; then
-  echo "ERROR: $4 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+if test -z "${rclone_remote_bucket}"; then
+  echo "ERROR: $4 is not rclone_remote:bucket." >&2
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${priority}
 mkdir -p ${work_directory}
 if test ${cron} -eq 1; then
   if test -s ${work_directory}/pid.txt; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority}" | wc -l`
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
   else
     running=0
   fi

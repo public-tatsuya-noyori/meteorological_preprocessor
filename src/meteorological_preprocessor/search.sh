@@ -33,7 +33,7 @@ for arg in "$@"; do
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
     "--end" ) end_yyyymmddhhmm=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--parallel the_number_of_parallel_transfer] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory rclone_remote_bucket priority keyword_pattern/inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--parallel the_number_of_parallel_transfer] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory priority rclone_remote_bucket keyword_pattern/inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
     "--out" ) out=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;
@@ -45,15 +45,15 @@ if test -z $4; then
 fi
 local_work_directory=$1
 set +e
-rclone_remote_bucket=`echo $2 | grep -F ':'`
-priority=`echo $3 | grep "^p[1-9]$"`
+priority=`echo $2 | grep "^p[1-9]$"`
+rclone_remote_bucket=`echo $3 | grep -F ':'`
 set -e
-if test -z "${rclone_remote_bucket}"; then
-  echo "ERROR: $2 is not rclone_remote:bucket." >&2
+if test -z ${priority}; then
+  echo "ERROR: $2 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
   exit 199
 fi
-if test -z ${priority}; then
-  echo "ERROR: $3 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+if test -z "${rclone_remote_bucket}"; then
+  echo "ERROR: $3 is not rclone_remote:bucket." >&2
   exit 199
 fi
 temporary_directory=`id -un`/${priority}/`date -u +"%Y%m%d%H%M%S%N"`
