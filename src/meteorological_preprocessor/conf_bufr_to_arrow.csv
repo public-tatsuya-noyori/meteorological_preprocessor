@@ -265,7 +265,6 @@ surface,synop,307096,,cloudAmount,0,0,0,,cloud_amount,cloud amount,subset,to_val
 surface,synop,307096,,cloudType,0,0,0,,low_cloud_type,low cloud type,subset,to_value,0,int32,0,32767
 surface,synop,307096,,cloudType,0,0,0,,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307096,,cloudType,0,0,0,,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
-surface,synop,307096,,totalPrecipitationPast24Hours,0,0,0,,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
 surface,ship,308009,,shipOrMobileLandStationIdentifier,0,0,0,,location_datetime,ship identifier,subset,to_value,0,string,,
 surface,ship,308009,,latitude,0,0,0,,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,ship,308009,,longitude,0,0,0,,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
@@ -297,18 +296,18 @@ surface,ship,308009,,heightOfWindWaves,0,0,0,,height_of_wind_waves,height of win
 surface,ship,308009,,swellWavesDirection,0,0,0,,direction_of_swell_waves,direction of swell waves [degree],subset,to_value,0,float64,0,360
 surface,ship,308009,,periodOfSwellWaves,0,0,0,,period_of_swell_waves,period of swell waves [s],subset,to_value,0,float64,0,32767
 surface,ship,308009,,heightOfSwellWaves,0,0,0,,height_of_swell_waves,height of swell waves [m],subset,to_value,0,float64,0,32767
-surface,profiling_float,315003,,waterPressure,0,0,0,,location_datetime,water pressure [Pa],subset,,0,float64,0,2147483647
-surface,profiling_float,315003,,marineObservingPlatformIdentifier,0,0,0,,location_datetime,profiling float id,subset,to_value_to_array,0,int32,0,2147483647
-surface,profiling_float,315003,,latitude,0,0,0,,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
-surface,profiling_float,315003,,longitude,0,0,0,,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
-surface,profiling_float,315003,,year,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
-surface,profiling_float,315003,,month,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,1,12
-surface,profiling_float,315003,,day,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,1,31
-surface,profiling_float,315003,,hour,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,23
-surface,profiling_float,315003,,minute,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,59
-surface,profiling_float,315003,,oceanographicWaterTemperature,0,0,0,,oceanographic_water_temperature,oceanographic water temperature [k],subset,,0,float64,-273.15,32767
-surface,profiling_float,315003,,salinity,0,0,0,,salinity,salinity [%],subset,,0,float64,0,100
-surface,profiling_float,315003,,oceanographicDissolvedOxygen,0,0,0,,oceanographic_dissolved_oxygen,oceanographic dissolved oxygen [umol/kg],subset,,0,float64,0,32767
+surface,tesac,315003,,waterPressure,0,0,0,,location_datetime,water pressure [Pa],subset,,0,float64,0,2147483647
+surface,tesac,315003,,marineObservingPlatformIdentifier,0,0,0,,location_datetime,profiling float id,subset,to_value_to_array,0,int32,0,2147483647
+surface,tesac,315003,,latitude,0,0,0,,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
+surface,tesac,315003,,longitude,0,0,0,,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
+surface,tesac,315003,,year,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
+surface,tesac,315003,,month,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,1,12
+surface,tesac,315003,,day,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,1,31
+surface,tesac,315003,,hour,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,23
+surface,tesac,315003,,minute,0,0,0,,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,59
+surface,tesac,315003,,oceanographicWaterTemperature,0,0,0,,oceanographic_water_temperature,oceanographic water temperature [k],subset,,0,float64,-273.15,32767
+surface,tesac,315003,,salinity,0,0,0,,salinity,salinity [%],subset,,0,float64,0,100
+surface,tesac,315003,,oceanographicDissolvedOxygen,0,0,0,,oceanographic_dissolved_oxygen,oceanographic dissolved oxygen [umol/kg],subset,,0,float64,0,32767
 surface,moored_buoy,315008,,marineObservingPlatformIdentifier,0,0,0,,location_datetime,moored buoy id,subset,to_value,0,int32,0,2147483647
 surface,moored_buoy,315008,,latitude,0,0,0,,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,moored_buoy,315008,,longitude,0,0,0,,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180

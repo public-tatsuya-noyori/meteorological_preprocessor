@@ -158,8 +158,8 @@
 #* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12oo p2 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o'  64
 */10 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12co p2 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o'  64
 #* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12co p2 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o'  64
-*/15 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12oo p3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o'  64
-#* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12oo p3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o'  64
+#*/15 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12oo p3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o'  64
+* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12oo p3 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o'  64
 */15 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12co p3 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o'  64
 #* * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12co p3 'iij1:japan.meteorological.agency.1.closed.data.d;iij2:japan.meteorological.agency.2.closed.data.d;;iij1:japan.meteorological.agency.1.closed.data.o;iij2:japan.meteorological.agency.2.closed.data.o'  64
 55 * * * * cd /home/noyori/tests; ./sub.sh --cron          cache_s iij12oo p4 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o' 256
@@ -176,7 +176,7 @@
 #55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
 # convert bufr synop to arrow
-#* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
+* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
 
 # convert arrow to tile arrow
 #* * * * * cd /home/noyori/tests; ./arrow_to_tile_arrow.sh >> log/arrow_to_tile_arrow.sh.log 2>&1

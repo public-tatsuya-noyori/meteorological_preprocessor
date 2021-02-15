@@ -113,7 +113,7 @@ if test -s download_${priority}_closed/created.txt; then
   fi
   rm -f download_${priority}_closed/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_input_index_file cache_c iij12ci ${i} ${rclone_remote_bucket_list} ${priority} 4;done
+for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_input_index_file cache_c iij12ci ${priority} ${i} ${rclone_remote_bucket_list} 64;done
 } &
 pid=$!
 echo ${pid} > download_${priority}_closed/pid.txt

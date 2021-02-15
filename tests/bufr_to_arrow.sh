@@ -24,15 +24,15 @@ if test -s bufr_to_arrow/pid.txt; then
   running=`cat bufr_to_arrow/pid.txt | xargs ps -f --no-headers | grep " $0" | wc -l`
 else
   mkdir -p bufr_to_arrow/out_list
-  ls -1 cache_s/4Sub/sub_iij12oip3/p3_processed > bufr_to_arrow/previous_list.txt
+  ls -1 cache_s/4Sub/iij12oo/p3/processed > bufr_to_arrow/previous_list.txt
   running=0
 fi
 if test ${running} -eq 0; then
   {
     cp /dev/null bufr_to_arrow/out_list.tmp
-    ls -1 cache_s/4Sub/sub_iij12oip3/p3_processed > bufr_to_arrow/current_list.txt
+    ls -1 cache_s/4Sub/iij12oo/p3/processed > bufr_to_arrow/current_list.txt
     for i in `diff bufr_to_arrow/previous_list.txt bufr_to_arrow/current_list.txt | grep '>' | cut -c3- | uniq`; do
-      grep /surface/ cache_s/4Sub/sub_iij12oip3/p3_processed/${i} | sed -e 's|^|cache_s|g' > bufr_to_arrow/in.tmp
+      grep /surface/ cache_s/4Sub/iij12oo/p3/processed/${i} | sed -e 's|^|cache_s|g' > bufr_to_arrow/in.tmp
       ./met_pre_bufr_to_arrow.py RJTD bufr_to_arrow/in.tmp cache_bufr_to_arrow 1>> bufr_to_arrow/out_list.tmp 2>> log/met_pre_bufr_to_arrow.py.log
     done
     if test -s bufr_to_arrow/out_list.tmp; then
