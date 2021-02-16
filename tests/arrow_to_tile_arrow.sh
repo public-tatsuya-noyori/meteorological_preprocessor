@@ -20,26 +20,21 @@
 set -e
 sh_name=arrow_to_tile_arrow.sh
 export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
-if test -s pid/${sh_name}.txt; then
-  running=`cat pid/${sh_name}.txt | xargs ps -f --no-headers | grep " $0" | wc -l`
+if test -s tile_arrow/pid.txt; then
+  running=`cat tile_arrow/pid.txt | xargs ps -f --no-headers | grep " $0" | wc -l`
 else
-  mkdir -p pid
+  mkdir -p tile_arrow
   running=0
 fi
 if test ${running} -eq 0; then
   now=`date -u "+%Y%m%d%H%M%S"`
   {
-    for i in `ls -1 sub_arrow_synop|grep -v '\.tmp$'|uniq`; do
-      cat sub_arrow_synop/${i} >> tile_arrow/${now}.txt.tmp
-      rm -f sub_arrow_synop/${i}
+    for i in `ls -1 bufr_to_arrow/out_list|grep -v '\.tmp$'|uniq`; do
+      cat bufr_to_arrow/out_list/${i} >> tile_arrow/${now}.txt.tmp
+      rm -f bufr_to_arrow/out_list/${i}
     done
     if test -s tile_arrow/${now}.txt.tmp; then
-      ./pub.sh --pub_dir_list_index cache_bufr_to_arrow bufr_synop_arrow_p7 tile_arrow/${now}.txt.tmp wasabi japan.meteorological.agency.open.data p7 8 2>>log/pub.sh.bufr_synop_arrow.log
-      echo "start"  >>log/met_pre_arrow_to_tile_arrow.py.log
-      date  >>log/met_pre_arrow_to_tile_arrow.py.log
       ./met_pre_arrow_to_tile_arrow.py tile_arrow/${now}.txt.tmp cache_tile_arrow/RJTD/tile_arrow_dataset 1 1>>tile_arrow/${now}.txt.tmp2 2>>log/met_pre_arrow_to_tile_arrow.py.log
-      echo "end"  >>log/met_pre_arrow_to_tile_arrow.py.log
-      date  >>log/met_pre_arrow_to_tile_arrow.py.log
       if test -s tile_arrow/${now}.txt.tmp2; then
         grep -v ecCodes tile_arrow/${now}.txt.tmp2 > tile_arrow/${now}.txt
       fi
@@ -48,6 +43,6 @@ if test ${running} -eq 0; then
     rm -f tile_arrow/${now}.txt.tmp2
   } &
   pid=$!
-  echo ${pid} > pid/${sh_name}.txt
+  echo ${pid} > tile_arrow/pid.txt
   wait ${pid}
 fi
