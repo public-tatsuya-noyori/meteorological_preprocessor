@@ -42,6 +42,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     new_datetime_list_dict = {}
     new_id_etfo_dict = {}
     del_etfo_id_dict = {}
+    out_file_dict = {}
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
@@ -83,11 +84,15 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             new_df = new_df.astype({'elapsed time [s]': 'int32'})
                             etfo_list = etfo_df.tolist()
                             tmp_id_etfo_dict = {}
+                            old_df = new_df.iloc[0:0]
                             for index, id in enumerate(new_df['id'].tolist()):
                                 tmp_id_etfo_dict[id] = etfo_list[index]
                             new_id_etfo_dict[(tile_x,  tile_y, new_datetime)] = tmp_id_etfo_dict
-                            if os.path.exists(out_file):
+                            if out_file in out_file_dict:
+                                old_df = out_file_dict[out_file]
+                            elif os.path.exists(out_file):
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
+                            if len(old_df) > 0:
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                 concat_df = concat_df.astype({'id': 'int32'})
                                 concat_df = concat_df.astype({'indicator': 'int32'})
@@ -99,20 +104,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 del_etfo_id_dict[(tile_x, tile_y, new_datetime)] = concat_df[duplicated][['elapsed time [s]', 'id']]
                                 concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
                                 if len(concat_df) > 0:
-                                    with open(out_file, 'bw') as out_f:
-                                        writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(concat_df))
-                                        writer.write_table(pa.Table.from_pandas(concat_df))
-                                        writer.close()
-                                if not out_file in out_arrows:
-                                    out_arrows.append(out_file)
+                                    out_file_dict[out_file] = concat_df
                             else:
-                                os.makedirs(out_directory, exist_ok=True)
-                                with open(out_file, 'bw') as out_f:
-                                    writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
-                                    writer.write_table(pa.Table.from_pandas(new_df))
-                                    writer.close()
-                                if not out_file in out_arrows:
-                                    out_arrows.append(out_file)
+                                out_file_dict[out_file] = new_df
         else:
             prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/' + date_hourminute + '/C_' + creator + '_' + created + '/([^/]*)\.arrow$', in_file)
             if prop_match:
@@ -136,8 +130,12 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         tmp_etfo_list.append(tmp_id_etfo_dict[id])
                                     new_df.insert(0, 'elapsed time [s]', tmp_etfo_list)
                                     new_df = new_df.astype({'elapsed time [s]': 'int32'})
-                                    if os.path.exists(out_file):
+                                    old_df = new_df.iloc[0:0]
+                                    if out_file in out_file_dict:
+                                        old_df = out_file_dict[out_file]
+                                    elif os.path.exists(out_file):
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
+                                    if len(old_df) > 0:
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         concat_df = concat_df.astype({'id': 'int32'})
                                         concat_df = concat_df.astype({'indicator': 'int32'})
@@ -152,21 +150,16 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         unique_key_list = new_df.columns.values.tolist()
                                         concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
                                         if len(concat_df) > 0:
-                                            with open(out_file, 'bw') as out_f:
-                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(concat_df))
-                                                writer.write_table(pa.Table.from_pandas(concat_df))
-                                                writer.close()
-                                            if not out_file in out_arrows:
-                                                out_arrows.append(out_file)
+                                            out_file_dict[out_file] = concat_df
                                     else:
-                                        if len(new_df) > 0:
-                                            os.makedirs(out_directory, exist_ok=True)
-                                            with open(out_file, 'bw') as out_f:
-                                                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(new_df))
-                                                writer.write_table(pa.Table.from_pandas(new_df))
-                                                writer.close()
-                                            if not out_file in out_arrows:
-                                                out_arrows.append(out_file)
+                                        out_file_dict[out_file] = new_df
+    for out_file, out_df in out_file_dict.items():
+        os.makedirs(os.path.dirname(out_file), exist_ok=True)
+        with open(out_file, 'bw') as out_f:
+            writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(out_df))
+            writer.write_table(pa.Table.from_pandas(out_df))
+            writer.close()
+        out_arrows.append(out_file)
     print('\n'.join(out_arrows), file=out_list_file)
 
 def main():
