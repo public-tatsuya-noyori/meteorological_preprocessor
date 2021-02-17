@@ -158,12 +158,13 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                     else:
                                         out_file_dict[out_file] = new_df
     for out_file, out_df in out_file_dict.items():
-        os.makedirs(os.path.dirname(out_file), exist_ok=True)
-        with open(out_file, 'bw') as out_f:
-            writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(out_df))
-            writer.write_table(pa.Table.from_pandas(out_df))
-            writer.close()
-        out_arrows.append(out_file)
+        if len(out_df['id'].tolist()) > 0:
+            os.makedirs(os.path.dirname(out_file), exist_ok=True)
+            with open(out_file, 'bw') as out_f:
+                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(out_df))
+                writer.write_table(pa.Table.from_pandas(out_df))
+                writer.close()
+            out_arrows.append(out_file)
     print('\n'.join(out_arrows), file=out_list_file)
 
 def main():
