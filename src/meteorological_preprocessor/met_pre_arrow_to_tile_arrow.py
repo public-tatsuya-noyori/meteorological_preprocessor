@@ -105,7 +105,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
                                 if len(concat_df['id'].tolist()) > 0:
                                     out_file_dict[out_file] = concat_df
-                                else
+                                else:
                                     out_file_dict.pop(out_file)
                             else:
                                 out_file_dict[out_file] = new_df
@@ -153,7 +153,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
                                         if len(concat_df['id'].tolist()) > 0:
                                             out_file_dict[out_file] = concat_df
-                                        else
+                                        else:
                                             out_file_dict.pop(out_file)
                                     else:
                                         out_file_dict[out_file] = new_df
