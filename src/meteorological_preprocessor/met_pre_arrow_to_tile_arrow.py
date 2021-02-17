@@ -92,7 +92,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 old_df = out_file_dict[out_file]
                             elif os.path.exists(out_file):
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
-                            if len(old_df) > 0:
+                            if len(old_df['id'].tolist()) > 0:
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                 concat_df = concat_df.astype({'id': 'int32'})
                                 concat_df = concat_df.astype({'indicator': 'int32'})
@@ -103,8 +103,10 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_dict[(tile_x, tile_y, new_datetime)] = concat_df[duplicated][['elapsed time [s]', 'id']]
                                 concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
-                                if len(concat_df) > 0:
+                                if len(concat_df['id'].tolist()) > 0:
                                     out_file_dict[out_file] = concat_df
+                                else
+                                    out_file_dict.pop(out_file)
                             else:
                                 out_file_dict[out_file] = new_df
         else:
@@ -135,7 +137,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         old_df = out_file_dict[out_file]
                                     elif os.path.exists(out_file):
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
-                                    if len(old_df) > 0:
+                                    if len(old_df['id'].tolist()) > 0:
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         concat_df = concat_df.astype({'id': 'int32'})
                                         concat_df = concat_df.astype({'indicator': 'int32'})
@@ -149,8 +151,10 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                             concat_df.drop(concat_df.index[del_index_list], inplace=True)
                                         unique_key_list = new_df.columns.values.tolist()
                                         concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
-                                        if len(concat_df) > 0:
+                                        if len(concat_df['id'].tolist()) > 0:
                                             out_file_dict[out_file] = concat_df
+                                        else
+                                            out_file_dict.pop(out_file)
                                     else:
                                         out_file_dict[out_file] = new_df
     for out_file, out_df in out_file_dict.items():
