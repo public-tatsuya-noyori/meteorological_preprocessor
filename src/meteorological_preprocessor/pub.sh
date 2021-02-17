@@ -96,7 +96,7 @@ publish(){
 }
 bandwidth_limit_k_bytes_per_s=0
 cron=0
-cutoff=16M
+cutoff=8M
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
