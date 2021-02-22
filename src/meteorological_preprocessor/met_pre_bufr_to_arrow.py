@@ -106,291 +106,293 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
     cat_subcat_set = set([re.search(r'^[^/]*/[^/]*/', re.sub('^.*/bufr/', '', in_file)).group().rstrip('/') for in_file in in_file_list])
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
-            datatype_dict = {}
-            output_property_dict = {}
-            property_dict = {}
-            for in_file in in_file_list:
-                match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
-                if not match:
-                    continue
-                if not os.access(in_file, os.F_OK):
-                    print('Warning', warno, ':', in_file, 'does not exist.', file=sys.stderr)
-                    continue
-                elif not os.path.isfile(in_file):
-                    print('Warning', warno, ':', in_file, 'is not file.', file=sys.stderr)
-                    continue
-                elif not os.access(in_file, os.R_OK):
-                    print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
-                    continue
-                with open(in_file, 'r') as in_file_stream:
-                    if debug:
-                        print('Debug', ':', in_file, file=sys.stderr)
-                    while True:
-                        bufr = codes_bufr_new_from_file(in_file_stream)
-                        if bufr is None:
-                            break
-                        try:
-                            codes_set(bufr, 'unpack', 1)
-                        except:
-                            break
-                        unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')                    
-                        descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
-                        for bufr_descriptor in unexpanded_descriptors:
-                            cat = re.sub('/.*$', '', cat_subcat)
-                            subcat = re.sub('^.*/', '', cat_subcat)
-                            descriptor_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
-                            if len(descriptor_conf_df) > 0:
-                                descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
-                                if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
-                                    is_descriptor_2 = False
-                                    for descriptor_2 in descriptor_2_list:
-                                        if descriptor_2 in unexpanded_descriptors:
-                                            descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['descriptor_2'] == descriptor_2]
-                                            is_descriptor_2 = True
-                                            break
-                                    if not is_descriptor_2:
-                                        descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
+            cat = re.sub('/.*$', '', cat_subcat)
+            subcat = re.sub('^.*/', '', cat_subcat)
+            out_cat_subcat_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat)]
+            for output_cat_subcat in list(out_cat_subcat_df[['output_category','output_subcategory']].unique.itertuples()):
+                datatype_dict = {}
+                output_property_dict = {}
+                property_dict = {}
+                for in_file in in_file_list:
+                    match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
+                    if not match:
+                        continue
+                    if not os.access(in_file, os.F_OK):
+                        print('Warning', warno, ':', in_file, 'does not exist.', file=sys.stderr)
+                        continue
+                    elif not os.path.isfile(in_file):
+                        print('Warning', warno, ':', in_file, 'is not file.', file=sys.stderr)
+                        continue
+                    elif not os.access(in_file, os.R_OK):
+                        print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
+                        continue
+                    with open(in_file, 'r') as in_file_stream:
+                        if debug:
+                            print('Debug', ':', in_file, file=sys.stderr)
+                        while True:
+                            bufr = codes_bufr_new_from_file(in_file_stream)
+                            if bufr is None:
                                 break
-                        if len(descriptor_conf_df) == 0:
-                            print('Info', ':', 'not found descriptor.', unexpanded_descriptors, in_file, file=sys.stderr)
-                            break
-                        number_of_subsets = codes_get(bufr, 'numberOfSubsets')
-                        if number_of_subsets == 0:
-                            print('Info', ':', 'number_of_subsets is 0.', unexpanded_descriptors, in_file, file=sys.stderr)
-                            break
-                        bufr_dict = {}
-                        none_np = np.array([])
-                        if descriptor_conf_df['get_type'].values.flatten()[0] == 'subset':
-                            for subset_num in range(1, number_of_subsets + 1):
+                            try:
+                                codes_set(bufr, 'unpack', 1)
+                            except:
+                                break
+                            unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')                    
+                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
+                            for bufr_descriptor in unexpanded_descriptors:
+                                descriptor_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['descriptor'] == bufr_descriptor)]
+                                if len(descriptor_conf_df) > 0:
+                                    descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
+                                    if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
+                                        is_descriptor_2 = False
+                                        for descriptor_2 in descriptor_2_list:
+                                            if descriptor_2 in unexpanded_descriptors:
+                                                descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['descriptor_2'] == descriptor_2]
+                                                is_descriptor_2 = True
+                                                break
+                                        if not is_descriptor_2:
+                                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
+                                    break
+                            if len(descriptor_conf_df) == 0:
+                                print('Info', ':', 'not found descriptor.', unexpanded_descriptors, in_file, file=sys.stderr)
+                                break
+                            number_of_subsets = codes_get(bufr, 'numberOfSubsets')
+                            if number_of_subsets == 0:
+                                print('Info', ':', 'number_of_subsets is 0.', unexpanded_descriptors, in_file, file=sys.stderr)
+                                break
+                            bufr_dict = {}
+                            none_np = np.array([])
+                            if descriptor_conf_df['get_type'].values.flatten()[0] == 'subset':
+                                for subset_num in range(1, number_of_subsets + 1):
+                                    number_of_array = 0
+                                    for conf_row in descriptor_conf_df.itertuples():
+                                        array = getArray(bufr, subset_num, number_of_subsets, conf_row, in_file)
+                                        if number_of_array == 0:
+                                            number_of_array = len(array)
+                                            if len(array) == 0:
+                                                print('Warning', warno, ':', 'len(array) is 0.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                                break
+                                            else:
+                                                number_of_array = len(array)                                    
+                                        if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
+                                            if len(array) > conf_row.array_index:
+                                                value = array[int(conf_row.array_index)]
+                                                if conf_row.convert_type == 'to_value_to_array':
+                                                    array = np.array([value for i in range(0, number_of_array)], dtype=object)
+                                                else:
+                                                    array = np.array([value], dtype=object)
+                                            elif len(array) == 0:
+                                                array = np.array([None for i in range(0, number_of_array)], dtype=object)
+                                            else:
+                                                print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                                array = np.array([None for i in range(0, number_of_array)], dtype=object)
+                                                break
+
+                                        if len(array) < number_of_array:
+                                            for padding_count in range(len(array), number_of_array):
+                                                array = np.append(array, None)
+                                        elif len(array) > number_of_array:
+                                            print('Warning', warno, ':', 'len(array) is more than number_of_array.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
+                                            break
+                                        if conf_row.key in bufr_dict:
+                                            bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], array])
+                                        else:
+                                            bufr_dict[conf_row.key] = array
+                            else:
                                 number_of_array = 0
                                 for conf_row in descriptor_conf_df.itertuples():
-                                    array = getArray(bufr, subset_num, number_of_subsets, conf_row, in_file)
+                                    array = getArray(bufr, 0, 0, conf_row, in_file)
                                     if number_of_array == 0:
-                                        number_of_array = len(array)
                                         if len(array) == 0:
-                                            print('Warning', warno, ':', 'len(array) is 0.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                            print('Warning', warno, ':', 'len(array) is 0.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
                                             break
                                         else:
-                                            number_of_array = len(array)                                    
-                                    if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
-                                        if len(array) > conf_row.array_index:
-                                            value = array[int(conf_row.array_index)]
-                                            if conf_row.convert_type == 'to_value_to_array':
-                                                array = np.array([value for i in range(0, number_of_array)], dtype=object)
+                                            number_of_array = len(array)
+                                    elif len(array) != number_of_array:
+                                        if len(array) == 1:
+                                            value = array[0]
+                                            array = np.array([value for i in range(0, number_of_array)], dtype=object)
+                                        else:
+                                            print('Warning', warno, ':', 'len(array) is not equals to number_of_array.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
+                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
+                                            break
+                                    bufr_dict[conf_row.key] = array
+                            for conf_row in descriptor_conf_df.itertuples():
+                                if conf_row.output == 'location_datetime' and conf_row.key in bufr_dict:
+                                    tmp_none_np = np.array([False if value == None else True for value in bufr_dict[conf_row.key]])
+                                    if len(none_np) > 0:
+                                        none_np = none_np * tmp_none_np
+                                    else:
+                                        none_np = tmp_none_np
+                            codes_release(bufr)
+                            if len(bufr_dict) == 0 or not True in none_np.tolist():
+                                print('Info', ':', 'len(bufr_dict) == 0 or not True in none_np.tolist().', in_file, file=sys.stderr)
+                                break
+                            bufr_dict['none'] = none_np
+                            location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
+                            if len(location_datetime_index_np) > 0:
+                                message_np = np.array([])
+                                pre_conf_row_name = ''
+                                for conf_row in descriptor_conf_df.itertuples():
+                                    if conf_row.name != pre_conf_row_name:
+                                        datatype_dict[conf_row.name] = conf_row.datatype
+                                        if conf_row.output != 'location_datetime':
+                                            if conf_row.output in output_property_dict:
+                                                tmp_output_property_list = output_property_dict[conf_row.output]
+                                                if not conf_row.name in tmp_output_property_list:
+                                                    tmp_output_property_list.append(conf_row.name)
+                                                    output_property_dict[conf_row.output] = tmp_output_property_list
                                             else:
-                                                array = np.array([value], dtype=object)
-                                        elif len(array) == 0:
-                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                        else:
-                                            print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                            break
-
-                                    if len(array) < number_of_array:
-                                        for padding_count in range(len(array), number_of_array):
-                                            array = np.append(array, None)
-                                    elif len(array) > number_of_array:
-                                        print('Warning', warno, ':', 'len(array) is more than number_of_array.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                        array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                        break
+                                                output_property_dict[conf_row.output] = [conf_row.name]
+                                        if len(message_np) > 0 and len(pre_conf_row_name) > 0:
+                                            if pre_conf_row_name in property_dict:
+                                                property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
+                                            else:
+                                                property_dict[pre_conf_row_name] = message_np
+                                            message_np = np.array([])
                                     if conf_row.key in bufr_dict:
-                                        bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], array])
-                                    else:
-                                        bufr_dict[conf_row.key] = array
-                        else:
-                            number_of_array = 0
-                            for conf_row in descriptor_conf_df.itertuples():
-                                array = getArray(bufr, 0, 0, conf_row, in_file)
-                                if number_of_array == 0:
-                                    if len(array) == 0:
-                                        print('Warning', warno, ':', 'len(array) is 0.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                        break
-                                    else:
-                                        number_of_array = len(array)
-                                elif len(array) != number_of_array:
-                                    if len(array) == 1:
-                                        value = array[0]
-                                        array = np.array([value for i in range(0, number_of_array)], dtype=object)
-                                    else:
-                                        print('Warning', warno, ':', 'len(array) is not equals to number_of_array.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                        array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                        break
-                                bufr_dict[conf_row.key] = array
-                        for conf_row in descriptor_conf_df.itertuples():
-                            if conf_row.output == 'location_datetime' and conf_row.key in bufr_dict:
-                                tmp_none_np = np.array([False if value == None else True for value in bufr_dict[conf_row.key]])
-                                if len(none_np) > 0:
-                                    none_np = none_np * tmp_none_np
-                                else:
-                                    none_np = tmp_none_np
-                        codes_release(bufr)
-                        if len(bufr_dict) == 0 or not True in none_np.tolist():
-                            print('Info', ':', 'len(bufr_dict) == 0 or not True in none_np.tolist().', in_file, file=sys.stderr)
-                            break
-                        bufr_dict['none'] = none_np
-                        location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
-                        if len(location_datetime_index_np) > 0:
-                            message_np = np.array([])
-                            pre_conf_row_name = ''
-                            for conf_row in descriptor_conf_df.itertuples():
-                                if conf_row.name != pre_conf_row_name:
-                                    datatype_dict[conf_row.name] = conf_row.datatype
-                                    if conf_row.output != 'location_datetime':
-                                        if conf_row.output in output_property_dict:
-                                            tmp_output_property_list = output_property_dict[conf_row.output]
-                                            if not conf_row.name in tmp_output_property_list:
-                                                tmp_output_property_list.append(conf_row.name)
-                                                output_property_dict[conf_row.output] = tmp_output_property_list
-                                        else:
-                                            output_property_dict[conf_row.output] = [conf_row.name]
-                                    if len(message_np) > 0 and len(pre_conf_row_name) > 0:
-                                        if pre_conf_row_name in property_dict:
-                                            property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
-                                        else:
-                                            property_dict[pre_conf_row_name] = message_np
-                                        message_np = np.array([])
-                                if conf_row.key in bufr_dict:
-                                    tmp_message_np = bufr_dict[conf_row.key]
-                                    if max(location_datetime_index_np) < len(tmp_message_np):
-                                        tmp_message_np = tmp_message_np[location_datetime_index_np]
-                                        if len(tmp_message_np) > 0:
-                                            if len(message_np) > 0:
-                                                if conf_row.multiply != 0:
-                                                    message_np = message_np + conf_row.multiply * tmp_message_np
+                                        tmp_message_np = bufr_dict[conf_row.key]
+                                        if max(location_datetime_index_np) < len(tmp_message_np):
+                                            tmp_message_np = tmp_message_np[location_datetime_index_np]
+                                            if len(tmp_message_np) > 0:
+                                                if len(message_np) > 0:
+                                                    if conf_row.multiply != 0:
+                                                        message_np = message_np + conf_row.multiply * tmp_message_np
+                                                    else:
+                                                        message_np = message_np + tmp_message_np
                                                 else:
-                                                    message_np = message_np + tmp_message_np
-                                            else:
-                                                if conf_row.multiply != 0:
-                                                    message_np = conf_row.multiply * tmp_message_np
-                                                else:
-                                                    message_np = tmp_message_np
+                                                    if conf_row.multiply != 0:
+                                                        message_np = conf_row.multiply * tmp_message_np
+                                                    else:
+                                                        message_np = tmp_message_np
+                                        else:
+                                            print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, max(location_datetime_index_np), len(tmp_message_np), in_file, file=sys.stderr)
+                                    pre_conf_row_name = conf_row.name
+                                if len(message_np) > 0 and len(pre_conf_row_name) > 0:
+                                    if pre_conf_row_name in property_dict:
+                                        property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
                                     else:
-                                        print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, max(location_datetime_index_np), len(tmp_message_np), in_file, file=sys.stderr)
-                                pre_conf_row_name = conf_row.name
-                            if len(message_np) > 0 and len(pre_conf_row_name) > 0:
-                                if pre_conf_row_name in property_dict:
-                                    property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
-                                else:
-                                    property_dict[pre_conf_row_name] = message_np
-            if 'datetime' in property_dict:
-                id_list = [id_num for id_num in range(0, len(property_dict['datetime']))]
-                location_datetime_data = [pa.array(id_list, 'int32')]
-                location_datetime_name_list = ['id']
-                datetime_directory_list = []
-                del_key_list = []
-                cat_subcat_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
-                datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
-                for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
-                    if conf_row_name == 'datetime':
-                        plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
-                        if 'time period [s]' in property_dict:
-                            plus_second_list = property_dict['time period [s]']
-                            del_key_list.append('time period [s]')
-                        if datetime_tail == 'millisecond':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:11] + "0" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:11] + "0")
-                        elif datetime_tail == 'second':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:11] + "0" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:11] + "0")
-                        elif datetime_tail == 'minute':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:11] + "0" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:11] + "0")
-                        elif datetime_tail == 'hour':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:10] + "00" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:10] + "00")
-                        elif datetime_tail == 'day':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:8] + "0000" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:8] + "0000")
-                        elif datetime_tail == 'month':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:6] + "000000" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:6] + "000000")
-                        elif datetime_tail == 'year':
-                            location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
-                            for dt_str in property_dict[conf_row_name]:
-                                if not dt_str[0:4] + "00000000" in datetime_directory_list:
-                                    datetime_directory_list.append(dt_str[0:4] + "00000000")
-                        location_datetime_name_list.append(conf_row_name)
-                    elif conf_row_name != 'time period [s]':
-                        if conf_row_name in property_dict:
-                            location_datetime_data.append(pa.array(property_dict[conf_row_name], datatype_dict[conf_row_name]))
+                                        property_dict[pre_conf_row_name] = message_np
+                if 'datetime' in property_dict:
+                    id_list = [id_num for id_num in range(0, len(property_dict['datetime']))]
+                    location_datetime_data = [pa.array(id_list, 'int32')]
+                    location_datetime_name_list = ['id']
+                    datetime_directory_list = []
+                    del_key_list = []
+                    cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['output_category'] == output_cat_subcat.output_category) & (conf_df['output_subcategory'] == output_cat_subcat.output_subcategory)]
+                    datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
+                    for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
+                        if conf_row_name == 'datetime':
+                            plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
+                            if 'time period [s]' in property_dict:
+                                plus_second_list = property_dict['time period [s]']
+                                del_key_list.append('time period [s]')
+                            if datetime_tail == 'millisecond':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:11] + "0" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:11] + "0")
+                            elif datetime_tail == 'second':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:11] + "0" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:11] + "0")
+                            elif datetime_tail == 'minute':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:11] + "0" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:11] + "0")
+                            elif datetime_tail == 'hour':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:10] + "00" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:10] + "00")
+                            elif datetime_tail == 'day':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:8] + "0000" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:8] + "0000")
+                            elif datetime_tail == 'month':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:6] + "000000" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:6] + "000000")
+                            elif datetime_tail == 'year':
+                                location_datetime_data.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
+                                for dt_str in property_dict[conf_row_name]:
+                                    if not dt_str[0:4] + "00000000" in datetime_directory_list:
+                                        datetime_directory_list.append(dt_str[0:4] + "00000000")
                             location_datetime_name_list.append(conf_row_name)
-                for datetime_directory in datetime_directory_list:
-                    datetime_len = 11
-                    if datetime_tail == 'hour':
-                        datetime_len = 10
-                    elif datetime_tail == 'day':
-                        datetime_len = 8
-                    elif datetime_tail == 'month':
-                        datetime_len = 6
-                    elif datetime_tail == 'year':
-                        datetime_len = 4
-                    datetime_index_list = [index for index, value in enumerate(property_dict['datetime']) if value[0:datetime_len] == datetime_directory[0:datetime_len]]
-                    if len(datetime_index_list) > 0:
-                        tmp_location_datetime_data = [location_datetime.take(pa.array(datetime_index_list)) for location_datetime in location_datetime_data]
-                        if len(tmp_location_datetime_data) > 0:
-                            out_directory_list = [out_dir, cccc, 'bufr_to_arrow', cat_subcat, datetime_directory, create_datetime_directory]
-                            out_directory = '/'.join(out_directory_list)
-                            os.makedirs(out_directory, exist_ok=True)
-                            out_file_list = [out_directory, 'location_datetime.arrow']
-                            out_file = '/'.join(out_file_list)
-                            with open(out_file, 'bw') as out_f:
-                                location_datetime_batch = pa.record_batch(tmp_location_datetime_data, names=location_datetime_name_list)
-                                writer = pa.ipc.new_file(out_f, location_datetime_batch.schema)
-                                writer.write_batch(location_datetime_batch)
-                                writer.close()
-                                print(out_file, file=out_list_file)
-                            for output in output_property_dict.keys():
-                                property_name_list = ['id']
-                                property_data = []
-                                datetime_id_pa = pa.array(id_list, 'int32').take(pa.array(datetime_index_list))
-                                value_index_list = []
-                                if output_property_dict[output] != None:
-                                    datetime_property_data_dict = {}
-                                    for property_key in output_property_dict[output]:
-                                        property_name_list.append(property_key)
-                                        if property_key in property_dict:
-                                            if max(datetime_index_list) < len(property_dict[property_key]):
-                                                datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
-                                                datetime_property_data_dict[property_key] = datetime_property_data
-                                                if len(value_index_list) > 0:
-                                                    value_index_list = list(set(value_index_list) & set([index for index, value in enumerate(datetime_property_data.tolist()) if value != None]))
-                                                else:
-                                                    value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
-                                            else:
-                                                print('Info', cat_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
-                                    if len(value_index_list) > 0:
-                                        property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
-                                        is_output = True
+                        elif conf_row_name != 'time period [s]':
+                            if conf_row_name in property_dict:
+                                location_datetime_data.append(pa.array(property_dict[conf_row_name], datatype_dict[conf_row_name]))
+                                location_datetime_name_list.append(conf_row_name)
+                    for datetime_directory in datetime_directory_list:
+                        datetime_len = 11
+                        if datetime_tail == 'hour':
+                            datetime_len = 10
+                        elif datetime_tail == 'day':
+                            datetime_len = 8
+                        elif datetime_tail == 'month':
+                            datetime_len = 6
+                        elif datetime_tail == 'year':
+                            datetime_len = 4
+                        datetime_index_list = [index for index, value in enumerate(property_dict['datetime']) if value[0:datetime_len] == datetime_directory[0:datetime_len]]
+                        if len(datetime_index_list) > 0:
+                            tmp_location_datetime_data = [location_datetime.take(pa.array(datetime_index_list)) for location_datetime in location_datetime_data]
+                            if len(tmp_location_datetime_data) > 0:
+                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, datetime_directory, create_datetime_directory]
+                                out_directory = '/'.join(out_directory_list)
+                                os.makedirs(out_directory, exist_ok=True)
+                                out_file_list = [out_directory, 'location_datetime.arrow']
+                                out_file = '/'.join(out_file_list)
+                                with open(out_file, 'bw') as out_f:
+                                    location_datetime_batch = pa.record_batch(tmp_location_datetime_data, names=location_datetime_name_list)
+                                    writer = pa.ipc.new_file(out_f, location_datetime_batch.schema)
+                                    writer.write_batch(location_datetime_batch)
+                                    writer.close()
+                                    print(out_file, file=out_list_file)
+                                for output in output_property_dict.keys():
+                                    property_name_list = ['id']
+                                    property_data = []
+                                    datetime_id_pa = pa.array(id_list, 'int32').take(pa.array(datetime_index_list))
+                                    value_index_list = []
+                                    if output_property_dict[output] != None:
+                                        datetime_property_data_dict = {}
                                         for property_key in output_property_dict[output]:
-                                            if property_key in datetime_property_data_dict:
-                                                property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
-                                            else:
-                                                print('Info', cat_subcat, 'key :', property_key, 'no data', file=sys.stderr)
-                                                is_output = False
-                                        if is_output:
-                                            out_directory_list = [out_dir, cccc, 'bufr_to_arrow', cat_subcat, datetime_directory, create_datetime_directory]
-                                            out_directory = '/'.join(out_directory_list)
-                                            os.makedirs(out_directory, exist_ok=True)
-                                            out_file_list = [out_directory, output + '.arrow']
-                                            out_file = '/'.join(out_file_list)
-                                            with open(out_file, 'bw') as out_f:
-                                                property_batch = pa.record_batch(property_data, names=property_name_list)
-                                                writer = pa.ipc.new_file(out_f, property_batch.schema)
-                                                writer.write_batch(property_batch)
-                                                writer.close()
-                                                print(out_file, file=out_list_file)
+                                            property_name_list.append(property_key)
+                                            if property_key in property_dict:
+                                                if max(datetime_index_list) < len(property_dict[property_key]):
+                                                    datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
+                                                    datetime_property_data_dict[property_key] = datetime_property_data
+                                                    if len(value_index_list) > 0:
+                                                        value_index_list = list(set(value_index_list) & set([index for index, value in enumerate(datetime_property_data.tolist()) if value != None]))
+                                                    else:
+                                                        value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
+                                                else:
+                                                    print('Info', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
+                                        if len(value_index_list) > 0:
+                                            property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
+                                            is_output = True
+                                            for property_key in output_property_dict[output]:
+                                                if property_key in datetime_property_data_dict:
+                                                    property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
+                                                else:
+                                                    print('Info', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, 'key :', property_key, 'no data', file=sys.stderr)
+                                                    is_output = False
+                                            if is_output:
+                                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, datetime_directory, create_datetime_directory]
+                                                out_directory = '/'.join(out_directory_list)
+                                                os.makedirs(out_directory, exist_ok=True)
+                                                out_file_list = [out_directory, output + '.arrow']
+                                                out_file = '/'.join(out_file_list)
+                                                with open(out_file, 'bw') as out_f:
+                                                    property_batch = pa.record_batch(property_data, names=property_name_list)
+                                                    writer = pa.ipc.new_file(out_f, property_batch.schema)
+                                                    writer.write_batch(property_batch)
+                                                    writer.close()
+                                                    print(out_file, file=out_list_file)
 
 def main():
     errno=198
