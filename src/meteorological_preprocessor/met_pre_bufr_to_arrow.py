@@ -109,7 +109,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
             cat = re.sub('/.*$', '', cat_subcat)
             subcat = re.sub('^.*/', '', cat_subcat)
             out_cat_subcat_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat)]
-            for output_cat_subcat in list(out_cat_subcat_df[['output_category','output_subcategory']].unique.itertuples()):
+            for output_cat_subcat in list(out_cat_subcat_df[['output_category','output_subcategory']].itertuples()):
                 datatype_dict = {}
                 output_property_dict = {}
                 property_dict = {}
