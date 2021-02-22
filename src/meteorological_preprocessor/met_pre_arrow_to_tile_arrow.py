@@ -26,7 +26,7 @@ import pandas as pd
 import re
 import sys
 import traceback
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     warno = 189
@@ -69,9 +69,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                         tile_df = in_df[(res * tile_x - 180.0 < in_df['longitude [degree]']) & (in_df['longitude [degree]'] <= res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] >= 90.0 - res * (tile_y + 1))]
                     else:
                         tile_df = in_df[(res * tile_x - 180.0 < in_df['longitude [degree]']) & (in_df['longitude [degree]'] <= res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y > in_df['latitude [degree]']) & (in_df['latitude [degree]'] >= 90.0 - res * (tile_y + 1))]
-                    new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].unique()
+                    new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.floor("10T").unique()
                     for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                        new_df = tile_df[(new_datetime == tile_df['datetime'])]
+                        new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=10))]
                         if len(new_df['id'].tolist()) > 0:
                             out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
                             out_file = ''.join([out_directory, '/location_datetime.arrow'])
