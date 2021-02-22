@@ -109,7 +109,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
             cat = re.sub('/.*$', '', cat_subcat)
             subcat = re.sub('^.*/', '', cat_subcat)
             out_cat_subcat_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat)]
-            for output_cat_subcat in list(out_cat_subcat_df[['output_category','output_subcategory']].itertuples()):
+            for output_cat, output_subcat in zip(out_cat_subcat_df['output_category'].unique(), out_cat_subcat_df['output_subcategory'].unique()):
                 datatype_dict = {}
                 output_property_dict = {}
                 property_dict = {}
@@ -280,7 +280,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     location_datetime_name_list = ['id']
                     datetime_directory_list = []
                     del_key_list = []
-                    cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['output_category'] == output_cat_subcat.output_category) & (conf_df['output_subcategory'] == output_cat_subcat.output_subcategory)]
+                    cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat)]
                     datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
                     for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                         if conf_row_name == 'datetime':
@@ -342,7 +342,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         if len(datetime_index_list) > 0:
                             tmp_location_datetime_data = [location_datetime.take(pa.array(datetime_index_list)) for location_datetime in location_datetime_data]
                             if len(tmp_location_datetime_data) > 0:
-                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, datetime_directory, create_datetime_directory]
+                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
                                 out_directory = '/'.join(out_directory_list)
                                 os.makedirs(out_directory, exist_ok=True)
                                 out_file_list = [out_directory, 'location_datetime.arrow']
@@ -371,7 +371,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                     else:
                                                         value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                                                 else:
-                                                    print('Info', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
+                                                    print('Info', output_cat, output_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
                                         if len(value_index_list) > 0:
                                             property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
                                             is_output = True
@@ -379,10 +379,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 if property_key in datetime_property_data_dict:
                                                     property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
                                                 else:
-                                                    print('Info', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, 'key :', property_key, 'no data', file=sys.stderr)
+                                                    print('Info', output_cat, output_subcat, 'key :', property_key, 'no data', file=sys.stderr)
                                                     is_output = False
                                             if is_output:
-                                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat_subcat.output_category, output_cat_subcat.output_subcategory, datetime_directory, create_datetime_directory]
+                                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
                                                 out_directory = '/'.join(out_directory_list)
                                                 os.makedirs(out_directory, exist_ok=True)
                                                 out_file_list = [out_directory, output + '.arrow']
