@@ -109,10 +109,15 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
             cat = re.sub('/.*$', '', cat_subcat)
             subcat = re.sub('^.*/', '', cat_subcat)
             out_cat_subcat_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat)]
-            for output_cat, output_subcat in zip(out_cat_subcat_df['output_category'].unique(), out_cat_subcat_df['output_subcategory'].unique()):
+            location_type_output_cat_subcat_set = set([str(location_type) + '/' + output_cat + '/' + output_subcat for output_index, location_type, output_cat, output_subcat in list(out_cat_subcat_df[['location_type','output_category','output_subcategory']].itertuples())])
+            for location_type_output_cat_subcat in location_type_output_cat_subcat_set:
                 datatype_dict = {}
                 output_property_dict = {}
                 property_dict = {}
+                location_type_output_cat_subcat_list = location_type_output_cat_subcat.split('/')
+                location_type = int(location_type_output_cat_subcat_list[0])
+                output_cat = location_type_output_cat_subcat_list[1]
+                output_subcat = location_type_output_cat_subcat_list[2]
                 for in_file in in_file_list:
                     match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
                     if not match:
@@ -280,7 +285,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     location_datetime_name_list = ['id']
                     datetime_directory_list = []
                     del_key_list = []
-                    cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat)]
+                    cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['location_type'] == location_type) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat)]
                     datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
                     for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                         if conf_row_name == 'datetime':
