@@ -135,7 +135,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         if debug:
                             print('Debug', ':', in_file, file=sys.stderr)
                         while True:
-                            bufr = codes_bufr_new_from_file(in_file_stream)
+                            bufr = None
+                            try:
+                                bufr = codes_bufr_new_from_file(in_file_stream)
+                            except:
+                                print('Warning', warno, ':', in_file, 'is not bufr.', file=sys.stderr)
+                                break
                             if bufr is None:
                                 break
                             try:
