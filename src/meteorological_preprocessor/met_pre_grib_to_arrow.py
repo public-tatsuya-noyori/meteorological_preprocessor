@@ -28,8 +28,7 @@ import re
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
-from pyarrow import csv
-from pyarrow import feather
+from pyarrow import csv, feather
 from eccodes import *
 
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):

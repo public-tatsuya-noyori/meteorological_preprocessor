@@ -117,7 +117,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                 for tile_x in range(0, 2**(zoom + 1)):
                     for tile_y in range(0, 2**(zoom)):
                         for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                            if len(new_id_etfo_dict[tile_x,  tile_y, new_datetime]) > 0:                                
+                            if len(new_id_etfo_dict[tile_x,  tile_y, new_datetime]) > 0:
                                 intersection_id_list = list(set(new_id_etfo_dict[(tile_x,  tile_y, new_datetime)].keys()) & set(in_df['id'].tolist()))
                                 new_df = in_df[in_df['id'].isin(intersection_id_list)]
                                 if len(new_df['id'].tolist()) > 0:
