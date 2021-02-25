@@ -74,7 +74,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                         new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=10))]
                         if len(new_df['id'].tolist()) > 0:
                             out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
-                            out_file = ''.join([out_directory, '/location_datetime.arrow'])
+                            out_file = ''.join([out_directory, '/location_datetime.feather'])
                             new_df = new_df.astype({'id': 'int32'})
                             new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                             new_df = new_df.astype({'indicator': 'int32'})
@@ -122,7 +122,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 new_df = in_df[in_df['id'].isin(intersection_id_list)]
                                 if len(new_df['id'].tolist()) > 0:
                                     out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
-                                    out_file = ''.join([out_directory, '/', prop_short_name, '.arrow'])
+                                    out_file = ''.join([out_directory, '/', prop_short_name, '.feather'])
                                     new_df = new_df.astype({'id': 'int32'})
                                     new_df.insert(1, 'indicator', ord(cccc[0]) * 1000000 + ord(cccc[1]) * 10000 + ord(cccc[2]) * 100 + ord(cccc[3]))
                                     new_df = new_df.astype({'indicator': 'int32'})
@@ -161,9 +161,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
         if len(out_df['id'].tolist()) > 0:
             os.makedirs(os.path.dirname(out_file), exist_ok=True)
             with open(out_file, 'bw') as out_f:
-                writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(out_df))
-                writer.write_table(pa.Table.from_pandas(out_df))
-                writer.close()
+                feather.write_feather(out_df, out_f, compression='uncompressed')
                 print(out_file, file=out_list_file)
 
 def main():
