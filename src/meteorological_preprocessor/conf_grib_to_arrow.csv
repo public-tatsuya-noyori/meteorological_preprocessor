@@ -1,2 +1,6 @@
 category,subcategory,stepRange,typeOfLevel,level,shortName,output,name,name2,value2,datatype,min,max
-gsm,1.25_1.25,"0",surface,"0",t,air_temperature,air temperature [K],hight above ground [m],2,float64,-273.15,32767
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10u,10_metre_U_wind_component,10 metre U wind component [m/s],hight above ground [m],10,float64,-32767,32767
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10v,10_metre_V_wind_component,10 metre V wind component [m/s],hight above ground [m],10,float64,-32767,32767
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"2",2t,2_metre_temperature,2 metre temperature [K],hight above ground [m],2,float64,-273.15,32767
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"2",2r,2_metre_relative_humidity,2 metre relative humidity [%],hight above ground [m],2,float64,0,100
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",meanSea,"0",prmsl,pressure_reduced_to_msl,pressure reduced to MSL [Pa],pressure reduced to MSL,0,float64,0,32767

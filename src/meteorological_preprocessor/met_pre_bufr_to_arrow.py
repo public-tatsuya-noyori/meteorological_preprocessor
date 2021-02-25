@@ -29,6 +29,7 @@ import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv
+from pyarrow import feather
 from eccodes import *
 
 def getArray(bufr, subset_num, subset_len, conf_row, in_file):
@@ -395,13 +396,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
                                                 out_directory = '/'.join(out_directory_list)
                                                 os.makedirs(out_directory, exist_ok=True)
-                                                out_file_list = [out_directory, output + '.arrow']
-                                                out_file = '/'.join(out_file_list)
+                                                out_file_list = [out_directory, '/', output, '.feather']
+                                                out_file = ''.join(out_file_list)
                                                 with open(out_file, 'bw') as out_f:
                                                     property_batch = pa.record_batch(property_data, names=property_name_list)
-                                                    writer = pa.ipc.new_file(out_f, property_batch.schema)
-                                                    writer.write_batch(property_batch)
-                                                    writer.close()
+                                                    property_table = pa.Table.from_batches([property_batch])
+                                                    feather.write_feather(property_table, out_f, compression='zstd')
                                                     print(out_file, file=out_list_file)
 
 def main():

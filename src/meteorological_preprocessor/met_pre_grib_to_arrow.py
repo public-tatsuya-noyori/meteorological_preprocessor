@@ -29,6 +29,7 @@ import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv
+from pyarrow import feather
 from eccodes import *
 
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
@@ -43,9 +44,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
         for cat_subcat in cat_subcat_set:
             keys = ['stepRange', 'typeOfLevel', 'level', 'shortName']
             missingValue = -3.402823e+38
-            property_dict = {}
-            ft_list = []
             for in_file in in_file_list:
+                property_dict = {}
+                ft_list = []
                 match = re.search(r'^.*/' + cccc + '/grib/' + cat_subcat + '/.*$', in_file)
                 if not match:
                     continue
@@ -58,6 +59,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                 elif not os.access(in_file, os.R_OK):
                     print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
                     continue
+                datetime_directory = re.sub('/.*$', '', re.sub('^.*/' + cccc + '/grib/' + cat_subcat + '/', '', in_file))
                 with open(in_file, 'r') as in_file_stream:
                     if debug:
                         print('Debug', ':', in_file, file=sys.stderr)
@@ -97,68 +99,36 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             target_conf_df = target_conf_df[(target_conf_df[key] == value)]
                                 codes_keys_iterator_delete(iterid)
                                 message_np = np.array([])
-                                if len(target_conf_df) == 1:
-                                    for conf_row in target_conf_df.itertuples():
-                                        ft = codes_get(gid, 'stepRange')
-                                        if not ft in ft_list:
-                                            ft_list.append(ft)
-                                        iterid = codes_grib_iterator_new(gid, 0)
-                                        while True:
-                                            latitude_longitude_value = codes_grib_iterator_next(iterid)
-                                            if not latitude_longitude_value:
-                                                break
-                                            else:
-                                                if len(message_np) > 0:
-                                                    message_np = np.append(message_np, np.array([[latitude_longitude_value[0], latitude_longitude_value[1], latitude_longitude_value[2]]]), axis=0)
-                                                else:
-                                                    message_np = np.array([[latitude_longitude_value[0], latitude_longitude_value[1], latitude_longitude_value[2]]])
-                                        if (conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName) in property_dict:
-                                            property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)] = np.append(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)], message_np, axis=0)
-                                        else:
-                                            property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)] = message_np
-                                        codes_grib_iterator_delete(iterid)
-                                else:
-                                    print('Warning', warno, ':', in_file, 'is not grib.', file=sys.stderr)
+                                for conf_row in target_conf_df.itertuples():
+                                    ft = codes_get(gid, 'stepRange')
+                                    if not ft in ft_list:
+                                        ft_list.append(ft)
+                                    property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)] = np.array(codes_get_values(gid))
                                 codes_release(gid)
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
-            if len(property_dict) > 0:
-                lat_lon_dict = {}
-                lat_lon_seq_id = 0
-                for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
-                    for ft in ft_list:
-                        if len(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]) > 0:
-                            property_data = []
-                            id_list = []
-                            value_list = []
-                            for latitude_longitude_value in property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]:
-                                id = 0
-                                if (latitude_longitude_value[0], latitude_longitude_value[1]) in lat_lon_dict:
-                                    id = lat_lon_dict[(latitude_longitude_value[0], latitude_longitude_value[1])]
-                                else:
-                                    id = lat_lon_seq_id
-                                    lat_lon_dict[(latitude_longitude_value[0], latitude_longitude_value[1])] = id
-                                    lat_lon_seq_id += 1
-                                id_list.append(id)
-                                value_list.append(latitude_longitude_value[2])
-                            property_name_list = ['id', conf_row.name]
-                            print(id_list)
-                            property_data.append(pa.array(id_list, 'int32'))
-                            property_data.append(pa.array(value_list, conf_row.datatype))
-                            out_file = 'test.arrow'
-                            with open(out_file, 'bw') as out_f:
-                                print(property_data)
-                                property_batch = pa.record_batch(property_data, names=property_name_list)
-                                writer = pa.ipc.new_file(out_f, property_batch.schema)
-                                writer.write_batch(property_batch)
-                                writer.close()
-                                print(out_file, file=stderr)
-
-
-
-
-
-
+                if len(property_dict) > 0:
+                    now = datetime.utcnow()
+                    create_datetime_directory_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2)]
+                    create_datetime_directory = ''.join(create_datetime_directory_list)
+                    for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
+                        for ft in ft_list:
+                            if len(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]) > 0:
+                                property_data = []
+                                value_list = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]
+                                id_list = range(len(value_list))
+                                property_name_list = [conf_row.name]
+                                property_data.append(pa.array(value_list, conf_row.datatype))
+                                out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory, datetime_directory, create_datetime_directory, ft]
+                                out_directory = '/'.join(out_directory_list)
+                                os.makedirs(out_directory, exist_ok=True)
+                                out_file_list = [out_directory, '/', conf_row.output, '.feather']
+                                out_file = ''.join(out_file_list)
+                                with open(out_file, 'bw') as out_f:
+                                    property_batch = pa.record_batch(property_data, names=property_name_list)
+                                    property_table = pa.Table.from_batches([property_batch])
+                                    feather.write_feather(property_table, out_f, compression='zstd')
+                                    print(out_file, file=out_list_file)
 
 def main():
     errno=198

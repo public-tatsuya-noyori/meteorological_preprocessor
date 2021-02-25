@@ -27,10 +27,10 @@ import re
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
+from pyarrow import feather
 
 def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     warno = 189
-    out_arrows = []
     res = 180 / 2**zoom
     cccc = ''
     form = ''
@@ -46,7 +46,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
-        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/([0-9]*)/C_([A-Z]{4})_([0-9]*)/location_datetime\.arrow$', in_file)
+        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/([0-9]*)/C_([A-Z]{4})_([0-9]*)/location_datetime\.feather$', in_file)
         if loc_time_match:
             cccc = loc_time_match.group(1)
             form = loc_time_match.group(2)
@@ -58,7 +58,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
             new_datetime_list_dict = {}
             new_id_etfo_dict = {}
             del_etfo_id_dict = {}
-            in_df = pa.ipc.open_file(in_file).read_pandas()
+            in_df = feather.read_feather(in_file)
             for tile_x in range(0, 2**(zoom + 1)):
                 for tile_y in range(0, 2**(zoom)):
                     if tile_x == 0 and tile_y == 0:
@@ -110,7 +110,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             else:
                                 out_file_dict[out_file] = new_df
         else:
-            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/' + date_hourminute + '/C_' + creator + '_' + created + '/([^/]*)\.arrow$', in_file)
+            prop_match = re.search(r'^.*/' + cccc + '/' + form + '/' + cat_dir + '/' + date_hourminute + '/C_' + creator + '_' + created + '/([^/]*)\.feather$', in_file)
             if prop_match:
                 prop_short_name = prop_match.group(1)
                 in_df = pa.ipc.open_file(in_file).read_pandas()
@@ -164,8 +164,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                 writer = pa.ipc.new_file(out_f, pa.Schema.from_pandas(out_df))
                 writer.write_table(pa.Table.from_pandas(out_df))
                 writer.close()
-            out_arrows.append(out_file)
-    print('\n'.join(out_arrows), file=out_list_file)
+                print(out_file, file=out_list_file)
 
 def main():
     errno=198
