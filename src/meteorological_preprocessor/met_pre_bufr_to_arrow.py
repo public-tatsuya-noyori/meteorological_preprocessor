@@ -356,13 +356,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
                                 out_directory = '/'.join(out_directory_list)
                                 os.makedirs(out_directory, exist_ok=True)
-                                out_file_list = [out_directory, 'location_datetime.arrow']
+                                out_file_list = [out_directory, 'location_datetime.feather']
                                 out_file = '/'.join(out_file_list)
                                 with open(out_file, 'bw') as out_f:
                                     location_datetime_batch = pa.record_batch(tmp_location_datetime_data, names=location_datetime_name_list)
-                                    writer = pa.ipc.new_file(out_f, location_datetime_batch.schema)
-                                    writer.write_batch(location_datetime_batch)
-                                    writer.close()
+                                    location_datetime_table = pa.Table.from_batches([location_datetime_batch])
+                                    feather.write_feather(location_datetime_table, out_f, compression='zstd')
                                     print(out_file, file=out_list_file)
                                 for output in output_property_dict.keys():
                                     property_name_list = ['id']
