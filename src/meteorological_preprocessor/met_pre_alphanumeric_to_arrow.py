@@ -30,25 +30,114 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv, feather
 
-def get99LaLaLa(token):
-    if len(token) != 5:
-        return []
+dt_name = 'datetime'
+lat_name = 'latitude [degree]'
+lon_name = 'longitude [degree]'
+ship_location_name = 'ship identifier'
+synop_location_name = 'station number'
+pressure_reduced_to_msl_name = 'pressure reduced to MSL [Pa]'
+temperature = 'temperature [K]'
+dewpoint_temperature = 'dewpoint temperature [K]'
 
-def getYYGGiw(token, dt_str):
-    r = []
-    if len(token) != 5:
-        return []
+
+def geta3hhh(token):
+    if token[0:1] == '1':
+        ml = 1000
+        gph = int(token[1:4])
+    elif token[0:1] == '2':
+        ml = 925
+        gph = int(token[1:4])
+    elif token[0:1] == '5':
+        ml = 500
+        gph = int(token[1:4])
+    elif token[0:1] == '7':
+        ml = 700
+        gph = int(token[1:4])
+    elif token[0:1] == '8':
+        ml = 850
+        gph = int(token[1:4])
+    return [ml, gph]
+
+def getPPPP(token):
+    if int(token[0:1]) <= 4:
+        p = (10000 + int(token)) * 10
+    else:
+        p = int(token) * 10
+    return [p]
+
+def getsnTTT(token):
+    if token[0:1] == '0':
+        t = (int(token[1:4]) + 2732) / 10
+    elif token[0:1] == '1':
+        t = (int(token[1:4]) * -1 + 2732) / 10
+    elif token[0:1] == '9':
+        t = int(token[1:4])
+    return [t]
+
+def getNddff_00fff(token1, token2, wind_multiply):
+    if token1[0:1] == '/':
+        total_cloud = -1
+    else:
+        total_cloud = int(token1[0:1])
+    if token1[1:3] == '//':
+        wind_direction = -1
+    else:
+        wind_direction = int(token1[1:3]) * 10
+    if token1[3:5] == '//':
+        wind_speed = -1        
+    else:
+        wind_speed = int(token1[3:5])
+    if len(token2) == 5 and re.match(r'^00[0-9]{3}$', token2):
+        wind_speed = int(token2[2:5])
+    elif wind_direction > 49 and wind_speed > -1:
+        wind_speed = wind_speed + 100
+    if wind_multiply > 0:
+        wind_speed = round(wind_speed * wind_multiply * 10) / 10 
+    else:
+        wind_speed = -1
+    return [total_cloud, wind_direction, wind_speed]
+
+def getiRixhVV(token):
+    is_precip = int(token[0:1])
+    is_weather = int(token[1:2])
+    if token[2:3] == '/':
+        cloud_base = -1
+    else:
+        cloud_base = int(token[2:3])
+    if token[3:5] == '//':
+        visibility = -1
+    else:
+        visibility = int(token[3:5])
+    return [is_precip, is_weather, cloud_base, visibility]
+
+def get99LaLaLa_QcLoLoLoLo(token1, token2):
+    lat = int(token1[2:5])
+    lon = int(token2[1:5])
+    if token2[0] == '3':
+        lat = lat * -1
+    elif token2[0] == '5':
+        lat = lat * -1
+        lon = lon * -1
+    elif token2[0] == '7':
+        lon = lon * -1
+    if lon == -1800:
+        lon = 1800
+    lat = lat / 10
+    lon = lon / 10
+    return [lat, lon]
+
+def getYYGGiw(token, dt_str, in_file):
+    warno = 187
     if not dt_str[6:10] == token[0:4]:
+        print('Warning', warno, ':', dt_str, 'in', in_file, 'does not match YYGG of', token, '.', file=sys.stderr)
         return []
-    else:
-        r.append(datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc))
+    dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc)
+    wind_multiply = -1.0
     if token[4] == '0' or token[4] == '1':
-        r.append(1.0)
+        wind_multiply = 1.0
     elif token[4] == '3' or token[4] == '4':
-        r.append(5.14444)
-    else:
-        r.append(0.0)
-    return r
+        wind_multiply = 0.514444
+    return [dt, wind_multiply]
 
 def parse(cccc, cat, subcat, in_file, message, dt_str, debug):
     warno = 188
@@ -57,16 +146,16 @@ def parse(cccc, cat, subcat, in_file, message, dt_str, debug):
     out_subcat = ''
     if cat == 'surface':
         if subcat == 'synop' or subcat == 'ship' or subcat == 'synop_mobil':
-            if not re.search(r' (AAXX [0-9][0-9][0-9][0-9][0-9]|BBXX|OOXX) ', text):
-                print('Warning', warno, ':', in_file, 'does not match " (AAXX [0-9][0-9][0-9][0-9][0-9]|BBXX|OOXX) ".', file=sys.stderr)
+            if not re.search(r' (AAXX [0-9]{5}|BBXX|OOXX) ', text):
+                print('Warning', warno, ':', in_file, 'does not match " (AAXX [0-9]{5}|BBXX|OOXX) ".', file=sys.stderr)
                 return {}
-            text = re.sub(' *\n *', '\n', re.sub('( (AAXX [0-9][0-9][0-9][0-9][0-9]|BBXX|OOXX) )', r'\n\1\n', text.replace('=', '\n')))
+            text = re.sub('\n$', '', re.sub(' *\n *', '\n', re.sub('( (AAXX [0-9]{5}|BBXX|OOXX) )', r'\n\1\n', text.replace('=', '\n'))))
             if debug:
                 print('Debug', ':', text, file=sys.stderr)
             for line_num, line in enumerate(text.split('\n')):
                 if line_num == 1:
-                    if not re.search(r'^(AAXX [0-9][0-9][0-9][0-9][0-9]|BBXX|OOXX)$', line):
-                        print('Warning', warno, ':', 'The second line of', in_file, 'does not match "(AAXX [0-9][0-9][0-9][0-9][0-9]|BBXX|OOXX)".', file=sys.stderr)
+                    if not re.search(r'^(AAXX [0-9]{5}|BBXX|OOXX)$', line):
+                        print('Warning', warno, ':', 'The', line_num, 'line of', in_file, 'does not match "(AAXX [0-9]{5}|BBXX|OOXX)".', file=sys.stderr)
                         return {}
                     line_token_list = line.split(' ')
                     if line_token_list[0] == 'BBXX':
@@ -75,19 +164,82 @@ def parse(cccc, cat, subcat, in_file, message, dt_str, debug):
                         out_subcat = 'synop_mobil'
                     else:
                         out_subcat = 'synop'
-                        datetime_wind_multiply = getYYGGiw(line_token_list[1], dt_str)
+                        datetime_wind_multiply = getYYGGiw(line_token_list[1], dt_str, in_file)
                         if len(datetime_wind_multiply) != 2:
                             print('Warning', warno, ':', in_file, 'does not have valid datetime_wind_multiply.', file=sys.stderr)
                             return {}
                 elif line_num > 1:
                     line_token_list = line.split(' ')
                     if out_subcat == 'ship':
+                        if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9]{4})*( 3[0-9]{4})* 4[0-9]{4} .*$', line):
+                            print('Warning', warno, ':', 'The', line_num, 'line of', in_file, 'does not match.', file=sys.stderr)
+                            continue
                         location = line_token_list[0]
-                        datetime_wind_multiply = getYYGGiw(line_token_list[1], dt_str)
+                        datetime_wind_multiply = getYYGGiw(line_token_list[1], dt_str, in_file)
+                        if len(datetime_wind_multiply) != 2:
+                            print('Warning', warno, ':', in_file, 'does not have valid datetime_wind_multiply.', file=sys.stderr)
+                            continue
+                        lat_lon = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3])
+                        if len(lat_lon) != 2:
+                            print('Warning', warno, ':', in_file, 'does not have valid lat_lon.', file=sys.stderr)
+                            continue
+                        rest_token_list = line_token_list[4:]
+                        sc_num = -2
+                        for token_num, token in enumerate(rest_token_list):
+                            is_precip_is_weather_cloud_base_visibility = []
+                            total_cloud_wind_direction_wind_speed = []
+                            temperature = []
+                            dewpoint_temperature = []
+                            relative_humidity = []
+                            pressure = []
+                            pressure_reduced_to_msl = []
+                            mandatory_level_geo_potential_height = []
+                            if sc_num < -1 and token_num == 0:
+                                is_precip_is_weather_cloud_base_visibility = getiRixhVV(token)
+                                sc_num = -1
+                            elif sc_num < 0 and token_num == 1:
+                                total_cloud_wind_direction_wind_speed = getNddff_00fff(token, rest_token_list[token_num + 1], datetime_wind_multiply[1])
+                                sc_num = 0
+                            elif sc_num < 1 and re.match(r'^1[01][0-9]{3}$', token):
+                                temperature = getsnTTT(token[1:])
+                                sc_num = 1
+                            elif sc_num < 2:
+                                if re.match(r'^2[01][0-9]{3}$', token):
+                                    dewpoint_temperature = getsnTTT(token[1:])
+                                    sc_num = 2
+                                elif re.match(r'^29[0-9]{3}$', token):
+                                    relative_humidity = getsnTTT(token[1:])
+                                    sc_num = 2
+                            elif sc_num < 3 and re.match(r'^3[0-9]{4}$', token):
+                                pressure = getPPPP(token[1:])
+                                sc_num = 3
+                            elif sc_num < 4:
+                                if re.match(r'^4[09][0-9]{3}$', token):
+                                    pressure_reduced_to_msl = getPPPP(token[1:])
+                                    sc_num = 4
+                                elif re.match(r'^4[12578][0-9]{3}$', token):
+                                    mandatory_level_geo_potential_height = geta3hhh(token[1:])
+                                    sc_num = 4
+                            if len(location) > 0 and lat_lon[0] >= -90.0 and lat_lon[0] <= 90.0 and lat_lon[1] > -180.0 and lat_lon[1] <= 180.0 and len(pressure_reduced_to_msl) > 0:
 
 
 
-                    print(line, file=sys.stdout)
+                                if pressure_reduced_to_msl_name in an_dict:
+                                    an_dict[pressure_reduced_to_msl_name] = np.concatenate([an_dict[pressure_reduced_to_msl_name], np.array(pressure_reduced_to_msl, dtype=object)])
+                                else:
+                                    an_dict[pressure_reduced_to_msl_name] = np.array(pressure_reduced_to_msl, dtype=object)
+                                
+
+
+
+
+
+
+
+                            
+
+                        
+
                     
 
 
