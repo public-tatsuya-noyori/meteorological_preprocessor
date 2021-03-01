@@ -364,7 +364,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                                         if len(value_index_list) > 0:
                                             property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
-                                            property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
+                                            property_data.append(datetime_property_data.take(pa.array(value_index_list)))
                                             out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
                                             out_directory = '/'.join(out_directory_list)
                                             os.makedirs(out_directory, exist_ok=True)
