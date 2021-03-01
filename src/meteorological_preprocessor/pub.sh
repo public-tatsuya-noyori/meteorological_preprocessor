@@ -23,7 +23,7 @@ publish(){
   if test ${wildcard_index} -eq 1; then
     grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/newly_created_file.tmp
   else
-    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" > ${work_directory}/newly_created_file.tmp
+    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | sort -u > ${work_directory}/newly_created_file.tmp
   fi
   if test -s ${work_directory}/newly_created_file.tmp; then
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
