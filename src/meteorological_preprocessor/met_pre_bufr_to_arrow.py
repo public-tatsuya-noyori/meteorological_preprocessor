@@ -378,7 +378,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     else:
                                         print('Info', output_cat, output_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
 
-
 def main():
     errno=198
     parser = argparse.ArgumentParser()

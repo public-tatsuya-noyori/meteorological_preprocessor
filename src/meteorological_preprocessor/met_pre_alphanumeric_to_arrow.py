@@ -92,7 +92,7 @@ def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
     else:
         wind_direction = int(token1[1:3]) * 10
     if token1[3:5] == '//':
-        wind_speed = -1        
+        wind_speed = -1
     else:
         wind_speed = int(token1[3:5])
     if len(token2) == 5 and re.match(r'^00[0-9]{3}$', token2):
@@ -103,7 +103,7 @@ def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
         if wind_speed == 0:
             wind_direction = 0
         elif wind_speed < 0:
-            wind_direction = -1        
+            wind_direction = -1
     if wind_multiply > 0 and wind_speed >= 0:
         elem_dict[wind_speed_name] = round(wind_speed * wind_multiply * 10) / 10
         if wind_speed == 0:
