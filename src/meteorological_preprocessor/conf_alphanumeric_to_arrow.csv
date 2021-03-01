@@ -1,0 +1,11 @@
+input_category,input_subcategory,location_type,output_category,output_subcategory
+surface,synop,0,surface,synop
+surface,ship,0,surface,ship
+surface,tesac,0,surface,tesac
+surface,moored_buoy,0,surface,moored_buoy
+surface,drifting_buoy,0,surface,drifting_buoy
+upper_air,amdar,0,upper_air,amdar
+upper_air,temp,0,upper_air,temp
+upper_air,temp_ship,0,upper_air,temp_ship
+upper_air,pilot,0,upper_air,pilot
+upper_air,temp_drop,0,upper_air,temp_drop

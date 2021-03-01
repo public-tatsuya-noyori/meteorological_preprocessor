@@ -112,7 +112,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
             location_type_output_cat_subcat_set = set([str(location_type) + '/' + output_cat + '/' + output_subcat for output_index, location_type, output_cat, output_subcat in list(out_cat_subcat_df[['location_type','output_category','output_subcategory']].itertuples())])
             for location_type_output_cat_subcat in location_type_output_cat_subcat_set:
                 datatype_dict = {}
-                output_property_dict = {}
                 property_dict = {}
                 location_type_output_cat_subcat_list = location_type_output_cat_subcat.split('/')
                 location_type = int(location_type_output_cat_subcat_list[0])
@@ -247,14 +246,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 for conf_row in descriptor_conf_df.itertuples():
                                     if conf_row.name != pre_conf_row_name:
                                         datatype_dict[conf_row.name] = conf_row.datatype
-                                        if conf_row.output != 'location_datetime':
-                                            if conf_row.output in output_property_dict:
-                                                tmp_output_property_list = output_property_dict[conf_row.output]
-                                                if not conf_row.name in tmp_output_property_list:
-                                                    tmp_output_property_list.append(conf_row.name)
-                                                    output_property_dict[conf_row.output] = tmp_output_property_list
-                                            else:
-                                                output_property_dict[conf_row.output] = [conf_row.name]
                                         if len(message_np) > 0 and len(pre_conf_row_name) > 0:
                                             if pre_conf_row_name in property_dict:
                                                 property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
@@ -362,45 +353,31 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     location_datetime_table = pa.Table.from_batches([location_datetime_batch])
                                     feather.write_feather(location_datetime_table, out_f, compression='zstd')
                                     print(out_file, file=out_list_file)
-                                for output in output_property_dict.keys():
+                                property_key_list = [property_key for property_key in property_dict.keys() if not property_key in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten())]
+                                for property_key in property_key_list:
                                     property_name_list = ['id']
+                                    property_name_list.append(property_key)
                                     property_data = []
                                     datetime_id_pa = pa.array(id_list, 'int32').take(pa.array(datetime_index_list))
-                                    value_index_list = []
-                                    if output_property_dict[output] != None:
-                                        datetime_property_data_dict = {}
-                                        for property_key in output_property_dict[output]:
-                                            property_name_list.append(property_key)
-                                            if property_key in property_dict:
-                                                if max(datetime_index_list) < len(property_dict[property_key]):
-                                                    datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
-                                                    datetime_property_data_dict[property_key] = datetime_property_data
-                                                    if len(value_index_list) > 0:
-                                                        value_index_list = list(set(value_index_list) & set([index for index, value in enumerate(datetime_property_data.tolist()) if value != None]))
-                                                    else:
-                                                        value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
-                                                else:
-                                                    print('Info', output_cat, output_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
+                                    if max(datetime_index_list) < len(property_dict[property_key]):
+                                        datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
+                                        value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
                                         if len(value_index_list) > 0:
                                             property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
-                                            is_output = True
-                                            for property_key in output_property_dict[output]:
-                                                if property_key in datetime_property_data_dict:
-                                                    property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
-                                                else:
-                                                    print('Info', output_cat, output_subcat, 'key :', property_key, 'no data', file=sys.stderr)
-                                                    is_output = False
-                                            if is_output:
-                                                out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
-                                                out_directory = '/'.join(out_directory_list)
-                                                os.makedirs(out_directory, exist_ok=True)
-                                                out_file_list = [out_directory, '/', output, '.feather']
-                                                out_file = ''.join(out_file_list)
-                                                with open(out_file, 'bw') as out_f:
-                                                    property_batch = pa.record_batch(property_data, names=property_name_list)
-                                                    property_table = pa.Table.from_batches([property_batch])
-                                                    feather.write_feather(property_table, out_f, compression='zstd')
-                                                    print(out_file, file=out_list_file)
+                                            property_data.append(datetime_property_data_dict[property_key].take(pa.array(value_index_list)))
+                                            out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
+                                            out_directory = '/'.join(out_directory_list)
+                                            os.makedirs(out_directory, exist_ok=True)
+                                            out_file_list = [out_directory, '/', re.sub(' ', '_', re.sub(' \[.*$', '', property_key)), '.feather']
+                                            out_file = ''.join(out_file_list)
+                                            with open(out_file, 'bw') as out_f:
+                                                property_batch = pa.record_batch(property_data, names=property_name_list)
+                                                property_table = pa.Table.from_batches([property_batch])
+                                                feather.write_feather(property_table, out_f, compression='zstd')
+                                                print(out_file, file=out_list_file)
+                                    else:
+                                        print('Info', output_cat, output_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
+
 
 def main():
     errno=198
