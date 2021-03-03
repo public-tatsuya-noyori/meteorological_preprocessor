@@ -34,6 +34,7 @@ constant_pressure_level_name = 'constant pressure level [Pa]'
 datetime_name = 'datetime'
 geopotential_height = 'geopotential height [m]'
 height_of_base_of_lowest_cloud_name = 'height of base of lowest cloud'
+height_of_station_ground_above_mean_sea_level_name = 'height of station ground above mean sea level [m]'
 horizontal_visibility_name = 'horizontal visibility'
 is_precip_name = 'is_precip'
 is_weather_name = 'is_weather'
@@ -49,6 +50,13 @@ total_cloud_name = 'total cloud'
 wind_speed_name = 'wind speed [m/s]'
 wind_direction_name = 'wind direction [degree]'
 wind_multiply_name = 'wind_multiply'
+
+def geth0h0h0h0im(token, elem_dict):
+    if token[4:5] == '1' or token[4:5] == '2':
+        elem_dict[height_of_station_ground_above_mean_sea_level_name] = int(token[0:4])
+    elif token[4:5] == '5' or token[4:5] == '6':
+        elem_dict[height_of_station_ground_above_mean_sea_level_name] = int(token[0:4]) * 3.28084
+    return elem_dict
 
 def geta3hhh(token, elem_dict):
     if token[0:1] == '1':
@@ -89,6 +97,8 @@ def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
         elem_dict[total_cloud_name] = int(token1[0:1])
     if token1[1:3] == '//':
         wind_direction = -1
+    elif token1[1:3] == '36':
+        wind_direction = 0
     else:
         wind_direction = int(token1[1:3]) * 10
     if token1[3:5] == '//':
@@ -151,7 +161,7 @@ def getYYGGiw(token, dt_str, in_file, elem_dict):
         elem_dict[wind_multiply_name] = -1.0
     return elem_dict
 
-def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str, debug):
+def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str, conf_synop_staion_df, conf_temp_pilot_staion_df, debug):
     warno = 188
     an_dict = {}
     datatype_dict = {}
@@ -165,83 +175,119 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
             text = re.sub('\n$', '', re.sub(' *\n *', '\n', re.sub('( (AAXX [0-9]{5}|BBXX|OOXX) )', r'\n\1\n', text.replace('=', '\n'))))
             if debug:
                 print('Debug', ':', text, file=sys.stderr)
+            elem_dict = {}
+            initialized_elem_dict = {}
             for line_num, line in enumerate(text.split('\n')):
                 if line_num == 1:
                     if not re.search(r'^(AAXX [0-9]{5}|BBXX|OOXX)$', line):
                         print('Warning', warno, ':', 'The', line_num, 'line of', in_file, 'does not match "(AAXX [0-9]{5}|BBXX|OOXX)".', file=sys.stderr)
                         return {}, {}
                     line_token_list = line.split(' ')
-                    if line_token_list[0] == 'BBXX':
-                        out_subcat = 'ship'
-                    elif line_token_list[0] == 'OOXX':
-                        out_subcat = 'synop_mobil'
-                    else:
-                        out_subcat = 'synop'
-                        elem_dict = {}
-                        elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
-                        if not datetime_name in elem_dict:
+                    if subcat == 'synop' and line_token_list[0] == 'AAXX':
+                        initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict)
+                        if not datetime_name in initialized_elem_dict:
                             print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
                             return {}, {}
                 elif line_num > 1:
                     line_token_list = line.split(' ')
-                    if output_cat == 'surface' and output_subcat == 'ship':
-                        elem_dict = {}
-                        if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9]{4})*( 3[0-9]{4})* 4[0-9]{4} .*$', line):
-                            print('Warning', warno, ':', 'The', line_num, 'line of', in_file, 'does not match.', file=sys.stderr)
-                            continue
-                        elem_dict[location_name] = line_token_list[0]
-                        elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
-                        if not datetime_name in elem_dict:
-                            print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
-                            continue
-                        elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
-                        rest_token_list = line_token_list[4:]
-                        sc_num = -2
-                        for token_num, token in enumerate(rest_token_list):
-                            if sc_num < -1 and token_num == 0:
-                                elem_dict = getiRixhVV(token, elem_dict)
-                                sc_num = -1
-                            elif sc_num < 0 and token_num == 1:
-                                elem_dict = getNddff_00fff(token, rest_token_list[token_num + 1], elem_dict[wind_multiply_name], elem_dict)
-                                sc_num = 0
-                            elif sc_num < 1 and re.match(r'^1[01][0-9]{3}$', token):
-                                elem_dict = getsnTTT(token[1:], elem_dict, temperature_name)
-                                sc_num = 1
-                            elif sc_num < 2:
-                                if re.match(r'^2[01][0-9]{3}$', token):
-                                    elem_dict = getsnTTT(token[1:], elem_dict, dewpoint_temperature_name)
-                                    sc_num = 2
-                                elif re.match(r'^29[0-9]{3}$', token):
-                                    elem_dict = getsnTTT(token[1:], elem_dict, relative_humidity_name)
-                                    sc_num = 2
-                            elif sc_num < 3 and re.match(r'^3[0-9]{4}$', token):
-                                elem_dict = getPPPP(token[1:], elem_dict, pressure_name)
-                                sc_num = 3
-                            elif sc_num < 4:
-                                if re.match(r'^4[09][0-9]{3}$', token):
-                                    elem_dict = getPPPP(token[1:], elem_dict, pressure_reduced_to_mean_sea_level_name)
-                                    sc_num = 4
-                                elif re.match(r'^4[12578][0-9]{3}$', token):
-                                    elem_dict = geta3hhh(token[1:], elem_dict)
-                                    sc_num = 4
-                        if datetime_name in elem_dict and location_name in elem_dict and latitude_name in elem_dict and longitude_name in elem_dict and len(elem_dict) > 3:
-                            for key in [datetime_name, location_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]:
-                                if key in [pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]:
-                                    datatype_dict[key] = 'float64'
-                                elif key in [height_of_base_of_lowest_cloud_name]:
-                                    datatype_dict[key] = 'int32'
-                                elif key in [location_name]:
-                                    datatype_dict[key] = 'string'
-                                value = None
-                                if key in elem_dict:
-                                    value = elem_dict[key]
-                                if key in an_dict:
-                                    an_dict[key] = np.concatenate([an_dict[key], np.array([value], dtype=object)])
-                                else:
-                                    an_dict[key] = np.array([value], dtype=object)
+                    elem_dict = initialized_elem_dict
+                    if cat == 'surface':
+                        if subcat == 'ship' or subcat == 'synop' or subcat == 'synop_mobil':
+                            rest_token_list = []
+                            if subcat == 'ship':
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9]{4})*( 3[0-9]{4})* 4[0-9/]{4}.*$', line):
+                                    print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                    continue
+                                elem_dict[location_name] = line_token_list[0]
+                                elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
+                                if not datetime_name in elem_dict:
+                                    print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
+                                    continue
+                                elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
+                                rest_token_list = line_token_list[4:]
+                                sc_num = -2
+                            elif subcat == 'synop_mobil':
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9]{4})*( 3[0-9]{4})*( 4[0-9/]{4})*.*$', line):
+                                    print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                    continue
+                                elem_dict[location_name] = line_token_list[0]
+                                elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
+                                if not datetime_name in elem_dict:
+                                    print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
+                                    continue
+                                elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
+                                elem_dict = geth0h0h0h0im(line_token_list[5], elem_dict)
+                                rest_token_list = line_token_list[6:]
+                                sc_num = -2
+                            elif subcat == 'synop':
+                                if not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9]{4})*( 3[0-9]{4})* 4[0-9/]{4}.*$', line):
+                                    print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                    continue
+                                synop_station = conf_synop_staion_df.query(''.join([location_name, ' == ', line_token_list[0]]))
+                                if len(synop_station) != 1:
+                                    print('Warning', warno, ':', 'conf_synop_staion.csv does not have the location of', line_token_list[0], file=sys.stderr)
+                                    continue
+                                elem_dict[location_name] = int(synop_station[location_name])
+                                elem_dict[latitude_name] = float(synop_station[latitude_name])
+                                elem_dict[longitude_name] = float(synop_station[longitude_name])
+                                elem_dict[height_of_station_ground_above_mean_sea_level_name] = int(synop_station[height_of_station_ground_above_mean_sea_level_name])
+                                rest_token_list = line_token_list[1:]
+                                sc_num = -2
+                            for token_num, token in enumerate(rest_token_list):
+                                if sc_num < -1 and re.match(r'^[0-4][1-7][0-9/]([0-9]{2}|//)', token):
+                                    elem_dict = getiRixhVV(token, elem_dict)
+                                    sc_num = -1
+                                elif sc_num < 0 and re.match(r'^[0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//)', token):
+                                    elem_dict = getNddff_00fff(token, rest_token_list[token_num + 1], elem_dict[wind_multiply_name], elem_dict)
+                                    sc_num = 0
+                                elif sc_num < 1 and re.match(r'^1[01][0-9]{3}$', token):
+                                    elem_dict = getsnTTT(token[1:], elem_dict, temperature_name)
+                                    sc_num = 1
+                                elif sc_num < 2:
+                                    if re.match(r'^2[01][0-9]{3}$', token):
+                                        elem_dict = getsnTTT(token[1:], elem_dict, dewpoint_temperature_name)
+                                        sc_num = 2
+                                    elif re.match(r'^29[0-9]{3}$', token):
+                                        elem_dict = getsnTTT(token[1:], elem_dict, relative_humidity_name)
+                                        sc_num = 2
+                                elif sc_num < 3 and re.match(r'^3[0-9]{4}$', token):
+                                    elem_dict = getPPPP(token[1:], elem_dict, pressure_name)
+                                    sc_num = 3
+                                elif sc_num < 4:
+                                    if re.match(r'^4[09][0-9]{3}$', token):
+                                        elem_dict = getPPPP(token[1:], elem_dict, pressure_reduced_to_mean_sea_level_name)
+                                        sc_num = 4
+                                    elif re.match(r'^4[12578][0-9]{3}$', token):
+                                        elem_dict = geta3hhh(token[1:], elem_dict)
+                                        sc_num = 4
+                                    elif re.match(r'^4[0125789][/]{3}$', token):
+                                        sc_num = 4
+                            if datetime_name in elem_dict and location_name in elem_dict and latitude_name in elem_dict and longitude_name in elem_dict and len(elem_dict) > 3:
+                                data_list = [datetime_name, location_name, latitude_name, longitude_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]
+                                if subcat == 'synop' or subcat == 'synop_mobil':
+                                    data_list.append(height_of_station_ground_above_mean_sea_level_name)
+                                for key in data_list:
+                                    if key in [latitude_name, longitude_name, height_of_station_ground_above_mean_sea_level_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]:
+                                        datatype_dict[key] = 'float64'
+                                    elif key in [height_of_base_of_lowest_cloud_name]:
+                                        datatype_dict[key] = 'int32'
+                                    elif key in [location_name]:
+                                        if subcat == 'ship' or subcat == 'synop_mobil':
+                                            datatype_dict[key] = 'string'
+                                        elif  subcat == 'synop':
+                                            datatype_dict[key] = 'int32'
+                                    value = None
+                                    if key in elem_dict:
+                                        value = elem_dict[key]
+                                    if key in an_dict:
+                                        an_dict[key] = np.concatenate([an_dict[key], np.array([value], dtype=object)])
+                                    else:
+                                        an_dict[key] = np.array([value], dtype=object)
+                        
+                    #elif output_cat == 'upper_air':
     return an_dict, datatype_dict
 
-def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
+def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, conf_synop_staion_df, conf_temp_pilot_staion_df, debug):
     warno = 189
     out_arrows = []
     now = datetime.utcnow()
@@ -281,7 +327,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             print('Debug', ':', in_file, file=sys.stderr)
                         message = in_file_stream.read()
                     dt_str = re.sub('/.*$', '',  re.sub('^.*/' + cat_subcat + '/', '', in_file))
-                    an_dict, datatype_dict = parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str, debug)
+                    an_dict, datatype_dict = parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str, conf_synop_staion_df, conf_temp_pilot_staion_df, debug)
                     for key in an_dict:
                         message_np = an_dict[key]
                         if key in property_dict:
@@ -290,10 +336,27 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             property_dict[key] = message_np
                 if datetime_name in property_dict:
                     id_list = [id_num for id_num in range(0, len(property_dict[datetime_name]))]
-                    location_datetime_name_list = ['id', datetime_name, location_name]
+                    location_datetime_name_list = ['id']
                     location_datetime_data = [pa.array(id_list, 'int32')]
-                    location_datetime_data.append(pa.array(property_dict[datetime_name], pa.timestamp('ms', tz='utc')))
+                    location_datetime_name_list.append(location_name)
                     location_datetime_data.append(pa.array(property_dict[location_name], datatype_dict[location_name]))
+                    property_dict.pop(location_name)
+                    datatype_dict.pop(location_name)
+                    location_datetime_name_list.append(latitude_name)
+                    location_datetime_data.append(pa.array(property_dict[latitude_name], datatype_dict[latitude_name]))
+                    property_dict.pop(latitude_name)
+                    datatype_dict.pop(latitude_name)
+                    location_datetime_name_list.append(longitude_name)
+                    location_datetime_data.append(pa.array(property_dict[longitude_name], datatype_dict[longitude_name]))
+                    property_dict.pop(longitude_name)
+                    datatype_dict.pop(longitude_name)
+                    if subcat == 'synop' or subcat == 'synop_mobil':
+                        location_datetime_name_list.append(height_of_station_ground_above_mean_sea_level_name)
+                        location_datetime_data.append(pa.array(property_dict[height_of_station_ground_above_mean_sea_level_name], datatype_dict[height_of_station_ground_above_mean_sea_level_name]))
+                        property_dict.pop(height_of_station_ground_above_mean_sea_level_name)
+                        datatype_dict.pop(height_of_station_ground_above_mean_sea_level_name)
+                    location_datetime_name_list.append(datetime_name)
+                    location_datetime_data.append(pa.array(property_dict[datetime_name], pa.timestamp('ms', tz='utc')))
                     datetime_directory_list = []
                     for dt in set(property_dict[datetime_name]):
                         dt_str = dt.strftime('%Y%m%d%H%M')
@@ -315,7 +378,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     location_datetime_table = pa.Table.from_batches([location_datetime_batch])
                                     feather.write_feather(location_datetime_table, out_f, compression='zstd')
                                     print(out_file, file=out_list_file)
-                                property_key_list = [property_key for property_key in property_dict.keys() if property_key != location_name and property_key != datetime_name]
+                                property_key_list = [property_key for property_key in property_dict.keys() if property_key != datetime_name]
                                 for property_key in property_key_list:
                                     property_name_list = ['id']
                                     property_name_list.append(property_key)
@@ -347,6 +410,8 @@ def main():
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
+    parser.add_argument("--config_synop_staion", type=str, metavar='conf_synop_staion.csv', default=pkg_resources.resource_filename(__name__, 'conf_synop_staion.csv'))
+    parser.add_argument("--config_temp_pilot_staion", type=str, metavar='conf_temp_pilot_staion.csv', default=pkg_resources.resource_filename(__name__, 'conf_temp_pilot_staion.csv'))
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     config = pkg_resources.resource_filename(__name__, 'conf_alphanumeric_to_arrow.csv')
@@ -361,6 +426,12 @@ def main():
     if not os.access(config, os.F_OK):
         print('Error', errno, ':', config, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
+    if not os.access(args.config_synop_staion, os.F_OK):
+        print('Error', errno, ':', args.config_synop_staion, 'does not exist.', file=sys.stderr)
+        sys.exit(errno)
+    if not os.access(args.config_temp_pilot_staion, os.F_OK):
+        print('Error', errno, ':', args.config_temp_pilot_staion, 'does not exist.', file=sys.stderr)
+        sys.exit(errno)
     if not os.path.isfile(args.input_list_file):
         print('Error', errno, ':', args.input_list_file, 'is not file.', file=sys.stderr)
         sys.exit(errno)
@@ -369,6 +440,12 @@ def main():
         sys.exit(errno)
     if not os.path.isfile(config):
         print('Error', errno, ':', config, 'is not file.', file=sys.stderr)
+        sys.exit(errno)
+    if not os.path.isfile(args.config_synop_staion):
+        print('Error', errno, ':', args.config_synop_staion, 'is not file.', file=sys.stderr)
+        sys.exit(errno)
+    if not os.path.isfile(args.config_temp_pilot_staion):
+        print('Error', errno, ':', args.config_temp_pilot_staion, 'is not file.', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.input_list_file, os.R_OK):
         print('Error', errno, ':', args.input_list_file, 'is not readable.', file=sys.stderr)
@@ -379,12 +456,20 @@ def main():
     if not os.access(config, os.R_OK):
         print('Error', errno, ':', config, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
+    if not os.access(args.config_synop_staion, os.R_OK):
+        print('Error', errno, ':', args.config_synop_staion, 'is not readable.', file=sys.stderr)
+        sys.exit(errno)
+    if not os.access(args.config_temp_pilot_staion, os.R_OK):
+        print('Error', errno, ':', args.config_temp_pilot_staion, 'is not readable.', file=sys.stderr)
+        sys.exit(errno)
     try:
         input_file_list = []
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_df = csv.read_csv(config).to_pandas()
-        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.debug)
+        conf_synop_staion_df = csv.read_csv(args.config_synop_staion).to_pandas()
+        conf_temp_pilot_staion_df = csv.read_csv(args.config_temp_pilot_staion).to_pandas()
+        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, conf_synop_staion_df, conf_temp_pilot_staion_df, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

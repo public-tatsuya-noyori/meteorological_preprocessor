@@ -1,6 +1,7 @@
 input_category,input_subcategory,location_type,output_category,output_subcategory
 surface,synop,0,surface,synop
 surface,ship,0,surface,ship
+surface,synop_mobil,0,surface,synop_mobil
 surface,tesac,0,surface,tesac
 surface,moored_buoy,0,surface,moored_buoy
 surface,drifting_buoy,0,surface,drifting_buoy
