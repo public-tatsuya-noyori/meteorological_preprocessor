@@ -150,6 +150,7 @@
 55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1co iij1:japan.meteorological.agency.1.closed.data.o 2
 55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2oo iij2:japan.meteorological.agency.2.open.data.o   2
 55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij2co iij2:japan.meteorological.agency.2.closed.data.o 2
+55 * * * * cd /home/noyori/tests; ./del.sh --cron cache iij1site iij1:japan.meteorological.agency.1.site/RJTD 2
 
 # sub
 * * * * * cd /home/noyori/tests; ./sub.sh --cron --urgent cache_s iij12oo p1 'iij1:japan.meteorological.agency.1.open.data.d;iij2:japan.meteorological.agency.2.open.data.d;;iij1:japan.meteorological.agency.1.open.data.o;iij2:japan.meteorological.agency.2.open.data.o'  64
@@ -173,10 +174,14 @@
 
 # delete on local PC
 55 1,9,17 * * * find /home/noyori/tests/cache_o /home/noyori/tests/cache_c /home/noyori/tests/cache_s -mindepth 5 -type d -mmin +360 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
+55 2,10,18 * * * find /home/noyori/tests/cache_bufr_to_arrow -mindepth 6 -type d -mmin +360 | grep C_RJTD | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +1440 | grep 20 | xargs -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
-# convert bufr synop to arrow
+# convert bufr to arrow
 * * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
+
+# convert alphanumeric to arrow
+* * * * * cd /home/noyori/tests; ./alphanumeric_to_arrow.sh >> log/alphanumeric_to_arrow.sh.log 2>&1
 
 # convert arrow to tile arrow
 * * * * * cd /home/noyori/tests; ./arrow_to_tile_arrow.sh >> log/arrow_to_tile_arrow.sh.log 2>&1
