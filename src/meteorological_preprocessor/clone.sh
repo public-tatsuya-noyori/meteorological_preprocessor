@@ -256,7 +256,7 @@ clone() {
             if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
               cp /dev/null ${source_work_directory}/info_log.tmp
               set +e
-              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/filtered_newly_created_file.tmp --immutable --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+              rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${source_work_directory}/filtered_newly_created_file.tmp --immutable --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --multi-thread-cutoff ${cutoff} --multi-thread-streams ${parallel} --no-traverse --retries 3 --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then

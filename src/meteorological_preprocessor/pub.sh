@@ -49,7 +49,7 @@ publish(){
     set -e
     cp /dev/null ${work_directory}/info_log.tmp
     set +e
-    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/filtered_newly_created_file.tmp --immutable --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-chunk-size ${cutoff} --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/filtered_newly_created_file.tmp --immutable --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -96,7 +96,6 @@ publish(){
 }
 bandwidth_limit_k_bytes_per_s=0
 cron=0
-cutoff=8M
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`

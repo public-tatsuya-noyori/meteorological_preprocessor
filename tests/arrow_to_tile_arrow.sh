@@ -43,7 +43,7 @@ if test ${running} -eq 0; then
     rm -f tile_arrow/${now}.txt.tmp2
     for i in `ls -1 tile_arrow/out_list|grep -v '\.tmp$'|uniq`; do
       set +e
-      rclone copy --checkers 256 --checksum --contimeout 8s --cutoff-mode=cautious --files-from-raw tile_arrow/out_list/${i} --log-file tile_arrow/log/${i}.log --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-chunk-size 8M --s3-upload-concurrency 64 --stats 0 --timeout 8s --transfers 64 cache_tile_arrow iij1:japan.meteorological.agency.1.site
+      rclone copy --checkers 64 --checksum --contimeout 8s --cutoff-mode=cautious --files-from-raw tile_arrow/out_list/${i} --log-file tile_arrow/log/${i}.log --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-chunk-size 8M --s3-upload-concurrency 64 --stats 0 --timeout 8s --transfers 64 cache_tile_arrow iij1:japan.meteorological.agency.1.site
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
