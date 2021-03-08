@@ -32,35 +32,29 @@ from eccodes import *
 def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     warno = 184
     rc = False
-    with open(in_file, 'r') as in_file_stream:
-        while True:
-            bufr = None
-            try:
-                bufr = codes_bufr_new_from_file(in_file_stream)
-            except:
-                break
-            if bufr is None:
-                break
+    f = open(in_file, 'rb')
+    while True:
+        bufr = codes_bufr_new_from_file(f)
+        if bufr is None:
+            break
+        try:
             unexpanded_descriptors = []
-            try:
-                codes_set(bufr, 'unpack', 1)
-                unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-            except:
-                break
-            descriptor_conf_df = None
+            unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
             if bufr_descriptor in unexpanded_descriptors:
                 if bufr_key_of_not_missing:
-                    try:
-                        values = codes_get_array(bufr, bufr_key_of_not_missing)
-                        if type(values[0]) == str and len(values[0].lstrip().rstrip()) > 0:
-                            rc = True
-                        elif not np.isnan(values[0]):
-                            rc = True
-                    except:
-                        return False
+                    values = codes_get_array(bufr, bufr_key_of_not_missing)
+                    if type(values[0]) == str and len(values[0].lstrip().rstrip()) > 0:
+                        rc = True
+                    elif not np.isnan(values[0]):
+                        rc = True
                 else:
                     rc = True
-            codes_release(bufr)
+        except:
+            rc = False
+            print('Warning', warno, ':', 'BUFR decode error on', in_file, 'has occurred.', file=sys.stderr)
+            break
+        codes_release(bufr)
+    f.close()
     return rc
 
 def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):
