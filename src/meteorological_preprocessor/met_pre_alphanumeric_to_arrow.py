@@ -197,7 +197,8 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                             rest_token_list = []
                             if subcat == 'ship':
                                 if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
-                                    print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9A-Z]+ NIL$', line):
+                                        print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = line_token_list[0]
                                 elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
@@ -228,12 +229,9 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     if not datetime_name in initialized_elem_dict:
                                         print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
                                         continue
-                                if not re.search(r'^NIL$', line):
-                                    continue
-                                if not re.search(r'^[0-9]{5} NIL$', line):
-                                    continue
                                 if not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
-                                    print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9]{5} NIL$', line):
+                                        print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
                                 synop_station = conf_synop_staion_df[conf_synop_staion_df[location_name] == re.sub(r'^0+', '', line_token_list[0])]
                                 if len(synop_station) != 1:
