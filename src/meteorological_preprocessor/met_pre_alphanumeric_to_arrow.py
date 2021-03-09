@@ -235,7 +235,6 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     continue
                                 synop_station = conf_synop_staion_df[conf_synop_staion_df[location_name] == re.sub(r'^0+', '', line_token_list[0])]
                                 if len(synop_station) != 1:
-                                    print('Info', ':', 'conf_synop_staion.csv does not have the location of', line_token_list[0], file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = int(synop_station[location_name])
                                 elem_dict[latitude_name] = float(synop_station[latitude_name])
