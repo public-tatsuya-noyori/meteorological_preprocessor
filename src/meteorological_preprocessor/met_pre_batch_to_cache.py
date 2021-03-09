@@ -19,15 +19,25 @@
 #
 
 import argparse
+import hashlib
 import numpy as np
 import os
+import pandas as pd
 import pkg_resources
 import re
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
-from pyarrow import csv
+from pyarrow import csv, feather
 from eccodes import *
+
+def getHash(out_file):
+    md5 = hashlib.md5()
+    with open(out_file, 'rb') as out_f:
+        for chunk in iter(lambda: out_f.read(4096 * md5.block_size), b''):
+            md5.update(chunk)
+    checksum = md5.hexdigest()
+    return checksum
 
 def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     warno = 184
@@ -304,8 +314,11 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
-def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_file, conf_list, debug):
+def convert_to_cache(my_cccc, input_file_list, out_dir, checksum_arrow_file, out_list_file, tmp_grib_file, conf_list, debug):
     warno = 189
+    checksum_df = feather.read_feather(checksum_arrow_file)
+    checksum_list = []
+    now = datetime.utcnow()
     for in_file in input_file_list:
         if debug:
             print('Debug', ':', 'in_file =', in_file, file=sys.stderr)
@@ -370,7 +383,12 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                         break
                     out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug)
                     if out_file:
-                        print(out_file, file=out_list_file)
+                        out_file_checksum = getHash(out_file)
+                        if len(checksum_df[checksum_df['checksum'] == out_file_checksum].index) == 0 and not out_file_checksum in checksum_list:
+                            checksum_list.append(out_file_checksum)
+                            print(out_file, file=out_list_file)
+                        else:
+                            os.remove(out_file)
                     break
                 if message_length <= 0:
                     if debug:
@@ -398,7 +416,12 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                     message_counter += 1
                 out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug)
                 if out_file:
-                    print(out_file, file=out_list_file)
+                    out_file_checksum = getHash(out_file)
+                    if len(checksum_df[checksum_df['checksum'] == out_file_checksum].index) == 0 and not out_file_checksum in checksum_list:
+                        checksum_list.append(out_file_checksum)
+                        print(out_file, file=out_list_file)
+                    else:
+                        os.remove(out_file)
                 try:
                     byte4 = in_file_stream.read(4)
                     if len(byte4) < 4:
@@ -407,6 +430,11 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, out_list_file, tmp_grib_
                 except:
                     start_char4 = None
                     print('Warning', warno, ':', 'The start 4 bytes of the message on', in_file, 'are not strings.', file=sys.stderr)
+    if len(checksum_list) > 0:
+        td = timedelta(days=1)
+        new_checksum_df = pd.concat([checksum_df[(checksum_df['mtime'] >= now - td) & (checksum_df['mtime'] <= now + td)], pd.DataFrame({"mtime": [now] * len(checksum_list), "checksum": checksum_list})])
+        with open(checksum_arrow_file, 'bw') as checksum_arrow_f:
+            feather.write_feather(new_checksum_df, checksum_arrow_f, compression='zstd')
 
 def main():
     errno=198
@@ -414,6 +442,7 @@ def main():
     parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('input_directory_or_list_file', type=str, metavar='input_directory_or_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
+    parser.add_argument('checksum_arrow_file', type=str, metavar='checksum.feather')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument('--tmp_grib_file', type=str, metavar='tmp_grib_file', default='tmp_grib_file.bin')
     parser.add_argument("--config", type=str, metavar='conf_batch_to_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_to_cache.csv'))
@@ -443,18 +472,24 @@ def main():
     if not os.path.isdir(args.output_directory):
         print('Error', errno, ':', args.output_directory, 'is not directory.', file=sys.stderr)
         sys.exit(errno)
+    if not os.path.isfile(args.checksum_arrow_file):
+        print('Error', errno, ':', args.checksum_arrow_file, 'is not file.', file=sys.stderr)
+        sys.exit(errno)
     if not os.path.isfile(args.config):
         print('Error', errno, ':', args.config, 'is not file.', file=sys.stderr)
         sys.exit(errno)
     if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
         print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
+    if not os.access(args.checksum_arrow_file, os.R_OK) or not os.access(args.checksum_arrow_file, os.W_OK):
+        print('Error', errno, ':', args.checksum_arrow_file, 'is not readable and writable.', file=sys.stderr)
+        sys.exit(errno)
     if not os.access(args.config, os.R_OK):
         print('Error', errno, ':', args.config, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
     try:
         conf_list = list(csv.read_csv(args.config).to_pandas().itertuples())
-        convert_to_cache(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, args.tmp_grib_file, conf_list, args.debug)
+        convert_to_cache(args.my_cccc, input_file_list, args.output_directory, args.checksum_arrow_file, args.output_list_file, args.tmp_grib_file, conf_list, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
