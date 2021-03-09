@@ -170,7 +170,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
     if cat == 'surface':
         if subcat == 'synop' or subcat == 'ship' or subcat == 'synop_mobil':
             if not re.search(r' (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) ', text):
-                if not re.search(r'^ *NIL= *$', text):
+                if not re.search(r'^ *NIL=* *$', text):
                     print('Warning', warno, ':', in_file, 'does not match " (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) ".', file=sys.stderr)
                 return {}, {}
             text = re.sub('\n$', '', re.sub(' *\n *', '\n', re.sub('( (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) )', r'\n\1\n', text.replace('=', '\n'))))
