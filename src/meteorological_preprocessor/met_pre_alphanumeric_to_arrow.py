@@ -195,7 +195,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                         if subcat == 'ship' or subcat == 'synop' or subcat == 'synop_mobil':
                             rest_token_list = []
                             if subcat == 'ship':
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
                                     print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = line_token_list[0]
@@ -207,7 +207,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 rest_token_list = line_token_list[4:]
                                 sc_num = -2
                             elif subcat == 'synop_mobil':
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
                                     print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = line_token_list[0]
