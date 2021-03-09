@@ -61,7 +61,6 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
                     rc = True
         except:
             rc = False
-            print('Warning', warno, ':', 'BUFR decode error on', in_file, 'has occurred.', file=sys.stderr)
             break
         codes_release(bufr)
     f.close()
