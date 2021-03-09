@@ -233,7 +233,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 if not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
                                     print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
-                                synop_station = conf_synop_staion_df.query(''.join([location_name, ' == ', re.sub(r'^0+', '', line_token_list[0])]))
+                                synop_station = conf_synop_staion_df[conf_synop_staion_df[location_name] == re.sub(r'^0+', '', line_token_list[0])]
                                 if len(synop_station) != 1:
                                     print('Info', ':', 'conf_synop_staion.csv does not have the location of', line_token_list[0], file=sys.stderr)
                                     continue
