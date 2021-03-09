@@ -194,8 +194,8 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                         if subcat == 'ship' or subcat == 'synop' or subcat == 'synop_mobil':
                             rest_token_list = []
                             if subcat == 'ship':
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
-                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9A-Z]+ NIL$', line):
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
+                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9A-Z]+ NIL$', line) not re.search(r'^BBXX$', line):
                                         print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = line_token_list[0]
@@ -205,10 +205,10 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     continue
                                 elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
                                 rest_token_list = line_token_list[4:]
-                                sc_num = -2
+                                sc_num = 0
                             elif subcat == 'synop_mobil':
                                 if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
-                                    if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
+                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9A-Z]+ NIL$', line) not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
                                         print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = line_token_list[0]
@@ -219,15 +219,15 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
                                 elem_dict = geth0h0h0h0im(line_token_list[5], elem_dict)
                                 rest_token_list = line_token_list[6:]
-                                sc_num = -2
+                                sc_num = 0
                             elif subcat == 'synop':
                                 if re.search(r'^AAXX [0-9]{4}[0-9/]$', line):
                                     line_token_list = line.split(' ')
                                     initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict)
                                     if not datetime_name in initialized_elem_dict:
                                         print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
-                                        continue
-                                if not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9]{4}( 2[0-9/]{4})*( 3[0-9/]{4})* 4[0-9/]{4}.*$', line):
+                                    continue
+                                elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
                                     if not re.search(r'^NIL$', line) and not re.search(r'^[0-9]{5} NIL$', line):
                                         print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
@@ -239,36 +239,48 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 elem_dict[longitude_name] = float(synop_station[longitude_name])
                                 elem_dict[height_of_station_ground_above_mean_sea_level_name] = int(synop_station[height_of_station_ground_above_mean_sea_level_name])
                                 rest_token_list = line_token_list[1:]
-                                sc_num = -2
+                                sc_num = 0
                             for token_num, token in enumerate(rest_token_list):
-                                if sc_num < -1 and re.match(r'^[0-4][1-7][0-9/]([0-9]{2}|//)', token):
+                                if sc_num < 10 and re.match(r'^[0-4][1-7][0-9/]([0-9]{2}|//)', token):
                                     elem_dict = getiRixhVV(token, elem_dict)
-                                    sc_num = -1
-                                elif sc_num < 0 and re.match(r'^[0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//)', token):
+                                    sc_num = 10
+                                elif sc_num < 11 and re.match(r'^[0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//)', token):
                                     elem_dict = getNddff_00fff(token, rest_token_list[token_num + 1], elem_dict[wind_multiply_name], elem_dict)
-                                    sc_num = 0
-                                elif sc_num < 1 and re.match(r'^1[01][0-9]{3}$', token):
+                                    sc_num = 11
+                                elif sc_num < 101 and re.match(r'^1[01][0-9]{3}$', token):
                                     elem_dict = getsnTTT(token[1:], elem_dict, temperature_name)
-                                    sc_num = 1
-                                elif sc_num < 2:
+                                    sc_num = 101
+                                elif sc_num < 102:
                                     if re.match(r'^2[01][0-9]{3}$', token):
                                         elem_dict = getsnTTT(token[1:], elem_dict, dewpoint_temperature_name)
-                                        sc_num = 2
+                                        sc_num = 102
                                     elif re.match(r'^29[0-9]{3}$', token):
                                         elem_dict = getsnTTT(token[1:], elem_dict, relative_humidity_name)
-                                        sc_num = 2
-                                elif sc_num < 3 and re.match(r'^3[0-9]{4}$', token):
+                                        sc_num = 102
+                                elif sc_num < 103 and re.match(r'^3[0-9]{4}$', token):
                                     elem_dict = getPPPP(token[1:], elem_dict, pressure_name)
-                                    sc_num = 3
-                                elif sc_num < 4:
+                                    sc_num = 103
+                                elif sc_num < 104:
                                     if re.match(r'^4[09][0-9]{3}$', token):
                                         elem_dict = getPPPP(token[1:], elem_dict, pressure_reduced_to_mean_sea_level_name)
-                                        sc_num = 4
+                                        sc_num = 104
                                     elif re.match(r'^4[12578][0-9]{3}$', token):
                                         elem_dict = geta3hhh(token[1:], elem_dict)
-                                        sc_num = 4
+                                        sc_num = 104
                                     elif re.match(r'^4[0125789][/]{3}$', token):
-                                        sc_num = 4
+                                        sc_num = 104
+                                elif sc_num < 200:
+                                    if re.match(r'^222[0-9/][0-9/]$', token):
+                                        sc_num = 200
+                                elif sc_num < 300:
+                                    if re.match(r'^333$', token):
+                                        sc_num = 300
+                                elif sc_num < 400:
+                                    if re.match(r'^444$', token):
+                                        sc_num = 400
+                                elif sc_num < 500:
+                                    if re.match(r'^555$', token):
+                                        sc_num = 500
                             if datetime_name in elem_dict and location_name in elem_dict and latitude_name in elem_dict and longitude_name in elem_dict and len(elem_dict) > 3:
                                 data_list = [datetime_name, location_name, latitude_name, longitude_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]
                                 if subcat == 'synop' or subcat == 'synop_mobil':
