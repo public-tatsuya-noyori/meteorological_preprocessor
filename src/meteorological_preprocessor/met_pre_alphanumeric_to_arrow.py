@@ -237,7 +237,6 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict, debug)
                                     continue
                                 elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
-                                    print("NG_SYNOP", file=sys.stderr)
                                     if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9]{5}  *NIL *$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
@@ -259,7 +258,10 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     elem_dict = getiRixhVV(token, elem_dict)
                                     sc_num = 10
                                 elif sc_num < 11 and re.match(r'^[0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//)', token):
-                                    elem_dict = getNddff_00fff(token, rest_token_list[token_num + 1], elem_dict[wind_multiply_name], elem_dict)
+                                    if len(rest_token_list) > token_num + 1:
+                                        elem_dict = getNddff_00fff(token, rest_token_list[token_num + 1], elem_dict[wind_multiply_name], elem_dict)
+                                    else:
+                                        elem_dict = getNddff_00fff(token, '', elem_dict[wind_multiply_name], elem_dict)
                                     sc_num = 11
                                 elif sc_num < 101 and re.match(r'^1[01][0-9]{3}$', token):
                                     elem_dict = getsnTTT(token[1:], elem_dict, temperature_name)
