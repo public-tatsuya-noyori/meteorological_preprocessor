@@ -95,7 +95,7 @@ def getsnTTT(token, elem_dict, elem_name):
 def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
     if token1[0:1] != '/':
         elem_dict[total_cloud_name] = int(token1[0:1])
-    if token1[1:3] == '//':
+    if token1[1:3] == '//' or token1[1:3] == '99':
         wind_direction = -1
     elif token1[1:3] == '36':
         wind_direction = 0
@@ -134,12 +134,12 @@ def getiRixhVV(token, elem_dict):
 def get99LaLaLa_QcLoLoLoLo(token1, token2, elem_dict):
     lat = int(token1[2:5])
     lon = int(token2[1:5])
-    if token2[0] == '3':
+    if token2[0:1] == '3':
         lat = lat * -1
-    elif token2[0] == '5':
+    elif token2[0:1] == '5':
         lat = lat * -1
         lon = lon * -1
-    elif token2[0] == '7':
+    elif token2[0:1] == '7':
         lon = lon * -1
     if lon == -1800:
         lon = 1800
@@ -147,15 +147,22 @@ def get99LaLaLa_QcLoLoLoLo(token1, token2, elem_dict):
     elem_dict[longitude_name] = lon / 10
     return elem_dict
 
-def getYYGGiw(token, dt_str, in_file, elem_dict):
+def getYYGGiw(token, dt_str, in_file, elem_dict, debug):
     warno = 187
     if not dt_str[6:10] == token[0:4]:
-        print('Warning', warno, ':', dt_str, 'in', in_file, 'does not match YYGG of', token, '.', file=sys.stderr)
-        return elem_dict
-    elem_dict[datetime_name] = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc)
-    if token[4] == '0' or token[4] == '1':
+        yesterday_dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) - timedelta(days=1)
+        if dt_str[6:8] == token[0:2] or yesterday_dt.strftime('%d') == token[0:2]:
+            elem_dict[datetime_name] = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(token[0:2]), int(token[2:4]), 0, 0, 0, tzinfo=timezone.utc)
+        else:
+            if datetime_name in elem_dict:
+                elem_dict.pop(datetime_name)
+            if debug:
+                print('Debug', ':', dt_str, 'in', in_file, 'does not match YYGG of', token, '.', file=sys.stderr)
+    else:
+        elem_dict[datetime_name] = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
+    if token[4:5] == '0' or token[4:5] == '1':
         elem_dict[wind_multiply_name] = 1.0
-    elif token[4] == '3' or token[4] == '4':
+    elif token[4:5] == '3' or token[4:5] == '4':
         elem_dict[wind_multiply_name] = 0.514444
     else:
         elem_dict[wind_multiply_name] = -1.0
@@ -170,51 +177,55 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
     if cat == 'surface':
         if subcat == 'synop' or subcat == 'ship' or subcat == 'synop_mobil':
             if not re.search(r' (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) ', text):
+                if debug:
+                    print('Debug', ':', in_file, 'does not match "(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)".', file=sys.stderr)
                 return {}, {}
             text = re.sub('\n$', '', re.sub(' *\n *', '\n', re.sub('( (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) )', r'\n\1\n', text.replace('=', '\n'))))
-            if debug:
-                print('Debug', ':', text, file=sys.stderr)
             elem_dict = {}
             initialized_elem_dict = {}
             for line_num, line in enumerate(text.split('\n')):
                 if line_num == 1:
                     if not re.search(r'^(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)$', line):
-                        print('Warning', warno, ':', 'The', line_num, 'line of', in_file, 'does not match "(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)".', file=sys.stderr)
+                        if debug:
+                            print('Debug', ':', 'The', line_num, 'line of', in_file, 'does not match "(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)".', file=sys.stderr)
                         return {}, {}
                     line_token_list = line.split(' ')
                     if subcat == 'synop' and line_token_list[0] == 'AAXX':
-                        initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict)
+                        initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict, debug)
                         if not datetime_name in initialized_elem_dict:
-                            print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
                             continue
                 elif line_num > 1:
-                    line_token_list = line.split(' ')
                     elem_dict = initialized_elem_dict
                     if cat == 'surface':
                         if subcat == 'ship' or subcat == 'synop' or subcat == 'synop_mobil':
+                            sc_num = -1
                             rest_token_list = []
                             if subcat == 'ship':
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
-                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9A-Z]+ NIL$', line) not re.search(r'^BBXX$', line):
-                                        print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                if re.search(r'^(STORM|SPREP) [0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                    line = re.sub('^(STORM|SPREP) ', '', line)
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9A-Z]+  *NIL *$', line) and not re.search(r'^BBXX$', line):
+                                        if debug:
+                                            print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
+                                line_token_list = line.split(' ')
                                 elem_dict[location_name] = line_token_list[0]
-                                elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
+                                elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict, debug)
                                 if not datetime_name in elem_dict:
-                                    print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
                                     continue
                                 elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
                                 rest_token_list = line_token_list[4:]
                                 sc_num = 0
                             elif subcat == 'synop_mobil':
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
-                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9A-Z]+ NIL$', line) not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{5} 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
-                                        print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9A-Z]+  *NIL *$', line) and not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                        if debug:
+                                            print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
+                                line_token_list = line.split(' ')
                                 elem_dict[location_name] = line_token_list[0]
-                                elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict)
+                                elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, elem_dict, debug)
                                 if not datetime_name in elem_dict:
-                                    print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
                                     continue
                                 elem_dict = get99LaLaLa_QcLoLoLoLo(line_token_list[2], line_token_list[3], elem_dict)
                                 elem_dict = geth0h0h0h0im(line_token_list[5], elem_dict)
@@ -223,16 +234,19 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                             elif subcat == 'synop':
                                 if re.search(r'^AAXX [0-9]{4}[0-9/]$', line):
                                     line_token_list = line.split(' ')
-                                    initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict)
-                                    if not datetime_name in initialized_elem_dict:
-                                        print('Warning', warno, ':', in_file, 'does not have valid datetime.', file=sys.stderr)
+                                    initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict, debug)
                                     continue
-                                elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//)([0-9]{2}|//) 1[0-9/]{4}( 2[0-9/]{4})*( 3[0-9/]{4})*( 4[0-9/]{4})*.*$', line):
-                                    if not re.search(r'^NIL$', line) and not re.search(r'^[0-9]{5} NIL$', line):
-                                        print('Warning', warno, ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
+                                elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                    print("NG_SYNOP", file=sys.stderr)
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9]{5}  *NIL *$', line):
+                                        if debug:
+                                            print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
-                                synop_station = conf_synop_staion_df[conf_synop_staion_df[location_name] == re.sub(r'^0+', '', line_token_list[0])]
-                                if len(synop_station) != 1:
+                                line_token_list = line.split(' ')
+                                synop_station = conf_synop_staion_df[conf_synop_staion_df[location_name] == int(line_token_list[0])]
+                                if len(synop_station.index) != 1:
+                                    if debug:
+                                        print('Debug', ':', 'conf_synop_staion.csv does not have the location of', int(line_token_list[0]), file=sys.stderr)
                                     continue
                                 elem_dict[location_name] = int(synop_station[location_name])
                                 elem_dict[latitude_name] = float(synop_station[latitude_name])
@@ -282,12 +296,12 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     if re.match(r'^555$', token):
                                         sc_num = 500
                             if datetime_name in elem_dict and location_name in elem_dict and latitude_name in elem_dict and longitude_name in elem_dict and len(elem_dict) > 3:
-                                data_list = [datetime_name, location_name, latitude_name, longitude_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]
+                                data_list = [datetime_name, location_name, latitude_name, longitude_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, wind_speed_name, wind_direction_name]
                                 if subcat == 'synop' or subcat == 'synop_mobil':
                                     data_list.append(height_of_station_ground_above_mean_sea_level_name)
                                 for key in data_list:
-                                    if key in [latitude_name, longitude_name, height_of_station_ground_above_mean_sea_level_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, relative_humidity_name, wind_speed_name, wind_direction_name]:
-                                        datatype_dict[key] = 'float64'
+                                    if key in [latitude_name, longitude_name, height_of_station_ground_above_mean_sea_level_name, pressure_reduced_to_mean_sea_level_name, pressure_name, temperature_name, dewpoint_temperature_name, wind_speed_name, wind_direction_name]:
+                                        datatype_dict[key] = 'float32'
                                     elif key in [height_of_base_of_lowest_cloud_name]:
                                         datatype_dict[key] = 'int32'
                                     elif key == location_name:
@@ -375,7 +389,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, con
                         property_dict.pop(height_of_station_ground_above_mean_sea_level_name)
                         datatype_dict.pop(height_of_station_ground_above_mean_sea_level_name)
                     location_datetime_name_list.append(datetime_name)
-                    location_datetime_data.append(pa.array(property_dict[datetime_name], pa.timestamp('ms', tz='utc')))
+                    location_datetime_data.append(pa.array(property_dict[datetime_name], pa.timestamp('s', tz='utc')))
                     datetime_directory_list = []
                     for dt in set(property_dict[datetime_name]):
                         dt_str = dt.strftime('%Y%m%d%H%M')
