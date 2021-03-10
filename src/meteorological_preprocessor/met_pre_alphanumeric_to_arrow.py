@@ -325,9 +325,6 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, conf_synop_staion_df, conf_temp_pilot_staion_df, debug):
     warno = 189
     out_arrows = []
-    now = datetime.utcnow()
-    create_datetime_directory_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2)]
-    create_datetime_directory = ''.join(create_datetime_directory_list)
     cccc_set = set([re.sub('^.*/', '', re.sub('/alphanumeric/.*$', '', in_file)) for in_file in in_file_list])
     cat_subcat_set = set([re.search(r'^[^/]*/[^/]*/', re.sub('^.*/alphanumeric/', '', in_file)).group().rstrip('/') for in_file in in_file_list])
     for cccc in cccc_set:
@@ -370,73 +367,38 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, con
                         else:
                             property_dict[key] = message_np
                 if datetime_name in property_dict and location_name in property_dict and location_name in datatype_dict:
-                    id_list = [id_num for id_num in range(0, len(property_dict[datetime_name]))]
-                    location_datetime_name_list = ['id']
-                    location_datetime_data = [pa.array(id_list, 'int32')]
-                    location_datetime_name_list.append(location_name)
-                    location_datetime_data.append(pa.array(property_dict[location_name], datatype_dict[location_name]))
-                    property_dict.pop(location_name)
+                    name_list = []
+                    data_list = []
+                    name_list.append(location_name)
+                    data_list.append(pa.array(property_dict[location_name], datatype_dict[location_name]))
                     datatype_dict.pop(location_name)
-                    location_datetime_name_list.append(latitude_name)
-                    location_datetime_data.append(pa.array(property_dict[latitude_name], datatype_dict[latitude_name]))
-                    property_dict.pop(latitude_name)
+                    name_list.append(latitude_name)
+                    data_list.append(pa.array(property_dict[latitude_name], datatype_dict[latitude_name]))
                     datatype_dict.pop(latitude_name)
-                    location_datetime_name_list.append(longitude_name)
-                    location_datetime_data.append(pa.array(property_dict[longitude_name], datatype_dict[longitude_name]))
-                    property_dict.pop(longitude_name)
+                    name_list.append(longitude_name)
+                    data_list.append(pa.array(property_dict[longitude_name], datatype_dict[longitude_name]))
                     datatype_dict.pop(longitude_name)
                     if subcat == 'synop' or subcat == 'synop_mobil':
-                        location_datetime_name_list.append(height_of_station_ground_above_mean_sea_level_name)
-                        location_datetime_data.append(pa.array(property_dict[height_of_station_ground_above_mean_sea_level_name], datatype_dict[height_of_station_ground_above_mean_sea_level_name]))
-                        property_dict.pop(height_of_station_ground_above_mean_sea_level_name)
+                        name_list.append(height_of_station_ground_above_mean_sea_level_name)
+                        data_list.append(pa.array(property_dict[height_of_station_ground_above_mean_sea_level_name], datatype_dict[height_of_station_ground_above_mean_sea_level_name]))
                         datatype_dict.pop(height_of_station_ground_above_mean_sea_level_name)
-                    location_datetime_name_list.append(datetime_name)
-                    location_datetime_data.append(pa.array(property_dict[datetime_name], pa.timestamp('s', tz='utc')))
-                    datetime_directory_list = []
-                    for dt in set(property_dict[datetime_name]):
-                        dt_str = dt.strftime('%Y%m%d%H%M')
-                        if not dt_str[0:11] + "0" in datetime_directory_list:
-                            datetime_directory_list.append(dt_str[0:11] + "0")
-                    datetime_len = 11
-                    for datetime_directory in datetime_directory_list:
-                        datetime_index_list = [index for index, value in enumerate(property_dict['datetime']) if value.strftime('%Y%m%d%H%M')[0:datetime_len] == datetime_directory[0:datetime_len]]
-                        if len(datetime_index_list) > 0:
-                            tmp_location_datetime_data = [location_datetime.take(pa.array(datetime_index_list)) for location_datetime in location_datetime_data]
-                            if len(tmp_location_datetime_data) > 0:
-                                out_directory_list = [out_dir, cccc, 'alphanumeric_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
-                                out_directory = '/'.join(out_directory_list)
-                                os.makedirs(out_directory, exist_ok=True)
-                                out_file_list = [out_directory, 'location_datetime.feather']
-                                out_file = '/'.join(out_file_list)
-                                with open(out_file, 'bw') as out_f:
-                                    location_datetime_batch = pa.record_batch(tmp_location_datetime_data, names=location_datetime_name_list)
-                                    location_datetime_table = pa.Table.from_batches([location_datetime_batch])
-                                    feather.write_feather(location_datetime_table, out_f, compression='zstd')
-                                    print(out_file, file=out_list_file)
-                                property_key_list = [property_key for property_key in property_dict.keys() if property_key != datetime_name]
-                                for property_key in property_key_list:
-                                    property_name_list = ['id']
-                                    property_name_list.append(property_key)
-                                    property_data = []
-                                    datetime_id_pa = pa.array(id_list, 'int32').take(pa.array(datetime_index_list))
-                                    if max(datetime_index_list) < len(property_dict[property_key]):
-                                        datetime_property_data = pa.array(property_dict[property_key][datetime_index_list].tolist(), datatype_dict[property_key])
-                                        value_index_list = [index for index, value in enumerate(datetime_property_data.tolist()) if value != None]
-                                        if len(value_index_list) > 0:
-                                            property_data.append(datetime_id_pa.take(pa.array(value_index_list)))
-                                            property_data.append(datetime_property_data.take(pa.array(value_index_list)))
-                                            out_directory_list = [out_dir, cccc, 'alphanumeric_to_arrow', output_cat, output_subcat, datetime_directory, create_datetime_directory]
-                                            out_directory = '/'.join(out_directory_list)
-                                            os.makedirs(out_directory, exist_ok=True)
-                                            out_file_list = [out_directory, '/', re.sub(' ', '_', re.sub(' \[.*$', '', property_key)), '.feather']
-                                            out_file = ''.join(out_file_list)
-                                            with open(out_file, 'bw') as out_f:
-                                                property_batch = pa.record_batch(property_data, names=property_name_list)
-                                                property_table = pa.Table.from_batches([property_batch])
-                                                feather.write_feather(property_table, out_f, compression='zstd')
-                                                print(out_file, file=out_list_file)
-                                    else:
-                                        print('Info', output_cat, output_subcat, 'max(datetime_index_list) >= len(property_dict[property_key]) key :', property_key, max(datetime_index_list), len(property_dict[property_key]), file=sys.stderr)
+                    name_list.append(datetime_name)
+                    data_list.append(pa.array(property_dict[datetime_name], pa.timestamp('s', tz='utc')))
+                    datatype_dict.pop(datetime_name)
+                    for property_key in property_dict.keys():
+                        name_list.append(property_key)
+                        data_list.append(pa.array(property_dict[latitude_name], datatype_dict[latitude_name]))
+                        out_directory_list = [out_dir, cccc, 'alphanumeric_to_arrow', output_cat, output_subcat]
+                        out_directory = '/'.join(out_directory_list)
+                        os.makedirs(out_directory, exist_ok=True)
+                        now = datetime.utcnow()
+                        out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.feather']
+                        out_file = ''.join(out_file_list)
+                        with open(out_file, 'bw') as out_f:
+                            batch = pa.record_batch(data_list, names=name_list)
+                            table = pa.Table.from_batches([batch])
+                            feather.write_feather(table, out_f, compression='zstd')
+                            print(out_file, file=out_list_file)
 
 def main():
     errno=198
