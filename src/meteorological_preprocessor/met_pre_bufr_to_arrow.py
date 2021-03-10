@@ -278,11 +278,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
                                     else:
                                         property_dict[pre_conf_row_name] = message_np
-                if datetime_name in property_dict and location_name in property_dict and location_name in datatype_dict:
+                if datetime_name in property_dict:
                     name_list = []
                     data_list = []
                     del_key_list = []
                     cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['location_type'] == location_type) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat)]
+                    datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
                     for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                         if conf_row_name == 'datetime':
                             plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
@@ -304,6 +305,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             elif datetime_tail == 'year':
                                 data_list.append(pa.array([datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i]) for i, dt_str in enumerate(property_dict[conf_row_name])], pa.timestamp('ms', tz='utc')))
                             name_list.append(conf_row_name)
+                            datatype_dict.pop(conf_row_name)
                         elif conf_row_name != 'time period [s]':
                             if conf_row_name in property_dict:
                                 data_list.append(pa.array(property_dict[conf_row_name], datatype_dict[conf_row_name]))
@@ -312,17 +314,17 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     for datatype_key in datatype_dict.keys():
                         name_list.append(datatype_key)
                         data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
-                        out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat]
-                        out_directory = '/'.join(out_directory_list)
-                        os.makedirs(out_directory, exist_ok=True)
-                        now = datetime.utcnow()
-                        out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.feather']
-                        out_file = ''.join(out_file_list)
-                        with open(out_file, 'bw') as out_f:
-                            batch = pa.record_batch(data_list, names=name_list)
-                            table = pa.Table.from_batches([batch])
-                            feather.write_feather(table, out_f, compression='zstd')
-                            print(out_file, file=out_list_file)
+                    out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat]
+                    out_directory = '/'.join(out_directory_list)
+                    os.makedirs(out_directory, exist_ok=True)
+                    now = datetime.utcnow()
+                    out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.feather']
+                    out_file = ''.join(out_file_list)
+                    with open(out_file, 'bw') as out_f:
+                        batch = pa.record_batch(data_list, names=name_list)
+                        table = pa.Table.from_batches([batch])
+                        feather.write_feather(table, out_f, compression='zstd')
+                        print(out_file, file=out_list_file)
 
 def main():
     errno=198

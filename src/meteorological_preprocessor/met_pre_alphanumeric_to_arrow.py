@@ -384,21 +384,20 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, con
                         datatype_dict.pop(height_of_station_ground_above_mean_sea_level_name)
                     name_list.append(datetime_name)
                     data_list.append(pa.array(property_dict[datetime_name], pa.timestamp('s', tz='utc')))
-                    datatype_dict.pop(datetime_name)
-                    for property_key in property_dict.keys():
-                        name_list.append(property_key)
-                        data_list.append(pa.array(property_dict[latitude_name], datatype_dict[latitude_name]))
-                        out_directory_list = [out_dir, cccc, 'alphanumeric_to_arrow', output_cat, output_subcat]
-                        out_directory = '/'.join(out_directory_list)
-                        os.makedirs(out_directory, exist_ok=True)
-                        now = datetime.utcnow()
-                        out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.feather']
-                        out_file = ''.join(out_file_list)
-                        with open(out_file, 'bw') as out_f:
-                            batch = pa.record_batch(data_list, names=name_list)
-                            table = pa.Table.from_batches([batch])
-                            feather.write_feather(table, out_f, compression='zstd')
-                            print(out_file, file=out_list_file)
+                    for datatype_key in datatype_dict.keys():
+                        name_list.append(datatype_key)
+                        data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
+                    out_directory_list = [out_dir, cccc, 'alphanumeric_to_arrow', output_cat, output_subcat]
+                    out_directory = '/'.join(out_directory_list)
+                    os.makedirs(out_directory, exist_ok=True)
+                    now = datetime.utcnow()
+                    out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.feather']
+                    out_file = ''.join(out_file_list)
+                    with open(out_file, 'bw') as out_f:
+                        batch = pa.record_batch(data_list, names=name_list)
+                        table = pa.Table.from_batches([batch])
+                        feather.write_feather(table, out_f, compression='zstd')
+                        print(out_file, file=out_list_file)
 
 def main():
     errno=198
