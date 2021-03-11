@@ -44,10 +44,11 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     rc = False
     f = open(in_file, 'rb')
     while True:
-        bufr = codes_bufr_new_from_file(f)
-        if bufr is None:
-            break
+        bufr = None
         try:
+            bufr = codes_bufr_new_from_file(f)
+            if bufr is None:
+                break
             unexpanded_descriptors = []
             unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
             if bufr_descriptor in unexpanded_descriptors:
