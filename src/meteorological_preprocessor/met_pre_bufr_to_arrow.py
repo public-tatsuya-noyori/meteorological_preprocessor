@@ -199,7 +199,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
                                                 array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                                 break
-
                                         if len(array) < number_of_array:
                                             for padding_count in range(len(array), number_of_array):
                                                 array = np.append(array, None)

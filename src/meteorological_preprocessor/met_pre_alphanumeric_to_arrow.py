@@ -383,10 +383,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, con
                         data_list.append(pa.array(property_dict[height_of_station_ground_above_mean_sea_level_name], datatype_dict[height_of_station_ground_above_mean_sea_level_name]))
                         datatype_dict.pop(height_of_station_ground_above_mean_sea_level_name)
                     name_list.append(datetime_name)
-                    data_list.append(pa.array(property_dict[datetime_name], pa.timestamp('s', tz='utc')))
+                    data_list.append(pa.array(property_dict[datetime_name], pa.timestamp('ms', tz='utc')))
                     for datatype_key in datatype_dict.keys():
-                        name_list.append(datatype_key)
-                        data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
+                        if datatype_key in property_dict:
+                            if any([False if value == None else True for value in property_dict[datatype_key]]):
+                                name_list.append(datatype_key)
+                                data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
                     out_directory_list = [out_dir, cccc, 'alphanumeric_to_arrow', output_cat, output_subcat]
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)

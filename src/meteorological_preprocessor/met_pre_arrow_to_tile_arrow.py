@@ -46,14 +46,13 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
     for in_file in in_file_list:
         if debug:
             print('Debug', ': in_file', in_file, file=sys.stderr)
-        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/([0-9]*)/C_([A-Z]{4})_([0-9]*)/location_datetime\.feather$', in_file)
+        loc_time_match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/([^/]*)/(.*)/C_([A-Z]{4})_([0-9]*)\.feather$', in_file)
         if loc_time_match:
             cccc = loc_time_match.group(1)
             form = loc_time_match.group(2)
             cat_dir = loc_time_match.group(3)
-            date_hourminute = loc_time_match.group(4)
-            creator = loc_time_match.group(5)
-            created = loc_time_match.group(6)
+            creator = loc_time_match.group(4)
+            created = loc_time_match.group(5)
             created_second = int(math.floor(datetime(int(created[0:4]), int(created[4:6]), int(created[6:8]), int(created[8:10]), int(created[10:12]), int(created[12:14]), 0, tzinfo=timezone.utc).timestamp()))
             new_datetime_list_dict = {}
             new_id_etfo_dict = {}
