@@ -29,7 +29,7 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import feather
 
-def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
+def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, debug):
     warno = 189
     res = 180 / 2**zoom
     cccc = ''
@@ -71,7 +71,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                     new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.floor("10T").unique()
                     for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
                         new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=10))]
-                        if len(new_df['id'].tolist()) > 0:
+                        if len(new_df['id'].index) > 0:
                             out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
                             out_file = ''.join([out_directory, '/location_datetime.feather'])
                             new_df = new_df.astype({'id': 'int32'})
@@ -91,7 +91,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 old_df = out_file_dict[out_file]
                             elif os.path.exists(out_file):
                                 old_df = pa.ipc.open_file(out_file).read_pandas()
-                            if len(old_df['id'].tolist()) > 0:
+                            if len(old_df['id'].index) > 0:
                                 concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                 concat_df = concat_df.astype({'id': 'int32'})
                                 concat_df = concat_df.astype({'indicator': 'int32'})
@@ -102,7 +102,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                 duplicated = concat_df.duplicated(subset=unique_key_list, keep='last')
                                 del_etfo_id_dict[(tile_x, tile_y, new_datetime)] = concat_df[duplicated][['elapsed time [s]', 'id']]
                                 concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
-                                if len(concat_df['id'].tolist()) > 0:
+                                if len(concat_df['id'].index) > 0:
                                     out_file_dict[out_file] = concat_df
                                 else:
                                     out_file_dict.pop(out_file)
@@ -119,7 +119,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                             if len(new_id_etfo_dict[tile_x,  tile_y, new_datetime]) > 0:
                                 intersection_id_list = list(set(new_id_etfo_dict[(tile_x,  tile_y, new_datetime)].keys()) & set(in_df['id'].tolist()))
                                 new_df = in_df[in_df['id'].isin(intersection_id_list)]
-                                if len(new_df['id'].tolist()) > 0:
+                                if len(new_df['id'].index) > 0:
                                     out_directory = ''.join([out_dir, '/', form, '/', cat_dir, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
                                     out_file = ''.join([out_directory, '/', prop_short_name, '.feather'])
                                     new_df = new_df.astype({'id': 'int32'})
@@ -136,7 +136,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                         old_df = out_file_dict[out_file]
                                     elif os.path.exists(out_file):
                                         old_df = pa.ipc.open_file(out_file).read_pandas()
-                                    if len(old_df['id'].tolist()) > 0:
+                                    if len(old_df['id'].index) > 0:
                                         concat_df = pd.concat([old_df, new_df], ignore_index=True)
                                         concat_df = concat_df.astype({'id': 'int32'})
                                         concat_df = concat_df.astype({'indicator': 'int32'})
@@ -150,14 +150,14 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, debug):
                                             concat_df.drop(concat_df.index[del_index_list], inplace=True)
                                         unique_key_list = new_df.columns.values.tolist()
                                         concat_df.drop_duplicates(subset=unique_key_list, keep='last', inplace=True)
-                                        if len(concat_df['id'].tolist()) > 0:
+                                        if len(concat_df['id'].index) > 0:
                                             out_file_dict[out_file] = concat_df
                                         else:
                                             out_file_dict.pop(out_file)
                                     else:
                                         out_file_dict[out_file] = new_df
     for out_file, out_df in out_file_dict.items():
-        if len(out_df['id'].tolist()) > 0:
+        if len(out_df['id'].index) > 0:
             os.makedirs(os.path.dirname(out_file), exist_ok=True)
             with open(out_file, 'bw') as out_f:
                 feather.write_feather(out_df, out_f, compression='uncompressed')
@@ -172,16 +172,23 @@ def main():
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
+    config = pkg_resources.resource_filename(__name__, 'conf_arrow_to_tile_arrow.csv')
     if not os.access(args.input_list_file, os.F_OK):
         print('Error', errno, ':', args.input_list_file, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.output_directory, os.F_OK):
         os.makedirs(args.output_directory, exist_ok=True)
+    if not os.access(config, os.F_OK):
+        print('Error', errno, ':', config, 'does not exist.', file=sys.stderr)
+        sys.exit(errno)
     if not os.path.isfile(args.input_list_file):
         print('Error', errno, ':', args.input_list_file, 'is not file.', file=sys.stderr)
         sys.exit(errno)
     if not os.path.isdir(args.output_directory):
         print('Error', errno, ':', args.output_directory, 'is not directory.', file=sys.stderr)
+        sys.exit(errno)
+    if not os.path.isfile(config):
+        print('Error', errno, ':', config, 'is not file.', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.input_list_file, os.R_OK):
         print('Error', errno, ':', args.input_list_file, 'is not readable.', file=sys.stderr)
@@ -189,11 +196,15 @@ def main():
     if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
         print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
+    if not os.access(config, os.R_OK):
+        print('Error', errno, ':', config, 'is not readable.', file=sys.stderr)
+        sys.exit(errno)
     try:
         input_file_list = []
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
-        convert_to_tile_arrow(input_file_list, args.output_directory, args.zoom, args.output_list_file, args.debug)
+        conf_df = csv.read_csv(config).to_pandas()
+        convert_to_tile_arrow(input_file_list, args.output_directory, args.zoom, args.output_list_file, conf_df, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

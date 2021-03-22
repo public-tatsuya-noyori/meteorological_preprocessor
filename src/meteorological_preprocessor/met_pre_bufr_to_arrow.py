@@ -149,7 +149,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                             for bufr_descriptor in unexpanded_descriptors:
                                 descriptor_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['location_type'] == location_type) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat) & (conf_df['descriptor'] == bufr_descriptor)]
-                                if len(descriptor_conf_df) > 0:
+                                if len(descriptor_conf_df.index) > 0:
                                     descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
                                     if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
                                         is_descriptor_2 = False
@@ -161,7 +161,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if not is_descriptor_2:
                                             descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                                     break
-                            if len(descriptor_conf_df) == 0:
+                            if len(descriptor_conf_df.index) == 0:
                                 print('Info', ':', 'not found descriptor.', unexpanded_descriptors, in_file, file=sys.stderr)
                                 break
                             number_of_subsets = codes_get(bufr, 'numberOfSubsets')
@@ -285,7 +285,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
                     for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                         if conf_row_name == 'datetime':
-                            plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
+                            plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name].index))]
                             if 'time period [s]' in property_dict:
                                 plus_second_list = property_dict['time period [s]']
                                 del_key_list.append('time period [s]')

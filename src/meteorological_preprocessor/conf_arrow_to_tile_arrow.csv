@@ -1,15 +1,54 @@
-category,subcategory,location
+category,subcategory,location_datetime
 surface,synop,station
+surface,synop,latitude [degree]
+surface,synop,longitude [degree]
+surface,synop,height of station ground above mean sea level [m]
+surface,synop,datetime
 surface,ship,station
+surface,ship,latitude [degree]
+surface,ship,longitude [degree]
+surface,ship,datetime
 surface,moored_buoy,station
+surface,moored_buoy,latitude [degree]
+surface,moored_buoy,longitude [degree]
+surface,moored_buoy,datetime
 surface,drifting_buoy,station
+surface,drifting_buoy,latitude [degree]
+surface,drifting_buoy,longitude [degree]
+surface,drifting_buoy,datetime
 surface,gps_pwv,station
+surface,gps_pwv,latitude [degree]
+surface,gps_pwv,longitude [degree]
+surface,gps_pwv,height of station [m]
 surface,tesac,station
-upper_air,temperature_profiler,station
+surface,tesac,latitude [degree]
+surface,tesac,longitude [degree]
+surface,tesac,water pressure [Pa]
 upper_air,temp,station
+upper_air,temp,latitude [degree]
+upper_air,temp,longitude [degree]
+upper_air,temp,pressure [Pa]
 upper_air,temp_ship,station
+upper_air,temp_ship,latitude [degree]
+upper_air,temp_ship,longitude [degree]
+upper_air,temp_ship,pressure [Pa]
 upper_air,temp_drop,station
+upper_air,temp_drop,latitude [degree]
+upper_air,temp_drop,longitude [degree]
+upper_air,temp_drop,pressure [Pa]
 upper_air,pilot,station
-upper_air,pilot_ship,station
+upper_air,pilot,latitude [degree]
+upper_air,pilot,longitude [degree]
+upper_air,pilot,pressure [Pa]
 upper_air,amdar,station
+upper_air,amdar,latitude [degree]
+upper_air,amdar,longitude [degree]
+upper_air,amdar,flight level [m]
 upper_air,wind_profiler,station
+upper_air,wind_profiler,latitude [degree]
+upper_air,wind_profiler,longitude [degree]
+upper_air,wind_profiler,height [m]
+upper_air,temperature_profiler,station
+upper_air,temperature_profiler,latitude [degree]
+upper_air,temperature_profiler,longitude [degree]
+upper_air,temperature_profiler,height [m]
