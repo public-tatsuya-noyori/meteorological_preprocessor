@@ -42,29 +42,27 @@ def getHash(out_file):
 def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
     warno = 184
     rc = False
-    f = open(in_file, 'rb')
-    while True:
-        bufr = None
-        try:
-            bufr = codes_bufr_new_from_file(f)
-            if bufr is None:
+    with open(in_file, 'rb') as in_file_stream:
+        while True:
+            bufr = None
+            try:
+                bufr = codes_bufr_new_from_file(in_file_stream)
+                if bufr is None:
+                    break
+                unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
+                if bufr_descriptor in unexpanded_descriptors:
+                    if bufr_key_of_not_missing:
+                        values = codes_get_array(bufr, bufr_key_of_not_missing)
+                        if type(values[0]) == str and len(values[0].lstrip().rstrip()) > 0:
+                            rc = True
+                        elif not np.isnan(values[0]):
+                            rc = True
+                    else:
+                        rc = True
+            except:
+                rc = False
                 break
-            unexpanded_descriptors = []
-            unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-            if bufr_descriptor in unexpanded_descriptors:
-                if bufr_key_of_not_missing:
-                    values = codes_get_array(bufr, bufr_key_of_not_missing)
-                    if type(values[0]) == str and len(values[0].lstrip().rstrip()) > 0:
-                        rc = True
-                    elif not np.isnan(values[0]):
-                        rc = True
-                else:
-                    rc = True
-        except:
-            rc = False
-            break
-        codes_release(bufr)
-    f.close()
+            codes_release(bufr)
     return rc
 
 def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):

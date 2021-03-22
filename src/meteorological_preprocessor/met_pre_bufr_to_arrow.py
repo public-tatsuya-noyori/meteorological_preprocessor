@@ -133,23 +133,19 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     elif not os.access(in_file, os.R_OK):
                         print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
                         continue
-                    with open(in_file, 'r') as in_file_stream:
-                        if debug:
-                            print('Debug', ':', in_file, file=sys.stderr)
+                    if debug:
+                        print('Debug', ':', in_file, file=sys.stderr)
+                    with open(in_file, 'rb') as in_file_stream:
                         while True:
                             bufr = None
+                            unexpanded_descriptors = []
                             try:
                                 bufr = codes_bufr_new_from_file(in_file_stream)
-                            except:
-                                print('Warning', warno, ':', in_file, 'is not bufr.', file=sys.stderr)
-                                break
-                            if bufr is None:
-                                break
-                            try:
-                                codes_set(bufr, 'unpack', 1)
+                                if bufr is None:
+                                    break
+                                unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
                             except:
                                 break
-                            unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
                             descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
                             for bufr_descriptor in unexpanded_descriptors:
                                 descriptor_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['location_type'] == location_type) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat) & (conf_df['descriptor'] == bufr_descriptor)]
@@ -171,6 +167,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             number_of_subsets = codes_get(bufr, 'numberOfSubsets')
                             if number_of_subsets == 0:
                                 print('Info', ':', 'number_of_subsets is 0.', unexpanded_descriptors, in_file, file=sys.stderr)
+                                break
+                            try:
+                                codes_set(bufr, 'unpack', 1)
+                            except:
                                 break
                             bufr_dict = {}
                             none_np = np.array([])
@@ -312,8 +312,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 name_list.append(conf_row_name)
                                 datatype_dict.pop(conf_row_name)
                     for datatype_key in datatype_dict.keys():
-                        name_list.append(datatype_key)
-                        data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
+                        if datatype_key in property_dict:
+                            if any([False if value == None else True for value in property_dict[datatype_key]]):
+                                name_list.append(datatype_key)
+                                data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
                     out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat]
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)
