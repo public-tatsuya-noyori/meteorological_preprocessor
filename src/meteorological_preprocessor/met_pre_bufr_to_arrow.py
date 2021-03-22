@@ -285,7 +285,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
                     for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
                         if conf_row_name == 'datetime':
-                            plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name].index))]
+                            plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
                             if 'time period [s]' in property_dict:
                                 plus_second_list = property_dict['time period [s]']
                                 del_key_list.append('time period [s]')
