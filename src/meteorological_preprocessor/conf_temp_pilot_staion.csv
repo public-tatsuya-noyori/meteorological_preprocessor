@@ -1,4 +1,4 @@
-location,latitude [degree],longitude [degree],height of station ground above mean sea level [m]
+station,latitude [degree],longitude [degree],height of station ground above mean sea level [m]
 1152,67.16,14.22,13
 1384,60.12,11.05,208
 2836,67.22,26.38,179
