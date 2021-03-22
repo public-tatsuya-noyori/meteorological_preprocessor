@@ -1,0 +1,15 @@
+category,subcategory,location
+surface,synop,station
+surface,ship,station
+surface,moored_buoy,station
+surface,drifting_buoy,station
+surface,gps_pwv,station
+surface,tesac,station
+upper_air,temperature_profiler,station
+upper_air,temp,station
+upper_air,temp_ship,station
+upper_air,temp_drop,station
+upper_air,pilot,station
+upper_air,pilot_ship,station
+upper_air,amdar,station
+upper_air,wind_profiler,station

@@ -1,6 +1,6 @@
 input_category,input_subcategory,descriptor,descriptor_2,location_type,key,slide,step,multiply,missing,output_category,output_subcategory,output,name,get_type,convert_type,array_index,datatype,min,max
 surface,gps_pwv,307022,,0,#1#atmosphericPathDelayInSatelliteSignal,0,0,0,,surface,gps_pwv,atmospheric_path_delay_in_satellite_signal,atmospheric path delay in satellite signal [m],,,0,float64,0,2147483647
-surface,gps_pwv,307022,,0,stationOrSiteName,0,0,0,,surface,gps_pwv,location_datetime,station name,,,0,string,,
+surface,gps_pwv,307022,,0,stationOrSiteName,0,0,0,,surface,gps_pwv,location_datetime,station,,,0,string,,
 surface,gps_pwv,307022,,0,latitude,0,0,0,,surface,gps_pwv,location_datetime,latitude [degree],,,0,float64,-90,90
 surface,gps_pwv,307022,,0,longitude,0,0,0,,surface,gps_pwv,location_datetime,longitude [degree],,,0,float64,-180,180
 surface,gps_pwv,307022,,0,heightOfStation,0,0,0,,surface,gps_pwv,location_datetime,height of station [m],,,0,float64,-32768,32767
@@ -16,8 +16,8 @@ surface,gps_pwv,307022,,0,#1#estimatedErrorInAtmosphericPathDelay,0,0,0,,surface
 surface,gps_pwv,307022,,0,#1#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,0,0,,surface,gps_pwv,difference_in_path_delays_for_limb_views_at_extremes_of_scan_1,difference in path delays for limb views at extremes of scan 1 [m],,,0,float64,0,2147483647
 surface,gps_pwv,307022,,0,#2#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,0,0,,surface,gps_pwv,difference_in_path_delays_for_limb_views_at_extremes_of_scan_2,difference in path delays for limb views at extremes of scan 2 [m],,,0,float64,0,2147483647
 surface,gps_pwv,307022,,0,componentOfZenithPathDelayDueToWaterVapour,0,0,0,,surface,gps_pwv,component_of_zenith_path_delay_due_to_water_vapour,component of zenith path delay due to water vapour [m],,,0,float64,0,2147483647
-surface,synop,307079,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307079,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307079,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307079,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307079,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307079,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307079,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -41,8 +41,8 @@ surface,synop,307079,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307079,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307079,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307079,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307080,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
-surface,synop,307080,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
+surface,synop,307080,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307080,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307080,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307080,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307080,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -66,8 +66,8 @@ surface,synop,307080,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307080,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307080,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307080,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307081,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307081,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307081,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307081,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307081,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307081,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307081,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -91,8 +91,8 @@ surface,synop,307081,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307081,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307081,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307081,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307082,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307082,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307082,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307082,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307082,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307082,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307082,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -116,8 +116,8 @@ surface,synop,307082,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307082,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307082,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307082,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307083,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307083,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307083,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307083,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307083,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307083,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307083,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -141,8 +141,8 @@ surface,synop,307083,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307083,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307083,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307083,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307084,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307084,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307084,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307084,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307084,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307084,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307084,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -166,8 +166,8 @@ surface,synop,307084,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307084,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307084,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307084,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307085,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307085,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307085,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307085,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307085,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
 surface,synop,307085,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307085,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
@@ -191,8 +191,8 @@ surface,synop,307085,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307085,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307085,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307085,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307086,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307086,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307086,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307086,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307086,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307086,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307086,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -216,8 +216,8 @@ surface,synop,307086,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307086,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307086,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307086,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307091,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307091,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307091,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307091,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307091,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307091,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307091,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -241,8 +241,8 @@ surface,synop,307091,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud 
 surface,synop,307091,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307091,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
 surface,synop,307091,,0,totalPrecipitationPast24Hours,0,0,0,,surface,synop,total_precipitation_past_24_hours,total precipitation past 24 hours [kg/m2],subset,to_value,0,float64,0,32767
-surface,synop,307096,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,99
-surface,synop,307096,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station number,subset,to_value,0,int32,0,999
+surface,synop,307096,,0,blockNumber,0,0,1000,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,99
+surface,synop,307096,,0,stationNumber,0,0,1,,surface,synop,location_datetime,station,subset,to_value,0,int32,0,999
 surface,synop,307096,,0,latitude,0,0,0,,surface,synop,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,synop,307096,,0,longitude,0,0,0,,surface,synop,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,synop,307096,,0,heightOfStationGroundAboveMeanSeaLevel,0,0,0,,surface,synop,location_datetime,height of station ground above mean sea level [m],subset,to_value,0,float64,-32768,32767
@@ -265,7 +265,7 @@ surface,synop,307096,,0,cloudAmount,0,0,0,,surface,synop,cloud_amount,cloud amou
 surface,synop,307096,,0,cloudType,0,0,0,,surface,synop,low_cloud_type,low cloud type,subset,to_value,0,int32,0,32767
 surface,synop,307096,,0,cloudType,0,0,0,,surface,synop,middle_cloud_type,middle cloud type,subset,to_value,1,int32,0,32767
 surface,synop,307096,,0,cloudType,0,0,0,,surface,synop,high_cloud_type,high cloud type,subset,to_value,2,int32,0,32767
-surface,ship,308009,,0,shipOrMobileLandStationIdentifier,0,0,0,,surface,ship,location_datetime,ship identifier,subset,to_value,0,string,,
+surface,ship,308009,,0,shipOrMobileLandStationIdentifier,0,0,0,,surface,ship,location_datetime,station,subset,to_value,0,string,,
 surface,ship,308009,,0,latitude,0,0,0,,surface,ship,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,ship,308009,,0,longitude,0,0,0,,surface,ship,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,ship,308009,,0,year,0,0,0,,surface,ship,location_datetime,datetime,subset,to_value,0,timestamp,0,9999
@@ -297,7 +297,7 @@ surface,ship,308009,,0,swellWavesDirection,0,0,0,,surface,ship,direction_of_swel
 surface,ship,308009,,0,periodOfSwellWaves,0,0,0,,surface,ship,period_of_swell_waves,period of swell waves [s],subset,to_value,0,float64,0,32767
 surface,ship,308009,,0,heightOfSwellWaves,0,0,0,,surface,ship,height_of_swell_waves,height of swell waves [m],subset,to_value,0,float64,0,32767
 surface,tesac,315003,,0,waterPressure,0,0,0,,surface,tesac,location_datetime,water pressure [Pa],subset,,0,float64,0,2147483647
-surface,tesac,315003,,0,marineObservingPlatformIdentifier,0,0,0,,surface,tesac,location_datetime,profiling float id,subset,to_value_to_array,0,int32,0,2147483647
+surface,tesac,315003,,0,marineObservingPlatformIdentifier,0,0,0,,surface,tesac,location_datetime,station,subset,to_value_to_array,0,int32,0,2147483647
 surface,tesac,315003,,0,latitude,0,0,0,,surface,tesac,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 surface,tesac,315003,,0,longitude,0,0,0,,surface,tesac,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
 surface,tesac,315003,,0,year,0,0,0,,surface,tesac,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
@@ -308,7 +308,7 @@ surface,tesac,315003,,0,minute,0,0,0,,surface,tesac,location_datetime,datetime,s
 surface,tesac,315003,,0,oceanographicWaterTemperature,0,0,0,,surface,tesac,oceanographic_water_temperature,oceanographic water temperature [k],subset,,0,float64,-273.15,32767
 surface,tesac,315003,,0,salinity,0,0,0,,surface,tesac,salinity,salinity [%],subset,,0,float64,0,100
 surface,tesac,315003,,0,oceanographicDissolvedOxygen,0,0,0,,surface,tesac,oceanographic_dissolved_oxygen,oceanographic dissolved oxygen [umol/kg],subset,,0,float64,0,32767
-surface,moored_buoy,315008,,0,marineObservingPlatformIdentifier,0,0,0,,surface,moored_buoy,location_datetime,moored buoy id,subset,to_value,0,int32,0,2147483647
+surface,moored_buoy,315008,,0,marineObservingPlatformIdentifier,0,0,0,,surface,moored_buoy,location_datetime,station,subset,to_value,0,int32,0,2147483647
 surface,moored_buoy,315008,,0,latitude,0,0,0,,surface,moored_buoy,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,moored_buoy,315008,,0,longitude,0,0,0,,surface,moored_buoy,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,moored_buoy,315008,,0,year,0,0,0,,surface,moored_buoy,location_datetime,datetime,subset,to_value,0,timestamp,0,9999
@@ -329,7 +329,7 @@ surface,moored_buoy,315008,,0,significantWaveHeight,0,0,0,,surface,moored_buoy,s
 surface,moored_buoy,315008,,0,maximumWaveHeight,0,0,0,,surface,moored_buoy,maximum_wave_height,maximum wave height [m],subset,to_value,0,float64,0,32767
 surface,moored_buoy,315008,,0,averageWavePeriod,0,0,0,,surface,moored_buoy,average_wave_period,average_wave_period [s],subset,to_value,0,float64,0,32767
 surface,moored_buoy,315008,,0,depthBelowWaterSurface,0,0,0,,surface,moored_buoy,depth_below_water_surface,depth below water surface [m],subset,to_value,0,float64,0,32767
-surface,drifting_buoy,315009,,0,marineObservingPlatformIdentifier,0,0,0,,surface,drifting_buoy,location_datetime,drifting buoy id,subset,to_value,0,int32,0,2147483647
+surface,drifting_buoy,315009,,0,marineObservingPlatformIdentifier,0,0,0,,surface,drifting_buoy,location_datetime,station,subset,to_value,0,int32,0,2147483647
 surface,drifting_buoy,315009,,0,latitude,0,0,0,,surface,drifting_buoy,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 surface,drifting_buoy,315009,,0,longitude,0,0,0,,surface,drifting_buoy,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 surface,drifting_buoy,315009,,0,year,1,2,0,,surface,drifting_buoy,location_datetime,datetime,subset,to_value,0,timestamp,0,9999
@@ -341,7 +341,7 @@ surface,drifting_buoy,315009,,0,oceanographicWaterTemperature,0,0,0,,surface,dri
 surface,drifting_buoy,315009,,0,pressureReducedToMeanSeaLevel,0,0,0,,surface,drifting_buoy,pressure_reduced_to_mean_sea_level,pressure reduced to mean sea level [Pa],subset,to_value,0,float64,0,2147483647
 surface,drifting_buoy,315009,,0,significantWaveHeight,0,0,0,,surface,drifting_buoy,significant_wave_height,significant wave height [m],subset,to_value,0,float64,0,32767
 surface,drifting_buoy,315009,,0,averageWavePeriod,0,0,0,,surface,drifting_buoy,average_wave_period,average_wave_period [s],subset,to_value,0,float64,0,32767
-upper_air,amdar,311005,,0,aircraftRegistrationNumberOrOtherIdentification,0,0,0,,upper_air,amdar,location_datetime,aircraft id,subset,to_value,0,string,,
+upper_air,amdar,311005,,0,aircraftRegistrationNumberOrOtherIdentification,0,0,0,,upper_air,amdar,location_datetime,station,subset,to_value,0,string,,
 upper_air,amdar,311005,,0,latitude,0,0,0,,upper_air,amdar,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 upper_air,amdar,311005,,0,longitude,0,0,0,,upper_air,amdar,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 upper_air,amdar,311005,,0,flightLevel,0,0,0,,upper_air,amdar,location_datetime,flight level [m],subset,to_value,0,float64,0,32767
@@ -355,7 +355,7 @@ upper_air,amdar,311005,,0,airTemperature,0,0,0,,upper_air,amdar,air_temperature,
 upper_air,amdar,311005,,0,windDirection,0,0,0,,upper_air,amdar,wind_direction,wind direction [degree],subset,to_value,0,float64,0,360
 upper_air,amdar,311005,,0,windSpeed,0,0,0,,upper_air,amdar,wind_speed,wind speed [m/s],subset,to_value,0,float64,0,32767
 upper_air,amdar,311005,,0,detailedPhaseOfFlight,0,0,0,,upper_air,amdar,detailed_phase_of_flight,detailed phase of flight,subset,to_value,0,int32,0,32767
-upper_air,amdar,311008,,0,aircraftRegistrationNumberOrOtherIdentification,0,0,0,,upper_air,amdar,location_datetime,aircraft id,subset,to_value,0,string,,
+upper_air,amdar,311008,,0,aircraftRegistrationNumberOrOtherIdentification,0,0,0,,upper_air,amdar,location_datetime,station,subset,to_value,0,string,,
 upper_air,amdar,311008,,0,latitude,0,0,0,,upper_air,amdar,location_datetime,latitude [degree],subset,to_value,0,float64,-90,90
 upper_air,amdar,311008,,0,longitude,0,0,0,,upper_air,amdar,location_datetime,longitude [degree],subset,to_value,0,float64,-180,180
 upper_air,amdar,311008,,0,flightLevel,0,0,0,,upper_air,amdar,location_datetime,flight level [m],subset,to_value,0,float64,0,32767
@@ -389,8 +389,8 @@ upper_air,amdar,311010,,0,aircraftRollAngleQuality,0,0,0,,upper_air,amdar,aircra
 upper_air,amdar,311010,,0,moistureQuality,0,0,0,,upper_air,amdar,moisture_quality,moisture quality,,,0,int32,0,32767
 upper_air,wind_profiler,301032,007006,0,heightAboveStation,0,0,0,,upper_air,wind_profiler,location_datetime,height [m],subset,,0,float64,0,32767
 upper_air,wind_profiler,301032,007006,0,heightOfStation,0,0,0,,upper_air,wind_profiler,location_datetime,height [m],subset,to_value_to_array,0,float64,-32768,32767
-upper_air,wind_profiler,301032,007006,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,wind_profiler,301032,007006,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,wind_profiler,301032,007006,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,wind_profiler,301032,007006,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,wind_profiler,301032,007006,0,latitude,0,0,0,,upper_air,wind_profiler,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,wind_profiler,301032,007006,0,longitude,0,0,0,,upper_air,wind_profiler,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
 upper_air,wind_profiler,301032,007006,0,year,0,0,0,,upper_air,wind_profiler,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
@@ -403,8 +403,8 @@ upper_air,wind_profiler,301032,007006,0,windDirection,0,0,0,,upper_air,wind_prof
 upper_air,wind_profiler,301032,007006,0,w,0,0,0,,upper_air,wind_profiler,w,w [m/s],subset,,0,float64,0,32767
 upper_air,wind_profiler,301032,007006,0,signalToNoiseRatio,0,0,0,,upper_air,wind_profiler,signal_to_noise_ratio,signal to noise ratio [dB],subset,,0,float64,0,32767
 upper_air,wind_profiler,301032,321022,0,height,0,0,0,,upper_air,wind_profiler,location_datetime,height [m],subset,,0,float64,0,32767
-upper_air,wind_profiler,301032,321022,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,wind_profiler,301032,321022,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,wind_profiler,301032,321022,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,wind_profiler,301032,321022,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,wind_profiler,301032,321022,0,latitude,0,0,0,,upper_air,wind_profiler,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,wind_profiler,301032,321022,0,longitude,0,0,0,,upper_air,wind_profiler,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
 upper_air,wind_profiler,301032,321022,0,year,0,0,0,,upper_air,wind_profiler,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
@@ -417,8 +417,8 @@ upper_air,wind_profiler,301032,321022,0,windDirection,0,0,0,,upper_air,wind_prof
 upper_air,wind_profiler,301032,321022,0,w,0,0,0,,upper_air,wind_profiler,w,w [m/s],subset,,0,float64,0,32767
 upper_air,wind_profiler,301032,321022,0,signalToNoiseRatio,0,0,0,,upper_air,wind_profiler,signal_to_noise_ratio,signal to noise ratio [dB],subset,,0,float64,0,32767
 upper_air,wind_profiler,301032,007007,0,height,0,0,0,,upper_air,wind_profiler,location_datetime,height [m],subset,,0,float64,0,32767
-upper_air,wind_profiler,301032,007007,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,wind_profiler,301032,007007,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,wind_profiler,301032,007007,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,wind_profiler,301032,007007,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,wind_profiler,301032,007007,0,latitude,0,0,0,,upper_air,wind_profiler,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,wind_profiler,301032,007007,0,longitude,0,0,0,,upper_air,wind_profiler,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
 upper_air,wind_profiler,301032,007007,0,year,0,0,0,,upper_air,wind_profiler,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
@@ -430,8 +430,8 @@ upper_air,wind_profiler,301032,007007,0,windSpeed,0,0,0,,upper_air,wind_profiler
 upper_air,wind_profiler,301032,007007,0,windDirection,0,0,0,,upper_air,wind_profiler,wind_direction,wind direction [degree],subset,,0,float64,0,360
 upper_air,wind_profiler,301032,007007,0,w,0,0,0,,upper_air,wind_profiler,w,w [m/s],subset,,0,float64,0,32767
 upper_air,wind_profiler,033002,007007,0,height,0,0,0,,upper_air,wind_profiler,location_datetime,height [m],subset,,0,float64,0,32767
-upper_air,wind_profiler,033002,007007,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,wind_profiler,033002,007007,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,wind_profiler,033002,007007,0,blockNumber,0,0,1000,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,wind_profiler,033002,007007,0,stationNumber,0,0,1,,upper_air,wind_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,wind_profiler,033002,007007,0,latitude,0,0,0,,upper_air,wind_profiler,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,wind_profiler,033002,007007,0,longitude,0,0,0,,upper_air,wind_profiler,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
 upper_air,wind_profiler,033002,007007,0,year,0,0,0,,upper_air,wind_profiler,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
@@ -443,8 +443,8 @@ upper_air,wind_profiler,033002,007007,0,windSpeed,0,0,0,,upper_air,wind_profiler
 upper_air,wind_profiler,033002,007007,0,windDirection,0,0,0,,upper_air,wind_profiler,wind_direction,wind direction [degree],subset,,0,float64,0,360
 upper_air,wind_profiler,033002,007007,0,w,0,0,0,,upper_air,wind_profiler,w,w [m/s],subset,,0,float64,0,32767
 upper_air,temperature_profiler,301032,321024,0,height,0,0,0,,upper_air,temperature_profiler,location_datetime,height [m],subset,,0,float64,0,32767
-upper_air,temperature_profiler,301032,321024,0,blockNumber,0,0,1000,,upper_air,temperature_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,temperature_profiler,301032,321024,0,stationNumber,0,0,1,,upper_air,temperature_profiler,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,temperature_profiler,301032,321024,0,blockNumber,0,0,1000,,upper_air,temperature_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,temperature_profiler,301032,321024,0,stationNumber,0,0,1,,upper_air,temperature_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,temperature_profiler,301032,321024,0,latitude,0,0,0,,upper_air,temperature_profiler,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,temperature_profiler,301032,321024,0,longitude,0,0,0,,upper_air,temperature_profiler,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
 upper_air,temperature_profiler,301032,321024,0,year,0,0,0,,upper_air,temperature_profiler,location_datetime,datetime,subset,to_value_to_array,0,timestamp,0,9999
@@ -456,8 +456,8 @@ upper_air,temperature_profiler,301032,321024,0,virtualTemperature,0,0,0,,upper_a
 upper_air,temperature_profiler,301032,321024,0,w,0,0,0,,upper_air,temperature_profiler,w,w [m/s],subset,,0,float64,0,32767
 upper_air,temperature_profiler,301032,321024,0,signalToNoiseRatio,0,0,0,,upper_air,temperature_profiler,signal_to_noise_ratio,signal to noise ratio [dB],subset,,0,float64,0,32767
 upper_air,temp,309052,,0,timePeriod,0,0,0,0,upper_air,temp,location_datetime,time period [s],subset,,0,float64,0,32767
-upper_air,temp,309052,,0,blockNumber,0,0,1000,,upper_air,temp,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,temp,309052,,0,stationNumber,0,0,1,,upper_air,temp,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,temp,309052,,0,blockNumber,0,0,1000,,upper_air,temp,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,temp,309052,,0,stationNumber,0,0,1,,upper_air,temp,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,temp,309052,,0,latitude,0,0,0,,upper_air,temp,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,temp,309052,,0,latitudeDisplacement,0,0,0,0,upper_air,temp,location_datetime,latitude [degree],subset,,0,float64,-32767,32767
 upper_air,temp,309052,,0,longitude,0,0,0,,upper_air,temp,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
@@ -476,7 +476,7 @@ upper_air,temp,309052,,0,windDirection,0,0,0,,upper_air,temp,wind_direction,wind
 upper_air,temp,309052,,0,windSpeed,0,0,0,,upper_air,temp,wind_speed,wind speed [m/s],subset,,0,float64,0,32767
 upper_air,temp,309052,,0,extendedVerticalSoundingSignificance,0,0,0,,upper_air,temp,extended_vertical_sounding_significance,extended_vertical_sounding_significance,subset,,0,int32,0,2147483647
 upper_air,temp_ship,309052,,0,timePeriod,0,0,0,,upper_air,temp_ship,location_datetime,time period [s],subset,,0,float64,0,32767
-upper_air,temp_ship,309052,,0,shipOrMobileLandStationIdentifier,0,0,0,,upper_air,temp_ship,location_datetime,ship id,subset,to_value_to_array,0,string,,
+upper_air,temp_ship,309052,,0,shipOrMobileLandStationIdentifier,0,0,0,,upper_air,temp_ship,location_datetime,station,subset,to_value_to_array,0,string,,
 upper_air,temp_ship,309052,,0,latitude,0,0,0,,upper_air,temp_ship,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,temp_ship,309052,,0,latitudeDisplacement,0,0,0,,upper_air,temp_ship,location_datetime,latitude [degree],subset,,0,float64,-32767,32767
 upper_air,temp_ship,309052,,0,longitude,0,0,0,,upper_air,temp_ship,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
@@ -495,8 +495,8 @@ upper_air,temp_ship,309052,,0,windDirection,0,0,0,,upper_air,temp_ship,wind_dire
 upper_air,temp_ship,309052,,0,windSpeed,0,0,0,,upper_air,temp_ship,wind_speed,wind speed [m/s],subset,,0,float64,0,32767
 upper_air,temp_ship,309052,,0,extendedVerticalSoundingSignificance,0,0,0,,upper_air,temp_ship,extended_vertical_sounding_significance,extended_vertical_sounding_significance,subset,,0,int32,0,2147483647
 upper_air,pilot,309051,,0,timePeriod,0,0,0,0,upper_air,pilot,location_datetime,time period [s],subset,,0,float64,0,32767
-upper_air,pilot,309051,,0,blockNumber,0,0,1000,,upper_air,pilot,location_datetime,station number,subset,to_value_to_array,0,int32,0,99
-upper_air,pilot,309051,,0,stationNumber,0,0,1,,upper_air,pilot,location_datetime,station number,subset,to_value_to_array,0,int32,0,999
+upper_air,pilot,309051,,0,blockNumber,0,0,1000,,upper_air,pilot,location_datetime,station,subset,to_value_to_array,0,int32,0,99
+upper_air,pilot,309051,,0,stationNumber,0,0,1,,upper_air,pilot,location_datetime,station,subset,to_value_to_array,0,int32,0,999
 upper_air,pilot,309051,,0,latitude,0,0,0,,upper_air,pilot,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,pilot,309051,,0,latitudeDisplacement,0,0,0,0,upper_air,pilot,location_datetime,latitude [degree],subset,,0,float64,-32767,32767
 upper_air,pilot,309051,,0,longitude,0,0,0,,upper_air,pilot,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
@@ -512,7 +512,7 @@ upper_air,pilot,309051,,0,windDirection,0,0,0,,upper_air,pilot,wind_direction,wi
 upper_air,pilot,309051,,0,windSpeed,0,0,0,,upper_air,pilot,wind_speed,wind speed [m/s],subset,,0,float64,0,32767
 upper_air,pilot,309051,,0,extendedVerticalSoundingSignificance,0,0,0,,upper_air,pilot,extended_vertical_sounding_significance,extended_vertical_sounding_significance,subset,,0,int32,0,2147483647
 upper_air,temp_drop,309053,,0,timePeriod,0,0,0,,upper_air,temp_drop,location_datetime,time period [s],subset,,0,float64,0,32767
-upper_air,temp_drop,309053,,0,aircraftFlightNumber,0,0,0,,upper_air,temp_drop,location_datetime,aircraft id,subset,to_value_to_array,0,string,,
+upper_air,temp_drop,309053,,0,aircraftFlightNumber,0,0,0,,upper_air,temp_drop,location_datetime,station,subset,to_value_to_array,0,string,,
 upper_air,temp_drop,309053,,0,latitude,0,0,0,,upper_air,temp_drop,location_datetime,latitude [degree],subset,to_value_to_array,0,float64,-90,90
 upper_air,temp_drop,309053,,0,latitudeDisplacement,0,0,0,,upper_air,temp_drop,location_datetime,latitude [degree],subset,,0,float64,-32767,32767
 upper_air,temp_drop,309053,,0,longitude,0,0,0,,upper_air,temp_drop,location_datetime,longitude [degree],subset,to_value_to_array,0,float64,-180,180
