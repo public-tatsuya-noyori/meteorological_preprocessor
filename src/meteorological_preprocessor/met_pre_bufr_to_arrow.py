@@ -237,8 +237,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     else:
                                         none_np = tmp_none_np
                             codes_release(bufr)
-                            if len(bufr_dict) == 0 or not True in none_np.tolist():
-                                print('Info', ':', 'len(bufr_dict) == 0 or not True in none_np.tolist().', in_file, file=sys.stderr)
+                            if len(bufr_dict) == 0:
                                 break
                             bufr_dict['none'] = none_np
                             location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
