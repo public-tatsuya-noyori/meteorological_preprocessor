@@ -94,8 +94,6 @@ def getArray(bufr, subset_num, subset_len, conf_row, in_file):
             if conf_row.slide > -1 and conf_row.step > 0:
                 array = array[conf_row.slide::conf_row.step]
     else:
-        if conf_row.output == 'location_datetime':
-            print('Info', ': sub ', 'can not get array.', conf_row.key, in_file, file=sys.stderr)
         array = np.array([])
     return array
 
@@ -166,7 +164,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 break
                             number_of_subsets = codes_get(bufr, 'numberOfSubsets')
                             if number_of_subsets == 0:
-                                print('Info', ':', 'number_of_subsets is 0.', unexpanded_descriptors, in_file, file=sys.stderr)
                                 break
                             try:
                                 codes_set(bufr, 'unpack', 1)
@@ -179,8 +176,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     number_of_array = 0
                                     for conf_row in descriptor_conf_df.itertuples():
                                         array = getArray(bufr, subset_num, number_of_subsets, conf_row, in_file)
-                                        if number_of_array == 0 and len(array) > 0:
-                                            number_of_array = len(array)
+                                        if number_of_array == 0:
+                                            if len(array) > 0:
+                                                number_of_array = len(array)
+                                            else:
+                                                break
                                         if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
                                             if len(array) > conf_row.array_index:
                                                 value = array[int(conf_row.array_index)]
