@@ -83,13 +83,15 @@ for minute_count in `seq ${move_index_minute}`; do
   move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H%M"`
 done
 pubsub_index_directory=4PubSub
+rclone_watch_seconds=3600
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] local_work_directory unique_job_name priority rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--watch rclone_watch_seconds] local_work_directory unique_job_name priority rclone_remote_bucket"; exit 0;;
+    "--watch" ) rclone_watch_seconds=$2;set +e;rclone_watch_seconds=`expr 0 + ${rclone_watch_seconds}`;set -e;shift;shift;;
   esac
 done
 if test -z $4; then

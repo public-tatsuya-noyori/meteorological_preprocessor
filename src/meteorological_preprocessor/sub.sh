@@ -343,6 +343,7 @@ job_directory=4Sub
 job_num=1
 job_period=60
 pubsub_index_directory=4PubSub
+rclone_watch_seconds=3600
 search_index_directory=4Search
 standard_output_processed_file=0
 backup_date_hour_pattern=${datetime_date}${datetime_hour}
@@ -363,9 +364,10 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--standard_output_processed_file] [--urgent] [--wildcard_index] local_work_directory unique_job_name priority 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub][;;backup_source_rclone_remote_bucket_main[;backup_source_rclone_remote_bucket_sub]]' parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--standard_output_processed_file] [--urgent] [--watch rclone_watch_seconds] [--wildcard_index] local_work_directory unique_job_name priority 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub][;;backup_source_rclone_remote_bucket_main[;backup_source_rclone_remote_bucket_sub]]' parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--standard_output_processed_file" ) standard_output_processed_file=1;shift;;
     "--urgent" ) urgent=1;shift;;
+    "--watch" ) rclone_watch_seconds=$2;set +e;rclone_watch_seconds=`expr 0 + ${rclone_watch_seconds}`;set -e;shift;shift;;
     "--wildcard_index" ) wildcard_index=1;file_from_option=--include-from;shift;;
   esac
 done

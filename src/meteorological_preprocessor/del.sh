@@ -54,11 +54,13 @@ delete() {
   return ${exit_code}
 }
 job_directory=4Del
+rclone_watch_seconds=3600
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--debug_shell] local_work_directory unique_job_name rclone_remote_bucket days_ago"; exit 0;;
+    "--help" ) echo "$0 [--debug_shell] [--watch rclone_watch_seconds] local_work_directory unique_job_name rclone_remote_bucket days_ago"; exit 0;;
+    "--watch" ) rclone_watch_seconds=$2;set +e;rclone_watch_seconds=`expr 0 + ${rclone_watch_seconds}`;set -e;shift;shift;;
   esac
 done
 if test -z $4; then
