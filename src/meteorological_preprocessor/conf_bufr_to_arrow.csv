@@ -444,7 +444,7 @@ upper_air,wind_profiler,033002,007007,0,minute,0,0,0,,upper_air,wind_profiler,lo
 upper_air,wind_profiler,033002,007007,0,windSpeed,0,0,0,,upper_air,wind_profiler,wind_speed,wind speed [m/s],subset,,0,float64,0,32767
 upper_air,wind_profiler,033002,007007,0,windDirection,0,0,0,,upper_air,wind_profiler,wind_direction,wind direction [degree],subset,,0,float64,0,360
 upper_air,wind_profiler,033002,007007,0,w,0,0,0,,upper_air,wind_profiler,w,w [m/s],subset,,0,float64,0,32767
-upper_air,wind_profiler,033022,007007,0,signalToNoiseRatio,0,0,0,,upper_air,wind_profiler,signal_to_noise_ratio,signal to noise ratio [dB],subset,,0,float64,0,32767
+upper_air,wind_profiler,033002,007007,0,signalToNoiseRatio,0,0,0,,upper_air,wind_profiler,signal_to_noise_ratio,signal to noise ratio [dB],subset,,0,float64,0,32767
 upper_air,temperature_profiler,301032,321024,0,height,0,0,0,,upper_air,temperature_profiler,location_datetime,height [m],subset,,0,float64,0,32767
 upper_air,temperature_profiler,301032,321024,0,blockNumber,0,0,1000,,upper_air,temperature_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,99
 upper_air,temperature_profiler,301032,321024,0,stationNumber,0,0,1,,upper_air,temperature_profiler,location_datetime,station,subset,to_value_to_array,0,int32,0,999
