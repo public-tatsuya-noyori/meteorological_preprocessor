@@ -182,8 +182,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if number_of_array == 0:
                                             number_of_array = len(array)
                                             if len(array) == 0:
-                                                print('Warning', warno, ':', 'len(array) is 0.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                                break
+                                                array = np.array([None for i in range(0, number_of_array)], dtype=object)
                                             else:
                                                 number_of_array = len(array)
                                         if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
