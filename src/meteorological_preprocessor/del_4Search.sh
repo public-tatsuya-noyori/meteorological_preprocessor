@@ -18,6 +18,29 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+watch(){
+  while -1; do
+    running=`ps ho 'pid' ${pid} | wc -l`
+    if test ${running} -eq 0; then
+      break
+    fi
+    for rclone_pid_etimes_comm in `ps --ppid ${pid} ho 'pid etimes comm' | sed -e 's|  *| |g' -e 's|^ ||g' | grep rclone$`; do
+      rclone_pid=`echo ${rclone_pid_etimes_comm} | cut -d' ' -f1`
+      etimes=`echo ${rclone_pid_etimes_comm} | cut -d' ' -f2`
+      set +e
+      etimes=`expr 0 + ${etimes}`
+      set -e
+      if test ${etimes} -gt ${rclone_watch_seconds}; then
+        set +e
+        kill ${rclone_pid}
+        set -e
+        echo "Error: killed rclone pid=${rclone_pid}" >&2
+      fi
+    done
+    sleep 1
+  done
+}
+
 delete_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
@@ -88,7 +111,6 @@ delete_4Search() {
   return ${exit_code}
 }
 bandwidth_limit_k_bytes_per_s=0
-cron=0
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
@@ -103,9 +125,8 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--cron" ) cron=1;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--cron] [--debug_shell] local_work_directory unique_job_name priority rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] local_work_directory unique_job_name priority rclone_remote_bucket"; exit 0;;
   esac
 done
 if test -z $4; then
@@ -128,18 +149,15 @@ if test -z "${rclone_remote_bucket}"; then
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${priority}
 mkdir -p ${work_directory}
-if test ${cron} -eq 1; then
-  if test -s ${work_directory}/pid.txt; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
-  else
-    running=0
-  fi
-  if test ${running} -eq 0; then
-    delete_4Search &
-    pid=$!
-    echo ${pid} > ${work_directory}/pid.txt
-    wait ${pid}
-  fi
+if test -s ${work_directory}/pid.txt; then
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
 else
-  delete_4Search
+  running=0
+fi
+if test ${running} -eq 0; then
+  delete_4Search &
+  pid=$!
+  echo ${pid} > ${work_directory}/pid.txt
+  watch &
+  wait ${pid}
 fi
