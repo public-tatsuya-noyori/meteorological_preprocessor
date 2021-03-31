@@ -1,54 +1,107 @@
-category,subcategory,location_datetime
-surface,synop,station
-surface,synop,latitude [degree]
-surface,synop,longitude [degree]
-surface,synop,height of station ground above mean sea level [m]
-surface,synop,datetime
-surface,ship,station
-surface,ship,latitude [degree]
-surface,ship,longitude [degree]
-surface,ship,datetime
-surface,moored_buoy,station
-surface,moored_buoy,latitude [degree]
-surface,moored_buoy,longitude [degree]
-surface,moored_buoy,datetime
-surface,drifting_buoy,station
-surface,drifting_buoy,latitude [degree]
-surface,drifting_buoy,longitude [degree]
-surface,drifting_buoy,datetime
-surface,gps_pwv,station
-surface,gps_pwv,latitude [degree]
-surface,gps_pwv,longitude [degree]
-surface,gps_pwv,height of station [m]
-surface,tesac,station
-surface,tesac,latitude [degree]
-surface,tesac,longitude [degree]
-surface,tesac,water pressure [Pa]
-upper_air,temp,station
-upper_air,temp,latitude [degree]
-upper_air,temp,longitude [degree]
-upper_air,temp,pressure [Pa]
-upper_air,temp_ship,station
-upper_air,temp_ship,latitude [degree]
-upper_air,temp_ship,longitude [degree]
-upper_air,temp_ship,pressure [Pa]
-upper_air,temp_drop,station
-upper_air,temp_drop,latitude [degree]
-upper_air,temp_drop,longitude [degree]
-upper_air,temp_drop,pressure [Pa]
-upper_air,pilot,station
-upper_air,pilot,latitude [degree]
-upper_air,pilot,longitude [degree]
-upper_air,pilot,pressure [Pa]
-upper_air,amdar,station
-upper_air,amdar,latitude [degree]
-upper_air,amdar,longitude [degree]
-upper_air,amdar,flight level [m]
-upper_air,wind_profiler,station
-upper_air,wind_profiler,latitude [degree]
-upper_air,wind_profiler,longitude [degree]
-upper_air,wind_profiler,height [m]
-upper_air,temperature_profiler,station
-upper_air,temperature_profiler,latitude [degree]
-upper_air,temperature_profiler,longitude [degree]
-upper_air,temperature_profiler,height [m]
+convert,category,subcategory,location_datetime
+alphanumeric_to_arrow,surface,synop,station
+alphanumeric_to_arrow,surface,synop,latitude [degree]
+alphanumeric_to_arrow,surface,synop,longitude [degree]
+alphanumeric_to_arrow,surface,synop,height of station ground above mean sea level [m]
+alphanumeric_to_arrow,surface,synop,datetime
+alphanumeric_to_arrow,surface,ship,station
+alphanumeric_to_arrow,surface,ship,latitude [degree]
+alphanumeric_to_arrow,surface,ship,longitude [degree]
+alphanumeric_to_arrow,surface,ship,datetime
+alphanumeric_to_arrow,surface,moored_buoy,station
+alphanumeric_to_arrow,surface,moored_buoy,latitude [degree]
+alphanumeric_to_arrow,surface,moored_buoy,longitude [degree]
+alphanumeric_to_arrow,surface,moored_buoy,datetime
+alphanumeric_to_arrow,surface,drifting_buoy,station
+alphanumeric_to_arrow,surface,drifting_buoy,latitude [degree]
+alphanumeric_to_arrow,surface,drifting_buoy,longitude [degree]
+alphanumeric_to_arrow,surface,drifting_buoy,datetime
+alphanumeric_to_arrow,surface,gps_pwv,station
+alphanumeric_to_arrow,surface,gps_pwv,latitude [degree]
+alphanumeric_to_arrow,surface,gps_pwv,longitude [degree]
+alphanumeric_to_arrow,surface,gps_pwv,height of station [m]
+alphanumeric_to_arrow,surface,tesac,station
+alphanumeric_to_arrow,surface,tesac,latitude [degree]
+alphanumeric_to_arrow,surface,tesac,longitude [degree]
+alphanumeric_to_arrow,surface,tesac,water pressure [Pa]
+alphanumeric_to_arrow,upper_air,temp,station
+alphanumeric_to_arrow,upper_air,temp,latitude [degree]
+alphanumeric_to_arrow,upper_air,temp,longitude [degree]
+alphanumeric_to_arrow,upper_air,temp,pressure [Pa]
+alphanumeric_to_arrow,upper_air,temp_ship,station
+alphanumeric_to_arrow,upper_air,temp_ship,latitude [degree]
+alphanumeric_to_arrow,upper_air,temp_ship,longitude [degree]
+alphanumeric_to_arrow,upper_air,temp_ship,pressure [Pa]
+alphanumeric_to_arrow,upper_air,temp_drop,station
+alphanumeric_to_arrow,upper_air,temp_drop,latitude [degree]
+alphanumeric_to_arrow,upper_air,temp_drop,longitude [degree]
+alphanumeric_to_arrow,upper_air,temp_drop,pressure [Pa]
+alphanumeric_to_arrow,upper_air,pilot,station
+alphanumeric_to_arrow,upper_air,pilot,latitude [degree]
+alphanumeric_to_arrow,upper_air,pilot,longitude [degree]
+alphanumeric_to_arrow,upper_air,pilot,pressure [Pa]
+alphanumeric_to_arrow,upper_air,amdar,station
+alphanumeric_to_arrow,upper_air,amdar,latitude [degree]
+alphanumeric_to_arrow,upper_air,amdar,longitude [degree]
+alphanumeric_to_arrow,upper_air,amdar,flight level [m]
+alphanumeric_to_arrow,upper_air,wind_profiler,station
+alphanumeric_to_arrow,upper_air,wind_profiler,latitude [degree]
+alphanumeric_to_arrow,upper_air,wind_profiler,longitude [degree]
+alphanumeric_to_arrow,upper_air,wind_profiler,height [m]
+alphanumeric_to_arrow,upper_air,temperature_profiler,station
+alphanumeric_to_arrow,upper_air,temperature_profiler,latitude [degree]
+alphanumeric_to_arrow,upper_air,temperature_profiler,longitude [degree]
+alphanumeric_to_arrow,upper_air,temperature_profiler,height [m]
+bufr_to_arrow,surface,synop,station
+bufr_to_arrow,surface,synop,latitude [degree]
+bufr_to_arrow,surface,synop,longitude [degree]
+bufr_to_arrow,surface,synop,height of station ground above mean sea level [m]
+bufr_to_arrow,surface,synop,datetime
+bufr_to_arrow,surface,ship,station
+bufr_to_arrow,surface,ship,latitude [degree]
+bufr_to_arrow,surface,ship,longitude [degree]
+bufr_to_arrow,surface,ship,datetime
+bufr_to_arrow,surface,moored_buoy,station
+bufr_to_arrow,surface,moored_buoy,latitude [degree]
+bufr_to_arrow,surface,moored_buoy,longitude [degree]
+bufr_to_arrow,surface,moored_buoy,datetime
+bufr_to_arrow,surface,drifting_buoy,station
+bufr_to_arrow,surface,drifting_buoy,latitude [degree]
+bufr_to_arrow,surface,drifting_buoy,longitude [degree]
+bufr_to_arrow,surface,drifting_buoy,datetime
+bufr_to_arrow,surface,gps_pwv,station
+bufr_to_arrow,surface,gps_pwv,latitude [degree]
+bufr_to_arrow,surface,gps_pwv,longitude [degree]
+bufr_to_arrow,surface,gps_pwv,height of station [m]
+bufr_to_arrow,surface,tesac,station
+bufr_to_arrow,surface,tesac,latitude [degree]
+bufr_to_arrow,surface,tesac,longitude [degree]
+bufr_to_arrow,surface,tesac,water pressure [Pa]
+bufr_to_arrow,upper_air,temp,station
+bufr_to_arrow,upper_air,temp,latitude [degree]
+bufr_to_arrow,upper_air,temp,longitude [degree]
+bufr_to_arrow,upper_air,temp,pressure [Pa]
+bufr_to_arrow,upper_air,temp_ship,station
+bufr_to_arrow,upper_air,temp_ship,latitude [degree]
+bufr_to_arrow,upper_air,temp_ship,longitude [degree]
+bufr_to_arrow,upper_air,temp_ship,pressure [Pa]
+bufr_to_arrow,upper_air,temp_drop,station
+bufr_to_arrow,upper_air,temp_drop,latitude [degree]
+bufr_to_arrow,upper_air,temp_drop,longitude [degree]
+bufr_to_arrow,upper_air,temp_drop,pressure [Pa]
+bufr_to_arrow,upper_air,pilot,station
+bufr_to_arrow,upper_air,pilot,latitude [degree]
+bufr_to_arrow,upper_air,pilot,longitude [degree]
+bufr_to_arrow,upper_air,pilot,pressure [Pa]
+bufr_to_arrow,upper_air,amdar,station
+bufr_to_arrow,upper_air,amdar,latitude [degree]
+bufr_to_arrow,upper_air,amdar,longitude [degree]
+bufr_to_arrow,upper_air,amdar,flight level [m]
+bufr_to_arrow,upper_air,wind_profiler,station
+bufr_to_arrow,upper_air,wind_profiler,latitude [degree]
+bufr_to_arrow,upper_air,wind_profiler,longitude [degree]
+bufr_to_arrow,upper_air,wind_profiler,height [m]
+bufr_to_arrow,upper_air,temperature_profiler,station
+bufr_to_arrow,upper_air,temperature_profiler,latitude [degree]
+bufr_to_arrow,upper_air,temperature_profiler,longitude [degree]
+bufr_to_arrow,upper_air,temperature_profiler,height [m]
