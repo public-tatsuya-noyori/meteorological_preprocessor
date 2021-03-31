@@ -149,6 +149,12 @@ def get99LaLaLa_QcLoLoLoLo(token1, token2, elem_dict):
 
 def getYYGGiw(token, dt_str, in_file, elem_dict, debug):
     warno = 187
+    if not re.search(r'^([0-2][0-9]|3[0-1])([01][0-9]|2[0-3])[0-9/]$', token):
+        if datetime_name in elem_dict:
+            elem_dict.pop(datetime_name)
+        if debug:
+            print('Debug', ':', 'YYGG in', in_file, 'does not match ^([0-2][0-9]|3[0-1])([01][0-9]|2[0-3])[0-9/]$', file=sys.stderr)
+        return elem_dict
     if not dt_str[6:10] == token[0:4]:
         yesterday_dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) - timedelta(days=1)
         if dt_str[6:8] == token[0:2] or yesterday_dt.strftime('%d') == token[0:2]:
