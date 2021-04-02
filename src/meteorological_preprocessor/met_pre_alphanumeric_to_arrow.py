@@ -157,8 +157,13 @@ def getYYGGiw(token, dt_str, in_file, elem_dict, debug):
         return elem_dict
     if not dt_str[6:10] == token[0:4]:
         yesterday_dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) - timedelta(days=1)
-        if dt_str[6:8] == token[0:2] or yesterday_dt.strftime('%d') == token[0:2]:
+        tomorrow_dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(days=1)
+        if dt_str[6:8] == token[0:2]:
             elem_dict[datetime_name] = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(token[0:2]), int(token[2:4]), 0, 0, 0, tzinfo=timezone.utc)
+        elif yesterday_dt.strftime('%d') == token[0:2]:
+            elem_dict[datetime_name] = datetime(yesterday_dt.year, yesterday_dt.month, int(token[0:2]), int(token[2:4]), 0, 0, 0, tzinfo=timezone.utc)
+        elif tomorrow_dt.strftime('%d') == token[0:2]:
+            elem_dict[datetime_name] = datetime(tomorrow_dt.year, tomorrow_dt.month, int(token[0:2]), int(token[2:4]), 0, 0, 0, tzinfo=timezone.utc)
         else:
             if datetime_name in elem_dict:
                 elem_dict.pop(datetime_name)
@@ -210,7 +215,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 if re.search(r'^(STORM|SPREP) [0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
                                     line = re.sub('^(STORM|SPREP) ', '', line)
                                 if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
-                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9A-Z]+  *NIL *$', line) and not re.search(r'^BBXX$', line):
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9A-Z]+  *NIL=* *$', line) and not re.search(r'^BBXX$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
@@ -224,7 +229,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 sc_num = 0
                             elif subcat == 'synop_mobil':
                                 if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
-                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9A-Z]+  *NIL *$', line) and not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9A-Z]+  *NIL=* *$', line) and not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
@@ -243,7 +248,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                     initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict, debug)
                                     continue
                                 elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
-                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL *$', line) and not re.search(r'^[0-9]{5}  *NIL *$', line):
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9]{5}  *NIL=* *$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue

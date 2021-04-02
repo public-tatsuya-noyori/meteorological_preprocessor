@@ -75,6 +75,8 @@ if test ! -s download_${priority}_closed/aria2c.log; then
 fi
 grep "ETag:" download_${priority}_closed/aria2c.log | tail -1 | cut -d' ' -f2 > download_${priority}_closed/etag.txt
 if test -s download_${priority}_closed/created.txt; then
+  cat download_${priority}_closed/created.txt | grep -v "/A_ISXX[0-9][0-9]EUSR" | grep -v "/A_P" | sort -u > download_${priority}_closed/created.txt.tmp
+  mv -f download_${priority}_closed/created.txt.tmp download_${priority}_closed/created.txt
   if test ! -s download_${priority}_closed/created.txt; then
     exit 0
   fi
@@ -93,7 +95,7 @@ if test -s download_${priority}_closed/created.txt; then
     fi
   done
   if test -s download_${priority}_closed/cached/${now}.txt.tmp; then
-    cat download_${priority}_closed/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v ecCodes | uniq > download_${priority}_closed/cached/${now}.txt
+    cat download_${priority}_closed/cached/${now}.txt.tmp | grep -v ecCodes | uniq > download_${priority}_closed/cached/${now}.txt
     if test ! -s download_${priority}_closed/cached/${now}.txt; then
       rm -f download_${priority}_closed/cached/${now}.txt
     fi

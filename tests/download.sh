@@ -73,7 +73,7 @@ if test ! -s download_${priority}/aria2c.log; then
 fi
 grep "ETag:" download_${priority}/aria2c.log | tail -1 | cut -d' ' -f2 > download_${priority}/etag.txt
 if test -s download_${priority}/created.txt; then
-  cat download_${priority}/created.txt | grep -v "/A_ISXX[0-9][0-9]EUSR" | sort -u > download_${priority}/created.txt.tmp
+  cat download_${priority}/created.txt | grep -v "/A_ISXX[0-9][0-9]EUSR" | grep -v "/A_P" | sort -u > download_${priority}/created.txt.tmp
   mv -f download_${priority}/created.txt.tmp download_${priority}/created.txt
   if test ! -s download_${priority}/created.txt; then
     exit 0
@@ -84,7 +84,7 @@ if test -s download_${priority}/created.txt; then
     rm -rf download_${priority}/downloaded download_${priority}/aria2c.log download_${priority}/get_file_stdout.txt
     mkdir -p download_${priority}/downloaded
     aria2c --check-certificate=false -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l download_${priority}/aria2c.log -i download_${priority}/created.txt -d download_${priority}/downloaded >> download_${priority}/get_file_stdout.txt
-    ./met_pre_batch_to_cache.py RJTD download_${priority}/downloaded cache_o 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
+    ./met_pre_batch_to_cache.py RJTD download_${priority}/downloaded cache_o download_${priority}/checksum.feather 1>> download_${priority}/cached/${now}.txt.tmp 2>> download_${priority}/met_pre_batch_to_cache.log
     grep -F '[ERROR]' download_${priority}/aria2c.log | grep 'URI=' | sed -e 's/^.*URI=//g' | grep -v '^ *$' | sort -u > download_${priority}/created.txt
     if test -s download_${priority}/created.txt; then
       created_num=`cat download_${priority}/created.txt | wc -l`
@@ -93,7 +93,7 @@ if test -s download_${priority}/created.txt; then
     fi
   done
   if test -s download_${priority}/cached/${now}.txt.tmp; then
-    cat download_${priority}/cached/${now}.txt.tmp | grep -v "/A_P" | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
+    cat download_${priority}/cached/${now}.txt.tmp | grep -v ecCodes | uniq > download_${priority}/cached/${now}.txt
     if test ! -s download_${priority}/cached/${now}.txt; then
       rm -f download_${priority}/cached/${now}.txt
     fi

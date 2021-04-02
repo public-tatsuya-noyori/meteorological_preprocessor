@@ -76,18 +76,8 @@ if test ! -s download_${priority}_closed/aria2c.log; then
 fi
 grep "ETag:" download_${priority}_closed/aria2c.log | tail -1 | cut -d' ' -f2 > download_${priority}_closed/etag.txt
 if test -s download_${priority}_closed/created.txt; then
-  set +e
-  if test -n "${ex_pattern}" -a -n "${in_pattern}"; then
-    grep -v -E "${ex_pattern}" download_${priority}_closed/created.txt | grep "${in_pattern}" > download_${priority}_closed/tmp_created.txt
-    mv -f download_${priority}_closed/tmp_created.txt download_${priority}_closed/created.txt
-  elif test -n "${in_pattern}"; then
-    grep -E "${ex_pattern}" download_${priority}_closed/created.txt > download_${priority}_closed/tmp_created.txt
-    mv -f download_${priority}_closed/tmp_created.txt download_${priority}_closed/created.txt
-  elif test -n "${ex_pattern}"; then
-    grep -v -E "${ex_pattern}" download_${priority}_closed/created.txt > download_${priority}_closed/tmp_created.txt
-    mv -f download_${priority}_closed/tmp_created.txt download_${priority}_closed/created.txt
-  fi
-  set -e
+  cat download_${priority}_closed/created.txt | grep -v "/A_ISXX[0-9][0-9]EUSR" | grep -v "/A_P" | sort -u > download_${priority}_closed/created.txt.tmp
+  mv -f download_${priority}_closed/created.txt.tmp download_${priority}_closed/created.txt
   if ! test -s download_${priority}_closed/created.txt; then
     exit 0
   fi
