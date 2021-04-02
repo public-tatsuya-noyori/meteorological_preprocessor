@@ -95,12 +95,12 @@ def getsnTTT(token, elem_dict, elem_name):
 def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
     if token1[0:1] != '/':
         elem_dict[total_cloud_name] = int(token1[0:1])
-    if token1[1:3] == '//' or token1[1:3] == '99':
-        wind_direction = -1
-    elif token1[1:3] == '36':
+    if re.match(r'^[38]6$', token1[1:3]):
         wind_direction = 0
+    elif re.match(r'^([0-25-7][0-9]|[38][0-5])$', token1[1:3]):
+        wind_direction = int(token1[1:3])
     else:
-        wind_direction = int(token1[1:3]) * 10
+        wind_direction = -1
     if token1[3:5] == '//':
         wind_speed = -1
     else:
@@ -109,6 +109,7 @@ def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
         wind_speed = int(token2[2:5])
     elif wind_direction > 49 and wind_speed > -1:
         wind_speed = wind_speed + 100
+        wind_direction = wind_direction - 50
     if wind_direction >= 0:
         if wind_speed == 0:
             wind_direction = 0
@@ -119,7 +120,7 @@ def getNddff_00fff(token1, token2, wind_multiply, elem_dict):
         if wind_speed == 0:
             elem_dict[wind_direction_name] = 0
         elif wind_direction > 0:
-            elem_dict[wind_direction_name] = wind_direction
+            elem_dict[wind_direction_name] = wind_direction * 10
     return elem_dict
 
 def getiRixhVV(token, elem_dict):
@@ -187,18 +188,19 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
     out_subcat = ''
     if cat == 'surface':
         if subcat == 'synop' or subcat == 'ship' or subcat == 'synop_mobil':
-            if not re.search(r' (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) ', text):
-                if debug:
-                    print('Debug', ':', in_file, 'does not match "(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)".', file=sys.stderr)
+            if not re.search(r' *(AAXX +[0-9]{4}[0-9/]|BBXX|OOXX) *', text):
+                if len(text.split('\n')) > 2:
+                    if debug:
+                        print('Debug', ':', in_file, 'does not match " *(AAXX +[0-9]{4}[0-9/]|BBXX|OOXX) *".', file=sys.stderr)
                 return {}, {}
-            text = re.sub('\n$', '', re.sub(' *\n *', '\n', re.sub('( (AAXX [0-9]{4}[0-9/]|BBXX|OOXX) )', r'\n\1\n', text.replace('=', '\n'))))
+            text = re.sub('\n$', '', re.sub(' *\n *', '\n', re.sub('( *(AAXX [0-9]{4}[0-9/]|BBXX|OOXX) *)', r'\n\1\n', text.replace('=', '\n'))))
             elem_dict = {}
             initialized_elem_dict = {}
             for line_num, line in enumerate(text.split('\n')):
                 if line_num == 1:
-                    if not re.search(r'^(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)$', line):
+                    if not re.search(r'^(AAXX +[0-9]{4}[0-9/]|BBXX|OOXX)$', line):
                         if debug:
-                            print('Debug', ':', 'The', line_num, 'line of', in_file, 'does not match "(AAXX [0-9]{4}[0-9/]|BBXX|OOXX)".', file=sys.stderr)
+                            print('Debug', ':', 'The', line_num, 'line of', in_file, 'does not match "(AAXX +[0-9]{4}[0-9/]|BBXX|OOXX)".', file=sys.stderr)
                         return {}, {}
                     line_token_list = line.split(' ')
                     if subcat == 'synop' and line_token_list[0] == 'AAXX':
@@ -212,9 +214,9 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                             sc_num = -1
                             rest_token_list = []
                             if subcat == 'ship':
-                                if re.search(r'^(STORM|SPREP) [0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                if re.search(r'^(STORM|SPREP) [0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]{5}.*$', line):
                                     line = re.sub('^(STORM|SPREP) ', '', line)
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]{5}.*$', line):
                                     if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9A-Z]+  *NIL=* *$', line) and not re.search(r'^BBXX$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
@@ -228,8 +230,8 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 rest_token_list = line_token_list[4:]
                                 sc_num = 0
                             elif subcat == 'synop_mobil':
-                                if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
-                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9A-Z]+  *NIL=* *$', line) and not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                if not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} [0-8][0-9]{3}[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]{5}.*$', line):
+                                    if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9A-Z]+  *NIL=* *$', line) and not re.search(r'^OOXX$', line) and not re.search(r'^[0-9A-Z]+ [0-9]{4}[0-9/] 99([0-8][0-9]{2}|900) [1357](0[0-9]{3}|1[0-7][0-9]{2}|1800) [0-5][0-9]{2}[0-9]{2} ////[1256] [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]{5}.*$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
                                     continue
@@ -243,11 +245,11 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 rest_token_list = line_token_list[6:]
                                 sc_num = 0
                             elif subcat == 'synop':
-                                if re.search(r'^AAXX [0-9]{4}[0-9/]$', line):
+                                if re.search(r'^AAXX +[0-9]{4}[0-9/]$', line):
                                     line_token_list = line.split(' ')
                                     initialized_elem_dict = getYYGGiw(line_token_list[1], dt_str, in_file, initialized_elem_dict, debug)
                                     continue
-                                elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]([0-2][0-9]|3[0-6]|//|99)([0-9]{2}|//).*$', line):
+                                elif not re.search(r'^[0-9]{5} [0-4][1-7][0-9/]([0-9]{2}|//) [0-9/]{5}.*$', line):
                                     if not re.search(r'^ *$', line) and not re.search(r'^ *NIL=* *$', line) and not re.search(r'^[0-9]{5}  *NIL=* *$', line):
                                         if debug:
                                             print('Debug', ':', line, 'of', in_file, 'does not match.', file=sys.stderr)
@@ -268,7 +270,7 @@ def parse(cccc, cat, subcat, output_cat, output_subcat, in_file, message, dt_str
                                 if sc_num < 10 and re.match(r'^[0-4][1-7][0-9/]([0-9]{2}|//)', token):
                                     elem_dict = getiRixhVV(token, elem_dict)
                                     sc_num = 10
-                                elif sc_num < 11 and re.match(r'^[0-9/]([0-2][0-9]|3[0-5]|//)([0-9]{2}|//)', token):
+                                elif sc_num < 11 and re.match(r'^[0-9/]{5}', token):
                                     if len(rest_token_list) > token_num + 1:
                                         elem_dict = getNddff_00fff(token, rest_token_list[token_num + 1], elem_dict[wind_multiply_name], elem_dict)
                                     else:
