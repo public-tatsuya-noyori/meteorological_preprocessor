@@ -31,7 +31,7 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv, feather
 from eccodes import *
 
-def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
+def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, is_location, debug):
     warno = 189
     out_arrows = []
     now = datetime.utcnow()
@@ -103,6 +103,27 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     if not ft in ft_list:
                                         ft_list.append(ft)
                                     property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)] = np.array(codes_get_values(gid))
+                                if is_location:
+                                    iterid = codes_grib_iterator_new(gid, 0)
+                                    lat_list = []
+                                    lon_list = []
+                                    while True:
+                                        latitude_longitude_value = codes_grib_iterator_next(iterid)
+                                        if not latitude_longitude_value:
+                                            break
+                                        else:
+                                            lat_list.append(latitude_longitude_value[0])
+                                            lon_list.append(latitude_longitude_value[1])
+                                    codes_grib_iterator_delete(iterid)
+                                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
+                                    out_directory = '/'.join(out_directory_list)
+                                    os.makedirs(out_directory, exist_ok=True)
+                                    out_file_list = [out_directory, '/location.feather']
+                                    out_file = ''.join(out_file_list)
+                                    with open(out_file, 'bw') as out_f:
+                                        location_batch = pa.record_batch([pa.array(lat_list, 'float32'), pa.array(lon_list, 'float32')], names=['latitude [degree]', 'longitude [degree]'])
+                                        location_table = pa.Table.from_batches([location_batch])
+                                        feather.write_feather(location_table, out_f, compression='zstd')
                                 codes_release(gid)
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
@@ -136,6 +157,7 @@ def main():
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
+    parser.add_argument("--location", action='store_true')
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     config = pkg_resources.resource_filename(__name__, 'conf_grib_to_arrow.csv')
@@ -173,7 +195,7 @@ def main():
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_df = csv.read_csv(config).to_pandas()
-        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.debug)
+        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.location, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

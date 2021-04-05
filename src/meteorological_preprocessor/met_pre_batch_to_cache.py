@@ -190,7 +190,6 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                             bufr = codes_bufr_new_from_file(bufr_file_stream)
                             if bufr is None:
                                 break
-                            codes_set(bufr, 'unpack', 1)
                             year = codes_get_array(bufr, 'typicalYear')[0]
                             month = codes_get_array(bufr, 'typicalMonth')[0]
                             day = codes_get_array(bufr, 'typicalDay')[0]
