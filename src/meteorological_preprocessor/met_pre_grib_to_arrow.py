@@ -31,12 +31,12 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv, feather
 from eccodes import *
 
-def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, is_location, debug):
+def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, write_location, debug):
     warno = 189
     out_arrows = []
     now = datetime.utcnow()
-    create_datetime_directory_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2)]
-    create_datetime_directory = ''.join(create_datetime_directory_list)
+    create_datetime_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2)]
+    create_datetime = ''.join(create_datetime_list)
     cccc_set = set([re.sub('^.*/', '', re.sub('/grib/.*$', '', in_file)) for in_file in in_file_list])
     cat_subcat_set = set([re.search(r'^[^/]*/[^/]*/', re.sub('^.*/grib/', '', in_file)).group().rstrip('/') for in_file in in_file_list])
     for cccc in cccc_set:
@@ -58,7 +58,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, is_
                 elif not os.access(in_file, os.R_OK):
                     print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
                     continue
-                datetime_directory = re.sub('/.*$', '', re.sub('^.*/' + cccc + '/grib/' + cat_subcat + '/', '', in_file))
+                dt_str = re.sub('/.*$', '', re.sub('^.*/' + cccc + '/grib/' + cat_subcat + '/', '', in_file))
                 with open(in_file, 'r') as in_file_stream:
                     if debug:
                         print('Debug', ':', in_file, file=sys.stderr)
@@ -103,7 +103,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, is_
                                     if not ft in ft_list:
                                         ft_list.append(ft)
                                     property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)] = np.array(codes_get_values(gid))
-                                if is_location:
+                                if write_location:
                                     iterid = codes_grib_iterator_new(gid, 0)
                                     lat_list = []
                                     lon_list = []
@@ -128,27 +128,35 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, is_
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
                 if len(property_dict) > 0:
-                    now = datetime.utcnow()
-                    create_datetime_directory_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2)]
-                    create_datetime_directory = ''.join(create_datetime_directory_list)
-                    for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
-                        for ft in ft_list:
+
+                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
+                    out_directory = '/'.join(out_directory_list)
+                    os.makedirs(out_directory, exist_ok=True)
+                    out_file_list = [out_directory, '/location.feather']
+                    out_file = ''.join(out_file_list)
+                    location_df = feather.read_feather(out_file)
+                    dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
+                    dt_list = [dt for i in range(0, len(location_df.index))]
+                    for ft in ft_list:
+                        name_list = ['latitude [degree]', 'longitude [degree]', 'datetime']
+                        data_list = [location_df['latitude [degree]'].values.tolist(), location_df['longitude [degree]'].values.tolist()]
+                        data_list.append(pa.array(dt_list, pa.timestamp('ms', tz='utc')))
+                        for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
                             if len(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]) > 0:
-                                property_data = []
                                 value_list = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]
-                                id_list = range(len(value_list))
-                                property_name_list = [conf_row.name]
-                                property_data.append(pa.array(value_list, conf_row.datatype))
-                                out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory, datetime_directory, create_datetime_directory, ft]
-                                out_directory = '/'.join(out_directory_list)
-                                os.makedirs(out_directory, exist_ok=True)
-                                out_file_list = [out_directory, '/', conf_row.output, '.feather']
-                                out_file = ''.join(out_file_list)
-                                with open(out_file, 'bw') as out_f:
-                                    property_batch = pa.record_batch(property_data, names=property_name_list)
-                                    property_table = pa.Table.from_batches([property_batch])
-                                    feather.write_feather(property_table, out_f, compression='zstd')
-                                    print(out_file, file=out_list_file)
+                                name_list.append(conf_row.name)
+                                data_list.append(pa.array(value_list, conf_row.datatype))
+
+                        out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
+                        out_directory = '/'.join(out_directory_list)
+                        os.makedirs(out_directory, exist_ok=True)
+                        out_file_list = [out_directory, '/', dt_str, '_', ft, '_', create_datetime, '.feather']
+                        out_file = ''.join(out_file_list)
+                        with open(out_file, 'bw') as out_f:
+                            property_batch = pa.record_batch(data_list, names=name_list)
+                            property_table = pa.Table.from_batches([property_batch])
+                            feather.write_feather(property_table, out_f, compression='zstd')
+                            print(out_file, file=out_list_file)
 
 def main():
     errno=198
@@ -157,7 +165,7 @@ def main():
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
-    parser.add_argument("--location", action='store_true')
+    parser.add_argument("--write_location", action='store_true')
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     config = pkg_resources.resource_filename(__name__, 'conf_grib_to_arrow.csv')
@@ -195,7 +203,7 @@ def main():
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_df = csv.read_csv(config).to_pandas()
-        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.location, args.debug)
+        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.write_location, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
