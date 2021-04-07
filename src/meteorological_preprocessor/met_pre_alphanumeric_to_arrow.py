@@ -151,6 +151,7 @@ def get99LaLaLa_QcLoLoLoLo(token1, token2, elem_dict):
 def getYYGGiw(token, dt_str, in_file, elem_dict, debug):
     warno = 187
     if not re.search(r'^([0-2][0-9]|3[0-1])([01][0-9]|2[0-3])[0-9/]$', token):
+        elem_dict[wind_multiply_name] = -1.0
         if datetime_name in elem_dict:
             elem_dict.pop(datetime_name)
         if debug:
