@@ -44,7 +44,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
     new_id_etfo_dict = {}
     del_etfo_id_dict = {}
     out_file_dict = {}
-    convert_cat_subcat_set = set([re.sub(r'/C_[A-Z]{4}_[0-9]*\.feather$', '', re.search(r'[^/]*/[^/]*/[^/]*/[^/]*\.feather$', in_file).group()) for in_file in in_file_list])
+    convert_cat_subcat_set = set([re.sub(r'/[^/]*C_[A-Z]{4}_[0-9]*\.feather$', '', re.search(r'[^/]*/[^/]*/[^/]*/[^/]*\.feather$', in_file).group()) for in_file in in_file_list])
     for convert_cat_subcat in convert_cat_subcat_set:
         convert_cat_subcat_match = re.search(r'^([^/]*)/([^/]*)/([^/]*)$', convert_cat_subcat)
         convert = convert_cat_subcat_match.group(1)
@@ -52,7 +52,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
         subcat = convert_cat_subcat_match.group(3)
         convert_cat_subcat_df = conf_df[(conf_df['convert'] == convert) & (conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
         for in_file in in_file_list:
-            match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/' + convert_cat_subcat+ '/C_([A-Z]{4})_([0-9]*)\.feather$', in_file)
+            match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/' + convert_cat_subcat+ '/[^/]*C_([A-Z]{4})_([0-9]*)\.feather$', in_file)
             if not match:
                 continue
             if debug:
