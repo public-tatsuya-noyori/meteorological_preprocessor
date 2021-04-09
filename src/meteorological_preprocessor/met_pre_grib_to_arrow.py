@@ -113,7 +113,10 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                             break
                                         else:
                                             lat_list.append(latitude_longitude_value[0])
-                                            lon_list.append(latitude_longitude_value[1])
+                                            if latitude_longitude_value[1] < 180.0:
+                                                lon_list.append(latitude_longitude_value[1])
+                                            else:
+                                                lon_list.append(latitude_longitude_value[1] - 360.0)
                                     codes_grib_iterator_delete(iterid)
                                     out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
                                     out_directory = '/'.join(out_directory_list)
