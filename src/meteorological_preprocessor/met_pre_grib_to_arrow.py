@@ -145,16 +145,17 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                         data_list.append(pa.array(dt_list, pa.timestamp('ms', tz='utc')))
                         for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
                             if len(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]) > 0:
-                                if re.match(r'U wind component',, conf_row.name):
+                                if re.match(r'^.*U wind component.*$', conf_row.name):
                                     u_value_np = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]
                                     v_value_np = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName.replace('u', 'v'), ft)]
                                     wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
-                                    wind_direction_np = np.degrees(np.atan2(v_value_np, u_value_np))
+                                    wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
+                                    wind_direction_np = np.array([value + 360.0 if value < 0 else value for value in wind_direction_np])
                                     name_list.append(re.sub(r'U wind component', 'wind speed [m/s]', conf_row.name))
                                     data_list.append(pa.array(wind_speed_np, conf_row.datatype))
                                     name_list.append(re.sub(r'U wind component', 'wind direction [degree]', conf_row.name))
                                     data_list.append(pa.array(wind_direction_np, conf_row.datatype))
-                                elif not re.match(r'V wind component',, conf_row.name):
+                                elif not re.match(r'^.*V wind component.*$', conf_row.name):
                                     value_list = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]
                                     name_list.append(conf_row.name)
                                     data_list.append(pa.array(value_list, conf_row.datatype))
