@@ -1,6 +1,6 @@
 category,subcategory,stepRange,typeOfLevel,level,shortName,name,datatype
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10u,10 metre U wind component [m/s],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10v,10 metre V wind component [m/s],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10u,10 metre U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10v,10 metre V wind component,float32
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"2",2t,2 metre temperature [K],float32
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"2",2r,2 metre relative humidity [%],float32
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",surface,"0",sp,surface pressure [Pa],float32
