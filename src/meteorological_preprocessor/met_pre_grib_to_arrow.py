@@ -139,7 +139,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                     dt_list = [dt for i in range(0, len(location_df.index))]
                     for ft in ft_list:
                         name_list = ['latitude [degree]', 'longitude [degree]', 'datetime']
-                        data_list = [location_df['latitude [degree]'].values.tolist(), location_df['longitude [degree]'].values.tolist()]
+                        data_list = [pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32')]
                         data_list.append(pa.array(dt_list, pa.timestamp('ms', tz='utc')))
                         for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
                             if len(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]) > 0:
