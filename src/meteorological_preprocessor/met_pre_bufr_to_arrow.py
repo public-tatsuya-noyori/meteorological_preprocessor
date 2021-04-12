@@ -90,7 +90,7 @@ def getArray(bufr, subset_num, subset_len, conf_row, in_file):
             else:
                 array = np.array([None if value < conf_row.min or value > conf_row.max else value for value in array], dtype=object)
             if conf_row.name == 'longitude [degree]':
-                array = np.where(array == conf_row.min, conf_row.max, array)
+                array = np.where(array == conf_row.max, conf_row.min, array)
             if conf_row.slide > -1 and conf_row.step > 0:
                 array = array[conf_row.slide::conf_row.step]
     else:
