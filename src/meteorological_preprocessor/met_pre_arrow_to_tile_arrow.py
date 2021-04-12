@@ -20,6 +20,7 @@
 
 import argparse
 import math
+import numpy as np
 import os
 import pkg_resources
 import pyarrow as pa
@@ -93,11 +94,12 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                             sort_key_list.insert(1, 'time since created [s]')
                             new_df.reset_index(drop=True, inplace=True)
                             out_file = ''.join([out_directory, '/location_datetime.feather'])
+                            properties_df = convert_cat_subcat_df[(convert_cat_subcat_df['location_datetime'] == 0)]
                             if out_directory in all_column_dict:
                                 old_df = all_column_dict[out_directory]
                             elif os.path.exists(out_file):
                                 old_df = feather.read_feather(out_file)
-                                for column in convert_cat_subcat_df[(convert_cat_subcat_df['location_datetime'] == 0)]['name'].values.tolist():
+                                for column in properties_df['name'].values.tolist():
                                     old_df.join(feather.read_feather(''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])))
                             else:
                                 old_df = new_df.iloc[0:0]
@@ -110,26 +112,34 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                                 concat_df.reset_index(drop=True, inplace=True)
                                 all_column_dict[out_directory] = concat_df
                                 out_file_dict[out_file] = concat_df[sort_key_list]
-                                for column in convert_cat_subcat_df[(convert_cat_subcat_df['location_datetime'] == 0)]['name'].values.tolist():
+                                for column in properties_df['name'].values.tolist():
                                     out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])
-                                    column_df = concat_df[[column]].dropna()
+                                    column_df = concat_df[[column]]
                                     if len(column_df.index) > 0:
                                         out_file_dict[out_file] = column_df
+
                             else:
                                 all_column_dict[out_directory] = new_df
                                 out_file_dict[out_file] = new_df[sort_key_list]
-                                for column in convert_cat_subcat_df[(convert_cat_subcat_df['location_datetime'] == 0)]['name'].values.tolist():
+                                for column in properties_df['name'].values.tolist():
                                     out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])
-                                    column_df = new_df[[column]].dropna()
+                                    column_df = new_df[[column]]
                                     if len(column_df.index) > 0:
                                         out_file_dict[out_file] = column_df
+                                        start_value = properties_df[(properties_df['name'] == column)]['start_value'].values.tolist()[0]
+                                        step_value = properties_df[(properties_df['name'] == column)]['step_value'].values.tolist()[0]
+                                        stop_value = 254 * step_value + start_value
+                                        column_df[column].where(column_df[column] < start_value, 0)
+                                        column_df[column].where(column_df[column] >= stop_value, 255)
+                                        bins_list = np.array(range(0, 255, 1), dtype=object) * step_value + start_value
+                                        if step_value < 0:
+                                            print('skip')
+                                        else:
+                                            print(pd.cut(column_df[column], bins_list, labels=range(1, 255, 1)))
     for out_file, out_df in out_file_dict.items():
         os.makedirs(os.path.dirname(out_file), exist_ok=True)
         with open(out_file, 'bw') as out_f:
-            if re.match(r'^.*/location_datetime\.feather$', out_file):
-                table = pa.Table.from_pandas(out_df)
-            else:
-                table = pa.Table.from_pandas(out_df, preserve_index=True)
+            table = pa.Table.from_pandas(out_df)
             feather.write_feather(table, out_f, compression='zstd')
             print(out_file, file=out_list_file)
 

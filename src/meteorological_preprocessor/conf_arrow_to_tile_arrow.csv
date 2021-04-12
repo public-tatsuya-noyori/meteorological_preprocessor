@@ -129,7 +129,7 @@ grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,1,longitude [degree],,
 grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/mean sea level/pressure reduced to mean sea level [Pa],110000,-400.0
 grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/2 metre/temperature [K],173.15,5.0
 grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/2 metre/relative humidity [%],0.0,1.0
-grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/10 metre/wind speed [m/s],5.0,0.0
+grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/10 metre/wind speed [m/s],0.0,1.0
 grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/10 metre/wind direction [degree],22.5,-11.25
 grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/surface/pressure [Pa],110000,-400.0
 grib_to_arrow,gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,0/surface/total cloud cover [%],0.0,1.0
