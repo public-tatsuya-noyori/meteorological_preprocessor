@@ -3,8 +3,8 @@ gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10u,10 metre/U wi
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"10",10v,10 metre/V wind component,float16
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"2",2t,2 metre/temperature [K],float16
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",heightAboveGround,"2",2r,2 metre/relative humidity [%],float16
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",surface,"0",sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",meanSea,"0",prmsl,mean sea level/pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",surface,"0",sp,surface/pressure [Pa],int32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",meanSea,"0",prmsl,mean sea level/pressure reduced to mean sea level [Pa],int32
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",surface,"0",unknown,surface/total cloud cover [%],float16
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",surface,"0",hcc,surface/high cloud cover [%],float16
 gsm,0.25_0.25_90.0_0.0_-90.0_359.75,"0",surface,"0",mcc,surface/medium cloud cover [%],float16

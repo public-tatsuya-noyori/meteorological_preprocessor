@@ -114,35 +114,13 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                                 out_file_dict[out_file] = concat_df[sort_key_list]
                                 for column in properties_df['name'].values.tolist():
                                     out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])
-                                    column_df = concat_df[[column]]
-                                    if len(column_df.index) > 0:
-                                        out_file_dict[out_file] = column_df
-
+                                    out_file_dict[out_file] = concat_df[[column]]
                             else:
                                 all_column_dict[out_directory] = new_df
                                 out_file_dict[out_file] = new_df[sort_key_list]
                                 for column in properties_df['name'].values.tolist():
                                     out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])
-                                    column_df = new_df[[column]].copy()
-                                    if len(column_df.index) > 0:
-                                        out_file_dict[out_file] = column_df
-                                        start_value = properties_df[(properties_df['name'] == column)]['start_value'].values.tolist()[0]
-                                        step_value = properties_df[(properties_df['name'] == column)]['step_value'].values.tolist()[0]
-                                        if step_value < 0:
-                                            print('')
-                                            #column_df[column][column_df[column] > start_value] = start_value
-                                            #column_df[column][column_df[column] <= stop_value - step_value] = stop_value
-                                            #bins_list = np.array(range(255, 0, -1), dtype=object) * step_value + start_value
-                                            #column_df['group'] = pd.cut(column_df[column], bins_list, labels=range(255, 1, -1))
-                                        else:
-                                            stop_value = 255 * step_value + start_value
-                                            column_df.loc[column_df[column] <= start_value, column] = start_value
-                                            column_df.loc[column_df[column] > stop_value, column] = stop_value
-                                            bins_np = np.array(range(-1, 256, 1), dtype=object) * step_value + start_value
-                                            column_df[column] = pd.cut(column_df[column], bins_np, labels=range(0, 256, 1))
-                                            column_df = column_df.astype({column: 'uint8'})
-                                            out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '_int8.feather'])
-                                            out_file_dict[out_file] = column_df
+                                    out_file_dict[out_file] = new_df[[column]]
     for out_file, out_df in out_file_dict.items():
         os.makedirs(os.path.dirname(out_file), exist_ok=True)
         with open(out_file, 'bw') as out_f:
