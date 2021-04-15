@@ -67,9 +67,8 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
             new_id_etfo_dict = {}
             del_dict = {}
             in_df = feather.read_feather(in_file)
-            pow2zoom = 2**zoom
-            for tile_x in range(0, 2*pow2zoom):
-                for tile_y in range(0, pow2zoom):
+            for tile_x in range(0, 2**(zoom + 1)):
+                for tile_y in range(0, 2**(zoom)):
                     if tile_y == pow2zoom - 1:
                         tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]'])]
                     else:
