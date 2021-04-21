@@ -69,7 +69,7 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
             in_df = feather.read_feather(in_file)
             for tile_x in range(0, 2**(zoom + 1)):
                 for tile_y in range(0, 2**(zoom)):
-                    if tile_y == pow2zoom - 1:
+                    if tile_y == 2**(zoom) - 1:
                         tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]'])]
                     else:
                         tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] > 90.0 - res * (tile_y + 1))]
@@ -122,10 +122,14 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                                     out_file_dict[out_file] = new_df[[column]]
     for out_file, out_df in out_file_dict.items():
         os.makedirs(os.path.dirname(out_file), exist_ok=True)
+        table = pa.Table.from_pandas(out_df)
         with open(out_file, 'bw') as out_f:
-            table = pa.Table.from_pandas(out_df)
             feather.write_feather(table, out_f, compression='zstd', compression_level=15)
-            print(out_file, file=out_list_file)
+        print(out_file, file=out_list_file)
+        out_file = re.sub(r'\.feather', '.arrow', out_file)
+        with open(out_file, 'bw') as out_f:
+            feather.write_feather(table, out_f, compression='uncompressed')
+        os.system("gzip {}".format(out_file))
 
 def main():
     errno=198
