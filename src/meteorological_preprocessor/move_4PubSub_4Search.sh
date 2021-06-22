@@ -18,8 +18,9 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+IFS=$'\n'
 watch(){
-  while -1; do
+  while :; do
     running=`ps ho 'pid' ${pid} | wc -l`
     if test ${running} -eq 0; then
       break
@@ -44,7 +45,7 @@ watch(){
 move_4PubSub_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
+  rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -eq 0; then
@@ -54,11 +55,11 @@ move_4PubSub_4Search() {
     echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >&2
     return ${exit_code}
   fi
-  for index_file in `grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt$" ${work_directory}/${pubsub_index_directory}_index.tmp | head -n -1`; do
+  for index_file in `grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt\.gz$" ${work_directory}/${pubsub_index_directory}_index.tmp | head -n -1`; do
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
     set +e
-    rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
+    rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -78,12 +79,12 @@ datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 datetime_minute=`echo ${datetime} | cut -c11-12`
 move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
-move_index_minute=9
+move_index_minute=4
 for minute_count in `seq ${move_index_minute}`; do
   move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H%M"`
 done
 pubsub_index_directory=4PubSub
-rclone_watch_seconds=3600
+rclone_watch_seconds=180
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
@@ -115,7 +116,7 @@ fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${priority}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
 else
   running=0
 fi

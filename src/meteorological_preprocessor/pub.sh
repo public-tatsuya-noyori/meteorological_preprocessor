@@ -18,8 +18,9 @@
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
 set -e
+IFS=$'\n'
 watch(){
-  while -1; do
+  while :; do
     running=`ps ho 'pid' ${pid} | wc -l`
     if test ${running} -eq 0; then
       break
@@ -43,16 +44,12 @@ watch(){
 
 publish(){
   exit_code=255
-  if test ${wildcard_index} -eq 1; then
-    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | xargs -r -n 1 dirname | sort -u | sed -e 's|$|/*|g' > ${work_directory}/newly_created_file.tmp
-  else
-    grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | sort -u > ${work_directory}/newly_created_file.tmp
-  fi
+  grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test -s ${work_directory}/newly_created_file.tmp; then
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
+      rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory} > /dev/null
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
@@ -72,7 +69,7 @@ publish(){
     set -e
     cp /dev/null ${work_directory}/info_log.tmp
     set +e
-    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checkers ${parallel} --checksum --contimeout ${timeout} --cutoff-mode=cautious ${file_from_option} ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-upload-concurrency ${parallel} --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -87,13 +84,17 @@ publish(){
     set -e
     if test -s ${work_directory}/processed_file.txt; then
       for retry_count in `seq ${retry_num}`; do
+        cp /dev/null ${work_directory}/err_log.tmp
+        rm -rf ${work_directory}/prepare
+        mkdir ${work_directory}/prepare
         now=`date -u "+%Y%m%d%H%M%S"`
+        cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}.txt
+        gzip -f ${work_directory}/prepare/${now}.txt
         set +e
-        rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${work_directory}/processed_file.txt ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${now}.txt
+        rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp /dev/null ${work_directory}/err_log.tmp
           cp ${work_directory}/processed_file.txt ${work_directory}/processed/${now}.txt
           break
         else
@@ -126,22 +127,19 @@ delete_index_hour=23
 for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
-file_from_option=--files-from-raw
 job_directory=4Pub
 pubsub_index_directory=4PubSub
 retry_num=8
-rclone_watch_seconds=3600
+rclone_watch_seconds=600
 rm_input_index_file=0
 timeout=8s
-wildcard_index=0
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--watch rclone_watch_seconds] [--wildcard_index] local_work_directory unique_job_name priority input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--watch rclone_watch_seconds] local_work_directory unique_job_name priority input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
     "--watch" ) rclone_watch_seconds=$2;set +e;rclone_watch_seconds=`expr 0 + ${rclone_watch_seconds}`;set -e;shift;shift;;
-    "--wildcard_index" ) wildcard_index=1;file_from_option=--include-from;shift;;
   esac
 done
 if test -z $6; then
