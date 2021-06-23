@@ -97,13 +97,13 @@ if test -s download_${priority}_closed/created.txt; then
   done
   if test -s download_${priority}_closed/cached/${now}.txt.tmp; then
     cat download_${priority}_closed/cached/${now}.txt.tmp | grep -v "/A_P"  | grep -v ecCodes | uniq > download_${priority}_closed/cached/${now}.txt
-    if test ! -s download_${priority}/cached/${now}.txt; then
-      rm -f download_${priority}/cached/${now}.txt
+    if test ! -s download_${priority}_closed/cached/${now}.txt; then
+      rm -f download_${priority}_closed/cached/${now}.txt
     fi
   fi
   rm -f download_${priority}_closed/cached/${now}.txt.tmp
 fi
-for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --cron --rm_input_index_file cache_c iij12ci ${priority} ${i} ${rclone_remote_bucket_list} 64;done
+for i in `ls -1 download_${priority}_closed/cached/*|grep -v '\.tmp$'|uniq`;do ./pub.sh --rm_input_index_file cache_c minio1closed ${priority} ${i} ${rclone_remote_bucket_list} 16;done
 } &
 pid=$!
 echo ${pid} > download_${priority}_closed/pid.txt
