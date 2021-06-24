@@ -143,11 +143,11 @@ if test ${end_yyyymmddhhmm} -eq 0; then
         fi
         set +e
         if test -n "${exclusive_pattern_file}"; then
-          grep -v -E -f ${exclusive_pattern_file} ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
+          zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
         elif test -n "${inclusive_pattern_file}"; then
-          grep -E -f ${inclusive_pattern_file} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+          zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
         else
-          grep -E ${keyword_pattern} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+          zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
         fi
         set -e
         if test -s ${work_directory}/search_file.tmp; then
@@ -194,11 +194,11 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       fi
       set +e
       if test -n "${exclusive_pattern_file}"; then
-        grep -v -E -f ${exclusive_pattern_file} ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
+        zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
       elif test -n "${inclusive_pattern_file}"; then
-        grep -E -f ${inclusive_pattern_file} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+        zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
       else
-        grep -E ${keyword_pattern} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+        zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
       fi
       set -e
       if test -s ${work_directory}/search_file.tmp; then
@@ -257,11 +257,11 @@ if test ${end_yyyymmddhhmm} -eq 0; then
             fi
             set +e
             if test -n "${exclusive_pattern_file}"; then
-              grep -v -E -f ${exclusive_pattern_file} ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
+              zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
             elif test -n "${inclusive_pattern_file}"; then
-              grep -E -f ${inclusive_pattern_file} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+              zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
             else
-              grep -E ${keyword_pattern} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+              zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
             fi
             set -e
             if test -s ${work_directory}/search_file.tmp; then
@@ -315,11 +315,11 @@ if test ${end_yyyymmddhhmm} -eq 0; then
         fi
         set +e
         if test -n "${exclusive_pattern_file}"; then
-          grep -v -E -f ${exclusive_pattern_file} ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
+          zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
         elif test -n "${inclusive_pattern_file}"; then
-          grep -E -f ${inclusive_pattern_file} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+          zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
         else
-          grep -E ${keyword_pattern} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+          zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
         fi
         set -e
         if test -s ${work_directory}/search_file.tmp; then
@@ -380,11 +380,11 @@ else
           fi
           set +e
           if test -n "${exclusive_pattern_file}"; then
-            grep -v -E -f ${exclusive_pattern_file} ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
+            zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
           elif test -n "${inclusive_pattern_file}"; then
-            grep -E -f ${inclusive_pattern_file} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+            zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
           else
-            grep -E ${keyword_pattern} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+            zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
           fi
           set -e
           if test -s ${work_directory}/search_file.tmp; then
@@ -438,11 +438,11 @@ else
       fi
       set +e
       if test -n "${exclusive_pattern_file}"; then
-        grep -v -E -f ${exclusive_pattern_file} ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
+        zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
       elif test -n "${inclusive_pattern_file}"; then
-        grep -E -f ${inclusive_pattern_file} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+        zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
       else
-        grep -E ${keyword_pattern} ${work_directory}/search_index.tmp > ${work_directory}/search_file.tmp
+        zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
       fi
       set -e
       if test -s ${work_directory}/search_file.tmp; then
