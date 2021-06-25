@@ -163,6 +163,5 @@ if test ${running} -eq 0; then
   publish &
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
-  watch &
   wait ${pid}
 fi
