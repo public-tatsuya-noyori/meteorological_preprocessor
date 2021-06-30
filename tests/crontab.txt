@@ -90,10 +90,10 @@
 * * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p5 'minio:jma2closed' 16
 
 # del
-55 0  * * * cd /home/noyori/tests; ./del.sh cache minio1open minio:jma1open 2
-55 6  * * * cd /home/noyori/tests; ./del.sh cache minio2open minio:jma2open 2
-55 12 * * * cd /home/noyori/tests; ./del.sh cache minio1closed minio:jma1closed 2
-55 18 * * * cd /home/noyori/tests; ./del.sh cache minio2closed minio:jma2closed 2
+#55 0  * * * cd /home/noyori/tests; ./del.sh cache minio1open minio:jma1open 2
+#55 6  * * * cd /home/noyori/tests; ./del.sh cache minio2open minio:jma2open 2
+#55 12 * * * cd /home/noyori/tests; ./del.sh cache minio1closed minio:jma1closed 2
+#55 18 * * * cd /home/noyori/tests; ./del.sh cache minio2closed minio:jma2closed 2
 
 
 # delete on local PC
