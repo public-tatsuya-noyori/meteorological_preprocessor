@@ -314,9 +314,9 @@ clone() {
           fi
           source_rclone_remote_bucket_count=`expr 1 + ${source_rclone_remote_bucket_count}`
         done
+        ls -1 ${work_directory}/processed/* | grep -v -F "${work_directory}/processed/dummy.tmp" | grep -v -E "^${work_directory}/processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+        ls -1 ${work_directory}/processed/* | xargs -r cat > ${work_directory}/all_processed_file.txt
       fi
-      ls -1 ${work_directory}/processed/* | grep -v -F "${work_directory}/processed/dummy.tmp" | grep -v -E "^${work_directory}/processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-      ls -1 ${work_directory}/processed/* | xargs -r cat > ${work_directory}/all_processed_file.txt
       if test ${exit_code} -eq 0; then
         backup=1
         for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
