@@ -78,22 +78,26 @@
 25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2closed p5 minio:jma2closed
 
 # sub
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p1 'minio:jma2open' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p2 'minio:jma2open' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p3 'minio:jma2open' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p4 'minio:jma2open' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p5 'minio:jma2open' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p1 'minio:jma2closed' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p2 'minio:jma2closed' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p3 'minio:jma2closed' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p4 'minio:jma2closed' 16
-* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p5 'minio:jma2closed' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p1 'minio:jma2open' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p2 'minio:jma2open' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p3 'minio:jma2open' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p4 'minio:jma2open' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2open p5 'minio:jma2open' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p1 'minio:jma2closed' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p2 'minio:jma2closed' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p3 'minio:jma2closed' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p4 'minio:jma2closed' 16
+#* * * * * cd /home/noyori/tests; ./sub.sh --urgent cache_s minio2closed p5 'minio:jma2closed' 16
+
+# touch
+50 0  * * * rclone touch minio:jma1open/4Site/explore.html
+50 6  * * * rclone touch minio:jma2open/4Site/explore.html
 
 # del
-#55 0  * * * cd /home/noyori/tests; ./del.sh cache minio1open minio:jma1open 2
-#55 6  * * * cd /home/noyori/tests; ./del.sh cache minio2open minio:jma2open 2
-#55 12 * * * cd /home/noyori/tests; ./del.sh cache minio1closed minio:jma1closed 2
-#55 18 * * * cd /home/noyori/tests; ./del.sh cache minio2closed minio:jma2closed 2
+55 0  * * * cd /home/noyori/tests; ./del.sh cache minio1open minio:jma1open 2
+55 6  * * * cd /home/noyori/tests; ./del.sh cache minio2open minio:jma2open 2
+55 12 * * * cd /home/noyori/tests; ./del.sh cache minio1closed minio:jma1closed 2
+55 18 * * * cd /home/noyori/tests; ./del.sh cache minio2closed minio:jma2closed 2
 
 
 # delete on local PC
