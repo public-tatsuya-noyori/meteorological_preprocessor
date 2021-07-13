@@ -100,6 +100,8 @@ def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):
                 data_date = (in_file_mtime + timedelta(days=-timedelta_day)).strftime('%Y%m%d')
                 if ddhhmm[0:2] == data_date[6:8]:
                     break
+                else:
+                    data_date = ''
             if not data_date:
                 for timedelta_day in range(1, 7):
                     data_date = (in_file_mtime + timedelta(days=timedelta_day)).strftime('%Y%m%d')
