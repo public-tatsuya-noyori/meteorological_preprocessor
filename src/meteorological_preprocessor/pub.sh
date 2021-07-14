@@ -41,6 +41,7 @@ publish(){
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
       return ${exit_code}
     fi
+    ls -1 ${processed_directory}/* | xargs -r cat > ${work_directory}/all_processed_file.txt
     set +e
     grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
     set -e
@@ -72,7 +73,7 @@ publish(){
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp ${work_directory}/processed_file.txt ${work_directory}/processed/${now}.txt
+          cp ${work_directory}/processed_file.txt ${processed_directory}/${now}.txt
           break
         else
           sleep 1
@@ -84,8 +85,9 @@ publish(){
         return ${exit_code}
       fi
     fi
-    ls -1 ${work_directory}/processed/* | grep -v -F "${work_directory}/processed/dummy.tmp" | grep -v -E "^${work_directory}/processed/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
-    ls -1 ${work_directory}/processed/* | xargs -r cat > ${work_directory}/all_processed_file.txt
+    if ${rm_old_processed_file} -eq 1; then
+      ls -1 ${processed_directory}/* | grep -v -F "${processed_directory}/dummy.tmp" | grep -v -E "^${processed_directory}/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
+    fi
   else
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
@@ -104,18 +106,20 @@ delete_index_hour=23
 for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
-job_directory=4Pub
+job_directory=4PubClone
 pubsub_index_directory=4PubSub
 rclone_timeout=600
 retry_num=8
 rm_input_index_file=0
+rm_old_processed_file=0
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--debug_shell" ) set -evx;shift;;    
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--rm_old_processed_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
+    "--rm_old_processed_file" ) rm_old_processed_file=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -151,8 +155,9 @@ elif test $6 -le 0; then
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
-mkdir -p ${work_directory}/processed
-cp /dev/null ${work_directory}/processed/dummy.tmp
+processed_directory=${local_work_directory}/processed
+mkdir -p ${processed_directory}
+cp /dev/null ${processed_directory}/dummy.tmp
 touch ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then
   running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
