@@ -22,28 +22,28 @@ IFS=$'\n'
 move_4PubSub_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
+  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -eq 0; then
     cp /dev/null ${work_directory}/err_log.tmp
   else
     cat ${work_directory}/err_log.tmp >&2
-    echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}." >&2
+    echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
     return ${exit_code}
   fi
   for index_file in `grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]\.txt\.gz$" ${work_directory}/${pubsub_index_directory}_index.tmp | head -n -1`; do
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
     set +e
-    timeout -k 3 ${rclone_timeout} rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}
+    timeout -k 3 ${rclone_timeout} rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
       cp /dev/null ${work_directory}/err_log.tmp
     else
       cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not move ${rclone_remote_bucket}/${pubsub_index_directory}/${priority}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${priority}/${index_file_date_hour}/${index_file_minute_second_extension}." >&2
+      echo "ERROR: can not move ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${index_file_date_hour}/${index_file_minute_second_extension}." >&2
       return ${exit_code}
     fi
   done
@@ -68,7 +68,7 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--timeout rclone_timeout] local_work_directory unique_job_name priority rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin rclone_remote_bucket"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -79,21 +79,21 @@ fi
 local_work_directory=$1
 unique_job_name=$2
 set +e
-priority=`echo $3 | grep "^p[1-9]$"`
+txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 rclone_remote_bucket=`echo $4 | grep -F ':'`
 set -e
-if test -z ${priority}; then
-  echo "ERROR: $3 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+if test -z ${txt_or_bin}; then
+  echo "ERROR: $3 is not txt or bin." >&2
   exit 199
 fi
 if test -z "${rclone_remote_bucket}"; then
   echo "ERROR: $4 is not rclone_remote:bucket." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${priority}
+work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
 else
   running=0
 fi
