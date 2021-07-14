@@ -53,7 +53,7 @@ publish(){
       set +e
       grep -F ERROR ${work_directory}/info_log.tmp >&2
       set -e
-      echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${priority}." >&2
+      echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
       return ${exit_code}
     fi
     set +e
@@ -68,7 +68,7 @@ publish(){
         cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}.txt
         gzip -f ${work_directory}/prepare/${now}.txt
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/
+        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
@@ -80,7 +80,7 @@ publish(){
       done
       if test ${exit_code} -ne 0; then
         cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${priority}/." >&2
+        echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
         return ${exit_code}
       fi
     fi
@@ -114,7 +114,7 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name priority input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
@@ -126,13 +126,13 @@ fi
 local_work_directory=$1
 unique_job_name=$2
 set +e
-priority=`echo $3 | grep "^p[1-9]$"`
+txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 input_index_file=$4
 destination_rclone_remote_bucket_main_sub=`echo $5 | grep -F ':'`
 parallel=`echo $6 | grep "^[0-9]\+$"`
 set -e
-if test -z "${priority}"; then
-  echo "ERROR: $3 is not p1 or p2 or p3 or p4 or p5 or p6 or p7 or p8 or p9." >&2
+if test -z "${txt_or_bin}"; then
+  echo "ERROR: $3 is not txt or bin." >&2
   exit 199
 fi
 if test ! -s ${input_index_file}; then
@@ -150,12 +150,12 @@ elif test $6 -le 0; then
   echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${priority}
+work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
 mkdir -p ${work_directory}/processed
 cp /dev/null ${work_directory}/processed/dummy.tmp
 touch ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${priority} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
 else
   running=0
 fi
