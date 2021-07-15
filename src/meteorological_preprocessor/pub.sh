@@ -149,7 +149,7 @@ elif test $6 -le 0; then
   exit 199
 fi
 work_directory=${local_work_directory}/${job_directory}/${txt_or_bin}/${unique_job_name}
-processed_directory=${local_work_directory}/${job_directory}/${txt_or_bin}/processed
+processed_directory=${local_work_directory}/${job_directory}/__processed/${txt_or_bin}
 mkdir -p ${work_directory} ${processed_directory}
 touch ${processed_directory}/dummy.tmp ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then

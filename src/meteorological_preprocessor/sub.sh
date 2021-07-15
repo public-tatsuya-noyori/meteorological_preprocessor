@@ -266,7 +266,7 @@ if test -n $7; then
   exclusive_pattern_file=$7
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
-processed_directory=${local_work_directory}/${job_directory}/${txt_or_bin}/processed
+processed_directory=${local_work_directory}/${job_directory}/__processed/${txt_or_bin}
 mkdir -p ${work_directory} ${processed_directory}
 touch ${processed_directory}/dummy.tmp ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then
