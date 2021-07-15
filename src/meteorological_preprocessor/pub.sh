@@ -17,7 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -e
+set -eu
 IFS=$'\n'
 publish(){
   exit_code=255
@@ -99,7 +99,7 @@ datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 delete_index_date_hour_pattern=${datetime_date}${datetime_hour}
-delete_index_hour=23
+delete_index_hour=24
 for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
@@ -108,13 +108,11 @@ pubsub_index_directory=4PubSub
 rclone_timeout=600
 retry_num=8
 rm_input_index_file=0
-rm_old_processed_file=0
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--debug_shell" ) set -evx;shift;;    
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
