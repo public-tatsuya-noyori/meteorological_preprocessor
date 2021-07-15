@@ -21,7 +21,7 @@ set -e
 IFS=$'\n'
 publish(){
   exit_code=255
-  grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/|/|g" | sort -u > ${work_directory}/newly_created_file.tmp
+  grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test -s ${work_directory}/newly_created_file.tmp; then
     for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
       cp /dev/null ${work_directory}/err_log.tmp
@@ -41,7 +41,7 @@ publish(){
       echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
       return ${exit_code}
     fi
-    ls -1 ${processed_directory}/* | xargs -r cat > ${work_directory}/all_processed_file.txt
+    ls -1 ${processed_directory}/ | sed -e "s|^|${processed_directory}/|g" | xargs -r cat > ${work_directory}/all_processed_file.txt
     set +e
     grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
     set -e
@@ -58,7 +58,7 @@ publish(){
       return ${exit_code}
     fi
     set +e
-    grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" | grep -v '^ *$' | sort -u > ${work_directory}/processed_file.txt
+    grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' | sort -u > ${work_directory}/processed_file.txt
     set -e
     if test -s ${work_directory}/processed_file.txt; then
       for retry_count in `seq ${retry_num}`; do
@@ -73,7 +73,7 @@ publish(){
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
-          cp ${work_directory}/processed_file.txt ${processed_directory}/${now}.txt
+          mv ${work_directory}/processed_file.txt ${processed_directory}/${unique_job_name}_${now}.txt
           break
         else
           sleep 1
@@ -84,9 +84,6 @@ publish(){
         echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
         return ${exit_code}
       fi
-    fi
-    if ${rm_old_processed_file} -eq 1; then
-      ls -1 ${processed_directory}/* | grep -v -F "${processed_directory}/dummy.tmp" | grep -v -E "^${processed_directory}/(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | xargs -r rm -f
     fi
   else
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
@@ -117,9 +114,8 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;    
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--rm_old_processed_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
-    "--rm_old_processed_file" ) rm_old_processed_file=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -154,11 +150,10 @@ elif test $6 -le 0; then
   echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
-processed_directory=${local_work_directory}/processed
-mkdir -p ${processed_directory}
-cp /dev/null ${processed_directory}/dummy.tmp
-touch ${work_directory}/all_processed_file.txt
+work_directory=${local_work_directory}/${job_directory}/${txt_or_bin}/${unique_job_name}
+processed_directory=${local_work_directory}/${job_directory}/${txt_or_bin}/processed
+mkdir -p ${work_directory} ${processed_directory}
+touch ${processed_directory}/dummy.tmp ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then
   running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
 else
@@ -169,4 +164,5 @@ if test ${running} -eq 0; then
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
   wait ${pid}
+  ls -1 ${processed_directory}/  | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
 fi
