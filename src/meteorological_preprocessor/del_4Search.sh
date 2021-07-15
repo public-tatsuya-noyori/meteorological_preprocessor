@@ -104,8 +104,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--debug_shell] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin rclone_remote_bucket"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
