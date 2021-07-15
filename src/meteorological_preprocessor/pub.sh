@@ -17,7 +17,7 @@
 # Authors:
 #   Tatsuya Noyori - Japan Meteorological Agency - https://www.jma.go.jp
 #
-set -eu
+set -e
 IFS=$'\n'
 publish(){
   exit_code=255
