@@ -62,67 +62,84 @@
 * * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh cache_3_closed cc_sub  bin minio:center-cc-cloud-c-region-f-closed-sub
 
 # del 4Search
-#5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1open p1 minio:jma1open
-#10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1open p2 minio:jma1open
-#15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1open p3 minio:jma1open
-#20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1open p4 minio:jma1open
-#25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1open p5 minio:jma1open
-#5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2open p1 minio:jma2open
-#10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2open p2 minio:jma2open
-#15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2open p3 minio:jma2open
-#20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2open p4 minio:jma2open
-#25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2open p5 minio:jma2open
-#5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1closed p1 minio:jma1closed
-#10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1closed p2 minio:jma1closed
-#15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1closed p3 minio:jma1closed
-#20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1closed p4 minio:jma1closed
-#25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio1closed p5 minio:jma1closed
-#5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2closed p1 minio:jma2closed
-#10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2closed p2 minio:jma2closed
-#15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2closed p3 minio:jma2closed
-#20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2closed p4 minio:jma2closed
-#25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache minio2closed p5 minio:jma2closed
+5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_main        txt minio:center-aa-cloud-a-region-a-open-main
+10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_main        bin minio:center-aa-cloud-a-region-a-open-main
+15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_sub         txt minio:center-aa-cloud-a-region-b-open-sub
+20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_sub         bin minio:center-aa-cloud-a-region-b-open-sub
+25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_main        txt minio:center-bb-cloud-b-region-c-open-main
+5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_main        bin minio:center-bb-cloud-b-region-c-open-main
+10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_sub         txt minio:center-bb-cloud-b-region-c-open-sub
+15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_sub         bin minio:center-bb-cloud-b-region-c-open-sub
+20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_main        txt minio:center-cc-cloud-c-region-e-open-main
+25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_main        bin minio:center-cc-cloud-c-region-e-open-main
+0,30   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_sub         txt minio:center-cc-cloud-c-region-f-open-sub
+1,31   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_sub         bin minio:center-cc-cloud-c-region-f-open-sub
+5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_main_closed txt minio:center-aa-cloud-a-region-a-closed-main
+10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_main_closed bin minio:center-aa-cloud-a-region-a-closed-main
+15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_sub_closed  txt minio:center-aa-cloud-a-region-b-closed-sub
+20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_1 aa_sub_closed  bin minio:center-aa-cloud-a-region-b-closed-sub
+25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_main_closed txt minio:center-bb-cloud-b-region-c-closed-main
+5,35   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_main_closed bin minio:center-bb-cloud-b-region-c-closed-main
+10,40  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_sub_closed  txt minio:center-bb-cloud-b-region-c-closed-sub
+15,45  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_2 bb_sub_closed  bin minio:center-bb-cloud-b-region-c-closed-sub
+20,50  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_main_closed txt minio:center-cc-cloud-c-region-e-closed-main
+25,55  * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_main_closed bin minio:center-cc-cloud-c-region-e-closed-main
+0,30   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_sub_closed  txt minio:center-cc-cloud-c-region-f-closed-sub
+1,31   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3 cc_sub_closed  bin minio:center-cc-cloud-c-region-f-closed-sub
 
 # touch
-#54 0  * * * rclone touch minio:cloud-aa-center-aa-main/4Site/explore.html
-#54 6  * * * rclone touch minio:cloud-aa-center-aa-sub/4Site/explore.html
-#54 2  * * * rclone touch minio:cloud-bb-center-bb-main/4Site/explore.html
-#54 8  * * * rclone touch minio:cloud-bb-center-bb-sub/4Site/explore.html
-#54 4  * * * rclone touch minio:cloud-cc-center-cc-main/4Site/explore.html
-#54 10 * * * rclone touch minio:cloud-cc-center-cc-sub/4Site/explore.html
+#54 0  * * * rclone touch minio:center-aa-cloud-a-region-a-open-main/4Site/explore.html
+#54 6  * * * rclone touch minio:center-aa-cloud-a-region-b-open-sub/4Site/explore.html
+#54 2  * * * rclone touch minio:center-bb-cloud-b-region-c-open-main/4Site/explore.html
+#54 8  * * * rclone touch minio:center-bb-cloud-b-region-d-open-sub/4Site/explore.html
+#54 4  * * * rclone touch minio:center-cc-cloud-c-region-e-open-main/4Site/explore.html
+#54 10 * * * rclone touch minio:center-cc-cloud-c-region-f-open-sub/4Site/explore.html
 
 # del
-#55 0  * * * cd /home/noyori/tests; ./del.sh cache AA_main        minio:cloud-aa-center-aa-main        2
-#55 6  * * * cd /home/noyori/tests; ./del.sh cache AA_sub         minio:cloud-aa-center-aa-sub         2
-#55 12 * * * cd /home/noyori/tests; ./del.sh cache AA_main_closed minio:cloud-aa-center-aa-main-closed 2
-#55 18 * * * cd /home/noyori/tests; ./del.sh cache AA_sub_closed  minio:cloud-aa-center-aa-sub-closed  2
-#55 2  * * * cd /home/noyori/tests; ./del.sh cache BB_main        minio:cloud-bb-center-bb-main        2
-#55 8  * * * cd /home/noyori/tests; ./del.sh cache BB_sub         minio:cloud-bb-center-bb-sub         2
-#55 14 * * * cd /home/noyori/tests; ./del.sh cache BB_main_closed minio:cloud-bb-center-bb-main-closed 2
-#55 20 * * * cd /home/noyori/tests; ./del.sh cache BB_sub_closed  minio:cloud-bb-center-bb-sub-closed  2
-#55 4  * * * cd /home/noyori/tests; ./del.sh cache CC_main        minio:cloud-cc-center-cc-main        2
-#55 10 * * * cd /home/noyori/tests; ./del.sh cache CC_sub         minio:cloud-cc-center-cc-sub         2
-#55 16 * * * cd /home/noyori/tests; ./del.sh cache CC_main_closed minio:cloud-cc-center-cc-main-closed 2
-#55 22 * * * cd /home/noyori/tests; ./del.sh cache CC_sub_closed  minio:cloud-cc-center-cc-sub-closed  2
+55 0  * * * cd /home/noyori/tests; ./del.sh cache aa_main        minio:center-aa-cloud-a-region-a-open-main   2
+55 6  * * * cd /home/noyori/tests; ./del.sh cache aa_sub         minio:center-aa-cloud-a-region-b-open-sub    2
+55 12 * * * cd /home/noyori/tests; ./del.sh cache aa_main_closed minio:center-aa-cloud-a-region-a-closed-main 2
+55 18 * * * cd /home/noyori/tests; ./del.sh cache aa_sub_closed  minio:center-aa-cloud-a-region-b-closed-sub  2
+55 2  * * * cd /home/noyori/tests; ./del.sh cache bb_main        minio:center-bb-cloud-b-region-c-open-main   2
+55 8  * * * cd /home/noyori/tests; ./del.sh cache bb_sub         minio:center-bb-cloud-b-region-d-open-sub    2
+55 14 * * * cd /home/noyori/tests; ./del.sh cache bb_main_closed minio:center-bb-cloud-b-region-c-closed-main 2
+55 20 * * * cd /home/noyori/tests; ./del.sh cache bb_sub_closed  minio:center-bb-cloud-b-region-d-closed-sub  2
+55 4  * * * cd /home/noyori/tests; ./del.sh cache cc_main        minio:center-cc-cloud-c-region-e-open-main   2
+55 10 * * * cd /home/noyori/tests; ./del.sh cache cc_sub         minio:center-cc-cloud-c-region-f-open-sub    2
+55 16 * * * cd /home/noyori/tests; ./del.sh cache cc_main_closed minio:center-cc-cloud-c-region-e-closed-main 2
+55 22 * * * cd /home/noyori/tests; ./del.sh cache cc_sub_closed  minio:center-cc-cloud-c-region-f-closed-sub  2
 
 # clone
-#* * * * * cd /home/noyori/tests; ./clone.sh cache to_AA bin 'minio:cloud-bb-center-bb-main;minio:cloud-cc-center-cc-main;minio:cloud-bb-center-bb-sub;minio:cloud-cc-center-cc-sub' 'minio:cloud-aa-center-aa-main;minio:cloud-aa-center-aa-sub' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh cache to_AA txt 'minio:cloud-bb-center-bb-main;minio:cloud-cc-center-cc-main;minio:cloud-bb-center-bb-sub;minio:cloud-cc-center-cc-sub' 'minio:cloud-aa-center-aa-main;minio:cloud-aa-center-aa-sub' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1opento2 p2 'minio:jma1open' 'minio:jma2open' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1opento2 p3 'minio:jma1open' 'minio:jma2open' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1opento2 p4 'minio:jma1open' 'minio:jma2open' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1opento2 p5 'minio:jma1open' 'minio:jma2open' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1closedto2 p1 'minio:jma1closed' 'minio:jma2closed' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1closedto2 p2 'minio:jma1closed' 'minio:jma2closed' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1closedto2 p3 'minio:jma1closed' 'minio:jma2closed' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1closedto2 p4 'minio:jma1closed' 'minio:jma2closed' 16
-#* * * * * cd /home/noyori/tests; ./clone.sh --urgent cache minio1closedto2 p5 'minio:jma1closed' 'minio:jma2closed' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1 clone_bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1 clone_bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1 clone_cc txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1 clone_cc bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2 clone_aa txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2 clone_aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2 clone_cc txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2 clone_cc bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3 clone_aa txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3 clone_aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3 clone_bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3 clone_bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1_closed clone_bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1_closed clone_bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1_closed clone_cc txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_1_closed clone_cc bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2_closed clone_aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2_closed clone_aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2_closed clone_cc txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_2_closed clone_cc bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3_closed clone_aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3_closed clone_aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3_closed clone_bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 16
+* * * * * cd /home/noyori/tests; ./clone.sh cache_3_closed clone_bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' 16
 
 # sub
-* * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
-* * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
-* * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
-* * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
+*/10 * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
+*/10 * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' 16
+10 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
+10 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' 16
 
 # delete on local PC
 55 1,9,17 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
