@@ -306,11 +306,6 @@ elif test $6 -le 0; then
   echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
-if test ${urgent} -eq 1; then
-  job_num=4
-  time_limit=`expr ${job_period} / ${job_num}`
-  deadline=`expr \( ${job_num} - 1 \) \* ${time_limit}`
-fi
 inclusive_pattern_file=''
 if test -n $7; then
   inclusive_pattern_file=$7

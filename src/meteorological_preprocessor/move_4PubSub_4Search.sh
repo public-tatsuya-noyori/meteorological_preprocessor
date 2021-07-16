@@ -56,7 +56,7 @@ datetime_minute=`echo ${datetime} | cut -c11-12`
 bandwidth_limit_k_bytes_per_s=0
 job_directory=4Move
 move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
-move_index_minute=4
+move_index_minute=3
 for minute_count in `seq ${move_index_minute}`; do
   move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H%M"`
 done
@@ -92,6 +92,7 @@ if test -z "${rclone_remote_bucket}"; then
 fi
 work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
 mkdir -p ${work_directory}
+sleep 30
 if test -s ${work_directory}/pid.txt; then
   running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
 else
