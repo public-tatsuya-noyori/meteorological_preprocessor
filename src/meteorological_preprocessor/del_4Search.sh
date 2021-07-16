@@ -28,9 +28,10 @@ delete_4Search() {
   if test ${exit_code} -eq 0; then
     cp /dev/null ${work_directory}/err_log.tmp
   else
-    cat ${work_directory}/err_log.tmp >&2
-    echo "ERROR: can not get index directory list from ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}." >&2
-    return ${exit_code}
+#    cat ${work_directory}/err_log.tmp >&2
+#    echo "ERROR: can not get index directory list from ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}." >&2
+#    return ${exit_code}
+    return 0
   fi
   if test -s ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp; then
     rm -rf ${work_directory}/${search_index_directory}/${txt_or_bin}
