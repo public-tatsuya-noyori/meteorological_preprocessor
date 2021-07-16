@@ -179,7 +179,8 @@ subscribe() {
           fi
         fi
         if test -s ${source_work_directory}/newly_created_file.tmp; then
-          ls -1 ${processed_directory}/ | sed -e "s|^|${processed_directory}/|g" | xargs -r cat > ${work_directory}/all_processed_file.txt
+          cp /dev/null ${work_directory}/all_processed_file.txt
+          ls -1 ${processed_directory}/ | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt
           set +e
           grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp | grep -v -F -f ${work_directory}/processed_file.txt > ${source_work_directory}/filtered_newly_created_file.tmp
           set -e
@@ -283,5 +284,5 @@ if test ${running} -eq 0; then
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
   wait ${pid}
-  ls -1 ${processed_directory}/  | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
+  ls -1 ${processed_directory} | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
 fi
