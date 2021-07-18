@@ -245,11 +245,14 @@ clone() {
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
       echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
-      return ${exit_code}
     fi
   fi
   if test ${exit_code} -eq 0; then
-    mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
+    for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
+      source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
+      source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
+      mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
+    done
   fi
   return ${exit_code}
 }
