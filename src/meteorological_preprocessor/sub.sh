@@ -192,7 +192,6 @@ subscribe() {
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then
-            cp /dev/null ${work_directory}/processed_file.txt
             set +e
             grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
             set -e
