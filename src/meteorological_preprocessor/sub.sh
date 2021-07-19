@@ -23,7 +23,6 @@ subscribe() {
   return_code=0
   for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     exit_code=255
-    cp /dev/null ${work_directory}/processed_file.txt
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
     source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
     mkdir -p ${source_work_directory}
@@ -183,7 +182,7 @@ subscribe() {
           cp /dev/null ${work_directory}/all_processed_file.txt
           ls -1 ${processed_directory}/ | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt
           set +e
-          grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp | grep -v -F -f ${work_directory}/processed_file.txt > ${source_work_directory}/filtered_newly_created_file.tmp
+          grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp > ${source_work_directory}/filtered_newly_created_file.tmp
           set -e
         fi
         if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
@@ -193,8 +192,9 @@ subscribe() {
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then
+            cp /dev/null ${work_directory}/processed_file.txt
             set +e
-            grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' | sort -u >> ${work_directory}/processed_file.txt
+            grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
             set -e
           else
             set +e
