@@ -213,6 +213,9 @@ subscribe() {
     now=`date -u "+%Y%m%d%H%M%S"`
     mv ${work_directory}/processed_file.txt ${processed_directory}/${unique_job_name}_${now}.txt
   fi
+  if test ${exit_code} -eq 0; then
+    ls -1 ${processed_directory} | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
+  fi
   return ${exit_code}
 }
 bandwidth_limit_k_bytes_per_s=0
@@ -220,7 +223,7 @@ datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 delete_index_date_hour_pattern=${datetime_date}${datetime_hour}
-delete_index_hour=24
+delete_index_hour=6
 for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
@@ -284,5 +287,4 @@ if test ${running} -eq 0; then
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
   wait ${pid}
-  ls -1 ${processed_directory} | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
 fi
