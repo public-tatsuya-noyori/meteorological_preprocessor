@@ -40,7 +40,6 @@ clone() {
     return ${exit_code}
   fi
   for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
-    exit_code=255
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
     source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
     mkdir -p ${source_work_directory}
@@ -228,15 +227,15 @@ clone() {
               rm -rf ${work_directory}/prepare
               mkdir ${work_directory}/prepare
               now=`date -u "+%Y%m%d%H%M%S"`
-              cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}.txt
-              gzip -f ${work_directory}/prepare/${now}.txt
+              cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_job_name}.txt
+              gzip -f ${work_directory}/prepare/${now}_${unique_job_name}.txt
               set +e
               timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
               exit_code=$?
               set -e
               if test ${exit_code} -eq 0; then
-                mv ${work_directory}/processed_file.txt ${processed_directory}/${unique_job_name}_${now}.txt
-                ls -1 ${processed_directory} | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
+                mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
+                ls -1 ${processed_directory} | grep -E "_${unique_job_name}\.txt$" | grep -v -E "^(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]_${unique_job_name}\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
                 break
               else
                 sleep 1
@@ -251,10 +250,10 @@ clone() {
         fi
       fi
     fi
+    if test ${exit_code} -ne 0; then
+      return_code=${exit_code}
+    fi
   done
-  if test ${exit_code} -ne 0; then
-    return_code=${exit_code}
-  fi
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0

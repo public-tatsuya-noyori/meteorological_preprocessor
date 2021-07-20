@@ -22,7 +22,6 @@ IFS=$'\n'
 subscribe() {
   return_code=0
   for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
-    exit_code=255
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
     source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
     mkdir -p ${source_work_directory}
@@ -206,8 +205,8 @@ subscribe() {
         if test ${exit_code} -eq 0; then
           if test -s ${work_directory}/processed_file.txt; then
             now=`date -u "+%Y%m%d%H%M%S"`
-            mv ${work_directory}/processed_file.txt ${processed_directory}/${unique_job_name}_${now}.txt
-            ls -1 ${processed_directory} | grep -E "^${unique_job_name}_" | grep -v -E "^${unique_job_name}_(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
+            mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
+            ls -1 ${processed_directory} | grep -E "_${unique_job_name}\.txt$" | grep -v -E "^(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]_${unique_job_name}\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
             sleep 1
           fi
           mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
