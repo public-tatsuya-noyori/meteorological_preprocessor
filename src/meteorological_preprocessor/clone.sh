@@ -238,7 +238,7 @@ clone() {
             set -e
             if test ${exit_code} -eq 0; then
               mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
-              ls -1 ${processed_directory} | grep -E "_${unique_job_name}\.txt$" | grep -v -E "^(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]_${unique_job_name}\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
+              find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_job_name}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
               break
             else
               sleep 1
@@ -259,14 +259,7 @@ clone() {
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0
-datetime=`date -u "+%Y%m%d%H%M%S"`
-datetime_date=`echo ${datetime} | cut -c1-8`
-datetime_hour=`echo ${datetime} | cut -c9-10`
-delete_index_date_hour_pattern=${datetime_date}${datetime_hour}
-delete_index_hour=6
-for hour_count in `seq ${delete_index_hour}`; do
-  delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
-done
+delete_index_minute=360
 job_directory=4PubClone
 pubsub_index_directory=4PubSub
 retry_num=8
