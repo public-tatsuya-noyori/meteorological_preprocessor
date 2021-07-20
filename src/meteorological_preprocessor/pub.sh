@@ -20,7 +20,6 @@
 set -e
 IFS=$'\n'
 publish(){
-  exit_code=255
   grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test ! -s ${work_directory}/newly_created_file.tmp; then
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2

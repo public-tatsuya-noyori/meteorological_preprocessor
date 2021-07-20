@@ -21,6 +21,7 @@ set -e
 IFS=$'\n'
 clone() {
   return_code=0
+  exit_code=0
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
@@ -40,6 +41,9 @@ clone() {
     return ${exit_code}
   fi
   for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
+    if test ${exit_code} -ne 0; then
+      return_code=${exit_code}
+    fi
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
     source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
     mkdir -p ${source_work_directory}
@@ -220,40 +224,38 @@ clone() {
             continue
           fi
         fi
-        if test ${exit_code} -eq 0; then
-          if test -s ${work_directory}/processed_file.txt; then
-            for retry_count in `seq ${retry_num}`; do
-              cp /dev/null ${work_directory}/err_log.tmp
-              rm -rf ${work_directory}/prepare
-              mkdir ${work_directory}/prepare
-              now=`date -u "+%Y%m%d%H%M%S"`
-              cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_job_name}.txt
-              gzip -f ${work_directory}/prepare/${now}_${unique_job_name}.txt
-              set +e
-              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
-              exit_code=$?
-              set -e
-              if test ${exit_code} -eq 0; then
-                mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
-                ls -1 ${processed_directory} | grep -E "_${unique_job_name}\.txt$" | grep -v -E "^(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]_${unique_job_name}\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
-                break
-              else
-                sleep 1
-              fi
-            done
-            if test ${exit_code} -ne 0; then
-              cat ${work_directory}/err_log.tmp >&2
-              echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
+        if test -s ${work_directory}/processed_file.txt; then
+          for retry_count in `seq ${retry_num}`; do
+            cp /dev/null ${work_directory}/err_log.tmp
+            rm -rf ${work_directory}/prepare
+            mkdir ${work_directory}/prepare
+            now=`date -u "+%Y%m%d%H%M%S"`
+            cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_job_name}.txt
+            gzip -f ${work_directory}/prepare/${now}_${unique_job_name}.txt
+            set +e
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
+            exit_code=$?
+            set -e
+            if test ${exit_code} -eq 0; then
+              mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
+              ls -1 ${processed_directory} | grep -E "_${unique_job_name}\.txt$" | grep -v -E "^(${delete_index_date_hour_pattern})[0-9][0-9][0-9][0-9]_${unique_job_name}\.txt$" | sed -e "s|^|${processed_directory}/|g" | xargs -r rm -f
+              break
+            else
+              sleep 1
             fi
+          done
+          if test ${exit_code} -ne 0; then
+            cat ${work_directory}/err_log.tmp >&2
+            echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
           fi
-          mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
         fi
+        mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
       fi
     fi
-    if test ${exit_code} -ne 0; then
-      return_code=${exit_code}
-    fi
   done
+  if test ${exit_code} -ne 0; then
+    return_code=${exit_code}
+  fi
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0
