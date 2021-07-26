@@ -183,8 +183,8 @@ subscribe() {
         fi
         if test -s ${source_work_directory}/newly_created_file.tmp; then
           cp /dev/null ${work_directory}/all_processed_file.txt
-          ls -1 ${processed_directory}/ | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt
           set +e
+          ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt 2>/dev/null
           grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp > ${source_work_directory}/filtered_newly_created_file.tmp
           set -e
         fi
@@ -222,7 +222,7 @@ subscribe() {
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0
-delete_index_minute=360
+delete_index_minute=60
 job_directory=4Sub
 pubsub_index_directory=4PubSub
 rclone_timeout=600
