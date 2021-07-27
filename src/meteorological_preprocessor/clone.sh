@@ -127,7 +127,7 @@ clone() {
           fi
           sed -e 's|/$||g' ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp > ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
-            former_index_file_first_line=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt`
+            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt.gz$||g'`
             search_index_directory_exit_code=0
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
               set +e
@@ -143,17 +143,17 @@ clone() {
                 break
               fi
               sed -e "s|^|${date_hour_directory}|g" ${source_work_directory}/${search_index_directory}_minute_second_index.tmp > ${source_work_directory}/${search_index_directory}_index.tmp
-              former_index_file_first_line_count=0
-              if test -n "${former_index_file_first_line}"; then
-                former_index_file_first_line_count=`grep -F ${former_index_file_first_line} ${source_work_directory}/${search_index_directory}_index.tmp | wc -l`
+              former_index_file_first_line_prefix_count=0
+              if test -n "${former_index_file_first_line_prefix}"; then
+                former_index_file_first_line_prefix_count=`grep -F ${former_index_file_first_line_prefix} ${source_work_directory}/${search_index_directory}_index.tmp | wc -l`
               fi
-              if test ${former_index_file_first_line_count} -eq 0; then
+              if test ${former_index_file_first_line_prefix_count} -eq 0; then
                 set +e
                 grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
                 set -e
               else
                 set +e
-                sed -ne "/${former_index_file_first_line}/,\$p" ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
+                sed -ne "/${former_index_file_first_line_prefix}/,\$p" ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
                 set -e
                 break
               fi
@@ -230,15 +230,17 @@ clone() {
             rm -rf ${work_directory}/prepare
             mkdir ${work_directory}/prepare
             now=`date -u "+%Y%m%d%H%M%S"`
-            cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_job_name}.txt
-            gzip -f ${work_directory}/prepare/${now}_${unique_job_name}.txt
+            cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
+            gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
             set +e
             timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
             exit_code=$?
             set -e
             if test ${exit_code} -eq 0; then
-              mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
-              find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_job_name}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+              mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_center_id}.txt
+#              find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+              mkdir -p ${processed_directory}_old
+              find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
               break
             else
               sleep 1
@@ -259,17 +261,17 @@ clone() {
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0
-delete_index_minute=60
+delete_index_minute=360
 job_directory=4PubClone
 pubsub_index_directory=4PubSub
-retry_num=8
 rclone_timeout=600
+retry_num=8
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -277,8 +279,8 @@ if test -z $6; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory=$1
-unique_job_name=$2
+local_work_directory_open_or_closed=$1
+unique_center_id=$2
 set +e
 txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 source_rclone_remote_bucket_main_sub=`echo $4 | grep -F ':'`
@@ -312,12 +314,12 @@ exclusive_pattern_file=''
 if test -n $8; then
   exclusive_pattern_file=$8
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
-processed_directory=${local_work_directory}/${job_directory}/__processed/${txt_or_bin}
+work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id}/${txt_or_bin}
+processed_directory=${local_work_directory_open_or_closed}/${job_directory}/processed/${txt_or_bin}
 mkdir -p ${work_directory} ${processed_directory}
 touch ${processed_directory}/dummy.tmp ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${txt_or_bin} " | wc -l`
 else
   running=0
 fi

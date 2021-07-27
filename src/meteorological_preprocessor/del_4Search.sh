@@ -105,7 +105,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -113,8 +113,8 @@ if test -z $4; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory=$1
-unique_job_name=$2
+local_work_directory_open_or_closed=$1
+unique_center_id_main_or_sub=$2
 set +e
 txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 rclone_remote_bucket=`echo $4 | grep -F ':'`
@@ -127,10 +127,10 @@ if test -z "${rclone_remote_bucket}"; then
   echo "ERROR: $4 is not rclone_remote:bucket." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
+work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id_main_or_sub}/${txt_or_bin}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${txt_or_bin} " | wc -l`
 else
   running=0
 fi

@@ -37,7 +37,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--debug_shell] [--timeout rclone_timeout] local_work_directory unique_job_name rclone_remote_bucket days_ago"; exit 0;;
+    "--help" ) echo "$0 [--debug_shell] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -45,8 +45,8 @@ if test -z $4; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory=$1
-unique_job_name=$2
+local_work_directory_open_or_closed=$1
+unique_center_id_main_or_sub=$2
 set +e
 rclone_remote_bucket=`echo $3 | grep -F ':'`
 days_ago=`echo $4 | grep "^[0-9]\+$"`
@@ -62,10 +62,10 @@ elif test $4 -le 0; then
   echo "ERROR: $4 is not more than 1." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}
+work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id_main_or_sub}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_job_name} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | wc -l`
 else
   running=0
 fi

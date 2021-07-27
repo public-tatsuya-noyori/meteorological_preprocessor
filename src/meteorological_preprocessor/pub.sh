@@ -20,9 +20,9 @@
 set -e
 IFS=$'\n'
 publish(){
-  grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
+  grep ^${local_work_directory_open_or_closed}/ ${input_index_file} | sed -e "s|^${local_work_directory_open_or_closed}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test ! -s ${work_directory}/newly_created_file.tmp; then
-    echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
+    echo "ERROR: can not match ^${local_work_directory_open_or_closed}/ on ${input_index_file}." >&2
     return 199
   fi
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
@@ -50,7 +50,7 @@ publish(){
   set -e
   cp /dev/null ${work_directory}/info_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+  timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -69,14 +69,14 @@ publish(){
       rm -rf ${work_directory}/prepare
       mkdir ${work_directory}/prepare
       now=`date -u "+%Y%m%d%H%M%S"`
-      cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_job_name}.txt
-      gzip -f ${work_directory}/prepare/${now}_${unique_job_name}.txt
+      cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
+      gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
       set +e
       timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_job_name}.txt
+        mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_center_id}.txt
         break
       else
         sleep 1
@@ -89,7 +89,9 @@ publish(){
     fi
   fi
   if test ${exit_code} -eq 0; then
-    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_job_name}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+#    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+    mkdir -p ${processed_directory}_old
+    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
     if test ${rm_input_index_file} -eq 1; then
       rm -f ${input_index_file}
     fi
@@ -97,7 +99,7 @@ publish(){
   return ${exit_code}
 }
 bandwidth_limit_k_bytes_per_s=0
-delete_index_minute=60
+delete_index_minute=360
 job_directory=4PubClone
 pubsub_index_directory=4PubSub
 rclone_timeout=600
@@ -107,7 +109,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory unique_job_name txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
@@ -116,8 +118,8 @@ if test -z $6; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory=$1
-unique_job_name=$2
+local_work_directory_open_or_closed=$1
+unique_center_id=$2
 set +e
 txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 input_index_file=$4
@@ -143,12 +145,12 @@ elif test $6 -le 0; then
   echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_job_name}/${txt_or_bin}
-processed_directory=${local_work_directory}/${job_directory}/__processed/${txt_or_bin}
+work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id}/${txt_or_bin}
+processed_directory=${local_work_directory_open_or_closed}/${job_directory}/processed/${txt_or_bin}
 mkdir -p ${work_directory} ${processed_directory}
 touch ${processed_directory}/dummy.tmp ${work_directory}/all_processed_file.txt
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_job_name} " | grep -F " ${txt_or_bin} " | wc -l`
+  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${txt_or_bin} " | wc -l`
 else
   running=0
 fi

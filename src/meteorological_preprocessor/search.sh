@@ -32,7 +32,7 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--end" ) end_yyyymmddhhmm=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory txt_or_bin rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory_open_or_closed txt_or_bin rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
     "--out" ) out=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;
@@ -43,7 +43,7 @@ if test -z $4; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory=$1
+local_work_directory_open_or_closed=$1
 set +e
 txt_or_bin=`echo $2 | grep -E '^(txt|bin)$'`
 rclone_remote_bucket=`echo $3 | grep -F ':'`
@@ -92,7 +92,7 @@ if test -n "${end_yyyymmddhhmm}"; then
   end_yyyymmddhhmm=`expr 0 + ${end_yyyymmddhhmm}`
   set -e
 fi
-work_directory=${local_work_directory}/${job_directory}/${temporary_directory}
+work_directory=${local_work_directory_open_or_closed}/${job_directory}/${temporary_directory}
 if test -e ${work_directory}; then
   echo "ERROR: exist ${work_directory}." >&2
   exit 199
@@ -155,7 +155,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
             cat ${work_directory}/search_file.tmp
           else
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -206,7 +206,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           cat ${work_directory}/search_file.tmp
         else
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
@@ -269,7 +269,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
                 cat ${work_directory}/search_file.tmp
               else
                 set +e
-                timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+                timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
                 exit_code=$?
                 set -e
                 if test ${exit_code} -ne 0; then
@@ -327,7 +327,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
             cat ${work_directory}/search_file.tmp
           else
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -392,7 +392,7 @@ else
               cat ${work_directory}/search_file.tmp
             else
               set +e
-              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then
@@ -450,7 +450,7 @@ else
           cat ${work_directory}/search_file.tmp
         else
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
