@@ -24,6 +24,7 @@ import numpy as np
 import os
 import pandas as pd
 import pkg_resources
+import pyarrow as pa
 import re
 import sys
 import traceback
@@ -471,6 +472,11 @@ def main():
     if not os.path.isdir(args.output_directory):
         print('Error', errno, ':', args.output_directory, 'is not directory.', file=sys.stderr)
         sys.exit(errno)
+    if not os.path.exists(args.checksum_arrow_file):
+        with open(args.checksum_arrow_file, 'bw') as out_f:
+            property_batch = pa.record_batch([[], []], names=['mtime', 'checksum'])
+            property_table = pa.Table.from_batches([property_batch])
+            feather.write_feather(property_table, out_f, compression='zstd')
     if not os.path.isfile(args.checksum_arrow_file):
         print('Error', errno, ':', args.checksum_arrow_file, 'is not file.', file=sys.stderr)
         sys.exit(errno)
