@@ -25,9 +25,7 @@ move_4PubSub_4Search() {
   timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
-  if test ${exit_code} -eq 0; then
-    cp /dev/null ${work_directory}/err_log.tmp
-  else
+  if test ${exit_code} -ne 0; then
     cat ${work_directory}/err_log.tmp >&2
     echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
     return ${exit_code}
@@ -35,13 +33,12 @@ move_4PubSub_4Search() {
   for index_file in `grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]_.*\.txt\.gz$" ${work_directory}/${pubsub_index_directory}_index.tmp | head -n -1`; do
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
+    cp /dev/null ${work_directory}/err_log.tmp
     set +e
     timeout -k 3 ${rclone_timeout} rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
-    if test ${exit_code} -eq 0; then
-      cp /dev/null ${work_directory}/err_log.tmp
-    else
+    if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
       echo "ERROR: can not move ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${index_file_date_hour}/${index_file_minute_second_extension}." >&2
       return ${exit_code}
@@ -50,13 +47,12 @@ move_4PubSub_4Search() {
   index_file_count=`grep -E '^[0-9]{14}_.*\.txt\.gz$' ${work_directory}/${pubsub_index_directory}_index.tmp | wc -l`
   if test ${index_file_count} -eq 1; then
     touch_index_file=`grep -E '^[0-9]{14}_.*\.txt\.gz$' ${work_directory}/${pubsub_index_directory}_index.tmp`
+    cp /dev/null ${work_directory}/err_log.tmp
     set +e
     timeout -k 3 ${rclone_timeout} rclone touch --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${touch_index_file}
     exit_code=$?
     set -e
-    if test ${exit_code} -eq 0; then
-      cp /dev/null ${work_directory}/err_log.tmp
-    else
+    if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
       echo "ERROR: can not touch ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${touch_index_file}." >&2
       return ${exit_code}
