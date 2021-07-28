@@ -101,6 +101,7 @@ publish(){
 bandwidth_limit_k_bytes_per_s=0
 delete_index_minute=360
 job_directory=4PubClone
+parallel=16
 pubsub_index_directory=4PubSub
 rclone_timeout=600
 retry_num=8
@@ -109,7 +110,8 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' parallel"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
+    "--parallel" ) parallel=$2;shift;shift;;
     "--rm_input_index_file" ) rm_input_index_file=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
@@ -124,7 +126,6 @@ set +e
 txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 input_index_file=$4
 destination_rclone_remote_bucket_main_sub=`echo $5 | grep -F ':'`
-parallel=`echo $6 | grep "^[0-9]\+$"`
 set -e
 if test -z "${txt_or_bin}"; then
   echo "ERROR: $3 is not txt or bin." >&2
@@ -136,13 +137,6 @@ if test ! -s ${input_index_file}; then
 fi
 if test -z "${destination_rclone_remote_bucket_main_sub}"; then
   echo "ERROR: $5 is not rclone_remote:bucket." >&2
-  exit 199
-fi
-if test -z "${parallel}"; then
-  echo "ERROR: $6 is not integer." >&2
-  exit 199
-elif test $6 -le 0; then
-  echo "ERROR: $6 is not more than 1." >&2
   exit 199
 fi
 work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id}/${txt_or_bin}
