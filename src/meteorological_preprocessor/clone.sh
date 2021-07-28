@@ -243,7 +243,9 @@ clone() {
             echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
           fi
         fi
-        mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
+        if test ${exit_code} -eq 0; then
+          mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
+        fi
       fi
     fi
     if test ${exit_code} -eq 0; then
