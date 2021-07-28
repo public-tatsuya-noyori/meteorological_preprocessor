@@ -20,6 +20,7 @@
 set -e
 IFS=$'\n'
 publish(){
+  cp /dev/null ${work_directory}/newly_created_file.tmp
   grep ^${local_work_directory_open_or_closed}/ ${input_index_file} | sed -e "s|^${local_work_directory_open_or_closed}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test ! -s ${work_directory}/newly_created_file.tmp; then
     echo "ERROR: can not match ^${local_work_directory_open_or_closed}/ on ${input_index_file}." >&2
@@ -32,7 +33,6 @@ publish(){
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
-      cp /dev/null ${work_directory}/err_log.tmp
       break
     else
       cat ${work_directory}/err_log.tmp >&2
@@ -44,6 +44,7 @@ publish(){
     return ${exit_code}
   fi
   cp /dev/null ${work_directory}/all_processed_file.txt
+  cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
   set +e
   ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt 2>/dev/null
   grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
@@ -60,6 +61,7 @@ publish(){
     echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
     return ${exit_code}
   fi
+  cp /dev/null ${work_directory}/processed_file.txt
   set +e
   grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' | sort -u > ${work_directory}/processed_file.txt
   set -e

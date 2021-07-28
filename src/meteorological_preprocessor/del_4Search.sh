@@ -62,7 +62,7 @@ delete_4Search() {
         ls -1 ${work_directory}/${search_index_directory}/${txt_or_bin}/${date_hour_directory}/* | xargs -r zcat > ${work_directory}/${search_index_directory}_file.tmp
         if test -s ${work_directory}/${search_index_directory}_file.tmp; then
           set +e
-          timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_file.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+          timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_file.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then
@@ -74,7 +74,7 @@ delete_4Search() {
           fi
         fi
         set +e
-        timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+        timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then

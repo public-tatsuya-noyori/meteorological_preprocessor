@@ -29,52 +29,51 @@ subscribe() {
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
     source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
     mkdir -p ${source_work_directory}
-    cp /dev/null ${source_work_directory}/err_log.tmp
-    cp /dev/null ${source_work_directory}/${pubsub_index_directory}_index_diff.txt
     rm -rf ${source_work_directory}/${pubsub_index_directory}/${txt_or_bin}
     rm -rf ${source_work_directory}/${search_index_directory}/${txt_or_bin}
     if test ! -f ${source_work_directory}/${pubsub_index_directory}_index.txt; then
+      cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
       timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_index.txt
       exit_code=$?
       set -e
-      if test ${exit_code} -eq 0; then
-        cp /dev/null ${source_work_directory}/err_log.tmp
-      else
+      if test ${exit_code} -ne 0; then
         cat ${source_work_directory}/err_log.tmp >&2
         echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
         rm -f ${source_work_directory}/${pubsub_index_directory}_index.txt
         continue
       fi
     fi
+    cp /dev/null ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
+    cp /dev/null ${source_work_directory}/err_log.tmp
     set +e
     timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
     exit_code=$?
     set -e
-    if test ${exit_code} -eq 0; then
-      cp /dev/null ${source_work_directory}/err_log.tmp
-    else
+    if test ${exit_code} -ne 0; then
       cat ${source_work_directory}/err_log.tmp >&2
       echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
       continue
     fi
     if test -s ${source_work_directory}/${pubsub_index_directory}_new_index.tmp; then
+      cp /dev/null ${source_work_directory}/${pubsub_index_directory}_index_diff.txt
       set +e
       diff ${source_work_directory}/${pubsub_index_directory}_index.txt ${source_work_directory}/${pubsub_index_directory}_new_index.tmp | grep -F '>' | cut -c3- | grep -v '^ *$' > ${source_work_directory}/${pubsub_index_directory}_index_diff.txt
       set -e
       if test -s ${source_work_directory}/${pubsub_index_directory}_index_diff.txt; then
+        cp /dev/null ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
         sed -e "s|^|/${pubsub_index_directory}/${txt_or_bin}/|g" ${source_work_directory}/${pubsub_index_directory}_index_diff.txt > ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
+        cp /dev/null ${source_work_directory}/err_log.tmp
         set +e
         timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
         exit_code=$?
         set -e
-        if test ${exit_code} -eq 0; then
-          cp /dev/null ${source_work_directory}/err_log.tmp
-        else
+        if test ${exit_code} -ne 0; then
           cat ${source_work_directory}/err_log.tmp >&2
           echo "ERROR: ${exit_code}: can not get index file from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
           continue
         fi
+        cp /dev/null ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp
         ls -1 ${source_work_directory}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp
         set +e
         cmp -s ${source_work_directory}/${pubsub_index_directory}_index_diff.txt ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp
@@ -96,34 +95,36 @@ subscribe() {
         fi
         cp /dev/null ${source_work_directory}/${search_index_directory}_new_index.tmp
         if test ${cmp_exit_code_1} -eq 1 -o ${cmp_exit_code_2} -eq 0; then
+          cp /dev/null ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
+          cp /dev/null ${source_work_directory}/err_log.tmp
           set +e
           timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin} > ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
           exit_code=$?
           set -e
-          if test ${exit_code} -eq 0; then
-            cp /dev/null ${source_work_directory}/err_log.tmp
-          else
+          if test ${exit_code} -ne 0; then
             cat ${source_work_directory}/err_log.tmp >&2
             echo "ERROR: ${exit_code}: can not get index directory list from ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}." >&2
             continue
           fi
+          cp /dev/null ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           sed -e 's|/$||g' ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp > ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
             former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt\.gz$||g'`
             search_index_directory_exit_code=0
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
+              cp /dev/null ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
+              cp /dev/null ${source_work_directory}/err_log.tmp
               set +e
               timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory} > ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
               exit_code=$?
               set -e
-              if test ${exit_code} -eq 0; then
-                cp /dev/null ${source_work_directory}/err_log.tmp
-              else
+              if test ${exit_code} -ne 0; then
                 search_index_directory_exit_code=${exit_code}
                 cat ${source_work_directory}/err_log.tmp >&2
                 echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory}." >&2
                 break
               fi
+              cp /dev/null ${source_work_directory}/${search_index_directory}_index.tmp
               sed -e "s|^|${date_hour_directory}|g" ${source_work_directory}/${search_index_directory}_minute_second_index.tmp > ${source_work_directory}/${search_index_directory}_index.tmp
               former_index_file_first_line_prefix_count=0
               if test -n "${former_index_file_first_line_prefix}"; then
@@ -143,14 +144,14 @@ subscribe() {
             if test ${search_index_directory_exit_code} -ne 0; then
               continue
             fi
+            cp /dev/null ${source_work_directory}/${search_index_directory}_newly_created_index.tmp
             cat ${source_work_directory}/${search_index_directory}_new_index.tmp | sort -u | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${txt_or_bin}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${search_index_directory}_newly_created_index.tmp
+            cp /dev/null ${source_work_directory}/err_log.tmp
             set +e
             timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${search_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
             exit_code=$?
             set -e
-            if test ${exit_code} -eq 0; then
-              cp /dev/null ${source_work_directory}/err_log.tmp
-            else
+            if test ${exit_code} -ne 0; then
               cat ${source_work_directory}/err_log.tmp >&2
               echo "ERROR: ${exit_code}: can not get index file from ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}." >&2
               continue
@@ -181,6 +182,7 @@ subscribe() {
             ls -1 ${source_work_directory}/${pubsub_index_directory}/${txt_or_bin}/* | xargs -r zcat > ${source_work_directory}/newly_created_file.tmp
           fi
         fi
+        cp /dev/null ${source_work_directory}/filtered_newly_created_file.tmp
         if test -s ${source_work_directory}/newly_created_file.tmp; then
           cp /dev/null ${work_directory}/all_processed_file.txt
           set +e
@@ -188,6 +190,7 @@ subscribe() {
           grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp > ${source_work_directory}/filtered_newly_created_file.tmp
           set -e
         fi
+        cp /dev/null ${work_directory}/processed_file.txt
         if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
           cp /dev/null ${source_work_directory}/info_log.tmp
           set +e
