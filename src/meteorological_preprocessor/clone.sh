@@ -124,7 +124,7 @@ clone() {
           fi
           sed -e 's|/$||g' ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp > ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
-            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt\.gz$||g'`
+            former_index_file_first_line_prefix=`grep -E "^[0-9]{14}_${source_index_file_unique_center_id_pattern}\.txt\.gz$" ${source_work_directory}/${pubsub_index_directory}_index.txt | head -1 | sed -e 's|_.*\.txt\.gz$||g'`
             search_index_directory_exit_code=0
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
               cp /dev/null ${source_work_directory}/err_log.tmp
