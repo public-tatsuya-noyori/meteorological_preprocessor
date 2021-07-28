@@ -61,9 +61,10 @@ clone() {
         continue
       fi
     fi
+    cp /dev/null ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
     cp /dev/null ${source_work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp.tmp
+    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -71,9 +72,6 @@ clone() {
       echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
       continue
     fi
-    set +e
-    grep -E "^[0-9]{14}_${source_index_file_unique_center_id_pattern}\.txt\.gz$" ${source_work_directory}/${pubsub_index_directory}_new_index.tmp.tmp > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
-    set -e
     if test -s ${source_work_directory}/${pubsub_index_directory}_new_index.tmp; then
       cp /dev/null ${source_work_directory}/${pubsub_index_directory}_index_diff.txt
       set +e
@@ -124,7 +122,7 @@ clone() {
           fi
           sed -e 's|/$||g' ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp > ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
-            former_index_file_first_line_prefix=`grep -E "^[0-9]{14}_${source_index_file_unique_center_id_pattern}\.txt\.gz$" ${source_work_directory}/${pubsub_index_directory}_index.txt | head -1 | sed -e 's|_.*\.txt\.gz$||g'`
+            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt\.gz$||g'`
             search_index_directory_exit_code=0
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
               cp /dev/null ${source_work_directory}/err_log.tmp
@@ -138,7 +136,7 @@ clone() {
                 echo "ERROR: ${exit_code}: can not get index file list from ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory}." >&2
                 break
               fi
-              grep -E "^[0-9]{4}_${source_index_file_unique_center_id_pattern}\.txt\.gz$" ${source_work_directory}/${search_index_directory}_minute_second_index.tmp | sed -e "s|^|${date_hour_directory}|g" > ${source_work_directory}/${search_index_directory}_index.tmp
+              sed -e "s|^|${date_hour_directory}|g" ${source_work_directory}/${search_index_directory}_minute_second_index.tmp > ${source_work_directory}/${search_index_directory}_index.tmp
               former_index_file_first_line_prefix_count=0
               if test -n "${former_index_file_first_line_prefix}"; then
                 former_index_file_first_line_prefix_count=`grep -F ${former_index_file_first_line_prefix} ${source_work_directory}/${search_index_directory}_index.tmp | wc -l`
@@ -272,12 +270,12 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'source_index_file_unique_center_id[|source_index_file_unique_center_id[|...]]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
-if test -z $6; then
+if test -z $5; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
@@ -286,8 +284,7 @@ unique_center_id=$2
 set +e
 txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
 source_rclone_remote_bucket_main_sub=`echo $4 | grep -F ':'`
-source_index_file_unique_center_id_pattern=$5
-destination_rclone_remote_bucket_main_sub=`echo $6 | grep -F ':'`
+destination_rclone_remote_bucket_main_sub=`echo $5 | grep -F ':'`
 set -e
 if test -z "${txt_or_bin}"; then
   echo "ERROR: $3 is not txt or bin." >&2
@@ -298,16 +295,16 @@ if test -z "${source_rclone_remote_bucket_main_sub}"; then
   exit 199
 fi
 if test -z "${destination_rclone_remote_bucket_main_sub}"; then
-  echo "ERROR: $6 is not rclone_remote:bucket." >&2
+  echo "ERROR: $5 is not rclone_remote:bucket." >&2
   exit 199
 fi
 inclusive_pattern_file=''
-if test -n $7; then
-  inclusive_pattern_file=$7
+if test -n $6; then
+  inclusive_pattern_file=$6
 fi
 exclusive_pattern_file=''
-if test -n $8; then
-  exclusive_pattern_file=$8
+if test -n $7; then
+  exclusive_pattern_file=$7
 fi
 work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id}/${txt_or_bin}
 processed_directory=${local_work_directory_open_or_closed}/${job_directory}/processed/${txt_or_bin}
