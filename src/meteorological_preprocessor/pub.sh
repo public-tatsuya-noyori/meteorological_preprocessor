@@ -50,7 +50,7 @@ publish(){
   set -e
   cp /dev/null ${work_directory}/info_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
+  timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then

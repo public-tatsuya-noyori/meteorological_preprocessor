@@ -83,7 +83,7 @@ clone() {
       if test -s ${source_work_directory}/${pubsub_index_directory}_index_diff.txt; then
         sed -e "s|^|/${pubsub_index_directory}/${txt_or_bin}/|g" ${source_work_directory}/${pubsub_index_directory}_index_diff.txt > ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
         exit_code=$?
         set -e
         if test ${exit_code} -eq 0; then
@@ -127,7 +127,7 @@ clone() {
           fi
           sed -e 's|/$||g' ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp > ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
-            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt.gz$||g'`
+            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt\.gz$||g'`
             search_index_directory_exit_code=0
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
               set +e
@@ -163,7 +163,7 @@ clone() {
             fi
             cat ${source_work_directory}/${search_index_directory}_new_index.tmp | sort -u | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${txt_or_bin}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${search_index_directory}_newly_created_index.tmp
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${search_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${search_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
             exit_code=$?
             set -e
             if test ${exit_code} -eq 0; then
@@ -209,7 +209,7 @@ clone() {
         if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
           cp /dev/null ${source_work_directory}/info_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
           exit_code=$?
           set -e
           if test ${exit_code} -eq 0; then
