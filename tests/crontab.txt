@@ -142,7 +142,7 @@
 *   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
 
 # delete on local PC
-55 1,9,17 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
+58 0,8,16 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r rm -rf > /dev/null 2>&1
 #55 2,10,18 * * * find /home/noyori/tests/cache_bufr_to_arrow -mindepth 6 -type d -mmin +360 | grep C_RJTD | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 #55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +1440 | grep 20 | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 
