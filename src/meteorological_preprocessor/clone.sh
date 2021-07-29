@@ -259,7 +259,7 @@ clone() {
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0
-delete_index_minute=60
+delete_index_minute=360
 job_directory=4PubClone
 parallel=16
 pubsub_index_directory=4PubSub
