@@ -48,6 +48,9 @@ clone() {
     mkdir -p ${source_work_directory}
     rm -rf ${source_work_directory}/${pubsub_index_directory}/${txt_or_bin}
     rm -rf ${source_work_directory}/${search_index_directory}/${txt_or_bin}
+    if test -f ${source_work_directory}/${pubsub_index_directory}_index.txt; then
+      find ${source_work_directory}/${pubsub_index_directory}_index.txt -mmin +${delete_index_minute} | xargs -r rm -f
+    fi
     if test ! -f ${source_work_directory}/${pubsub_index_directory}_index.txt; then
       cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
