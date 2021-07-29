@@ -136,8 +136,8 @@
 * * * * * cd /home/noyori/tests; ./clone.sh cache_3_closed bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
 
 # sub
-*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub'
-*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub'
+* * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub'
+* * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub'
 *   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
 *   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
 
