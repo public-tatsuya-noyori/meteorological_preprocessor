@@ -36,7 +36,7 @@ for arg in "$@"; do
     "--out" ) out=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;
-    "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
+    "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
 done
 if test -z $4; then

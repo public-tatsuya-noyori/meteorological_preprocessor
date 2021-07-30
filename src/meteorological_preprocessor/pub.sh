@@ -95,7 +95,7 @@ publish(){
 #    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
     mkdir -p ${processed_directory}_old
     find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
-    if test ${rm_input_index_file} -eq 1; then
+    if test ${delete_input_index_file} -eq 1; then
       rm -f ${input_index_file}
     fi
   fi
@@ -103,20 +103,21 @@ publish(){
 }
 bandwidth_limit_k_bytes_per_s=0
 delete_index_minute=360
+delete_input_index_file=0
 job_directory=4PubClone
 parallel=16
 pubsub_index_directory=4PubSub
 rclone_timeout=600
 retry_num=8
-rm_input_index_file=0
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--rm_input_index_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
+    "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
+    "--delete_input_index_file" ) delete_input_index_file=1;shift;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
     "--parallel" ) parallel=$2;shift;shift;;
-    "--rm_input_index_file" ) rm_input_index_file=1;shift;;
-    "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
+    "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
 done
 if test -z $5; then
@@ -145,7 +146,7 @@ fi
 work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id}/${txt_or_bin}
 processed_directory=${local_work_directory_open_or_closed}/${job_directory}/processed/${txt_or_bin}
 mkdir -p ${work_directory} ${processed_directory}
-touch ${processed_directory}/dummy.tmp ${work_directory}/all_processed_file.txt
+touch ${processed_directory}/dummy.tmp
 if test -s ${work_directory}/pid.txt; then
   running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${txt_or_bin} " | wc -l`
 else
