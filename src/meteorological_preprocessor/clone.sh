@@ -261,7 +261,7 @@ clone() {
 bandwidth_limit_k_bytes_per_s=0
 delete_index_minute=360
 job_directory=4PubClone
-parallel=16
+parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=600
 retry_num=8

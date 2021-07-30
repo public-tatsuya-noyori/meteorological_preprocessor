@@ -223,7 +223,7 @@ subscribe() {
 bandwidth_limit_k_bytes_per_s=0
 delete_index_minute=60
 job_directory=4Sub
-parallel=16
+parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=600
 search_index_directory=4Search
