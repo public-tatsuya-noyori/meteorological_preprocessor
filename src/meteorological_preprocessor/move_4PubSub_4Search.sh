@@ -30,7 +30,7 @@ move_4PubSub_4Search() {
     echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}." >&2
     return ${exit_code}
   fi
-  for index_file in `grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]_.*\.txt\.gz$" ${work_directory}/${pubsub_index_directory}_index.tmp | head -n -1`; do
+  for index_file in `head -n -1 | grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]_.*\.txt\.gz$" ${work_directory}/${pubsub_index_directory}_index.tmp`; do
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
     cp /dev/null ${work_directory}/err_log.tmp
