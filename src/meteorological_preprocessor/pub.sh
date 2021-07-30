@@ -75,7 +75,7 @@ publish(){
       cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
       gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
       set +e
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
+      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
@@ -108,7 +108,7 @@ job_directory=4PubClone
 parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=600
-retry_num=8
+retry_num=16
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
