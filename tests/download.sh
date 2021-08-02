@@ -22,12 +22,12 @@ export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 set -e
 if test $1 = 'p1'; then
   priority=p1
-  parallel=16
+  parallel=4
   format=Alphanumeric
   category=Warning
 elif test $1 = 'p2'; then
   priority=p2
-  parallel=16
+  parallel=4
   format=Alphanumeric
   category=''
 elif test $1 = 'p2_crex'; then

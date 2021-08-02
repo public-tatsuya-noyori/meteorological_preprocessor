@@ -140,6 +140,15 @@
 * * * * * cd /home/noyori/tests; ./sub.sh cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub'
 *   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
 *   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
+*/2 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub'
+*/2 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub'
+*/2   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub'
+*/2   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub'
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub'
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub'
+*/3   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
+*/3   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
+
 
 # delete on local PC
 58 0,8,16 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r rm -rf > /dev/null 2>&1
