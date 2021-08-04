@@ -208,12 +208,19 @@ clone() {
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
+            if test ${exit_code} -eq 124; then
+              if test -s ${source_work_directory}/rclone_timeout.txt; then
+                rm -f ${source_work_directory}/${pubsub_index_directory}_index.txt
+              fi
+              echo 124 > ${source_work_directory}/rclone_timeout.txt
+            fi
             set +e
             grep -F ERROR ${source_work_directory}/info_log.tmp >&2
             set -e
             echo "ERROR: ${exit_code}: can not clone file from ${source_rclone_remote_bucket} ${txt_or_bin} to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
             continue
           fi
+          cp /dev/null ${source_work_directory}/rclone_timeout.txt
           set +e
           grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
           set -e
@@ -263,7 +270,7 @@ delete_index_minute=360
 job_directory=4PubClone
 parallel=4
 pubsub_index_directory=4PubSub
-rclone_timeout=3600
+rclone_timeout=480
 retry_num=16
 search_index_directory=4Search
 timeout=8s

@@ -107,7 +107,7 @@ delete_input_index_file=0
 job_directory=4PubClone
 parallel=4
 pubsub_index_directory=4PubSub
-rclone_timeout=3600
+rclone_timeout=480
 retry_num=16
 timeout=8s
 for arg in "$@"; do
