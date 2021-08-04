@@ -258,9 +258,7 @@ clone() {
       fi
     fi
     if test ${exit_code} -eq 0; then
-#      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
-      mkdir -p ${processed_directory}_old
-      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
+      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
     fi
   done
   if test ${exit_code} -ne 0; then
