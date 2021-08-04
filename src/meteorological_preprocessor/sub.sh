@@ -225,7 +225,7 @@ delete_index_minute=60
 job_directory=4Sub
 parallel=4
 pubsub_index_directory=4PubSub
-rclone_timeout=600
+rclone_timeout=3600
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
