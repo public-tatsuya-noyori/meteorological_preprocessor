@@ -192,6 +192,7 @@ subscribe() {
           set -e
           if test ${exit_code} -ne 0; then
             if test ${exit_code} -eq 124; then
+              touch ${source_work_directory}/rclone_timeout.txt
               if test -s ${source_work_directory}/rclone_timeout.txt; then
                 echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${txt_or_bin} to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
                 rm -f ${source_work_directory}/${pubsub_index_directory}_index.txt
@@ -223,7 +224,9 @@ subscribe() {
       fi
     fi
     if test ${exit_code} -eq 0; then
-      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+#      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+      mkdir -p ${processed_directory}_old
+      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
     fi
   done
   if test ${exit_code} -ne 0; then
