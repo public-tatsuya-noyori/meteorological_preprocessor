@@ -192,12 +192,16 @@ subscribe() {
           set -e
           if test ${exit_code} -ne 0; then
             if test ${exit_code} -eq 124; then
+              touch ${source_work_directory}/rclone_timeout.txt
               if test -s ${source_work_directory}/rclone_timeout.txt; then
+                echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${txt_or_bin} to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
                 rm -f ${source_work_directory}/${pubsub_index_directory}_index.txt
                 echo "INFO: clear index: deleted ${source_work_directory}/${pubsub_index_directory}_index.txt." >&2
+                cp /dev/null ${source_work_directory}/rclone_timeout.txt
+              else
+                echo 124 > ${source_work_directory}/rclone_timeout.txt
+                echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${txt_or_bin} to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
               fi
-              echo 124 > ${source_work_directory}/rclone_timeout.txt
-              echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${txt_or_bin} to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
             else
               set +e
               grep -F ERROR ${source_work_directory}/info_log.tmp >&2
