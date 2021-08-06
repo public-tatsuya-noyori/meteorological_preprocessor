@@ -4,4 +4,4 @@ passwd=`grep MINIO_ROOT_PASSWORD /home/noyori/minio_uid_passwd.txt | cut -d':' -
 MINIO_BROWSER=off MINIO_ROOT_USER=${uid} MINIO_ROOT_PASSWORD=${passwd} /home/noyori/minio server /home/noyori/minio_data 1>> /home/noyori/minio.log 2>>/home/noyori/minio.log &
 echo $! > /home/noyori/minio_pid.txt
 sleep 10
-./mc admin update minio/
+/home/noyori/mc admin update minio/
