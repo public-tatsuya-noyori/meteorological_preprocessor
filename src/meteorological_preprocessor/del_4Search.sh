@@ -22,7 +22,7 @@ IFS=$'\n'
 delete_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/ > ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
+  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/ > ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -33,7 +33,7 @@ delete_4Search() {
     for date_hour_directory in `grep -v -E "^(${delete_index_date_hour_pattern})/$" ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp | sed -e 's|/$||g'`; do
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${txt_or_bin}/${date_hour_directory}/|g" > ${work_directory}/${search_index_directory}_index.tmp
+      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${txt_or_bin}/${date_hour_directory}/|g" > ${work_directory}/${search_index_directory}_index.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -44,7 +44,7 @@ delete_4Search() {
       if test -s ${work_directory}/${search_index_directory}_index.tmp; then
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -56,7 +56,7 @@ delete_4Search() {
         if test -s ${work_directory}/${search_index_directory}_file.tmp; then
           cp /dev/null ${work_directory}/err_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_file.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+          timeout -k 3 ${rclone_timeout} rclone delete --config ${config}  --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_file.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
@@ -67,7 +67,7 @@ delete_4Search() {
         fi
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+        timeout -k 3 ${rclone_timeout} rclone delete --config ${config}  --contimeout ${timeout} --files-from-raw ${work_directory}/${search_index_directory}_index.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -89,6 +89,7 @@ for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
 bandwidth_limit_k_bytes_per_s=0
+config=$HOME/.config/rclone/rclone.conf
 job_directory=4Del_4Search
 rclone_timeout=3600
 search_index_directory=4Search
@@ -96,7 +97,8 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--config") config=$2;shift;shift;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done

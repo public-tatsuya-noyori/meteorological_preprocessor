@@ -22,7 +22,7 @@ IFS=$'\n'
 move_4PubSub_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
+  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -35,7 +35,7 @@ move_4PubSub_4Search() {
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${index_file_date_hour}/${index_file_minute_second_extension}
+    timeout -k 3 ${rclone_timeout} rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -49,7 +49,7 @@ move_4PubSub_4Search() {
     touch_index_file=`grep -E '^[0-9]{14}_.*\.txt\.gz$' ${work_directory}/${pubsub_index_directory}_index.tmp`
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone touch --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${touch_index_file}
+    timeout -k 3 ${rclone_timeout} rclone touch --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${touch_index_file}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -60,11 +60,12 @@ move_4PubSub_4Search() {
   fi
   return ${exit_code}
 }
+bandwidth_limit_k_bytes_per_s=0
+config=$HOME/.config/rclone/rclone.conf
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 datetime_minute=`echo ${datetime} | cut -c11-12`
-bandwidth_limit_k_bytes_per_s=0
 job_directory=4Move
 move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
 move_index_minute=3
@@ -78,7 +79,8 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--config") config=$2;shift;shift;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done

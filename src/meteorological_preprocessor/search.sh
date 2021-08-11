@@ -19,6 +19,7 @@
 #
 set -e
 bandwidth_limit_k_bytes_per_s=0
+config=$HOME/.config/rclone/rclone.conf
 end_yyyymmddhhmm=0
 job_directory=4Search.tmp
 out=0
@@ -31,8 +32,9 @@ parallel=16
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
+    "--config") config=$2;shift;shift;;
     "--end" ) end_yyyymmddhhmm=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory_open_or_closed txt_or_bin rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory_open_or_closed txt_or_bin rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
     "--out" ) out=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;
@@ -100,7 +102,7 @@ fi
 mkdir -p ${work_directory}
 cp /dev/null ${work_directory}/err_log.tmp
 set +e
-rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin} > ${work_directory}/search_index_dir_list.tmp
+rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin} > ${work_directory}/search_index_dir_list.tmp
 exit_code=$?
 set -e
 if test ${exit_code} -ne 0; then
@@ -116,7 +118,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp
+      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -128,7 +130,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       for index_file in `cat ${work_directory}/search_index_list.tmp`; do
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
+        timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -153,7 +155,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           else
             cp /dev/null ${work_directory}/err_log.tmp
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -168,7 +170,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
     done
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${work_directory}/search_index_list.tmp
+    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${work_directory}/search_index_list.tmp
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -180,7 +182,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
     for index_file in `cat ${work_directory}/search_index_list.tmp`; do
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${work_directory}/search_index.tmp
+      timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${work_directory}/search_index.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -205,7 +207,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
         else
           cp /dev/null ${work_directory}/err_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
@@ -226,7 +228,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm}; then
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp
+        timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -244,7 +246,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
             cp /dev/null ${work_directory}/err_log.tmp
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
+            timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -269,7 +271,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
               else
                 cp /dev/null ${work_directory}/err_log.tmp
                 set +e
-                timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
+                timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
                 exit_code=$?
                 set -e
                 if test ${exit_code} -ne 0; then
@@ -286,7 +288,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
     done
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${work_directory}/search_index_list.tmp
+    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${work_directory}/search_index_list.tmp
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -303,7 +305,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${work_directory}/search_index.tmp
+        timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${work_directory}/search_index.tmp
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -328,7 +330,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           else
             cp /dev/null ${work_directory}/err_log.tmp
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -351,7 +353,7 @@ else
     if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhh00} -le ${end_yyyymmddhhmm}; then
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp
+      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh} > ${work_directory}/search_index_list.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -369,7 +371,7 @@ else
         if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
           cp /dev/null ${work_directory}/err_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
+          timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
@@ -394,7 +396,7 @@ else
             else
               cp /dev/null ${work_directory}/err_log.tmp
               set +e
-              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
+              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then
@@ -411,7 +413,7 @@ else
   done
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${work_directory}/search_index_list.tmp
+  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${work_directory}/search_index_list.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -428,7 +430,7 @@ else
     if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${work_directory}/search_index.tmp
+      timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/${index_file} ${work_directory}/search_index.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -453,7 +455,7 @@ else
         else
           cp /dev/null ${work_directory}/err_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory_open_or_closed}
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then

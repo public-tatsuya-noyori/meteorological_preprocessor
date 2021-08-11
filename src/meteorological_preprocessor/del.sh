@@ -22,7 +22,7 @@ IFS=$'\n'
 delete() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone delete --contimeout ${timeout} --exclude=/4PubSub/** --exclude=/4Site/** --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+  timeout -k 3 ${rclone_timeout} rclone delete --config ${config} --contimeout ${timeout} --exclude=/4PubSub/** --exclude=/4Site/** --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -31,13 +31,15 @@ delete() {
   fi
   return ${exit_code}
 }
+config=$HOME/.config/rclone/rclone.conf
 job_directory=4Del
 rclone_timeout=43200
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
+    "--config") config=$2;shift;shift;;
     "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--debug_shell] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
+    "--help" ) echo "$0 [--config config_file] [--debug_shell] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done

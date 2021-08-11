@@ -34,7 +34,7 @@ subscribe() {
     if test ! -f ${source_work_directory}/${pubsub_index_directory}_index.txt; then
       cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_index.txt
+      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_index.txt
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -47,7 +47,7 @@ subscribe() {
     cp /dev/null ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
     cp /dev/null ${source_work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
+    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin} > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -64,7 +64,7 @@ subscribe() {
         sed -e "s|^|/${pubsub_index_directory}/${txt_or_bin}/|g" ${source_work_directory}/${pubsub_index_directory}_index_diff.txt > ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
         cp /dev/null ${source_work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -95,7 +95,7 @@ subscribe() {
         if test ${cmp_exit_code_1} -eq 1 -o ${cmp_exit_code_2} -eq 0; then
           cp /dev/null ${source_work_directory}/err_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin} > ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
+          timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin} > ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
@@ -110,7 +110,7 @@ subscribe() {
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
               cp /dev/null ${source_work_directory}/err_log.tmp
               set +e
-              timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory} > ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
+              timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${txt_or_bin}/${date_hour_directory} > ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
               exit_code=$?
               set -e
               if test ${exit_code} -ne 0; then
@@ -141,7 +141,7 @@ subscribe() {
             cat ${source_work_directory}/${search_index_directory}_new_index.tmp | sort -u | xargs -r -n 1 -I {} sh -c 'index_file={};index_file_date_hour=`echo ${index_file} | cut -c1-10`;index_file_minute_second_extension=`echo ${index_file} | cut -c11-`;echo /'${search_index_directory}/${txt_or_bin}'/${index_file_date_hour}/${index_file_minute_second_extension}' > ${source_work_directory}/${search_index_directory}_newly_created_index.tmp
             cp /dev/null ${source_work_directory}/err_log.tmp
             set +e
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${search_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
+            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/${search_index_directory}_newly_created_index.tmp --local-no-set-modtime --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${source_work_directory}
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -187,7 +187,7 @@ subscribe() {
         if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
           cp /dev/null ${source_work_directory}/info_log.tmp
           set +e
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --local-no-set-modtime --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${local_work_directory_open_or_closed}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --local-no-set-modtime --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${local_work_directory_open_or_closed}
           exit_code=$?
           set -e
           if test ${exit_code} -ne 0; then
@@ -224,9 +224,9 @@ subscribe() {
       fi
     fi
     if test ${exit_code} -eq 0; then
-      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
-#      mkdir -p ${processed_directory}_old
-#      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
+#      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+      mkdir -p ${processed_directory}_old
+      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
     fi
   done
   if test ${exit_code} -ne 0; then
@@ -235,6 +235,7 @@ subscribe() {
   return ${return_code}
 }
 bandwidth_limit_k_bytes_per_s=0
+config=$HOME/.config/rclone/rclone.conf
 delete_index_minute=60
 job_directory=4Sub
 parallel=4
@@ -245,8 +246,9 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
+    "--config") config=$2;shift;shift;;
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--delete_index_minute delete_index_minute] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
