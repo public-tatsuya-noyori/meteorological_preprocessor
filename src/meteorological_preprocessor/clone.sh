@@ -122,7 +122,7 @@ clone() {
           fi
           sed -e 's|/$||g' ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp > ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp
           if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
-            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | sed -e 's|_.*\.txt\.gz$||g'`
+            former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | cut -c1-12`
             search_index_directory_exit_code=0
             for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
               cp /dev/null ${source_work_directory}/err_log.tmp
