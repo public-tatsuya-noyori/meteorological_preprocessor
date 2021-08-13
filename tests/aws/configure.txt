@@ -1,0 +1,57 @@
+$ sudo apt install awscli
+$ sudo apt install groff-base
+$ sudo apt install zip
+$ aws configure
+AWS Access Key ID [None]: *******************
+AWS Secret Access Key [None]: *******************
+Default region name [None]: us-east-2
+Default output format [None]:
+$ ls rclone/
+rclone
+$ zip -ll rclone.zip rclone/*
+updating: rclone/rclone (deflated 66%)
+$ aws lambda publish-layer-version --layer-name rclone --zip-file fileb://rclone.zip
+...
+"LayerVersionArn": "arn:aws:lambda:us-east-2:************:layer:rclone:**"
+...
+$ ls move_all/
+bootstrap  commands_args.txt  move_4PubSub_4Search.sh  move_all.sh  rclone.conf
+$ cd move_all/
+$ zip -ll ../move_all.zip *
+  adding: move_all/bootstrap (deflated 43%)
+  adding: move_all/commands_args.txt (stored 0%)
+  adding: move_all/move_4PubSub_4Search.sh (deflated 71%)
+  adding: move_all/move_all.sh (deflated 43%)
+  adding: move_all/rclone.conf (deflated 16%)
+$ cd ..
+$ aws iam create-role --role-name lambda-ex --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
+...
+"Arn": "arn:aws:iam::************:role/lambda-ex"
+...
+$ aws iam attach-role-policy --role-name lambda-ex --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+$ aws lambda create-function --function-name move_all --handler move_all.handler --runtime provided --role arn:aws:iam::************:role/lambda-ex --layers arn:aws:lambda:us-east-2:************:layer:rclone:** --zip-file fileb://move_all.zip --timeout 59
+...
+"FunctionArn": "arn:aws:lambda:us-east-2:************:function:move_all"
+...
+$ aws events put-rule --name move_all_schedule --schedule-expression 'rate(1 minute)'
+{
+    "RuleArn": "arn:aws:events:us-east-2:************:rule/move_all_schedule"
+}
+$ aws lambda add-permission --function-name move_all --statement-id move_all_schedule --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn arn:aws:events:us-east-2:************:rule/move_all_schedule
+$ aws events put-targets --rule move_all_schedule --targets '{"Id": "1", "Arn": "arn:aws:lambda:us-east-2:************:function:move_all"}'
+
+
+
+
+
+re-create function
+$ aws lambda delete-function --function-name move_all
+$ aws lambda create-function --function-name move_all --handler move_all.handler --runtime provided --role arn:aws:iam::************:role/lambda-ex --layers arn:aws:lambda:us-east-2:************:layer:rclone:** --zip-file fileb://move_all.zip
+
+
+
+
+re-add schedule-relation
+$ aws lambda add-permission --function-name move_all --statement-id move_all_schedule --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn arn:aws:events:us-east-2:************:rule/move_all_schedule
+$ aws events put-targets --rule move_all_schedule --targets '{"Id": "1", "Arn": "arn:aws:lambda:us-east-2:************:function:move_all"}'
+
