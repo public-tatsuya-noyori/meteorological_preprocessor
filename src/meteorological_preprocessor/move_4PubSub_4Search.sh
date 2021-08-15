@@ -22,7 +22,7 @@ IFS=$'\n'
 move_4PubSub_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
+  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
