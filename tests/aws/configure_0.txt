@@ -1,0 +1,26 @@
+$ sudo apt install awscli
+$ sudo apt install groff-base
+$ sudo apt install zip
+$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+$ unzip awscliv2.zip
+$ sudo ./aws/install
+$ aws configure
+AWS Access Key ID [None]: *******************
+AWS Secret Access Key [None]: *******************
+Default region name [None]: us-east-2
+Default output format [None]:
+$ ls object_storage/
+clone.sh  move_4PubSub_4Search.sh  pub.sh  rclone  search.sh  sub.sh
+$ zip -ll object_storage.zip object_storage/*
+  adding: object_storage/clone.sh (deflated 84%)
+  adding: object_storage/move_4PubSub_4Search.sh (deflated 71%)
+  adding: object_storage/pub.sh (deflated 72%)
+  adding: object_storage/rclone
+        zip warning: has binary so -ll ignored
+ (deflated 66%)
+  adding: object_storage/search.sh (deflated 90%)
+  adding: object_storage/sub.sh (deflated 84%)
+$ aws lambda publish-layer-version --layer-name object_storage --zip-file fileb://object_storage.zip
+...
+"LayerVersionArn": "arn:aws:lambda:us-east-2:************:layer:object_storage:**"
+...
