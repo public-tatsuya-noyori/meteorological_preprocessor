@@ -51,10 +51,17 @@ publish(){
   cp /dev/null ${work_directory}/processed_file.txt
   if test -s ${work_directory}/filtered_newly_created_file.tmp; then
     cp /dev/null ${work_directory}/info_log.tmp
-    set +e
-    timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
-    exit_code=$?
-    set -e
+    if test -z "${header_upload}"; then
+      set +e
+      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
+      exit_code=$?
+      set -e
+    else
+      set +e
+      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
+      exit_code=$?
+      set -e
+    fi
     if test ${exit_code} -ne 0; then
       set +e
       grep -F ERROR ${work_directory}/info_log.tmp >&2
@@ -105,6 +112,7 @@ bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
 delete_index_minute=360
 delete_input_index_file=0
+header_upload=''
 job_directory=4PubClone
 parallel=4
 pubsub_index_directory=4PubSub
@@ -117,7 +125,8 @@ for arg in "$@"; do
     "--config") config=$2;shift;shift;;
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--delete_input_index_file" ) delete_input_index_file=1;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
+    "--header_upload" ) header_upload=$2;shift;shift;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--header_upload header_upload] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
