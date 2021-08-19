@@ -12,7 +12,7 @@ $ aws iam create-role --role-name lambda-ex --assume-role-policy-document '{"Ver
 "Arn": "arn:aws:iam::************:role/lambda-ex"
 ...
 $ aws iam attach-role-policy --role-name lambda-ex --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-$ aws lambda create-function --function-name run_commands_main --handler run_commands_main.handler --runtime provided --role arn:aws:iam::************:role/lambda-ex --layers arn:aws:lambda:us-east-2:************:layer:object_storage:** --zip-file fileb://run_commands_main.zip --timeout 57
+$ aws lambda create-function --function-name run_commands_main --handler run_commands_main.handler --runtime provided --role arn:aws:iam::************:role/lambda-ex --layers arn:aws:lambda:us-east-2:************:layer:object_storage:** --zip-file fileb://run_commands_main.zip --timeout 600
 ...
 "FunctionArn": "arn:aws:lambda:us-east-2:************:function:run_commands_main"
 ...
@@ -35,7 +35,7 @@ $ aws lambda update-function-event-invoke-config --function-name run_commands_ma
 #######################################################################
 re-create function
 $ aws lambda delete-function --function-name run_commands_main
-$ aws lambda create-function --function-name run_commands_main --handler run_commands_main.handler --runtime provided --role arn:aws:iam::************:role/lambda-ex --layers arn:aws:lambda:us-east-2:************:layer:object_storage:** --zip-file fileb://run_commands_main.zip --timeout 57
+$ aws lambda create-function --function-name run_commands_main --handler run_commands_main.handler --runtime provided --role arn:aws:iam::************:role/lambda-ex --layers arn:aws:lambda:us-east-2:************:layer:object_storage:** --zip-file fileb://run_commands_main.zip --timeout 600
 
 re-create schedule
 $ aws events remove-targets --rule run_commands_main_schedule --ids run_commands_main_schedule
