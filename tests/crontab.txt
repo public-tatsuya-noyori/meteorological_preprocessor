@@ -83,14 +83,6 @@
 0,30   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3_closed cc_sub  txt minio:center-cc-cloud-c-region-f-closed-sub
 1,31   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3_closed cc_sub  bin minio:center-cc-cloud-c-region-f-closed-sub
 
-# touch
-#54 0  * * * rclone touch minio:center-aa-cloud-a-region-a-open-main/4Site/explore.html
-#54 6  * * * rclone touch minio:center-aa-cloud-a-region-b-open-sub/4Site/explore.html
-#54 2  * * * rclone touch minio:center-bb-cloud-b-region-c-open-main/4Site/explore.html
-#54 8  * * * rclone touch minio:center-bb-cloud-b-region-d-open-sub/4Site/explore.html
-#54 4  * * * rclone touch minio:center-cc-cloud-c-region-e-open-main/4Site/explore.html
-#54 10 * * * rclone touch minio:center-cc-cloud-c-region-f-open-sub/4Site/explore.html
-
 # del
 55 0  * * * cd /home/noyori/tests; ./del.sh cache_1        aa_main minio:center-aa-cloud-a-region-a-open-main   2
 55 6  * * * cd /home/noyori/tests; ./del.sh cache_1        aa_sub  minio:center-aa-cloud-a-region-b-open-sub    2
@@ -136,14 +128,14 @@
 0 */2 * * * cd /home/noyori/tests; ./sub.sh cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub'
 0 */2 * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
 0 */2 * * * cd /home/noyori/tests; ./sub.sh cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub'
-*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub'
-*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub'
-*/4   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub'
-*/4   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub'
-*/5 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub'
-*/5 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub'
-*/5   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
-*/5   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub'
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub'
+*/3   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub'
+*/3   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub'
+*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub'
+*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub'
+*/4   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
+*/4   * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub'
 
 
 # delete on local PC
