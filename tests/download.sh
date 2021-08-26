@@ -42,7 +42,7 @@ elif test $1 = 'p3'; then
   category=''
 elif test $1 = 'p4'; then
   priority=p4
-  parallel=4
+  parallel=1
   format=GRIB
   category=''
 fi
