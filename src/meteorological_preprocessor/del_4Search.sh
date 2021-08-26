@@ -80,6 +80,8 @@ delete_4Search() {
   fi
   return ${exit_code}
 }
+bandwidth_limit_k_bytes_per_s=0
+config=$HOME/.config/rclone/rclone.conf
 datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
@@ -88,9 +90,9 @@ delete_index_hour=23
 for hour_count in `seq ${delete_index_hour}`; do
   delete_index_date_hour_pattern="${delete_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
-bandwidth_limit_k_bytes_per_s=0
-config=$HOME/.config/rclone/rclone.conf
+ec=0
 job_directory=4Del_4Search
+no_check_pid=0
 rclone_timeout=3600
 search_index_directory=4Search
 timeout=8s
@@ -98,7 +100,8 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--no_check_pid" ) no_check_pid=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -123,7 +126,11 @@ fi
 work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id_main_or_sub}/${txt_or_bin}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${txt_or_bin} " | wc -l`
+  if test ${no_check_pid} -eq 0; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${txt_or_bin} " | wc -l`
+  else
+    exit 0
+  fi
 else
   running=0
 fi
@@ -131,5 +138,10 @@ if test ${running} -eq 0; then
   delete_4Search &
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
+  set +e
   wait ${pid}
+  ec=$?
+  set -e
+  rm ${work_directory}/pid.txt
 fi
+exit ${ec}

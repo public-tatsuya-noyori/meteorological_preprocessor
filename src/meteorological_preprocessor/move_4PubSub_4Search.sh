@@ -66,12 +66,14 @@ datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 datetime_minute=`echo ${datetime} | cut -c11-12`
+ec=0
 job_directory=4Move
 move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
 move_index_minute=3
 for minute_count in `seq ${move_index_minute}`; do
   move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H%M"`
 done
+no_check_pid=0
 pubsub_index_directory=4PubSub
 rclone_timeout=180
 search_index_directory=4Search
@@ -80,7 +82,8 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub txt_or_bin rclone_remote_bucket"; exit 0;;
+    "--no_check_pid" ) no_check_pid=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -106,7 +109,11 @@ work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_
 mkdir -p ${work_directory}
 sleep 30
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${txt_or_bin} " | wc -l`
+  if test ${no_check_pid} -eq 0; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${txt_or_bin} " | wc -l`
+  else
+    exit 0
+  fi
 else
   running=0
 fi
@@ -114,5 +121,10 @@ if test ${running} -eq 0; then
   move_4PubSub_4Search &
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
+  set +e
   wait ${pid}
+  ec=$?
+  set -e
+  rm ${work_directory}/pid.txt
 fi
+exit ${ec}

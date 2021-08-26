@@ -32,14 +32,16 @@ delete() {
   return ${exit_code}
 }
 config=$HOME/.config/rclone/rclone.conf
+ec=0
 job_directory=4Del
+no_check_pid=0
 rclone_timeout=43200
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--config") config=$2;shift;shift;;
-    "--debug_shell" ) set -evx;shift;;
-    "--help" ) echo "$0 [--config config_file] [--debug_shell] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
+    "--help" ) echo "$0 [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
+    "--no_check_pid" ) no_check_pid=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
@@ -67,7 +69,11 @@ fi
 work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id_main_or_sub}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | wc -l`
+  if test ${no_check_pid} -eq 0; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho "pid comm args" | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | wc -l`
+  else
+    exit 0
+  fi
 else
   running=0
 fi
@@ -75,5 +81,10 @@ if test ${running} -eq 0; then
   delete &
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
+  set +e
   wait ${pid}
+  ec=$?
+  set -e
+  rm ${work_directory}/pid.txt
 fi
+exit ${ec}

@@ -298,9 +298,11 @@ clone() {
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
 delete_index_minute=360
+ec=0
 header_upload=''
 index_only_center_id_prefix=''
 job_directory=4PubClone
+no_check_pid=0
 parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=480
@@ -314,7 +316,8 @@ for arg in "$@"; do
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--header_upload" ) header_upload=$2;shift;shift;;
     "--index_only" ) index_only_center_id_prefix=$2;shift;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--header_upload header_upload] [--index_only center_id_prefix] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--header_upload header_upload] [--index_only center_id_prefix] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' [inclusive_pattern_file] [exclusive_pattern_file]"; exit 0;;
+    "--no_check_pid" ) no_check_pid=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
@@ -355,7 +358,11 @@ processed_directory=${local_work_directory_open_or_closed}/${job_directory}/proc
 mkdir -p ${work_directory} ${processed_directory}
 touch ${processed_directory}/dummy.tmp
 if test -s ${work_directory}/pid.txt; then
-  running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${txt_or_bin} " | wc -l`
+  if test ${no_check_pid} -eq 0; then
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${txt_or_bin} " | wc -l`
+  else
+    exit 0
+  fi
 else
   running=0
 fi
@@ -363,5 +370,10 @@ if test ${running} -eq 0; then
   clone &
   pid=$!
   echo ${pid} > ${work_directory}/pid.txt
+  set +e
   wait ${pid}
+  ec=$?
+  set -e
+  rm ${work_directory}/pid.txt
 fi
+exit ${ec}
