@@ -189,7 +189,7 @@ subscribe() {
         if test -s ${source_work_directory}/newly_created_file.tmp; then
           cp /dev/null ${work_directory}/all_processed_file.txt
           set +e
-          ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt 2>/dev/null
+          ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r zcat >> ${work_directory}/all_processed_file.txt 2>/dev/null
           grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp > ${source_work_directory}/filtered_newly_created_file.tmp
           set -e
         fi
@@ -225,16 +225,14 @@ subscribe() {
             set +e
             grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
             set -e
-          else
-            now=`date -u "+%Y%m%d%H%M%S"`
-            mv ${source_work_directory}/filtered_newly_created_file.tmp ${processed_directory}/${now}_${unique_center_id}.txt
-            sleep 1
+            if test -s ${work_directory}/processed_file.txt; then
+              now=`date -u "+%Y%m%d%H%M%S"`
+              mv ${work_directory}/processed_file.txt ${work_directory}/${now}_${unique_center_id}.txt
+              gzip -f ${work_directory}/${now}_${unique_center_id}.txt
+              mv ${work_directory}/${now}_${unique_center_id}.txt.gz ${processed_directory}/
+              sleep 1
+            fi
           fi
-        fi
-        if test -s ${work_directory}/processed_file.txt -a -z "${index_only_center_id_prefix}"; then
-          now=`date -u "+%Y%m%d%H%M%S"`
-          mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_center_id}.txt
-          sleep 1
         fi
         if test ${exit_code} -eq 0; then
           mv -f ${source_work_directory}/${pubsub_index_directory}_new_index.tmp ${source_work_directory}/${pubsub_index_directory}_index.txt
@@ -242,9 +240,9 @@ subscribe() {
       fi
     fi
     if test ${exit_code} -eq 0; then
-#      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+#      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
       mkdir -p ${processed_directory}_old
-      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
+      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
     fi
   done
   if test ${exit_code} -ne 0; then
