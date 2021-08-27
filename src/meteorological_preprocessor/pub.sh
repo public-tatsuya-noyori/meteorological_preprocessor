@@ -45,7 +45,7 @@ publish(){
   cp /dev/null ${work_directory}/all_processed_file.txt
   cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
   set +e
-  ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r cat >> ${work_directory}/all_processed_file.txt 2>/dev/null
+  ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r zcat >> ${work_directory}/all_processed_file.txt 2>/dev/null
   grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
   set -e
   cp /dev/null ${work_directory}/processed_file.txt
@@ -86,7 +86,7 @@ publish(){
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
-        mv ${work_directory}/processed_file.txt ${processed_directory}/${now}_${unique_center_id}.txt
+        mv ${work_directory}/prepare/${now}_${unique_center_id}.txt.gz ${processed_directory}/
         break
       else
         sleep 1
@@ -99,9 +99,9 @@ publish(){
     fi
   fi
   if test ${exit_code} -eq 0; then
-#    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+#    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
     mkdir -p ${processed_directory}_old
-    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
+    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
     if test ${delete_input_index_file} -eq 1; then
       rm -f ${input_index_file}
     fi
