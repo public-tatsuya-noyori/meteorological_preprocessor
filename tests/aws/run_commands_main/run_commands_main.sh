@@ -7,7 +7,7 @@ function handler () {
   rc=0
   commands_args_file=commands_args.txt
   for command_args in `cat ${commands_args_file}`; do
-    echo ${command_args[@]} | xargs -I {} sh -c "{}" &
+    echo ${command_args[@]} | xargs -r -I {} sh -c "{}" &
     pids+=($!)
   done
   for pid in ${pids[@]}; do
