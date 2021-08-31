@@ -142,6 +142,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_TT[A-Z][A-Z][0-9][0-9].*)$,^TT[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,satellite,sea_surface_temperature_satob,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_TW[A-Z][A-Z][0-9][0-9].*)$,^TW[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,satellite,wind_cloud_temperature_satob,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_TX[A-Z][A-Z][0-9][0-9].*)$,^TX[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,satellite,miscellaneous,txt
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_UA[A-Z][A-Z][0-9][0-9].*)$,^UA[A-Z][A-Z][0-9][0-9]$,( |^)PIREP( |$),,,,alphanumeric,upper_air,pirep,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_UA[A-Z][A-Z][0-9][0-9].*)$,^UA[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,upper_air,airep,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_UD[A-Z][A-Z][0-9][0-9].*)$,^UD[A-Z][A-Z][0-9][0-9]$,,,,,alphanumeric,upper_air,amdar,txt
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_U[EFKLMS][A-Z][A-Z][0-9][0-9].*)$,^U[EFKLMS][A-Z][A-Z][0-9][0-9]$,( |^)II(AA|BB|CC|DD)( |$),,,,alphanumeric,upper_air,temp_mobil,txt
