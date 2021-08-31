@@ -1,4 +1,2 @@
-move_4PubSub_4Search.sh --config rclone.conf /tmp/work_open ******centerID******_main txt aws:******bucket******
-move_4PubSub_4Search.sh --config rclone.conf /tmp/work_open ******centerID******_main bin aws:******bucket******
-clone.sh --config rclone.conf /tmp/work_open ******centerID******_main txt azure:******bucket****** aws:******bucket******
-clone.sh --config rclone.conf /tmp/work_open ******centerID******_main bin azure:******bucket****** aws:******bucket******
+move_4PubSub_4Search.sh --config rclone.conf --no_check_pid /mnt/run_commands_main/open ******centerID******_main txt aws:******bucket******
+move_4PubSub_4Search.sh --config rclone.conf --no_check_pid /mnt/run_commands_main/open ******centerID******_main bin aws:******bucket******
