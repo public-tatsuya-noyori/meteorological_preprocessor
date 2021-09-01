@@ -26,6 +26,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INM[A-Z][0-9][0-9].*|W_.*mhs.*bin)$,^INM[A-Z][0-9][0-9]$,,,,,bufr,satellite,mhs,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INQ[A-Z][0-9][0-9].*|W_.*iasi.*bin)$,^INQ[A-Z][0-9][0-9]$,,,,,bufr,satellite,iasi,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INR[A-Z][0-9][0-9].*|W_.*airs.*bin)$,^INR[A-Z][0-9][0-9]$,,310050,,,bufr,satellite,airs,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INR[A-Z][0-9][0-9].*)$,^INR[A-Z][0-9][0-9]$,,,,RKSL,bufr,satellite,csr,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INS[A-Z][0-9][0-9].*|W_.*atms.*bin)$,^INS[A-Z][0-9][0-9]$,,,,,bufr,satellite,atms,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INT[A-Z][0-9][0-9].*|W_.*mwts.*bin)$,^INT[A-Z][0-9][0-9]$,,,,,bufr,satellite,mwts,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_INV[A-Z][0-9][0-9].*)$,^INV[A-Z][0-9][0-9]$,,,,,bufr,satellite,amv,bin
@@ -44,6 +45,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,bufr_key_of_not_mi
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IS[IMN][A-Z][0-9][0-9].*)$,^IS[IMN][A-Z][0-9][0-9]$,,,,,bufr,surface,synop,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_ISS[A-Z][0-9][0-9].*)$,^ISS[A-Z][0-9][0-9]$,,,,,bufr,surface,ship,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_ISX[A-Z][0-9][0-9].*)$,^ISX[A-Z][0-9][0-9]$,,307022,,,bufr,surface,gps_pwv,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_ISXC[0-9][0-9].*)$,^ISXC[0-9][0-9]$,,,,RJTD,bufr,forecast,cyclone,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_ISZX[0-9][0-9].*)$,^ISZX[0-9][0-9]$,,,,,bufr,satellite,ogdr,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IU[AO][A-Z][0-9][0-9].*)$,^IU[AO][A-Z][0-9][0-9]$,,,,,bufr,upper_air,amdar,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IUC[A-Z][0-9][0-9].*)$,^IUC[A-Z][0-9][0-9]$,,,,,bufr,satellite,cloud_analysis,bin

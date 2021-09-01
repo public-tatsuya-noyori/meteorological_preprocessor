@@ -99,9 +99,7 @@ publish(){
     fi
   fi
   if test ${exit_code} -eq 0; then
-#    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
-    mkdir -p ${processed_directory}_old
-    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r mv -t ${processed_directory}_old
+    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
     if test ${delete_input_index_file} -eq 1; then
       rm -f ${input_index_file}
     fi
@@ -110,7 +108,7 @@ publish(){
 }
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
-delete_index_minute=360
+delete_index_minute=1440
 delete_input_index_file=0
 ec=0
 header_upload=''
