@@ -27,7 +27,7 @@ server_side_encryption =
 :wq
 ```
 1. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
-1. Edit inclusive_pattern.txt and exclusive_pattern.txt.
+1. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
 1. Configure Cron
 ```
 crontab -e
