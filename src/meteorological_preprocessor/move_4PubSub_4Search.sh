@@ -107,7 +107,6 @@ if test -z "${rclone_remote_bucket}"; then
 fi
 work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id_main_or_sub}/${txt_or_bin}
 mkdir -p ${work_directory}
-sleep 30
 if test -s ${work_directory}/pid.txt; then
   if test ${no_check_pid} -eq 0; then
     running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${txt_or_bin} " | wc -l`
