@@ -32,8 +32,8 @@ server_side_encryption =
 ```
 crontab -e
 
-* * * * * /path/to/sub.sh /path/to/work_directory center_ID txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt
-* * * * * /path/to/sub.sh /path/to/work_directory center_ID bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt
+* * * * * /path/to/sub.sh /path/to/work_directory center_ID txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+* * * * * /path/to/sub.sh /path/to/work_directory center_ID bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 
 :wq
 ```
