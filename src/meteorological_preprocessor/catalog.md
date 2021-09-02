@@ -6,7 +6,7 @@
 ## Data explorer
 [Tokyo data explorer](http://202.32.195.138:9000/center-aa-cloud-a-region-a-open-main/4Site/explore.html)
 
-## How to Subscribe
+## How to subscribe and search
 1. Install rclone.  
 See [here](https://rclone.org/install/) 
 1. Configure rclone.
@@ -36,4 +36,9 @@ crontab -e
 * * * * * /path/to/sub.sh /path/to/work_directory center_ID bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 
 :wq
+```
+1. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
+1. Run search.sh.
+```
+/path/to/search.sh /path/to/work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
