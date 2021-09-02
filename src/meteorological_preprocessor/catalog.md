@@ -7,9 +7,9 @@
 [Tokyo data explorer](http://202.32.195.138:9000/center-aa-cloud-a-region-a-open-main/4Site/explore.html)
 
 ## How to Subscribe
-1. Install rclone  
+1. Install rclone.  
 See [here](https://rclone.org/install/) 
-1. Configure rclone
+1. Configure rclone.
 ```
 vi $HOME/.config/rclone/rclone.conf
 
@@ -28,7 +28,7 @@ server_side_encryption =
 ```
 1. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
 1. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
-1. Configure Cron
+1. Configure Cron.
 ```
 crontab -e
 
