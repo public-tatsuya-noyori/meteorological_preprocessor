@@ -1,7 +1,7 @@
 # Catalog
 
 ## Data catalog
-[Tokyo data catalog](inclusive_pattern.txt)
+[data catalog](inclusive_pattern.txt)
 
 ## Data explorer
 [Tokyo data explorer](http://202.32.195.138:9000/center-aa-cloud-a-region-a-open-main/4Site/explore.html)
