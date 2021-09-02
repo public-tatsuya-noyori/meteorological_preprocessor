@@ -9,7 +9,7 @@
 ## How to subscribe and search
 1. Install rclone.  
 See [here](https://rclone.org/install/) 
-1. Configure rclone.
+2. Configure rclone.
 ```
 vi $HOME/.config/rclone/rclone.conf
 
@@ -26,9 +26,9 @@ server_side_encryption =
 
 :wq
 ```
-1. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
-1. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
-1. Configure Cron.
+3. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
+4. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
+5. Configure Cron.
 ```
 crontab -e
 
@@ -37,8 +37,8 @@ crontab -e
 
 :wq
 ```
-1. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
-1. Run search.sh.
+6. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
+7. Run search.sh.
 ```
 /path/to/search.sh /path/to/work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
