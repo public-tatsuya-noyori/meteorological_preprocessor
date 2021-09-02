@@ -6,7 +6,7 @@
 ## Data explorer
 [Tokyo data explorer](http://202.32.195.138:9000/center-aa-cloud-a-region-a-open-main/4Site/explore.html)
 
-## How to subscribe and search
+## How to subscribe data and search data
 1. Install rclone.  
 See [here](https://rclone.org/install/) 
 2. Configure rclone.
