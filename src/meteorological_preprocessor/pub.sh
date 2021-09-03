@@ -20,6 +20,10 @@
 set -e
 IFS=$'\n'
 publish(){
+  non_gz_count=`grep -v \.gz$ ${input_index_file} | wc -l`
+  if test ${non_gz_count} -gt 0; then
+    echo "ERROR: Do not include non-gz file on ${input_index_file}." >&2
+  fi
   grep ^${local_work_directory_open_or_closed}/ ${input_index_file} | sed -e "s|^${local_work_directory_open_or_closed}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test ! -s ${work_directory}/newly_created_file.tmp; then
     echo "ERROR: can not match ^${local_work_directory_open_or_closed}/ on ${input_index_file}." >&2
