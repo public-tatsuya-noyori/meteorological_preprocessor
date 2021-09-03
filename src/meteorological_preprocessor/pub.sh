@@ -108,7 +108,7 @@ publish(){
 }
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
-delete_index_minute=1440
+delete_index_minute=720
 delete_input_index_file=0
 ec=0
 header_upload=''

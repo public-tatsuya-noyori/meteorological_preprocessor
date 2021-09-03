@@ -95,6 +95,8 @@ clone() {
       set -e
       if test ${exit_code} -eq 0; then
         break
+      else
+        sleep 8
       fi
     done
     if test ${exit_code} -ne 0; then
@@ -300,7 +302,7 @@ clone() {
 }
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
-delete_index_minute=1440
+delete_index_minute=720
 ec=0
 header_upload=''
 index_only=0

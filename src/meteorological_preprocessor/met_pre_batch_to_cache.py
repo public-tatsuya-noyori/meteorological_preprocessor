@@ -19,6 +19,7 @@
 #
 
 import argparse
+import gzip
 import hashlib
 import numpy as np
 import os
@@ -229,23 +230,17 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 out_file_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f'))
                 out_file_list.append('.')
                 out_file_list.append(conf_row.file_extension)
+                out_file_list.append('.gz')
                 out_file = ''.join(out_file_list)
-                with open(out_file, 'wb') as out_file_stream:
-                    out_file_stream.write(message)
-                return out_file
             else:
                 out_file_list = []
                 out_file_list.append(out_directory)
                 out_file_list.append(os.path.basename(in_file))
+                out_file_list.append('.gz')
                 out_file = '/'.join(out_file_list)
-                if os.path.exists(out_file):
-                    if debug:
-                        print('Debug', ':', in_file, 'already exists', '. The file is not created', file=sys.stderr)
-                    return ''
-                else:
-                    with open(out_file, 'wb') as out_file_stream:
-                        out_file_stream.write(message)
-                    return out_file
+            with gzip.open(out_file, 'wb') as out_file_stream:
+                out_file_stream.write(message)
+            return out_file
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
@@ -304,8 +299,9 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                 out_file_list.append(datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f'))
                 out_file_list.append('.')
                 out_file_list.append(conf_row.file_extension)
+                out_file_list.append('.gz')
                 out_file = ''.join(out_file_list)
-                with open(out_file, 'wb') as out_file_stream:
+                with gzip.open(out_file, 'wb') as out_file_stream:
                     out_file_stream.write(message)
                 return out_file
             else:
