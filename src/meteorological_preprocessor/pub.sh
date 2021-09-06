@@ -30,7 +30,10 @@ publish(){
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
   fi
-  not_exist_file=`grep -v '^ *$' ${input_index_file} | xargs -r -n 1 test -f`
+  set +e
+  grep -v '^ *$' ${input_index_file} | xargs -r -n 1 test -f
+  not_exist_file=$?
+  set -e
   if test ${not_exist_file} -gt 0; then
     echo "ERROR: not exist file on ${input_index_file}." >&2
     return 199
@@ -47,7 +50,7 @@ publish(){
     echo "ERROR: exist already published file on ${input_index_file}." >&2
     return 199
   fi
-  grep -v '^ *$' ${input_index_file} | xargs -r gunzip -f
+  grep -v '^ *$' ${input_index_file} | xargs -r gzip -f
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
