@@ -40,7 +40,7 @@ timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
+    "--help" ) echo "$0 [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
@@ -49,7 +49,7 @@ if test -z $4; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory_open_or_closed=$1
+local_work_directory=$1
 unique_center_id_main_or_sub=$2
 set +e
 rclone_remote_bucket=`echo $3 | grep -F ':'`
@@ -66,7 +66,7 @@ elif test $4 -le 0; then
   echo "ERROR: $4 is not more than 1." >&2
   exit 199
 fi
-work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id_main_or_sub}
+work_directory=${local_work_directory}/${job_directory}/${unique_center_id_main_or_sub}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
   if test ${no_check_pid} -eq 0; then

@@ -25,9 +25,9 @@ publish(){
     echo "ERROR: Do not include non-gz file on ${input_index_file}." >&2
     return 199
   fi
-  grep ^${local_work_directory_open_or_closed}/ ${input_index_file} | sed -e "s|^${local_work_directory_open_or_closed}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
+  grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
   if test ! -s ${work_directory}/newly_created_file.tmp; then
-    echo "ERROR: can not match ^${local_work_directory_open_or_closed}/ on ${input_index_file}." >&2
+    echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
   fi
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
@@ -58,14 +58,14 @@ publish(){
     cp /dev/null ${work_directory}/info_log.tmp
     if test -z "${header_upload}"; then
       set +e
-#      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
+#      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
       exit_code=$?
       set -e
     else
       set +e
-#      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory_open_or_closed} ${destination_rclone_remote_bucket}
+#      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
       exit_code=$?
       set -e
     fi
@@ -73,7 +73,7 @@ publish(){
       set +e
       grep -F ERROR ${work_directory}/info_log.tmp >&2
       set -e
-      echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${txt_or_bin}." >&2
+      echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${extension}." >&2
       return ${exit_code}
     fi
     set +e
@@ -89,7 +89,7 @@ publish(){
       cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
       gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
       set +e
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/
+      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension}/
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
@@ -101,7 +101,7 @@ publish(){
     done
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${txt_or_bin}/." >&2
+      echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension}/." >&2
       return ${exit_code}
     fi
   fi
@@ -133,7 +133,7 @@ for arg in "$@"; do
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--delete_input_index_file" ) delete_input_index_file=1;shift;;
     "--header_upload" ) header_upload=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--header_upload header_upload] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory_open_or_closed unique_center_id txt_or_bin input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--header_upload header_upload] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
@@ -143,14 +143,14 @@ if test -z $5; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
-local_work_directory_open_or_closed=$1
+local_work_directory=$1
 unique_center_id=$2
 set +e
-txt_or_bin=`echo $3 | grep -E '^(txt|bin)$'`
+extension=`echo $3 | grep -E '^(txt|bin)$'`
 input_index_file=$4
 destination_rclone_remote_bucket_main_sub=`echo $5 | grep -F ':'`
 set -e
-if test -z "${txt_or_bin}"; then
+if test -z "${extension}"; then
   echo "ERROR: $3 is not txt or bin." >&2
   exit 199
 fi
@@ -162,13 +162,13 @@ if test -z "${destination_rclone_remote_bucket_main_sub}"; then
   echo "ERROR: $5 is not rclone_remote:bucket." >&2
   exit 199
 fi
-work_directory=${local_work_directory_open_or_closed}/${job_directory}/${unique_center_id}/${txt_or_bin}
-processed_directory=${local_work_directory_open_or_closed}/${job_directory}/processed/${txt_or_bin}
+work_directory=${local_work_directory}/${job_directory}/${unique_center_id}/${extension}
+processed_directory=${local_work_directory}/${job_directory}/processed/${extension}
 mkdir -p ${work_directory} ${processed_directory}
 touch ${processed_directory}/dummy.tmp
 if test -s ${work_directory}/pid.txt; then
   if test ${no_check_pid} -eq 0; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${txt_or_bin} " | wc -l`
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${extension} " | wc -l`
   else
     exit 0
   fi
