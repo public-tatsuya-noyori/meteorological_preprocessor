@@ -52,7 +52,7 @@ delete_4Search() {
           echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension}." >&2
           return ${exit_code}
         fi
-        ls -1 ${work_directory}/${search_index_directory}/${extension}/${date_hour_directory}/* | xargs -r zcat > ${work_directory}/${search_index_directory}_file.tmp
+        find ${work_directory}/${search_index_directory}/${extension}/${date_hour_directory} -regextype posix-egrep -regex "^.*/[0-9]{4}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/${search_index_directory}_file.tmp
         if test -s ${work_directory}/${search_index_directory}_file.tmp; then
           cp /dev/null ${work_directory}/err_log.tmp
           set +e
