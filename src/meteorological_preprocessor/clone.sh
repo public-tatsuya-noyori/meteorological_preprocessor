@@ -197,9 +197,9 @@ clone() {
       cp /dev/null ${source_work_directory}/newly_created_file.tmp
       set +e
       if test -s ${source_work_directory}/${search_index_directory}_newly_created_index.tmp; then
-        cat ${source_work_directory}/${search_index_directory}_newly_created_index.tmp ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp | sed -e "s|^|${local_work_directory}/|g" | xargs -r zcat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/newly_created_file.tmp
+        cat ${source_work_directory}/${search_index_directory}_newly_created_index.tmp ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp | sed -e "s|^|${source_work_directory}|g" | xargs -r zcat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/newly_created_file.tmp
       else
-        sed -e "s|^|${local_work_directory}/|g" ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp | xargs -r zcat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/newly_created_file.tmp
+        sed -e "s|^|${source_work_directory}|g" ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp | xargs -r zcat | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${source_work_directory}/newly_created_file.tmp
       fi
       set -e
       cp /dev/null ${source_work_directory}/filtered_newly_created_file.tmp
