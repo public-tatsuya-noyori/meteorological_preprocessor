@@ -20,16 +20,34 @@
 set -e
 IFS=$'\n'
 publish(){
-  non_gz_count=`grep -v \.gz$ ${input_index_file} | wc -l`
-  if test ${non_gz_count} -gt 0; then
-    echo "ERROR: Do not include non-gz file on ${input_index_file}." >&2
+  non_extension_count=`grep -v '^ *$' ${input_index_file} | grep -v \.${extension}$ | wc -l`
+  if test ${non_extension_count} -gt 0; then
+    echo "ERROR: Do not include non .${extension} file on ${input_index_file}." >&2
     return 199
   fi
-  grep ^${local_work_directory}/ ${input_index_file} | sed -e "s|^${local_work_directory}/||g" | sort -u > ${work_directory}/newly_created_file.tmp
-  if test ! -s ${work_directory}/newly_created_file.tmp; then
+  not_matched_prefix_count=`grep -v ^${local_work_directory}/ ${input_index_file} | wc -l`
+  if test ${not_matched_prefix_count} -gt 0; then
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
   fi
+  not_exist_file=`grep -v '^ *$' ${input_index_file} | xargs -r -n 1 test -f`
+  if test ${not_exist_file} -gt 0; then
+    echo "ERROR: not exist file on ${input_index_file}." >&2
+    return 199
+  fi
+  grep -v '^ *$' ${input_index_file} | sed -e "s|^${local_work_directory}/||g" -e "s|$|.gz|g" | sort -u > ${work_directory}/newly_created_file.tmp
+  cp /dev/null ${work_directory}/all_processed_file.txt
+  cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
+  set +e
+  find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f | xargs -r zcat >> ${work_directory}/all_processed_file.txt 2>/dev/null
+  grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
+  set -e
+  already_publishd_file_count=`grep -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp | wc -l`
+  if test ${already_publishd_file_count} -gt 0; then
+    echo "ERROR: exist already published file on ${input_index_file}." >&2
+    return 199
+  fi
+  grep -v '^ *$' ${input_index_file} | xargs -r gunzip -f
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
@@ -47,12 +65,6 @@ publish(){
     echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
     return ${exit_code}
   fi
-  cp /dev/null ${work_directory}/all_processed_file.txt
-  cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
-  set +e
-  ls -1 ${processed_directory} | sed -e "s|^|${processed_directory}/|g" | xargs -r zcat >> ${work_directory}/all_processed_file.txt 2>/dev/null
-  grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
-  set -e
   cp /dev/null ${work_directory}/processed_file.txt
   if test -s ${work_directory}/filtered_newly_created_file.tmp; then
     cp /dev/null ${work_directory}/info_log.tmp
@@ -133,13 +145,13 @@ for arg in "$@"; do
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--delete_input_index_file" ) delete_input_index_file=1;shift;;
     "--header_upload" ) header_upload=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--header_upload header_upload] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]'"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--header_upload header_upload] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
 done
-if test -z $5; then
+if test -z $7; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
@@ -162,6 +174,16 @@ if test -z "${destination_rclone_remote_bucket_main_sub}"; then
   echo "ERROR: $5 is not rclone_remote:bucket." >&2
   exit 199
 fi
+if test ! -f $6; then
+  echo "ERROR: $6 is not a file." >&2
+  exit 199
+fi
+inclusive_pattern_file=$6
+if test ! -f $7; then
+  echo "ERROR: $7 is not a file." >&2
+  exit 199
+fi
+exclusive_pattern_file=$7
 work_directory=${local_work_directory}/${job_directory}/${unique_center_id}/${extension}
 processed_directory=${local_work_directory}/${job_directory}/processed/${extension}
 mkdir -p ${work_directory} ${processed_directory}
