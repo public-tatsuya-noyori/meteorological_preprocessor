@@ -189,7 +189,7 @@ subscribe() {
       if test -s ${source_work_directory}/newly_created_file.tmp; then
         cp /dev/null ${work_directory}/all_processed_file.txt
         set +e
-        find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f | xargs -r zcat >> ${work_directory}/all_processed_file.txt 2>/dev/null
+        find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/all_processed_file.txt 2>/dev/null
         grep -v -F -f ${work_directory}/all_processed_file.txt ${source_work_directory}/newly_created_file.tmp > ${source_work_directory}/filtered_newly_created_file.tmp
         set -e
       fi
@@ -228,7 +228,7 @@ subscribe() {
           set -e
           if test -s ${work_directory}/processed_file.txt; then
             if test ${no_gunzip} -eq 0; then
-              sed -e "s|^|${local_work_directory}/|g" ${work_directory}/processed_file.txt | xargs -r gunzip -f
+              sed -e "s|^|${local_work_directory}/|g" ${work_directory}/processed_file.txt | xargs -r -n 64 -P ${parallel} gunzip -f
             fi
             now=`date -u "+%Y%m%d%H%M%S"`
             mv ${work_directory}/processed_file.txt ${work_directory}/${now}_${unique_center_id}.txt

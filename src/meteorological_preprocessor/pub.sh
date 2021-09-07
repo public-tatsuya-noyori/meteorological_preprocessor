@@ -21,12 +21,12 @@ set -e
 IFS=$'\n'
 publish(){
   non_extension_count=`grep -v '^ *$' ${input_index_file} | grep -v \.${extension}$ | wc -l`
-  if test ${non_extension_count} -gt 0; then
+  if test ${non_extension_count} -ne 0; then
     echo "ERROR: Do not include non .${extension} file on ${input_index_file}." >&2
     return 199
   fi
   not_matched_prefix_count=`grep -v ^${local_work_directory}/ ${input_index_file} | wc -l`
-  if test ${not_matched_prefix_count} -gt 0; then
+  if test ${not_matched_prefix_count} -ne 0; then
     echo "ERROR: can not match ^${local_work_directory}/ on ${input_index_file}." >&2
     return 199
   fi
@@ -34,7 +34,7 @@ publish(){
   grep -v '^ *$' ${input_index_file} | xargs -r -n 1 test -f
   not_exist_file=$?
   set -e
-  if test ${not_exist_file} -gt 0; then
+  if test ${not_exist_file} -ne 0; then
     echo "ERROR: not exist file on ${input_index_file}." >&2
     return 199
   fi
@@ -42,15 +42,15 @@ publish(){
   cp /dev/null ${work_directory}/all_processed_file.txt
   cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
   set +e
-  find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f | xargs -r zcat >> ${work_directory}/all_processed_file.txt 2>/dev/null
+  find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/all_processed_file.txt 2>/dev/null
   grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
   set -e
   already_publishd_file_count=`grep -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp | wc -l`
-  if test ${already_publishd_file_count} -gt 0; then
+  if test ${already_publishd_file_count} -ne 0; then
     echo "ERROR: exist already published file on ${input_index_file}." >&2
     return 199
   fi
-  grep -v '^ *$' ${input_index_file} | xargs -r gzip -f
+  grep -v '^ *$' ${input_index_file} | xargs -r -n 64 -P ${parallel} gzip -f
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
@@ -71,19 +71,10 @@ publish(){
   cp /dev/null ${work_directory}/processed_file.txt
   if test -s ${work_directory}/filtered_newly_created_file.tmp; then
     cp /dev/null ${work_directory}/info_log.tmp
-    if test -z "${header_upload}"; then
-      set +e
-#      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
-      exit_code=$?
-      set -e
-    else
-      set +e
-#      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --header-upload "${header_upload}" --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
-      exit_code=$?
-      set -e
-    fi
+    set +e
+    timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/filtered_newly_created_file.tmp --log-file ${work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} --transfers ${parallel} ${local_work_directory} ${destination_rclone_remote_bucket}
+    exit_code=$?
+    set -e
     if test ${exit_code} -ne 0; then
       set +e
       grep -F ERROR ${work_directory}/info_log.tmp >&2
@@ -133,7 +124,6 @@ config=$HOME/.config/rclone/rclone.conf
 delete_index_minute=720
 delete_input_index_file=0
 ec=0
-header_upload=''
 job_directory=4PubClone
 no_check_pid=0
 parallel=4
@@ -147,8 +137,7 @@ for arg in "$@"; do
     "--config") config=$2;shift;shift;;
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--delete_input_index_file" ) delete_input_index_file=1;shift;;
-    "--header_upload" ) header_upload=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--header_upload header_upload] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
