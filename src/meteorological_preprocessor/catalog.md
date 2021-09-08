@@ -46,7 +46,7 @@ $ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-clou
 ```
 $ vi $HOME/.config/rclone/rclone.conf
 
-# When using aws, write as follows.
+# When using AWS, write as follows.
 [***your_center_ID***_main]
 type = s3
 env_auth = false
@@ -56,13 +56,13 @@ region = ***your_region***
 endpoint = https://s3.***your_region***.amazonaws.com
 acl = public-read
 
-# When using Microsoft azure, write as follows.
+# When using Microsoft Azure, write as follows.
 [***your_center_ID***_main]
 type = azureblob
 account = ***your_account***
 key = ***your_key***
 
-# When using Alibaba cloud, write as follows.
+# When using Alibaba Cloud, write as follows.
 [***your_center_ID***_main]
 type = s3
 env_auth = false
