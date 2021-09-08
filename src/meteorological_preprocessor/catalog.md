@@ -105,3 +105,4 @@ acl = public-read
 
 :wq
 ```
+2. Prepare data file and index file.
