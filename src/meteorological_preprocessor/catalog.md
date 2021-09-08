@@ -67,7 +67,6 @@ type = s3
 env_auth = false
 access_key_id = ***your_access_key***
 secret_access_key = ***your_secret_access_key***
-region = ***your_region***
 endpoint = oss-cn-***your_region***.aliyuncs.com
 acl = public-read
 force_path_style = false
