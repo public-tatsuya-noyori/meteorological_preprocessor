@@ -31,7 +31,7 @@ publish(){
     return 199
   fi
   set +e
-  grep -v '^ *$' ${input_index_file} | xargs -r -n 1 test -f
+  grep -v '^ *$' ${input_index_file} | xargs -r -n 1 -P ${parallel} test -f
   not_exist_file=$?
   set -e
   if test ${not_exist_file} -ne 0; then
