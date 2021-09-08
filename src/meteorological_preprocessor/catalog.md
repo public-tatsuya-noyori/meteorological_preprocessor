@@ -15,7 +15,6 @@ $ vi $HOME/.config/rclone/rclone.conf
 
 [jma]
 type = s3
-provider = Minio
 env_auth = false
 access_key_id =
 secret_access_key =
@@ -95,7 +94,6 @@ acl = public-read
 
 # if you use Minio,
 type = s3
-provider = Minio
 env_auth = false
 access_key_id = ***your_access_key***
 secret_access_key = ***your_secret_access_key***
