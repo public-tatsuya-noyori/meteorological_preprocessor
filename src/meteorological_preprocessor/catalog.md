@@ -68,6 +68,7 @@ type = s3
 env_auth = false
 access_key_id = ***your_access_key***
 secret_access_key = ***your_secret_access_key***
+region = 
 endpoint = oss-cn-***your_region***.aliyuncs.com
 acl = public-read
 force_path_style = false
@@ -88,7 +89,7 @@ type = s3
 env_auth = false
 access_key_id = ***your_access_key***
 secret_access_key = ***your_secret_access_key***
-region = **your_region***
+region = 
 endpoint = https://s3.**your_region***.wasabisys.com
 acl = public-read
 
