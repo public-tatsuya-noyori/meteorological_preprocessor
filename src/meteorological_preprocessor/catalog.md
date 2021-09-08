@@ -42,7 +42,7 @@ $ crontab -e
 $ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
 ## How to publish data and clone data
-2. Configure rclone.conf.
+1. Configure rclone.conf.
 ```
 $ vi $HOME/.config/rclone/rclone.conf
 
