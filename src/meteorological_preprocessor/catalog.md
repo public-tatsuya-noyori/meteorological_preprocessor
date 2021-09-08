@@ -115,11 +115,12 @@ $ echo '***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC**
 ```
 $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_ID*** txt /path/to/index.txt '***your_center_ID***_main:***your_bucket_on_cloud_storage***' inclusive_pattern.txt exclusive_pattern.txt
 ```
-5. Configure Cron for clone.sh and move_4PubSub_4Search.sh.
+5. Configure Cron for [clone.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/clone.sh) and [move_4PubSub_4Search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/move_4PubSub_4Search.sh).
 ```
 $ crontab -e
 
 * * * * * /path/to/clone.sh /path/to/pub_clone_work_directory jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' '***your_center_ID***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+* * * * * /path/to/move_4PubSub_4Search.sh /path/to/pub_clone_work_directory ***your_center_ID***_main txt '***your_center_ID***_main:***your_bucket_on_cloud_storage***'
 
 :wq
 ```
