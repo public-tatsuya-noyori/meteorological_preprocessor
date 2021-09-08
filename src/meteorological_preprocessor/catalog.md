@@ -27,7 +27,7 @@ acl = public-read
 ```
 3. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
 4. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
-5. Configure Cron.
+5. Configure Cron for sub.sh.
 ```
 $ crontab -e
 
@@ -105,13 +105,22 @@ acl = public-read
 
 :wq
 ```
-2. Download [pub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/pub.sh)
-3. Prepare data file and index file.
+2. Prepare data file and index file.
 ```
 $ cp /path/to/your_synop_bulletin.txt /path/to/pub_clone_work_directory/***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt
 $ echo '***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt' > index.txt
 ```
+3. Download [pub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/pub.sh)
 4. Run pub.sh.
 ```
 $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_ID*** txt /path/to/index.txt '***your_center_ID***_main:***your_bucket_on_cloud_storage***' inclusive_pattern.txt exclusive_pattern.txt
+```
+5. Configure Cron for clone.sh and move_4PubSub_4Search.sh.
+```
+$ crontab -e
+```
+
+* * * * * /path/to/clone.sh /path/to/pub_clone_work_directory jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' '***your_center_ID***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+
+:wq
 ```
