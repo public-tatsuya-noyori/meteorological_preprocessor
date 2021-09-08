@@ -143,7 +143,7 @@ clone() {
         if test -s ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp; then
           former_index_file_first_line_prefix=`head -1 ${source_work_directory}/${pubsub_index_directory}_index.txt | cut -c1-12`
           search_index_directory_exit_code=0
-          for date_hour_directory in `tac ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp`; do
+          for date_hour_directory in `grep -E "^(${inclusive_index_date_hour_pattern})$" ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp | tac`; do
             cp /dev/null ${source_work_directory}/err_log.tmp
             set +e
             timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${extension}/${date_hour_directory}/ > ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
@@ -341,6 +341,14 @@ if test ! -f $7; then
   exit 199
 fi
 exclusive_pattern_file=$7
+datetime=`date -u "+%Y%m%d%H%M%S"`
+datetime_date=`echo ${datetime} | cut -c1-8`
+datetime_hour=`echo ${datetime} | cut -c9-10`
+inclusive_index_date_hour_pattern=${datetime_date}${datetime_hour}
+inclusive_index_hour=`${delete_index_minute} / 60 - 1`
+for hour_count in `seq ${inclusive_index_hour}`; do
+  inclusive_index_date_hour_pattern="${inclusive_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
+done
 work_directory=${local_work_directory}/${job_directory}/${unique_center_id}/${extension}
 processed_directory=${local_work_directory}/${job_directory}/processed/${extension}
 mkdir -p ${work_directory} ${processed_directory}
