@@ -112,3 +112,6 @@ $ cp /path/to/your_synop_bulletin.txt /path/to/pub_clone_work_directory/***your_
 $ echo '***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt' > index.txt
 ```
 4. Run pub.sh.
+```
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_ID*** txt /path/to/index.txt '***your_center_ID***_main:***your_bucket_on_cloud_storage***' inclusive_pattern.txt exclusive_pattern.txt
+```
