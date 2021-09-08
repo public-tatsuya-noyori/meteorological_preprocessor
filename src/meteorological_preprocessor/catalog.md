@@ -4,7 +4,7 @@
 [JMA](inclusive_pattern.txt)
 
 ## Data explorer
-[JMA:Tokyo](http://202.32.195.138:9000/center-aa-cloud-a-region-a-open-main/4Site/explore.html), [JMA:Osaka](http://202.32.195.138:9000/center-aa-cloud-a-region-b-open-sub/4Site/explore.html)
+[JMA:Main](http://202.32.195.138:9000/center-aa-cloud-a-region-a-open-main/4Site/explore.html), [JMA:Sub](http://202.32.195.138:9000/center-aa-cloud-a-region-b-open-sub/4Site/explore.html)
 
 
 ## How to subscribe data and search data
