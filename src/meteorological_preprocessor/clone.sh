@@ -345,7 +345,7 @@ datetime=`date -u "+%Y%m%d%H%M%S"`
 datetime_date=`echo ${datetime} | cut -c1-8`
 datetime_hour=`echo ${datetime} | cut -c9-10`
 inclusive_index_date_hour_pattern=${datetime_date}${datetime_hour}
-inclusive_index_hour=`${delete_index_minute} / 60 - 1`
+inclusive_index_hour=`expr ${delete_index_minute} / 60 - 1`
 for hour_count in `seq ${inclusive_index_hour}`; do
   inclusive_index_date_hour_pattern="${inclusive_index_date_hour_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour ago" "+%Y%m%d%H"`"|"`date -u -d "${datetime_date} ${datetime_hour}:00 ${hour_count} hour" "+%Y%m%d%H"`
 done
