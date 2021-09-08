@@ -108,7 +108,7 @@ acl = public-read
 2. Download [pub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/pub.sh)
 3. Prepare data file and index file.
 ```
-$ cp your_synop_bulletin /path/to/pub_clone_work_directory/***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt
+$ cp /path/to/your_synop_bulletin.txt /path/to/pub_clone_work_directory/***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt
 $ echo '***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt' > index.txt
 ```
 4. Run pub.sh.
