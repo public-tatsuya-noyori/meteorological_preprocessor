@@ -92,6 +92,7 @@ endpoint = https://s3.**your_region***.wasabisys.com
 acl = public-read
 
 # When using Minio, write as follows.
+[***your_center_ID***_main]
 type = s3
 env_auth = false
 access_key_id = ***your_access_key***
