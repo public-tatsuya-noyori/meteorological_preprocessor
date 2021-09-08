@@ -45,7 +45,7 @@ $ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-clou
 ```
 $ vi $HOME/.config/rclone/rclone.conf
 
-# if you use aws,
+# When using aws, write as follows.
 [***your_center_ID***_main]
 type = s3
 env_auth = false
@@ -55,13 +55,13 @@ region = ***your_region***
 endpoint = https://s3.***your_region***.amazonaws.com
 acl = public-read
 
-# if you use Microsoft azure,
+# When using Microsoft azure, write as follows.
 [***your_center_ID***_main]
 type = azureblob
 account = ***your_account***
 key = ***your_key***
 
-# if you use Alibaba cloud,
+# When using Alibaba cloud, write as follows.
 [***your_center_ID***_main]
 type = s3
 env_auth = false
@@ -71,7 +71,7 @@ endpoint = oss-cn-***your_region***.aliyuncs.com
 acl = public-read
 force_path_style = false
 
-# if you use Google Cloud,
+# When using Google Cloud, write as follows.
 [***your_center_ID***_main]
 type = s3
 env_auth = false
@@ -81,7 +81,7 @@ region = ***your_region***
 endpoint = https://storage.googleapis.com
 acl = public-read
 
-# if you use Wasabi,
+# When using Wasabi, write as follows.
 [***your_center_ID***_main]
 type = s3
 env_auth = false
@@ -91,7 +91,7 @@ region = **your_region***
 endpoint = https://s3.**your_region***.wasabisys.com
 acl = public-read
 
-# if you use Minio,
+# When using Minio, write as follows.
 type = s3
 env_auth = false
 access_key_id = ***your_access_key***
