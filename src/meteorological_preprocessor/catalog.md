@@ -118,7 +118,6 @@ $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_ID*** txt /pa
 5. Configure Cron for clone.sh and move_4PubSub_4Search.sh.
 ```
 $ crontab -e
-```
 
 * * * * * /path/to/clone.sh /path/to/pub_clone_work_directory jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' '***your_center_ID***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 
