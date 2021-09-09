@@ -22,7 +22,7 @@ IFS=$'\n'
 publish(){
   non_extension_count=`grep -v '^ *$' ${input_index_file} | grep -v \.${extension}$ | wc -l`
   if test ${non_extension_count} -ne 0; then
-    echo "ERROR: Do not include non .${extension} file on ${input_index_file}." >&2
+    echo "ERROR: Do not include non-.${extension} file on ${input_index_file}." >&2
     return 199
   fi
   not_matched_prefix_count=`grep -v ^${local_work_directory}/ ${input_index_file} | wc -l`
@@ -39,6 +39,16 @@ publish(){
     return 199
   fi
   grep -v '^ *$' ${input_index_file} | sed -e "s|^${local_work_directory}/||g" -e "s|$|.gz|g" | sort -u > ${work_directory}/newly_created_file.tmp
+  non_inclusive_pattern_count=`grep -v '^ *$' ${work_directory}/newly_created_file.tmp | grep -v -E -f ${inclusive_pattern_file} | wc -l`
+  if test ${non_inclusive_pattern_count} -ne 0; then
+    echo "ERROR: Do not include non-inclusive pattern file on ${input_index_file} with .gz." >&2
+    return 199
+  fi
+  non_exclusive_pattern_count=`grep -v '^ *$' ${work_directory}/newly_created_file.tmp | grep -E -f ${exclusive_pattern_file} | wc -l`
+  if test ${non_exclusive_pattern_count} -ne 0; then
+    echo "ERROR: Do not include non-exclusive pattern file on ${input_index_file} with .gz." >&2
+    return 199
+  fi
   cp /dev/null ${work_directory}/all_processed_file.txt
   cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
   set +e
