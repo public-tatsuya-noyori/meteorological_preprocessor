@@ -82,7 +82,7 @@ subscribe() {
       if test ${exit_code} -eq 0; then
         break
       else
-        sleep 30
+        sleep 8
       fi
     done
     if test ${exit_code} -ne 0; then
