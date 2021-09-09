@@ -135,8 +135,8 @@
 ^[A-Z][A-Z0-9]{3}/bufr/upper_air/temperature_profiler/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/upper_air/temp_ship/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/upper_air/wind_profiler/[0-9]{12}/[^/]+\.bin.gz$
-^[A-Z][A-Z0-9]{3}/crex/surface/sea_level_data/[0-9]{12}/[^/]+\.bin.gz$
-^[A-Z][A-Z0-9]{3}/crex/upper_air/total_ozon/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/crex/surface/sea_level_data/[0-9]{12}/[^/]+\.txt.gz$
+^[A-Z][A-Z0-9]{3}/crex/upper_air/total_ozon/[0-9]{12}/[^/]+\.txt.gz$
 ^[A-Z][A-Z0-9]{3}/iwxxm/surface/metar/[0-9]{12}/[^/]+\.bin.gz$
 ^RJTD/bufr/forecast/cyclone/[0-9]{12}/[^/]+\.bin.gz$
 ^RJTD/grib/geps/[^/]+/[0-9]{12}/[^/]+\.bin.gz$
