@@ -37,9 +37,13 @@ $ crontab -e
 :wq
 ```
 6. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
-7. Run search.sh.
+7. Run search.sh to search keyword.
 ```
 $ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
+```
+8. Run search.sh to download the searched files.
+```
+$ /path/to/search.sh --out /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
 ## How to publish data and clone data
 1. Configure rclone.conf.
@@ -125,3 +129,6 @@ $ crontab -e
 
 :wq
 ```
+## How to clone data on cloud with serverless computing
+### When using AWS
+1.
