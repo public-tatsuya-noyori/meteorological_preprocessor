@@ -22,23 +22,23 @@ IFS=$'\n'
 delete_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension}/ > ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
+  timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/ > ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
     return 0
   fi
   if test -s ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp; then
-    rm -rf ${work_directory}/${search_index_directory}/${extension}
+    rm -rf ${work_directory}/${search_index_directory}/${extension_type}
     for date_hour_directory in `grep -v -E "^(${delete_index_date_hour_pattern})/$" ${work_directory}/${search_index_directory}_date_hour_slash_directory.tmp | sed -e 's|/$||g'`; do
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${extension}/${date_hour_directory}/|g" > ${work_directory}/${search_index_directory}_index.tmp
+      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${date_hour_directory}/ | sed -e "s|^|/${search_index_directory}/${extension_type}/${date_hour_directory}/|g" > ${work_directory}/${search_index_directory}_index.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
         cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension}/${date_hour_directory}." >&2
+        echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${date_hour_directory}." >&2
         return ${exit_code}
       fi
       if test -s ${work_directory}/${search_index_directory}_index.tmp; then
@@ -49,10 +49,10 @@ delete_4Search() {
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension}." >&2
+          echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
           return ${exit_code}
         fi
-        find ${work_directory}/${search_index_directory}/${extension}/${date_hour_directory} -regextype posix-egrep -regex "^.*/[0-9]{4}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/${search_index_directory}_file.tmp
+        find ${work_directory}/${search_index_directory}/${extension_type}/${date_hour_directory} -regextype posix-egrep -regex "^.*/[0-9]{4}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/${search_index_directory}_file.tmp
         if test -s ${work_directory}/${search_index_directory}_file.tmp; then
           cp /dev/null ${work_directory}/err_log.tmp
           set +e
@@ -74,7 +74,7 @@ delete_4Search() {
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not delete index file on ${rclone_remote_bucket}/${search_index_directory}/${extension}." >&2
+          echo "ERROR: can not delete index file on ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
           return ${exit_code}
         fi
       fi
@@ -102,7 +102,7 @@ for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub extension rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
@@ -114,10 +114,10 @@ fi
 local_work_directory=$1
 unique_center_id_main_or_sub=$2
 set +e
-extension=`echo $3 | grep -E '^(txt|bin)$'`
+extension_type=`echo $3 | grep -E '^(txt|bin)$'`
 rclone_remote_bucket=`echo $4 | grep -F ':'`
 set -e
-if test -z ${extension}; then
+if test -z ${extension_type}; then
   echo "ERROR: $3 is not txt or bin." >&2
   exit 199
 fi
@@ -125,11 +125,11 @@ if test -z "${rclone_remote_bucket}"; then
   echo "ERROR: $4 is not rclone_remote:bucket." >&2
   exit 199
 fi
-work_directory=${local_work_directory}/${job_directory}/${unique_center_id_main_or_sub}/${extension}
+work_directory=${local_work_directory}/${job_directory}/${unique_center_id_main_or_sub}/${extension_type}
 mkdir -p ${work_directory}
 if test -s ${work_directory}/pid.txt; then
   if test ${no_check_pid} -eq 0; then
-    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${extension} " | wc -l`
+    running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id_main_or_sub} " | grep -F " ${extension_type} " | wc -l`
   else
     exit 0
   fi
