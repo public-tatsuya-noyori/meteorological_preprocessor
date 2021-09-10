@@ -5,31 +5,37 @@
 * * * * * cd /home/noyori/tests; ./download.sh p2_crex 1
 * * * * * cd /home/noyori/tests; ./download.sh p2_crex 2
 * * * * * cd /home/noyori/tests; ./download.sh p2_crex 3
-* * * * * cd /home/noyori/tests; ./download.sh p2 1 closed
-* * * * * cd /home/noyori/tests; ./download.sh p2 2 closed
-* * * * * cd /home/noyori/tests; ./download.sh p2 3 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p2 1 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p2 2 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p2 3 closed
 * * * * * cd /home/noyori/tests; ./download.sh p3 1
 * * * * * cd /home/noyori/tests; ./download.sh p3 2
 * * * * * cd /home/noyori/tests; ./download.sh p3 3
-* * * * * cd /home/noyori/tests; ./download.sh p3 1 closed
-* * * * * cd /home/noyori/tests; ./download.sh p3 2 closed
-* * * * * cd /home/noyori/tests; ./download.sh p3 3 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p3 1 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p3 2 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p3 3 closed
 * * * * * cd /home/noyori/tests; ./download.sh p4 2
-* * * * * cd /home/noyori/tests; ./download.sh p4 2 closed
+#* * * * * cd /home/noyori/tests; ./download.sh p4 2 closed
 
 # pub
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_1/cached/* download_p2_crex_1/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p2_1/index.txt; rm -r ${i};done; if test -s download_p2_1/index.txt;then ./pub.sh --delete_input_index_file cache_1 aa txt download_p2_1/index.txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_2/cached/* download_p2_crex_2/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p2_2/index.txt; rm -r ${i};done; if test -s download_p2_2/index.txt;then ./pub.sh --delete_input_index_file cache_2 bb txt download_p2_2/index.txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_3/cached/* download_p2_crex_3/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p2_3/index.txt; rm -r ${i};done; if test -s download_p2_3/index.txt;then ./pub.sh --delete_input_index_file cache_3 cc txt download_p2_3/index.txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_1/cached/* download_p4_1/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p3_1/index.txt; rm -r ${i};done; if test -s download_p3_1/index.txt;then ./pub.sh --delete_input_index_file cache_1 aa bin download_p3_1/index.txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_2/cached/* download_p4_2/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p3_2/index.txt; rm -r ${i};done; if test -s download_p3_2/index.txt;then ./pub.sh --delete_input_index_file cache_2 bb bin download_p3_2/index.txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_3/cached/* download_p4_3/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p3_3/index.txt; rm -r ${i};done; if test -s download_p3_3/index.txt;then ./pub.sh --delete_input_index_file cache_3 cc bin download_p3_3/index.txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_1_closed/cached/* |grep -v '\.tmp$'|uniq`;do ./pub.sh --delete_input_index_file cache_1_closed aa txt ${i} 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;done
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_2_closed/cached/* |grep -v '\.tmp$'|uniq`;do ./pub.sh --delete_input_index_file cache_2_closed bb txt ${i} 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;done
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_3_closed/cached/* |grep -v '\.tmp$'|uniq`;do ./pub.sh --delete_input_index_file cache_3_closed cc txt ${i} 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;done
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_1_closed/cached/* download_p4_1_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p3_1_closed/index.txt; rm -r ${i};done; if test -s download_p3_1_closed/index.txt;then ./pub.sh --delete_input_index_file cache_1_closed aa bin download_p3_1_closed/index.txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_2_closed/cached/* download_p4_2_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p3_2_closed/index.txt; rm -r ${i};done; if test -s download_p3_2_closed/index.txt;then ./pub.sh --delete_input_index_file cache_2_closed bb bin download_p3_2_closed/index.txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
-* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_3_closed/cached/* download_p4_3_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} >> download_p3_3_closed/index.txt; rm -r ${i};done; if test -s download_p3_3_closed/index.txt;then ./pub.sh --delete_input_index_file cache_3_closed cc bin download_p3_3_closed/index.txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_1/cached/* download_p2_crex_1/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p2_1/index.txt; rm -r ${i};done; if test -s download_p2_1/index.txt;then ./pub.sh --delete_input_index_file cache_1 aa txt download_p2_1/index.txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_2/cached/* download_p2_crex_2/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p2_2/index.txt; rm -r ${i};done; if test -s download_p2_2/index.txt;then ./pub.sh --delete_input_index_file cache_2 bb txt download_p2_2/index.txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_3/cached/* download_p2_crex_3/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p2_3/index.txt; rm -r ${i};done; if test -s download_p2_3/index.txt;then ./pub.sh --delete_input_index_file cache_3 cc txt download_p2_3/index.txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_1/cached/* download_p4_1/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p3_1/index.txt; rm -r ${i};done; if test -s download_p3_1/index.txt;then ./pub.sh --delete_input_index_file cache_1 aa bin download_p3_1/index.txt 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_2/cached/* download_p4_2/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p3_2/index.txt; rm -r ${i};done; if test -s download_p3_2/index.txt;then ./pub.sh --delete_input_index_file cache_2 bb bin download_p3_2/index.txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_3/cached/* download_p4_3/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p3_3/index.txt; rm -r ${i};done; if test -s download_p3_3/index.txt;then ./pub.sh --delete_input_index_file cache_3 cc bin download_p3_3/index.txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_1_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p2_1_closed/index.txt; rm -r ${i};done; if test -s download_p2_1_closed/index.txt;then ./pub.sh --delete_input_index_file cache_1_closed aa txt download_p2_1_closed/index.txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_2_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p2_2_closed/index.txt; rm -r ${i};done; if test -s download_p2_2_closed/index.txt;then ./pub.sh --delete_input_index_file cache_2_closed aa txt download_p2_2_closed/index.txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_3_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p2_3_closed/index.txt; rm -r ${i};done; if test -s download_p2_3_closed/index.txt;then ./pub.sh --delete_input_index_file cache_3_closed aa txt download_p2_3_closed/index.txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+
+#* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_1_closed/cached/* |grep -v '\.tmp$'|uniq`;do ./pub.sh --delete_input_index_file cache_1_closed aa txt ${i} 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;done
+#* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_2_closed/cached/* |grep -v '\.tmp$'|uniq`;do ./pub.sh --delete_input_index_file cache_2_closed bb txt ${i} 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;done
+#* * * * * cd /home/noyori/tests; for i in `ls -1 download_p2_3_closed/cached/* |grep -v '\.tmp$'|uniq`;do ./pub.sh --delete_input_index_file cache_3_closed cc txt ${i} 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;done
+
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_1_closed/cached/* download_p4_1_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p3_1_closed/index.txt; rm -r ${i};done; if test -s download_p3_1_closed/index.txt;then ./pub.sh --delete_input_index_file cache_1_closed aa bin download_p3_1_closed/index.txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_2_closed/cached/* download_p4_2_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p3_2_closed/index.txt; rm -r ${i};done; if test -s download_p3_2_closed/index.txt;then ./pub.sh --delete_input_index_file cache_2_closed bb bin download_p3_2_closed/index.txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
+* * * * * cd /home/noyori/tests; for i in `ls -1 download_p3_3_closed/cached/* download_p4_3_closed/cached/* |grep -v '\.tmp$'|uniq`;do cat ${i} | grep -v /unknown/ >> download_p3_3_closed/index.txt; rm -r ${i};done; if test -s download_p3_3_closed/index.txt;then ./pub.sh --delete_input_index_file cache_3_closed cc bin download_p3_3_closed/index.txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt;fi
 
 # move
 * * * * * cd /home/noyori/tests; ./move_4PubSub_4Search.sh cache_1        aa_main txt minio:center-aa-cloud-a-region-a-open-main
@@ -84,18 +90,18 @@
 1,31   * * * * cd /home/noyori/tests; ./del_4Search.sh cache_3_closed cc_sub  bin minio:center-cc-cloud-c-region-f-closed-sub
 
 # del
-#55 0  * * * cd /home/noyori/tests; ./del.sh cache_1        aa_main minio:center-aa-cloud-a-region-a-open-main   2
-#55 6  * * * cd /home/noyori/tests; ./del.sh cache_1        aa_sub  minio:center-aa-cloud-a-region-b-open-sub    2
-#55 12 * * * cd /home/noyori/tests; ./del.sh cache_1_closed aa_main minio:center-aa-cloud-a-region-a-closed-main 2
-#55 18 * * * cd /home/noyori/tests; ./del.sh cache_1_closed aa_sub  minio:center-aa-cloud-a-region-b-closed-sub  2
-#55 2  * * * cd /home/noyori/tests; ./del.sh cache_2        bb_main minio:center-bb-cloud-b-region-c-open-main   2
-#55 8  * * * cd /home/noyori/tests; ./del.sh cache_2        bb_sub  minio:center-bb-cloud-b-region-d-open-sub    2
-#55 14 * * * cd /home/noyori/tests; ./del.sh cache_2_closed bb_main minio:center-bb-cloud-b-region-c-closed-main 2
-#55 20 * * * cd /home/noyori/tests; ./del.sh cache_2_closed bb_sub  minio:center-bb-cloud-b-region-d-closed-sub  2
-#55 4  * * * cd /home/noyori/tests; ./del.sh cache_3        cc_main minio:center-cc-cloud-c-region-e-open-main   2
-#55 10 * * * cd /home/noyori/tests; ./del.sh cache_3        cc_sub  minio:center-cc-cloud-c-region-f-open-sub    2
-#55 16 * * * cd /home/noyori/tests; ./del.sh cache_3_closed cc_main minio:center-cc-cloud-c-region-e-closed-main 2
-#55 22 * * * cd /home/noyori/tests; ./del.sh cache_3_closed cc_sub  minio:center-cc-cloud-c-region-f-closed-sub  2
+55 0  * * * cd /home/noyori/tests; ./del.sh cache_1        aa_main minio:center-aa-cloud-a-region-a-open-main   2
+55 6  * * * cd /home/noyori/tests; ./del.sh cache_1        aa_sub  minio:center-aa-cloud-a-region-b-open-sub    2
+55 12 * * * cd /home/noyori/tests; ./del.sh cache_1_closed aa_main minio:center-aa-cloud-a-region-a-closed-main 2
+55 18 * * * cd /home/noyori/tests; ./del.sh cache_1_closed aa_sub  minio:center-aa-cloud-a-region-b-closed-sub  2
+55 2  * * * cd /home/noyori/tests; ./del.sh cache_2        bb_main minio:center-bb-cloud-b-region-c-open-main   2
+55 8  * * * cd /home/noyori/tests; ./del.sh cache_2        bb_sub  minio:center-bb-cloud-b-region-d-open-sub    2
+55 14 * * * cd /home/noyori/tests; ./del.sh cache_2_closed bb_main minio:center-bb-cloud-b-region-c-closed-main 2
+55 20 * * * cd /home/noyori/tests; ./del.sh cache_2_closed bb_sub  minio:center-bb-cloud-b-region-d-closed-sub  2
+55 4  * * * cd /home/noyori/tests; ./del.sh cache_3        cc_main minio:center-cc-cloud-c-region-e-open-main   2
+55 10 * * * cd /home/noyori/tests; ./del.sh cache_3        cc_sub  minio:center-cc-cloud-c-region-f-open-sub    2
+55 16 * * * cd /home/noyori/tests; ./del.sh cache_3_closed cc_main minio:center-cc-cloud-c-region-e-closed-main 2
+55 22 * * * cd /home/noyori/tests; ./del.sh cache_3_closed cc_sub  minio:center-cc-cloud-c-region-f-closed-sub  2
 
 # clone
 * * * * * cd /home/noyori/tests; ./clone.sh cache_1 bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt
@@ -128,14 +134,14 @@
 0 */2 * * * cd /home/noyori/tests; ./sub.sh --no_gunzip cache_s        aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' inclusive_pattern.txt exclusive_pattern.txt
 0 */2 * * * cd /home/noyori/tests; ./sub.sh --no_gunzip cache_s_closed aa txt 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
 0 */2 * * * cd /home/noyori/tests; ./sub.sh --no_gunzip cache_s_closed aa bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
-*/4 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/2 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb txt 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/2 * * * * cd /home/noyori/tests; ./sub.sh cache_s_2        bb bin 'minio:center-bb-cloud-b-region-c-open-main;minio:center-bb-cloud-b-region-d-open-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/2 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb txt 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/2 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_2 bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb txt 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_3        bb bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
+*/3 * * * * cd /home/noyori/tests; ./sub.sh cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
 
 # delete on local PC
 40 2,10,18 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_2 /home/noyori/tests/cache_s_3 /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_s_closed_2 /home/noyori/tests/cache_s_closed_3 /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r rm -rf > /dev/null 2>&1
