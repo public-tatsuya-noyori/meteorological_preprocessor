@@ -46,10 +46,6 @@ clone() {
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
     source_work_directory=${work_directory}/${source_rclone_remote_bucket_directory}
     mkdir -p ${source_work_directory}
-    rm -rf ${source_work_directory}/${pubsub_index_directory}/${extension_type}
-    rm -rf ${source_work_directory}/${search_index_directory}/${extension_type}
-    cp /dev/null ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
-    cp /dev/null ${source_work_directory}/${search_index_directory}_newly_created_index.tmp
     if test ! -f ${source_work_directory}/${pubsub_index_directory}_index.txt; then
       cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
@@ -64,6 +60,8 @@ clone() {
       fi
     fi
     for get_pubsub_index_retry_count in `seq 2`; do
+      rm -rf ${source_work_directory}/${pubsub_index_directory}/${extension_type}
+      cp /dev/null ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
       cp /dev/null ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
       cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
@@ -108,27 +106,20 @@ clone() {
       continue
     fi
     if test -s ${source_work_directory}/${pubsub_index_directory}_index_diff.txt; then
-      find ${source_work_directory}/${pubsub_index_directory}/${extension_type} -regextype posix-egrep -regex "^.*/[0-9]{14}_[^/]*\.txt.gz$" -type f | sed -e 's|.*/||g' > ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp
-      set +e
-      cmp -s ${source_work_directory}/${pubsub_index_directory}_index_diff.txt ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp
-      cmp_exit_code_1=$?
-      set -e
-      if test ${cmp_exit_code_1} -gt 1; then
-        exit_code=${cmp_exit_code_1}
-        echo "ERROR: ${exit_code}: can not compare." >&2
-        continue
-      fi
       set +e
       cmp -s ${source_work_directory}/${pubsub_index_directory}_index_diff.txt ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
-      cmp_exit_code_2=$?
+      cmp_exit_code=$?
       set -e
-      if test ${cmp_exit_code_2} -gt 1; then
-        exit_code=${cmp_exit_code_2}
+      if test ${cmp_exit_code} -gt 1; then
+        exit_code=${cmp_exit_code}
         echo "ERROR: ${exit_code}: can not compare." >&2
         continue
       fi
+      rm -rf ${source_work_directory}/${search_index_directory}/${extension_type}
+      cp /dev/null ${source_work_directory}/${search_index_directory}_newly_created_index.tmp
       cp /dev/null ${source_work_directory}/${search_index_directory}_new_index.tmp
-      if test ${cmp_exit_code_1} -eq 1 -o ${cmp_exit_code_2} -eq 0; then
+      if test ${cmp_exit_code} -eq 0; then
+        date -u "+%Y%m%d%H%M%S" > ${work_directory}/searched_datetime.txt
         cp /dev/null ${source_work_directory}/err_log.tmp
         set +e
         timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${extension_type}/ > ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp

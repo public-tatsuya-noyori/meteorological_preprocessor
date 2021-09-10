@@ -69,7 +69,7 @@ datetime_minute=`echo ${datetime} | cut -c11-12`
 ec=0
 job_directory=4Move
 move_index_date_hour_minute_pattern=${datetime_date}${datetime_hour}${datetime_minute}
-move_index_minute=1
+move_index_minute=2
 for minute_count in `seq ${move_index_minute}`; do
   move_index_date_hour_minute_pattern="${move_index_date_hour_minute_pattern}|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute ago" "+%Y%m%d%H%M"`"|"`date -u -d "${datetime_date} ${datetime_hour}:${datetime_minute} ${minute_count} minute" "+%Y%m%d%H%M"`
 done
