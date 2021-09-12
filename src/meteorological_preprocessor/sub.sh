@@ -227,6 +227,13 @@ subscribe() {
             mv ${work_directory}/${now}_${unique_center_id}.txt.gz ${processed_directory}/
             sleep 1
           fi
+        else
+          rm -rf ${work_directory}/prepare
+          mkdir ${work_directory}/prepare
+          now=`date -u "+%Y%m%d%H%M%S"`
+          cp ${source_work_directory}/filtered_newly_created_file.tmp ${work_directory}/prepare/${now}_${unique_center_id}.txt
+          gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
+          mv ${work_directory}/prepare/${now}_${unique_center_id}.txt.gz ${processed_directory}/
         fi
       fi
       if test ${exit_code} -eq 0; then

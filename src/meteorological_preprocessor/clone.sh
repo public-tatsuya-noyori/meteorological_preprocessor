@@ -258,6 +258,13 @@ clone() {
               echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/." >&2
             fi
           fi
+        else
+          rm -rf ${work_directory}/prepare
+          mkdir ${work_directory}/prepare
+          now=`date -u "+%Y%m%d%H%M%S"`
+          cp ${source_work_directory}/filtered_newly_created_file.tmp ${work_directory}/prepare/${now}_${unique_center_id}.txt
+          gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
+          mv ${work_directory}/prepare/${now}_${unique_center_id}.txt.gz ${processed_directory}/
         fi
       fi
       if test ${exit_code} -eq 0; then
