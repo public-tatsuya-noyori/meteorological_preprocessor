@@ -26,10 +26,10 @@ acl = public-read
 :wq
 ```
 3. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
-4. Change file.
+4. Change file mode.
 ```
 $ chmod 600 $HOME/.config/rclone/rclone.conf
-$ chmod 744 sub.sh
+$ chmod 755 sub.sh
 ```
 5. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
 6. Configure Cron for sub.sh.
@@ -42,11 +42,15 @@ $ crontab -e
 :wq
 ```
 7. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
-8. Run search.sh to search keyword.
+8. Change file mode.
+```
+$ chmod 755 search.sh
+```
+9. Run search.sh to search keyword.
 ```
 $ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
-9. Run search.sh to download the searched files.
+10. Run search.sh to download the searched files.
 ```
 $ /path/to/search.sh --out /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
@@ -120,12 +124,20 @@ $ cp /path/to/your_synop_bulletin.txt /path/to/pub_clone_work_directory/***your_
 $ echo '***your_CCCC***/alphanumeric/surface/synop/202109080000/C_***your_CCCC***_20210908001003846866.txt' > index.txt
 ```
 3. Download [pub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/pub.sh)
-4. Run pub.sh.
+4. Change file mode.
+```
+$ chmod 755 pub.sh
+```
+5. Run pub.sh.
 ```
 $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_ID*** txt /path/to/index.txt '***your_center_ID***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 ```
-5. Download [clone.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/clone.sh) and [move_4PubSub_4Search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/move_4PubSub_4Search.sh).
-6. Configure Cron for clone.sh and move_4PubSub_4Search.sh.
+6. Download [clone.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/clone.sh) and [move_4PubSub_4Search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/move_4PubSub_4Search.sh).
+7. Change file mode.
+```
+$ chmod 755 clone.sh move_4PubSub_4Search.sh
+```
+8. Configure Cron for clone.sh and move_4PubSub_4Search.sh.
 ```
 $ crontab -e
 
