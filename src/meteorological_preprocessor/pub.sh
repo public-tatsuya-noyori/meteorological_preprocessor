@@ -133,7 +133,7 @@ publish(){
 }
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
-delete_index_minute=720
+delete_index_minute=480
 delete_input_index_file=0
 ec=0
 job_directory=4PubClone

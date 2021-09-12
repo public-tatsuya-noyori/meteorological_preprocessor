@@ -275,7 +275,7 @@ clone() {
 }
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
-delete_index_minute=720
+delete_index_minute=480
 ec=0
 index_only=0
 index_only_center_id_prefix=''
