@@ -26,8 +26,13 @@ acl = public-read
 :wq
 ```
 3. Download [sub.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/sub.sh), [inclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/inclusive_pattern.txt) and [exclusive_pattern.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/exclusive_pattern.txt).
-4. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
-5. Configure Cron for sub.sh.
+4. Change file.
+```
+$ chmod 600 $HOME/.config/rclone/rclone.conf
+$ chmod 744 sub.sh
+```
+5. If needed, edit inclusive_pattern.txt and exclusive_pattern.txt.
+6. Configure Cron for sub.sh.
 ```
 $ crontab -e
 
@@ -36,12 +41,12 @@ $ crontab -e
 
 :wq
 ```
-6. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
-7. Run search.sh to search keyword.
+7. Download [search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/search.sh)
+8. Run search.sh to search keyword.
 ```
 $ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
-8. Run search.sh to download the searched files.
+9. Run search.sh to download the searched files.
 ```
 $ /path/to/search.sh --out /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
 ```
