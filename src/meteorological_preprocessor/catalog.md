@@ -54,7 +54,7 @@ $ vi $HOME/.config/rclone/rclone.conf
 [***your_center_ID***_main]
 type = s3
 env_auth = false
-access_key_id = ***your_access_key***
+access_key_id = ***your_access_key_id***
 secret_access_key = ***your_secret_access_key***
 region = ***your_region***
 endpoint = https://s3.***your_region***.amazonaws.com
@@ -70,7 +70,7 @@ key = ***your_key***
 [***your_center_ID***_main]
 type = s3
 env_auth = false
-access_key_id = ***your_access_key***
+access_key_id = ***your_access_key_id***
 secret_access_key = ***your_secret_access_key***
 region = 
 endpoint = oss-cn-***your_region***.aliyuncs.com
@@ -81,7 +81,7 @@ force_path_style = false
 [***your_center_ID***_main]
 type = s3
 env_auth = false
-access_key_id = ***your_access_key***
+access_key_id = ***your_access_key_id***
 secret_access_key = ***your_secret_access_key***
 region = ***your_region***
 endpoint = https://storage.googleapis.com
@@ -91,7 +91,7 @@ acl = public-read
 [***your_center_ID***_main]
 type = s3
 env_auth = false
-access_key_id = ***your_access_key***
+access_key_id = ***your_access_key_id***
 secret_access_key = ***your_secret_access_key***
 region = 
 endpoint = https://s3.**your_region***.wasabisys.com
@@ -101,7 +101,7 @@ acl = public-read
 [***your_center_ID***_main]
 type = s3
 env_auth = false
-access_key_id = ***your_access_key***
+access_key_id = ***your_access_key_id***
 secret_access_key = ***your_secret_access_key***
 region =
 endpoint = **your_endpoint***
