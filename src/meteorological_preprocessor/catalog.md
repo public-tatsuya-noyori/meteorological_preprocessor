@@ -159,5 +159,5 @@ $ aws configure
 AWS Access Key ID [None]: ***your_access_key_id***
 AWS Secret Access Key [None]: ***your_secret_access_key***
 Default region name [None]: ***your_region***
-Default output format [None]:
+Default output format [None]: None
 ```
