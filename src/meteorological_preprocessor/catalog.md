@@ -148,4 +148,16 @@ $ crontab -e
 ```
 ## How to clone data on cloud with serverless computing
 ### When using AWS
-1.
+1. Install awscliv2 and configure awscliv2
+```
+$ sudo apt install groff-base
+$ sudo apt install zip
+$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+$ unzip awscliv2.zip
+$ sudo ./aws/install
+$ aws configure
+AWS Access Key ID [None]: ***your_access_key_id***
+AWS Secret Access Key [None]: ***your_secret_access_key***
+Default region name [None]: ***your_region***
+Default output format [None]:
+```
