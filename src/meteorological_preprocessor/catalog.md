@@ -48,11 +48,11 @@ $ chmod 755 /path/to/search.sh
 ```
 9. Run search.sh to search keyword.
 ```
-$ /path/to/search.sh /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
+$ /path/to/search.sh /path/to/sub_search_work_directory txt jma:center-aa-cloud-a-region-a-open-main /synop/
 ```
 10. Run search.sh to download the searched files.
 ```
-$ /path/to/search.sh --out /path/to/sub_search_work_directory txt minio:center-aa-cloud-a-region-a-open-main /synop/
+$ /path/to/search.sh --out /path/to/sub_search_work_directory txt jma:center-aa-cloud-a-region-a-open-main /synop/
 ```
 ## How to publish data and clone data
 1. Configure rclone.conf.
