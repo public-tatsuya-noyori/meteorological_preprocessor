@@ -57,6 +57,11 @@ $ /path/to/search.sh /path/to/sub_search_work_directory txt jma:center-aa-cloud-
 ```
 $ /path/to/search.sh --out /path/to/sub_search_work_directory txt jma:center-aa-cloud-a-region-a-open-main /synop/
 ```
+11. To see the command options, run the command with --help.
+```
+$ /path/to/search.sh --help
+search.sh [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory extension_type rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]
+```
 ## How to publish data and clone data
 1. Configure rclone.conf.
 ```
