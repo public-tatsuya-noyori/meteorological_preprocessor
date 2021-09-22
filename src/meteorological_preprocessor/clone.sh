@@ -158,11 +158,11 @@ clone() {
               fi
               if test ${former_index_file_first_line_prefix_count} -eq 0; then
                 set +e
-                grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
+                grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt ${source_work_directory}/${search_index_directory}_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
                 set -e
               else
                 set +e
-                sed -ne "/${former_index_file_first_line_prefix}/,\$p" ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
+                sed -ne "/${former_index_file_first_line_prefix}/,\$p" ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt >> ${source_work_directory}/${search_index_directory}_new_index.tmp
                 set -e
                 break
               fi

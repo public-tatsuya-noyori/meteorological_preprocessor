@@ -141,11 +141,11 @@ subscribe() {
               fi
               if test ${former_index_file_first_line_prefix_count} -eq 0; then
                 set +e
-                grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
+                grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt ${source_work_directory}/${search_index_directory}_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
                 set -e
               else
                 set +e
-                sed -ne "/${former_index_file_first_line_prefix}/,\$p" ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_gotten_new_index.tmp >> ${source_work_directory}/${search_index_directory}_new_index.tmp
+                sed -ne "/${former_index_file_first_line_prefix}/,\$p" ${source_work_directory}/${search_index_directory}_index.tmp | grep -v -F -f ${source_work_directory}/${pubsub_index_directory}_index.txt >> ${source_work_directory}/${search_index_directory}_new_index.tmp
                 set -e
                 break
               fi
@@ -218,9 +218,7 @@ subscribe() {
           grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
           set -e
           if test -s ${work_directory}/processed_file.txt; then
-            if test ${no_gunzip} -eq 0; then
-              sed -e "s|^|${local_work_directory}/|g" ${work_directory}/processed_file.txt | xargs -r -n 64 -P ${parallel} gunzip -f
-            fi
+            sed -e "s|^|${local_work_directory}/|g" ${work_directory}/processed_file.txt | xargs -r -n 64 -P ${parallel} gunzip -f
             now=`date -u "+%Y%m%d%H%M%S"`
             mv ${work_directory}/processed_file.txt ${work_directory}/${now}_${unique_center_id}.txt
             gzip -f ${work_directory}/${now}_${unique_center_id}.txt
@@ -257,7 +255,6 @@ index_only=0
 index_only_center_id_prefix=''
 job_directory=4Sub
 no_check_pid=0
-no_gunzip=0
 parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=480
@@ -269,9 +266,8 @@ for arg in "$@"; do
     "--config") config=$2;shift;shift;;
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--index_only" ) index_only=1;index_only_center_id_prefix=$2;shift;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--index_only center_id_prefix] [--no_check_pid] [--no_gunzip] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension_type 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--index_only center_id_prefix] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension_type 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
-    "--no_gunzip" ) no_gunzip=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
   esac
