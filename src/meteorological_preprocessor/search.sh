@@ -165,6 +165,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
               rm -rf ${work_directory}
               exit ${exit_code}
             fi
+            sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
           fi
         fi
       done
@@ -218,6 +219,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
             rm -rf ${work_directory}
             exit ${exit_code}
           fi
+          sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
         fi
       fi
     done
@@ -283,6 +285,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
                   rm -rf ${work_directory}
                   exit ${exit_code}
                 fi
+                sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
               fi
             fi
           fi
@@ -343,6 +346,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
               rm -rf ${work_directory}
               exit ${exit_code}
             fi
+            sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
           fi
         fi
       fi
@@ -410,6 +414,7 @@ else
                 rm -rf ${work_directory}
                 exit ${exit_code}
               fi
+              sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
             fi
           fi
         fi
@@ -470,6 +475,7 @@ else
             rm -rf ${work_directory}
             exit ${exit_code}
           fi
+          sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
         fi
       fi
     fi

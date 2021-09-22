@@ -1,2 +1,0 @@
-move_4PubSub_4Search.sh --config rclone.conf --no_check_pid /mnt/run_commands_main/open ******centerID******_main txt aws:******bucket******
-move_4PubSub_4Search.sh --config rclone.conf --no_check_pid /mnt/run_commands_main/open ******centerID******_main bin aws:******bucket******
