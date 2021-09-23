@@ -276,6 +276,7 @@ if test -z $6; then
   echo "ERROR: The number of arguments is incorrect.\nTry $0 --help for more information." >&2
   exit 199
 fi
+set -u
 local_work_directory=$1
 unique_center_id=$2
 set +e
