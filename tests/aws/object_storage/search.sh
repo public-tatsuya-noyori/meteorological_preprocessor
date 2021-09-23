@@ -1,1 +1,0 @@
-../../../src/meteorological_preprocessor/search.sh
