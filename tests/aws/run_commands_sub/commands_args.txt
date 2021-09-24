@@ -1,2 +1,0 @@
-move_4PubSub_4Search.sh --config rclone.conf /tmp/work_open ******centerID******_sub txt aws:******bucket******
-move_4PubSub_4Search.sh --config rclone.conf /tmp/work_open ******centerID******_sub bin aws:******bucket******
