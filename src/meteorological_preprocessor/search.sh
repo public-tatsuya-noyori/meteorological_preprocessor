@@ -99,6 +99,7 @@ if test -e ${work_directory}; then
   echo "ERROR: exist ${work_directory}." >&2
   exit 199
 fi
+set -u
 mkdir -p ${work_directory}
 cp /dev/null ${work_directory}/err_log.tmp
 set +e
