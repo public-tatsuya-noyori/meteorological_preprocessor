@@ -25,7 +25,7 @@ clone() {
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory}/ > /dev/null
+    timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory}/ > /dev/null
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -49,7 +49,7 @@ clone() {
     if test ! -f ${source_work_directory}/${pubsub_index_directory}_index.txt; then
       cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${source_work_directory}/${pubsub_index_directory}_index.txt
+      timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${source_work_directory}/${pubsub_index_directory}_index.txt
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -65,7 +65,7 @@ clone() {
       cp /dev/null ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
       cp /dev/null ${source_work_directory}/err_log.tmp
       set +e
-      timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
+      timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${source_work_directory}/${pubsub_index_directory}_new_index.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -122,7 +122,7 @@ clone() {
         date -u "+%Y%m%d%H%M%S" > ${work_directory}/searched_datetime.txt
         cp /dev/null ${source_work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${extension_type}/ > ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
+        timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${extension_type}/ > ${source_work_directory}/${search_index_directory}_date_hour_slash_directory.tmp
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -137,7 +137,7 @@ clone() {
           for date_hour_directory in `grep -E "^(${inclusive_index_date_hour_pattern})$" ${source_work_directory}/${search_index_directory}_date_hour_directory.tmp | tac`; do
             cp /dev/null ${source_work_directory}/err_log.tmp
             set +e
-            timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${extension_type}/${date_hour_directory}/ > ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
+            timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${source_work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${source_rclone_remote_bucket}/${search_index_directory}/${extension_type}/${date_hour_directory}/ > ${source_work_directory}/${search_index_directory}_minute_second_index.tmp
             exit_code=$?
             set -e
             if test ${exit_code} -ne 0; then
@@ -272,7 +272,7 @@ clone() {
       fi
     fi
     if test ${exit_code} -eq 0; then
-      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+      find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f 2>/dev/null
     fi
   done
   if test ${exit_code} -ne 0; then
@@ -356,7 +356,6 @@ done
 work_directory=${local_work_directory}/${job_directory}/${unique_center_id}/${extension_type}
 processed_directory=${local_work_directory}/${job_directory}/processed/${extension_type}
 mkdir -p ${work_directory} ${processed_directory}
-touch ${processed_directory}/dummy.tmp
 if test -s ${work_directory}/pid.txt; then
   if test ${no_check_pid} -eq 0; then
     running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${extension_type} " | wc -l`

@@ -66,7 +66,7 @@ publish(){
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory}/ > /dev/null
+    timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory}/ > /dev/null
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -124,7 +124,7 @@ publish(){
     fi
   fi
   if test ${exit_code} -eq 0; then
-    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f
+    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f 2>/dev/null
     if test ${delete_input_index_file} -eq 1; then
       rm -f ${input_index_file}
     fi
@@ -192,7 +192,6 @@ exclusive_pattern_file=$7
 work_directory=${local_work_directory}/${job_directory}/${unique_center_id}/${extension_type}
 processed_directory=${local_work_directory}/${job_directory}/processed/${extension_type}
 mkdir -p ${work_directory} ${processed_directory}
-touch ${processed_directory}/dummy.tmp
 if test -s ${work_directory}/pid.txt; then
   if test ${no_check_pid} -eq 0; then
     running=`cat ${work_directory}/pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${extension_type} " | wc -l`
