@@ -1,8 +1,8 @@
 function handler () {
   set +euo pipefail
   destination_rclone_remote_bucket_main_sub=''
-  extension_type=txt
-  function=tar_txt_index_function
+  extension_type=bin
+  function=tar_bin_index_function
   the_number_of_execution_within_timeout=11
   rclone_timeout=480
   set -evx

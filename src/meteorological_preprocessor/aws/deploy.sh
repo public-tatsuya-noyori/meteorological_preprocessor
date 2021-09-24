@@ -119,9 +119,9 @@ timeout_seconds=240
 deploy
 
 function=tar_txt_index_function
-timeout_seconds=600
+timeout_seconds=240
 deploy
 
 function=tar_bin_index_function
-timeout_seconds=600
+timeout_seconds=240
 deploy
