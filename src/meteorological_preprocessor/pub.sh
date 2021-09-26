@@ -54,7 +54,7 @@ publish(){
   cp /dev/null ${work_directory}/all_processed_file.txt
   cp /dev/null ${work_directory}/filtered_newly_created_file.tmp
   set +e
-  find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/all_processed_file.txt 2>/dev/null
+  find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_[^/]*\.txt.gz$" -type f 2>/dev/null | xargs -r zcat > ${work_directory}/all_processed_file.txt 2>/dev/null
   grep -v -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp > ${work_directory}/filtered_newly_created_file.tmp
   set -e
   already_publishd_file_count=`grep -F -f ${work_directory}/all_processed_file.txt ${work_directory}/newly_created_file.tmp | wc -l`
@@ -66,7 +66,7 @@ publish(){
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory}/ > /dev/null
+    timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${destination_rclone_remote_bucket}/${pubsub_index_directory}/ > /dev/null
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -107,7 +107,7 @@ publish(){
       cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
       gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
       set +e
-      timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/
+      timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
@@ -124,7 +124,7 @@ publish(){
     fi
   fi
   if test ${exit_code} -eq 0; then
-    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} | xargs -r rm -f 2>/dev/null
+    find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} 2>/dev/null | xargs -r rm -f
     if test ${delete_input_index_file} -eq 1; then
       rm -f ${input_index_file}
     fi

@@ -22,7 +22,7 @@ IFS=$'\n'
 move_4PubSub_4Search() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
+  timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -35,7 +35,7 @@ move_4PubSub_4Search() {
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}
+    timeout -k 3 30 rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -49,7 +49,7 @@ move_4PubSub_4Search() {
     touch_index_file=`grep -E '^[0-9]{14}_.*\.txt\.gz$' ${work_directory}/${pubsub_index_directory}_index.tmp`
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 ${rclone_timeout} rclone touch --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${touch_index_file}
+    timeout -k 3 30 rclone touch --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${touch_index_file}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -75,16 +75,14 @@ for minute_count in `seq ${move_index_minute}`; do
 done
 no_check_pid=0
 pubsub_index_directory=4PubSub
-rclone_timeout=180
 search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
-    "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
 if test -z $4; then

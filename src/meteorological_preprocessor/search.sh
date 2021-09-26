@@ -103,7 +103,7 @@ set -u
 mkdir -p ${work_directory}
 cp /dev/null ${work_directory}/err_log.tmp
 set +e
-rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/ > ${work_directory}/search_index_dir_list.tmp
+timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/ > ${work_directory}/search_index_dir_list.tmp
 exit_code=$?
 set -e
 if test ${exit_code} -ne 0; then
@@ -119,7 +119,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
       yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
+      timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -173,7 +173,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
     done
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
+    timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -233,7 +233,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm}; then
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
+        timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -295,7 +295,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
     done
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
+    timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -362,7 +362,7 @@ else
     if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhh00} -le ${end_yyyymmddhhmm}; then
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
+      timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -424,7 +424,7 @@ else
   done
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 60 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
+  timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then

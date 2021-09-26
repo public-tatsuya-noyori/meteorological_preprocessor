@@ -118,6 +118,7 @@
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/mwhs/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/mwts/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/ogdr/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/siral/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/surface/bathy/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/surface/buoy/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/surface/drifting_buoy/[0-9]{12}/[^/]+\.bin.gz$
