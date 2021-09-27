@@ -195,59 +195,68 @@ clone() {
       fi
       cp /dev/null ${work_directory}/processed_file.txt
       if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
-        cp /dev/null ${source_work_directory}/info_log.tmp
-        set +e
-#        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
-        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
-        exit_code=$?
-        set -e
-        if test ${exit_code} -ne 0; then
-          if test ${exit_code} -eq 124; then
-            touch ${source_work_directory}/rclone_timeout.txt
-            if test -s ${source_work_directory}/rclone_timeout.txt; then
-              echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${extension_type} to ${destination_rclone_remote_bucket} ${extension_type}." >&2
-              rm -f ${source_work_directory}/${pubsub_index_directory}_index.txt
-              echo "INFO: clear index: deleted ${source_work_directory}/${pubsub_index_directory}_index.txt." >&2
-              cp /dev/null ${source_work_directory}/rclone_timeout.txt
-            else
-              echo 124 > ${source_work_directory}/rclone_timeout.txt
-              echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${extension_type} to ${destination_rclone_remote_bucket} ${extension_type}." >&2
-            fi
-          else
-            set +e
-            grep -F ERROR ${source_work_directory}/info_log.tmp >&2
-            set -e
-            echo "ERROR: ${exit_code}: can not clone file from ${source_rclone_remote_bucket} ${extension_type} to ${destination_rclone_remote_bucket} ${extension_type}." >&2
-          fi
-          continue
-        fi
-        cp /dev/null ${source_work_directory}/rclone_timeout.txt
-        set +e
-        grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
-        set -e
-        if test -s ${work_directory}/processed_file.txt; then
-          for retry_count in `seq ${retry_num}`; do
-            rm -rf ${work_directory}/prepare
-            mkdir ${work_directory}/prepare
-            now=`date -u "+%Y%m%d%H%M%S"`
-            cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
-            gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
-            cp /dev/null ${work_directory}/err_log.tmp
-            set +e
-            timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/
-            exit_code=$?
-            set -e
-            if test ${exit_code} -eq 0; then
-              mv ${work_directory}/prepare/${now}_${unique_center_id}.txt.gz ${processed_directory}/
-              break
-            else
-              sleep 1
-            fi
-          done
+        if test ${index_only} -eq 0; then
+          cp /dev/null ${source_work_directory}/info_log.tmp
+          set +e
+  #        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${source_work_directory}/filtered_newly_created_file.tmp --log-file ${source_work_directory}/info_log.tmp --log-level DEBUG --low-level-retries 3 --no-check-dest --no-traverse --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${source_rclone_remote_bucket} ${destination_rclone_remote_bucket}
+          exit_code=$?
+          set -e
           if test ${exit_code} -ne 0; then
-            cat ${work_directory}/err_log.tmp >&2
-            echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/." >&2
+            if test ${exit_code} -eq 124; then
+              touch ${source_work_directory}/rclone_timeout.txt
+              if test -s ${source_work_directory}/rclone_timeout.txt; then
+                echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${extension_type} to ${destination_rclone_remote_bucket} ${extension_type}." >&2
+                rm -f ${source_work_directory}/${pubsub_index_directory}_index.txt
+                echo "INFO: clear index: deleted ${source_work_directory}/${pubsub_index_directory}_index.txt." >&2
+                cp /dev/null ${source_work_directory}/rclone_timeout.txt
+              else
+                echo 124 > ${source_work_directory}/rclone_timeout.txt
+                echo "ERROR: rclone timeout ${exit_code}: terminated clone file from ${source_rclone_remote_bucket} ${extension_type} to ${destination_rclone_remote_bucket} ${extension_type}." >&2
+              fi
+            else
+              set +e
+              grep -F ERROR ${source_work_directory}/info_log.tmp >&2
+              set -e
+              echo "ERROR: ${exit_code}: can not clone file from ${source_rclone_remote_bucket} ${extension_type} to ${destination_rclone_remote_bucket} ${extension_type}." >&2
+            fi
+            continue
           fi
+          cp /dev/null ${source_work_directory}/rclone_timeout.txt
+          set +e
+          grep -E "^(.* DEBUG *: *[^ ]* *:.* Unchanged skipping.*|.* INFO *: *[^ ]* *:.* Copied .*)$" ${source_work_directory}/info_log.tmp | sed -e "s|^.* DEBUG *: *\([^ ]*\) *:.* Unchanged skipping.*$|/\1|g" -e "s|^.* INFO *: *\([^ ]*\) *:.* Copied .*$|/\1|g" -e 's|^/||g' | grep -v '^ *$' > ${work_directory}/processed_file.txt
+          set -e
+          if test -s ${work_directory}/processed_file.txt; then
+            for retry_count in `seq ${retry_num}`; do
+              rm -rf ${work_directory}/prepare
+              mkdir ${work_directory}/prepare
+              now=`date -u "+%Y%m%d%H%M%S"`
+              cp ${work_directory}/processed_file.txt ${work_directory}/prepare/${now}_${unique_center_id}.txt
+              gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
+              cp /dev/null ${work_directory}/err_log.tmp
+              set +e
+              timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --immutable --log-file ${work_directory}/err_log.tmp --low-level-retries 1 --no-traverse --quiet --retries 1 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/prepare/ ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/
+              exit_code=$?
+              set -e
+              if test ${exit_code} -eq 0; then
+                mv ${work_directory}/prepare/${now}_${unique_center_id}.txt.gz ${processed_directory}/
+                break
+              else
+                sleep 1
+              fi
+            done
+            if test ${exit_code} -ne 0; then
+              cat ${work_directory}/err_log.tmp >&2
+              echo "ERROR: ${exit_code}: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/." >&2
+            fi
+          fi
+        else
+          rm -rf ${work_directory}/prepare
+          mkdir ${work_directory}/prepare
+          now=`date -u "+%Y%m%d%H%M%S"`
+          cp ${source_work_directory}/filtered_newly_created_file.tmp ${work_directory}/prepare/${now}_${unique_center_id}.txt
+          gzip -f ${work_directory}/prepare/${now}_${unique_center_id}.txt
+          mv ${work_directory}/prepare/${now}_${unique_center_id}.txt.gz ${processed_directory}/
         fi
       fi
       if test ${exit_code} -eq 0; then
@@ -267,6 +276,7 @@ bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
 delete_index_minute=480
 ec=0
+index_only=0
 job_directory=4PubClone
 no_check_pid=0
 parallel=4
@@ -280,7 +290,8 @@ for arg in "$@"; do
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
-    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension_type 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
+    "--index_only" ) index_only=1;shift;;
+    '--help' ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--index_only] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension_type 'source_rclone_remote_bucket_main[;source_rclone_remote_bucket_sub]' 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
