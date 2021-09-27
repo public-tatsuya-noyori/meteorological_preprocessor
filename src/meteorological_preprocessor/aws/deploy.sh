@@ -60,31 +60,22 @@ if test -z "$6"; then
 fi
 
 account=`aws sts get-caller-identity | grep '"Account"' | cut -d: -f2 | sed -e 's|[", ]||g'`
-region=`cat $HOME/.aws/config | grep ^region | cut -d= -f2 | sed -e 's| ||g'`
 access_key_id=`cat $HOME/.aws/credentials | grep ^aws_access_key_id | cut -d= -f2 | sed -e 's| ||g'`
 secret_access_key=`cat $HOME/.aws/credentials | grep ^aws_secret_access_key | cut -d= -f2 | sed -e 's| ||g'`
 function_zip=$1
 bootstrap_body_file=$2
-email=$3
-center_id=$4
-main_sub=$5
-bucket=$6
+region_main_sub=$3
+rclone_remote_bucket_main_sub=$4
+center_id=$5
+email=$6
 
-echo "#!/bin/sh
-set -euo pipefail
+cp /dev/null rclone.conf
 
-access_key_id=${access_key_id}
-secret_access_key=${secret_access_key}
-region=${region}
-center_id=${center_id}
-main_sub=${main_sub}
-bucket=${bucket}
-" > bootstrap
-cat ${bootstrap_body_file} >> bootstrap
-chmod 755 bootstrap
-zip -ll ${function_zip} bootstrap
-
-echo "[${center_id}_${main_sub}]
+rclone_remote_bucket_count=1
+for rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
+  region=`echo "${region_main_sub}" | cut -d';' -f${rclone_remote_bucket_count}`
+  rclone_remote=`echo ${rclone_remote_bucket} | cut -d':' -f1`
+  echo "[${rclone_remote}]
 type = s3
 env_auth = false
 access_key_id = ${access_key_id}
@@ -92,36 +83,95 @@ secret_access_key = ${secret_access_key}
 region = ${region}
 endpoint = https://s3.${region}.amazonaws.com
 acl = public-read
+" >> rclone.conf
+  rclone_remote_bucket_count=`expr 1 + ${rclone_remote_bucket_count}`
+done
 
-[jma]
+echo "[jma]
 type = s3
 env_auth = false
 access_key_id =
 secret_access_key =
 region =
 endpoint = http://202.32.195.138:9000
-acl = public-read" > rclone.conf
+acl = public-read" >> rclone.conf
 chmod 644 rclone.conf
 zip -ll ${function_zip} rclone.conf
 
-set -ex
+region=`echo "${region_main_sub}" | cut -d';' -f1`
 
-function=clone_jma_txt_function
-timeout_seconds=600
-deploy
+echo "#!/bin/sh
+set -euo pipefail
 
-function=clone_jma_bin_function
-timeout_seconds=600
-deploy
+access_key_id=${access_key_id}
+secret_access_key=${secret_access_key}
+region_main_sub='${region_main_sub}'
+rclone_remote_bucket_main_sub='${rclone_remote_bucket_main_sub}'
+center_id=${center_id}
+region=${region}" > bootstrap
 
-function=move_4PubSub_4Search_function
-timeout_seconds=240
-deploy
+cat ${bootstrap_body_file} >> bootstrap
+chmod 755 bootstrap
+zip -ll ${function_zip} bootstrap
 
-function=tar_txt_index_function
-timeout_seconds=240
-deploy
 
-function=tar_bin_index_function
-timeout_seconds=240
-deploy
+region_count=1
+for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
+  if test ${region_count} -eq 1; then
+    function=clone_jma_txt_main_function
+    timeout_seconds=600
+    deploy
+    set +x
+
+#    function=clone_jma_bin_main_function
+#    timeout_seconds=600
+#    deploy
+#    set +x
+
+    function=move_4PubSub_4Search_main_function
+    timeout_seconds=240
+    deploy
+    set +x
+
+    function=tar_txt_index_main_function
+    timeout_seconds=240
+    deploy
+    set +x
+
+#    function=tar_bin_index_main_function
+#    timeout_seconds=240
+#    deploy
+#    set +x
+  else
+    function=clone_jma_txt_sub_function
+    timeout_seconds=600
+    deploy
+    aws events disable-rule --name ${function}
+    set +x
+
+#    function=clone_jma_bin_sub_function
+#    timeout_seconds=600
+#    deploy
+#    aws events disable-rule --name ${function}
+#    set +x
+
+    function=move_4PubSub_4Search_sub_function
+    timeout_seconds=240
+    set -ex
+    deploy
+    set +x
+
+    function=tar_txt_index_sub_function
+    timeout_seconds=240
+    deploy
+    aws events disable-rule --name ${function}
+    set +x
+
+#    function=tar_bin_index_sub_function
+#    timeout_seconds=240
+#    deploy
+#    aws events disable-rule --name ${function}
+#    set +x
+  fi
+  region_count=`expr 1 + ${region_count}`
+done

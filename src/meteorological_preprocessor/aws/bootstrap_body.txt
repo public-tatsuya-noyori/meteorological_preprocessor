@@ -12,10 +12,10 @@ aws configure set aws_access_key_id $access_key_id
 aws configure set aws_secret_access_key $secret_access_key
 aws configure set default.region $region
 account=`aws sts get-caller-identity | grep '"Account"' | cut -d: -f2 | sed -e 's|[", ]||g'`
-echo "account = ${account}
-center_id = ${center_id}
-main_sub = ${main_sub}
-bucket = ${bucket}" > $HOME/.config/rclone/my_remote_bucket.txt
+echo "account=${account}
+region_main_sub=${region_main_sub}
+rclone_remote_bucket_main_sub=${rclone_remote_bucket_main_sub}
+center_id=${center_id}" > $HOME/.config/rclone/my_remote_bucket.txt
 cd $LAMBDA_TASK_ROOT
 
 # Handler format: <script_name>.<bash_function_name>
