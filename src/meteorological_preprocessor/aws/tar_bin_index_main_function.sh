@@ -23,7 +23,7 @@ function handler () {
   rc=0
   rm -rf ${sub_work_directory}/${sub_directory}/processed
   rm -rf ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}
-  for destination_rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
+  for destination_rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     destination_rclone_remote_bucket_directory=`echo ${destination_rclone_remote_bucket} | tr ':' '_'`
     rm -rf ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}
     mkdir -p ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}
@@ -69,7 +69,8 @@ function handler () {
     cd ${cwd}
     is_tar=1
   fi
-  for destination_rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
+  for destination_rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
+    destination_rclone_remote_bucket_directory=`echo ${destination_rclone_remote_bucket} | tr ':' '_'`
     if test ${is_tar} -ne 0; then
       set +e
       timeout -k 3 ${rclone_timeout} rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${sub_work_directory}/${sub_directory}/processed/${extension_type}/${now}.tar ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${now}.tar

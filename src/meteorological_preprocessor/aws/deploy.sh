@@ -71,15 +71,15 @@ access_key_id=`cat $HOME/.aws/credentials | grep ^aws_access_key_id | cut -d= -f
 secret_access_key=`cat $HOME/.aws/credentials | grep ^aws_secret_access_key | cut -d= -f2 | sed -e 's| ||g'`
 function_zip=$1
 bootstrap_body_file=$2
-region_main_sub=$3
-rclone_remote_bucket_main_sub=$4
+region_main_sub="$3"
+rclone_remote_bucket_main_sub="$4"
 center_id=$5
 email=$6
 
 cp /dev/null rclone.conf
 
 rclone_remote_bucket_count=1
-for rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
+for rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
   region=`echo "${region_main_sub}" | cut -d';' -f${rclone_remote_bucket_count}`
   rclone_remote=`echo ${rclone_remote_bucket} | cut -d':' -f1`
   echo "[${rclone_remote}]
@@ -123,25 +123,11 @@ zip -ll ${function_zip} bootstrap
 
 
 region_count=1
-for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
+for region in `echo ${region_main_sub} | tr ';' '\n'`; do
   if test ${region_count} -eq 1; then
     function=clone_jma_txt_main_function
     timeout_seconds=600
     email=''
-    disable_schedule=0
-    deploy
-    set +x
-
-#    function=clone_jma_bin_main_function
-#    timeout_seconds=600
-#    email=''
-#    disable_schedule=0
-#    deploy
-#    set +x
-
-    function=move_4PubSub_4Search_main_function
-    timeout_seconds=240
-    email=$6
     disable_schedule=0
     deploy
     set +x
@@ -153,16 +139,37 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
     deploy
     set +x
 
+#    function=clone_jma_bin_main_function
+#    timeout_seconds=600
+#    email=''
+#    disable_schedule=0
+#    deploy
+#    set +x
+
 #    function=tar_bin_index_main_function
 #    timeout_seconds=240
 #    email=$6
 #    disable_schedule=0
 #    deploy
 #    set +x
+
+    function=move_4PubSub_4Search_main_function
+    timeout_seconds=240
+    email=$6
+    disable_schedule=0
+    deploy
+    set +x
   else
     function=clone_jma_txt_sub_function
     timeout_seconds=600
     email=''
+    disable_schedule=1
+    deploy
+    set +x
+
+    function=tar_txt_index_sub_function
+    timeout_seconds=240
+    email=$6
     disable_schedule=1
     deploy
     set +x
@@ -175,26 +182,19 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
 #    aws events disable-rule --name ${function}
 #    set +x
 
-    function=move_4PubSub_4Search_sub_function
-    timeout_seconds=240
-    email=$6
-    disable_schedule=0
-    deploy
-    set +x
-
-    function=tar_txt_index_sub_function
-    timeout_seconds=240
-    email=$6
-    disable_schedule=1
-    deploy
-    set +x
-
 #    function=tar_bin_index_sub_function
 #    timeout_seconds=240
 #    email=$6
 #    disable_schedule=1
 #    deploy
 #    set +x
+
+    function=move_4PubSub_4Search_sub_function
+    timeout_seconds=240
+    email=$6
+    disable_schedule=0
+    deploy
+    set +x
   fi
   region_count=`expr 1 + ${region_count}`
 done
