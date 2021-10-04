@@ -48,6 +48,9 @@ deploy(){
     aws iam put-role-policy --role-name ${function}_lambda --policy-name ${function}_sns --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": "sns:Publish", "Resource": "arn:aws:sns:'${region}:${account}:${function}'"}]}'
   fi
   aws events put-rule --name ${function} --schedule-expression 'rate(1 minute)'
+  if test ${disable_schedule} -eq 1; then
+    aws events disable-rule --name ${function}
+  fi
   aws iam create-role --role-name ${function}_events --path /service-role/ --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "events.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
   aws iam create-policy --policy-name ${function}_events_step_functions --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": ["states:StartExecution"], "Resource": ["arn:aws:states:'${region}:${account}:stateMachine:${function}'"]}]}'
   aws iam attach-role-policy --role-name ${function}_events --policy-arn arn:aws:iam::${account}:policy/${function}_events_step_functions
@@ -99,7 +102,7 @@ secret_access_key =
 region =
 endpoint = http://202.32.195.138:9000
 acl = public-read" >> rclone.conf
-chmod 600 rclone.conf
+chmod 644 rclone.conf
 zip -ll ${function_zip} rclone.conf
 
 region=`echo "${region_main_sub}" | cut -d';' -f1`
@@ -125,40 +128,49 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
     function=clone_jma_txt_main_function
     timeout_seconds=600
     email=''
+    disable_schedule=0
     deploy
     set +x
 
 #    function=clone_jma_bin_main_function
 #    timeout_seconds=600
+#    email=''
+#    disable_schedule=0
 #    deploy
 #    set +x
 
     function=move_4PubSub_4Search_main_function
     timeout_seconds=240
     email=$6
+    disable_schedule=0
     deploy
     set +x
 
     function=tar_txt_index_main_function
     timeout_seconds=240
     email=$6
+    disable_schedule=0
     deploy
     set +x
 
 #    function=tar_bin_index_main_function
 #    timeout_seconds=240
+#    email=$6
+#    disable_schedule=0
 #    deploy
 #    set +x
   else
     function=clone_jma_txt_sub_function
     timeout_seconds=600
     email=''
+    disable_schedule=1
     deploy
-    aws events disable-rule --name ${function}
     set +x
 
 #    function=clone_jma_bin_sub_function
 #    timeout_seconds=600
+#    email=''
+#    disable_schedule=1
 #    deploy
 #    aws events disable-rule --name ${function}
 #    set +x
@@ -166,21 +178,22 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
     function=move_4PubSub_4Search_sub_function
     timeout_seconds=240
     email=$6
-    set -ex
+    disable_schedule=0
     deploy
     set +x
 
     function=tar_txt_index_sub_function
     timeout_seconds=240
     email=$6
+    disable_schedule=1
     deploy
-    aws events disable-rule --name ${function}
     set +x
 
 #    function=tar_bin_index_sub_function
 #    timeout_seconds=240
+#    email=$6
+#    disable_schedule=1
 #    deploy
-#    aws events disable-rule --name ${function}
 #    set +x
   fi
   region_count=`expr 1 + ${region_count}`
