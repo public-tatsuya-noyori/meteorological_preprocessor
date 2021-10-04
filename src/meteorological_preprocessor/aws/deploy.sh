@@ -42,14 +42,18 @@ deploy(){
   aws stepfunctions create-state-machine --name ${function} --definition '{"StartAt": "'${function}'", "States": {"'${function}'": {"Type": "Task", "Resource": "arn:aws:lambda:'${region}:${account}:function:${function}'", "End": true}}, "TimeoutSeconds":'${timeout_seconds}'}' --role-arn arn:aws:iam::${account}:role/service-role/${function}_step_functions --logging-configuration '{"level": "ERROR", "includeExecutionData": false, "destinations": [{"cloudWatchLogsLogGroup": {"logGroupArn": "arn:aws:logs:'${region}:${account}:log-group:/aws/step_functions/${function}':*"}}]}'
   aws iam create-policy --policy-name ${function}_lambda_list_executions --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": ["states:ListExecutions"], "Resource": "arn:aws:states:'${region}:${account}:stateMachine:${function}'"}]}'
   aws iam attach-role-policy --role-name ${function}_lambda --policy-arn arn:aws:iam::${account}:policy/${function}_lambda_list_executions
-  aws sns create-topic --name ${function}
-  aws sns subscribe --topic-arn arn:aws:sns:${region}:${account}:${function} --protocol email --notification-endpoint ${email}
-  aws iam put-role-policy --role-name ${function}_lambda --policy-name ${function}_sns --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": "sns:Publish", "Resource": "arn:aws:sns:'${region}:${account}:${function}'"}]}'
+  if test -n "${email}"; then
+    aws sns create-topic --name ${function}
+    aws sns subscribe --topic-arn arn:aws:sns:${region}:${account}:${function} --protocol email --notification-endpoint ${email}
+    aws iam put-role-policy --role-name ${function}_lambda --policy-name ${function}_sns --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": "sns:Publish", "Resource": "arn:aws:sns:'${region}:${account}:${function}'"}]}'
+  fi
   aws events put-rule --name ${function} --schedule-expression 'rate(1 minute)'
   aws iam create-role --role-name ${function}_events --path /service-role/ --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "events.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
   aws iam create-policy --policy-name ${function}_events_step_functions --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": ["states:StartExecution"], "Resource": ["arn:aws:states:'${region}:${account}:stateMachine:${function}'"]}]}'
   aws iam attach-role-policy --role-name ${function}_events --policy-arn arn:aws:iam::${account}:policy/${function}_events_step_functions
-  aws lambda update-function-event-invoke-config --function-name ${function} --destination-config '{"OnFailure":{"Destination": "arn:aws:sns:'${region}:${account}:${function}'"}}'
+  if test -n "${email}"; then
+    aws lambda update-function-event-invoke-config --function-name ${function} --destination-config '{"OnFailure":{"Destination": "arn:aws:sns:'${region}:${account}:${function}'"}}'
+  fi
   aws lambda add-permission --function-name ${function} --statement-id ${function} --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn arn:aws:events:${region}:${account}:rule/${function}
   aws events put-targets --rule ${function} --targets 'Id='${function}'_step_functions,Arn=arn:aws:states:'${region}:${account}:stateMachine:${function},RoleArn=arn:aws:iam::${account}:role/service-role/${function}_events
 }
@@ -95,7 +99,7 @@ secret_access_key =
 region =
 endpoint = http://202.32.195.138:9000
 acl = public-read" >> rclone.conf
-chmod 644 rclone.conf
+chmod 600 rclone.conf
 zip -ll ${function_zip} rclone.conf
 
 region=`echo "${region_main_sub}" | cut -d';' -f1`
@@ -120,6 +124,7 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
   if test ${region_count} -eq 1; then
     function=clone_jma_txt_main_function
     timeout_seconds=600
+    email=''
     deploy
     set +x
 
@@ -130,11 +135,13 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
 
     function=move_4PubSub_4Search_main_function
     timeout_seconds=240
+    email=$6
     deploy
     set +x
 
     function=tar_txt_index_main_function
     timeout_seconds=240
+    email=$6
     deploy
     set +x
 
@@ -145,6 +152,7 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
   else
     function=clone_jma_txt_sub_function
     timeout_seconds=600
+    email=''
     deploy
     aws events disable-rule --name ${function}
     set +x
@@ -157,12 +165,14 @@ for region in `echo "${region_main_sub}" | tr ';' '\n'`; do
 
     function=move_4PubSub_4Search_sub_function
     timeout_seconds=240
+    email=$6
     set -ex
     deploy
     set +x
 
     function=tar_txt_index_sub_function
     timeout_seconds=240
+    email=$6
     deploy
     aws events disable-rule --name ${function}
     set +x

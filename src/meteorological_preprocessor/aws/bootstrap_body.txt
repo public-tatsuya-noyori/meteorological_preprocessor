@@ -17,6 +17,9 @@ region_main_sub=${region_main_sub}
 rclone_remote_bucket_main_sub=${rclone_remote_bucket_main_sub}
 center_id=${center_id}" > $HOME/.config/rclone/my_remote_bucket.txt
 cd $LAMBDA_TASK_ROOT
+for rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
+  rclone --config rclone.conf mkdir ${rclone_remote_bucket}
+done
 
 # Handler format: <script_name>.<bash_function_name>
 #
