@@ -38,7 +38,7 @@ deploy(){
   aws iam create-policy --policy-name ${function}_step_functions_cloud_watch --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": ["logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery", "logs:DeleteLogDelivery", "logs:ListLogDeliveries", "logs:PutResourcePolicy", "logs:DescribeResourcePolicies", "logs:DescribeLogGroups"], "Resource": "*"}]}'
   aws iam attach-role-policy --role-name ${function}_step_functions --policy-arn arn:aws:iam::${account}:policy/${function}_step_functions_cloud_watch
   aws logs create-log-group --log-group-name /aws/step_functions/${function}
-  sleep 10
+  sleep 15
   aws stepfunctions create-state-machine --name ${function} --definition '{"StartAt": "'${function}'", "States": {"'${function}'": {"Type": "Task", "Resource": "arn:aws:lambda:'${region}:${account}:function:${function}'", "End": true}}, "TimeoutSeconds":'${timeout_seconds}'}' --role-arn arn:aws:iam::${account}:role/service-role/${function}_step_functions --logging-configuration '{"level": "ERROR", "includeExecutionData": false, "destinations": [{"cloudWatchLogsLogGroup": {"logGroupArn": "arn:aws:logs:'${region}:${account}:log-group:/aws/step_functions/${function}':*"}}]}'
   aws iam create-policy --policy-name ${function}_lambda_list_executions --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": ["states:ListExecutions"], "Resource": "arn:aws:states:'${region}:${account}:stateMachine:${function}'"}]}'
   aws iam attach-role-policy --role-name ${function}_lambda --policy-arn arn:aws:iam::${account}:policy/${function}_lambda_list_executions
