@@ -179,7 +179,6 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
 #    email=''
 #    disable_schedule=1
 #    deploy
-#    aws events disable-rule --name ${function}
 #    set +x
 
 #    function=tar_bin_index_sub_function

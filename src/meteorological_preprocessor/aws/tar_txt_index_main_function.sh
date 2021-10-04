@@ -38,8 +38,11 @@ function handler () {
       mkdir -p ${sub_work_directory}/${sub_directory}/processed
       tar_file=`tail -1 ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt`
       timeout -k 3 ${rclone_timeout} rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${tar_file} ${sub_work_directory}/${sub_directory}/processed/${tar_file}
-      tar -xf ${sub_work_directory}/${sub_directory}/processed/${tar_file}
-      rm -f ${sub_work_directory}/${sub_directory}/processed/${tar_file}
+      cwd=`pwd`
+      cd ${sub_work_directory}/${sub_directory}/processed
+      tar -xf ${tar_file}
+      rm -f ${tar_file}
+      cd ${cwd}
     fi
     rm -rf ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}
     mkdir -p ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}
@@ -59,7 +62,7 @@ function handler () {
   set +e
   ./sub.sh --no_check_pid --config rclone.conf --index_only ${sub_work_directory} ${center_id} ${extension_type} "${rclone_remote_bucket_main_sub}" inclusive_pattern.txt exclusive_pattern.txt
   set -e
-  gz_index_count=`find ${sub_work_directory}/${sub_directory}/processed/${extension_type} -regextype posix-egrep -regex "^${sub_work_directory}/${sub_directory}/processed/${extension_type}/[0-9]{14}_.*\.txt.gz$" -type f | wc -l 2>/dev/null`
+  gz_index_count=`find ${sub_work_directory}/${sub_directory}/processed/${extension_type} -regextype posix-egrep -regex "^${sub_work_directory}/${sub_directory}/processed/${extension_type}/[0-9]{14}_.*\.txt.gz$" -type f 2>/dev/null | wc -l`
   is_tar=0
   now=`date -u "+%Y%m%d%H%M%S"`
   if test ${gz_index_count} -gt 0; then
