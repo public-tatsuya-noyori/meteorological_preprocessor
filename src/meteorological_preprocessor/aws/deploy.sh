@@ -139,19 +139,19 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
     deploy
     set +x
 
-#    function=clone_jma_bin_main_function
-#    timeout_seconds=600
-#    email=''
-#    disable_schedule=0
-#    deploy
-#    set +x
+    function=clone_jma_bin_main_function
+    timeout_seconds=600
+    email=''
+    disable_schedule=0
+    deploy
+    set +x
 
-#    function=tar_bin_index_main_function
-#    timeout_seconds=240
-#    email=$6
-#    disable_schedule=0
-#    deploy
-#    set +x
+    function=tar_bin_index_main_function
+    timeout_seconds=240
+    email=$6
+    disable_schedule=0
+    deploy
+    set +x
 
     function=move_4PubSub_4Search_main_function
     timeout_seconds=240
@@ -174,19 +174,19 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
     deploy
     set +x
 
-#    function=clone_jma_bin_sub_function
-#    timeout_seconds=600
-#    email=''
-#    disable_schedule=1
-#    deploy
-#    set +x
+    function=clone_jma_bin_sub_function
+    timeout_seconds=600
+    email=''
+    disable_schedule=1
+    deploy
+    set +x
 
-#    function=tar_bin_index_sub_function
-#    timeout_seconds=240
-#    email=$6
-#    disable_schedule=1
-#    deploy
-#    set +x
+    function=tar_bin_index_sub_function
+    timeout_seconds=240
+    email=$6
+    disable_schedule=1
+    deploy
+    set +x
 
     function=move_4PubSub_4Search_sub_function
     timeout_seconds=240

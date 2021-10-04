@@ -17,8 +17,7 @@ function handler () {
   pub_clone_work_directory=$HOME/${pub_clone_directory}
   IFS=$'\n'
   rc=0
-  commands_args="./move_4PubSub_4Search.sh --no_check_pid --config rclone.conf ${pub_clone_work_directory} ${center_id} txt ${rclone_remote_bucket}"
-#  commands_args="./move_4PubSub_4Search.sh --no_check_pid --config rclone.conf ${pub_clone_work_directory} ${center_id} txt ${rclone_remote_bucket}
+  commands_args="./move_4PubSub_4Search.sh --no_check_pid --config rclone.conf ${pub_clone_work_directory} ${center_id} txt ${rclone_remote_bucket}
 #./move_4PubSub_4Search.sh --no_check_pid --config rclone.conf ${pub_clone_work_directory} ${center_id} bin ${rclone_remote_bucket}"
   for command_args in `echo "${commands_args}"`; do
     echo ${command_args[@]} | xargs -r -I {} sh -c "{}" &
