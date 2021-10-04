@@ -7,6 +7,7 @@ function handler () {
   main_sub_num=2
   the_number_of_execution_within_timeout=11
   rclone_timeout=480
+  parallel=16
   export HOME="/tmp"
   export PATH="$HOME/aws-cli/bin:$HOME/rclone/bin:$PATH"
   account=`cat $HOME/.config/rclone/my_remote_bucket.txt | grep ^account | cut -d= -f2 | sed -e 's| ||g'`
@@ -73,7 +74,7 @@ function handler () {
     fi
   done
   set +e
-  ./clone.sh --no_check_pid --config rclone.conf --parallel 16 ${pub_clone_work_directory} ${source_center_id} ${extension_type} ${source_rclone_remote_bucket_main_sub} "${rclone_remote_bucket_main_sub}" inclusive_pattern.txt exclusive_pattern.txt
+  ./clone.sh --no_check_pid --config rclone.conf --parallel ${parallel} ${pub_clone_work_directory} ${source_center_id} ${extension_type} ${source_rclone_remote_bucket_main_sub} "${rclone_remote_bucket_main_sub}" inclusive_pattern.txt exclusive_pattern.txt
   set -e
   for source_rclone_remote_bucket in `echo ${source_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     source_rclone_remote_bucket_directory=`echo ${source_rclone_remote_bucket} | tr ':' '_'`
