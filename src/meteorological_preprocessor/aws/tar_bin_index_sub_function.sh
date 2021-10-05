@@ -4,7 +4,6 @@ function handler () {
   function=tar_bin_index_sub_function
   main_sub_num=2
   the_number_of_execution_within_timeout=11
-  rclone_timeout=480
   export HOME="/tmp"
   export PATH="$HOME/aws-cli/bin:$HOME/rclone/bin:$PATH"
   account=`cat $HOME/.config/rclone/my_remote_bucket.txt | grep ^account | cut -d= -f2 | sed -e 's| ||g'`
@@ -21,25 +20,25 @@ function handler () {
   sub_work_directory=$HOME/${sub_directory}
   IFS=$'\n'
   rc=0
-  rm -rf ${sub_work_directory}/${sub_directory}/processed
+  rm -rf ${sub_work_directory}/${sub_directory}/processed/${extension_type}
   rm -rf ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}
   for destination_rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     destination_rclone_remote_bucket_directory=`echo ${destination_rclone_remote_bucket} | tr ':' '_'`
     rm -rf ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}
     mkdir -p ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}
     set +e
-    timeout -k 3 60 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/ > ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt
+    timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/ > ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
       continue
     fi
     if test -s ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt; then
-      mkdir -p ${sub_work_directory}/${sub_directory}/processed
-      tar_file=`tail -1 ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt`
-      timeout -k 3 ${rclone_timeout} rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${tar_file} ${sub_work_directory}/${sub_directory}/processed/${tar_file}
+      mkdir -p ${sub_work_directory}/${sub_directory}/processed/${extension_type}
+      tar_file=`sort -u ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt | grep -E '^[0-9]+\.tar' | tail -1`
+      timeout -k 3 30 rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${tar_file} ${sub_work_directory}/${sub_directory}/processed/${extension_type}/${tar_file}
       cwd=`pwd`
-      cd ${sub_work_directory}/${sub_directory}/processed
+      cd ${sub_work_directory}/${sub_directory}/processed/${extension_type}
       tar -xf ${tar_file}
       rm -f ${tar_file}
       cd ${cwd}
@@ -47,7 +46,7 @@ function handler () {
     rm -rf ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}
     mkdir -p ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}
     set +e
-    timeout -k 3 60 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/ > ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt
+    timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/ > ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -55,8 +54,8 @@ function handler () {
     fi
     if test -s ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt; then
       mkdir -p ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}/${destination_rclone_remote_bucket_directory}
-      index_file=`tail -1 ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt`
-      timeout -k 3 ${rclone_timeout} rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/${index_file} ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}/${destination_rclone_remote_bucket_directory}/4PubSub_index.txt
+      index_file=`sort -u ${tar_index_work_directory}/index/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt | grep -E '^[0-9]+\.txt' | tail -1`
+      timeout -k 3 30 rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/${index_file} ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}/${destination_rclone_remote_bucket_directory}/4PubSub_index.txt
     fi
   done
   set +e
@@ -76,30 +75,30 @@ function handler () {
     destination_rclone_remote_bucket_directory=`echo ${destination_rclone_remote_bucket} | tr ':' '_'`
     if test ${is_tar} -ne 0; then
       set +e
-      timeout -k 3 ${rclone_timeout} rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${sub_work_directory}/${sub_directory}/processed/${extension_type}/${now}.tar ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${now}.tar
+      timeout -k 3 30 rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${sub_work_directory}/${sub_directory}/processed/${extension_type}/${now}.tar ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${now}.tar
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
         continue
       fi
-      for tar_file in `timeout -k 3 60 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/ | grep -E '^[0-9]+\.tar' | head -n -3`; do
+      for tar_file in `timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/ | grep -E '^[0-9]+\.tar' | head -n -3`; do
         set +e
-        timeout -k 3 60 rclone delete --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${tar_file}
+        timeout -k 3 30 rclone delete --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/${tar_file}
         set -e
       done
     fi
     if test -s ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}/${destination_rclone_remote_bucket_directory}/4PubSub_index.txt; then
       for destination_rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}/${destination_rclone_remote_bucket_directory}/4PubSub_index.txt ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/${now}.txt
+        timeout -k 3 30 rclone copyto --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${sub_work_directory}/${sub_directory}/${center_id}/${extension_type}/${destination_rclone_remote_bucket_directory}/4PubSub_index.txt ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/${now}.txt
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
           continue
         fi
-        for index_file in `timeout -k 3 60 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/ | grep -E '^[0-9]+\.txt' | head -n -3`; do
+        for index_file in `timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/ | grep -E '^[0-9]+\.txt' | head -n -3`; do
           set +e
-          timeout -k 3 60 rclone delete --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/${index_file}
+          timeout -k 3 30 rclone delete --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/index/${extension_type}/${index_file}
           set -e
         done
       done
