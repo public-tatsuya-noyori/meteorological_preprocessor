@@ -94,7 +94,7 @@ acl = public-read
   rclone_remote_bucket_count=`expr 1 + ${rclone_remote_bucket_count}`
   rclone --config rclone.conf mkdir ${rclone_remote_bucket}
   bucket=`echo ${rclone_remote_bucket} | cut -d: -f2`
-  aws s3api put-bucket-lifecycle-configuration --bucket ${bucket} --lifecycle-configuration '{"Rules": [{"Expiration": {"Days": 1}, "ID": "'${bucket}'", "Filter": {}, "Status": "Enabled", "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 1}}]}'
+  aws s3api put-bucket-lifecycle-configuration --bucket ${bucket} --lifecycle-configuration '{"Rules": [{"Expiration": {"Days": 1}, "ID": "Delete objects that are one day old", "Filter": {}, "Status": "Enabled", "NoncurrentVersionExpiration": {"NoncurrentDays": 1}, "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 1}}]}'
 done
 
 echo "[jma]

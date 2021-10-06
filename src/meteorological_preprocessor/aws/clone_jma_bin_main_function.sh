@@ -21,6 +21,7 @@ function handler () {
   clone_work_directory=$HOME/${clone_directory}
   pub_clone_directory=4PubClone
   pub_clone_work_directory=$HOME/${pub_clone_directory}
+  destination_tar_index_directory=4TarIndex
   tar_index_directory=4Clone_TarIndex
   tar_index_work_directory=$HOME/${tar_index_directory}
   IFS=$'\n'
@@ -33,13 +34,17 @@ function handler () {
     cp /dev/null ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt
     for destination_rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
       set +e
-      timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | sed -e "s|$|/${destination_rclone_remote_bucket}|g" | grep -E '^[0-9]+\.txt' >> ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt
+      timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt
+      exit_code=$?
       set -e
+      if test ${exit_code} -ne 0; then
+        rc=${exit_code}
+      fi
     done
     if test -s ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt; then
       remote_bucket_former_index=`sort -u ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt | tail -1 | sed -e "s|\([^/]\+\)/\([^/]\+\)|\2/${clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/\1|"`
-      remote_bucket=`echo ${remote_bucket_former_index} -d/ -f1`
-      former_index=`echo ${remote_bucket_former_index} -d/ -f2-`
+      remote_bucket=`echo ${remote_bucket_former_index} | cut -d/ -f1`
+      former_index=`echo ${remote_bucket_former_index} | cut -d/ -f2-`
       echo ${former_index} > ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/raw.txt
       set +e
       timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${clone_work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/raw.txt --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${pub_clone_work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}
@@ -48,36 +53,44 @@ function handler () {
       if test ${exit_code} -ne 0; then
         return 255
       fi
-      mv ${pub_clone_work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/${former_index} ${pub_clone_work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/4PubSub_index.txt
+      if test -f ${pub_clone_work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/${former_index}; then
+        mv -f ${pub_clone_work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/${former_index} ${pub_clone_work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/4PubSub_index.txt
+      fi
     fi
   done
+  rm -rf ${tar_index_work_directory}/tar/${extension_type}
+  mkdir -p ${tar_index_work_directory}/tar/${extension_type}
   cp /dev/null ${tar_index_work_directory}/tar/${extension_type}/list.txt
   for destination_rclone_remote_bucket in `echo "${rclone_remote_bucket_main_sub}" | tr ';' '\n'`; do
-    destination_rclone_remote_bucket_directory=`echo ${destination_rclone_remote_bucket} | tr ':' '_'`
-    mkdir -p ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}
     set +e
-    timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${tar_index_directory}/tar/${extension_type}/ | sed -e "s|$|/${destination_rclone_remote_bucket}|g" | grep -E '^[0-9]+\.tar' >> ${tar_index_work_directory}/tar/${extension_type}/list.txt
+    timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_tar_index_directory}/tar/${extension_type}/ | grep -E '^[0-9]+\.tar' | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${tar_index_work_directory}/tar/${extension_type}/list.txt
+    exit_code=$?
     set -e
+    if test ${exit_code} -ne 0; then
+      rc=${exit_code}
+    fi
   done
-  if test -s ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt; then
+  if test -s ${tar_index_work_directory}/tar/${extension_type}/list.txt; then
     mkdir -p ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}
-    remote_bucket_tar_file=`sort -u ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/list.txt | tail -1 | sed -e "s|\([^/]\+\)/\([^/]\+\)|\2/${tar_index_directory}/tar/${extension_type}/\1|"`
-    remote_bucket=`echo ${remote_bucket_tar_file} -d/ -f1`
-    tar_file=`echo ${remote_bucket_tar_file} -d/ -f2-`
-    echo ${tar_file} > ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/raw.txt
+    remote_bucket_tar_file=`sort -u ${tar_index_work_directory}/tar/${extension_type}/list.txt | tail -1 | sed -e "s|\([^/]\+\)/\([^/]\+\)|\2/${destination_tar_index_directory}/tar/${extension_type}/\1|"`
+    remote_bucket=`echo ${remote_bucket_tar_file} | cut -d/ -f1`
+    tar_file=`echo ${remote_bucket_tar_file} | cut -d/ -f2-`
+    echo ${tar_file} > ${tar_index_work_directory}/tar/${extension_type}/raw.txt
     set +e
-    timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${tar_index_work_directory}/tar/${extension_type}/${destination_rclone_remote_bucket_directory}/raw.txt --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}
+    timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${tar_index_work_directory}/tar/${extension_type}/raw.txt --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
       return 255
     fi
-    mv ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}/${tar_file} ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}/former.tar
-    cwd=`pwd`
-    cd ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}
-    tar -xf former.tar
-    rm -rf former.tar ${tar_index_directory}
-    cd ${cwd}
+    if test -f ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}/${tar_file}; then
+      mv -f ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}/${tar_file} ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}/former.tar
+      cwd=`pwd`
+      cd ${pub_clone_work_directory}/${pub_clone_directory}/processed/${extension_type}
+      tar -xf former.tar
+      rm -rf former.tar
+      cd ${cwd}
+    fi
   fi
   set +e
   ./clone.sh --no_check_pid --config rclone.conf --parallel ${parallel} ${pub_clone_work_directory} ${source_center_id} ${extension_type} ${source_rclone_remote_bucket_main_sub} "${rclone_remote_bucket_main_sub}" inclusive_pattern.txt exclusive_pattern.txt
@@ -96,7 +109,6 @@ function handler () {
       set -e
       if test ${exit_code} -ne 0; then
         rc=${exit_code}
-        continue
       fi
       for index_file in `timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | head -n -2`; do
         set +e
