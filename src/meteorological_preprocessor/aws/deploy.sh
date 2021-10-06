@@ -137,7 +137,7 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
 
     function=tar_txt_index_main_function
     timeout_seconds=240
-    email=$6
+    email=''
     disable_schedule=0
     deploy
     set +x
@@ -151,7 +151,7 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
 
     function=tar_bin_index_main_function
     timeout_seconds=240
-    email=$6
+    email=''
     disable_schedule=0
     deploy
     set +x
@@ -172,7 +172,7 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
 
     function=tar_txt_index_sub_function
     timeout_seconds=240
-    email=$6
+    email=''
     disable_schedule=1
     deploy
     set +x
@@ -186,7 +186,7 @@ for region in `echo ${region_main_sub} | tr ';' '\n'`; do
 
     function=tar_bin_index_sub_function
     timeout_seconds=240
-    email=$6
+    email=''
     disable_schedule=1
     deploy
     set +x
