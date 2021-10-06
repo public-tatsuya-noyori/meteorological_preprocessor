@@ -59,6 +59,8 @@ deploy(){
   fi
   aws lambda add-permission --function-name ${function} --statement-id ${function} --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn arn:aws:events:${region}:${account}:rule/${function}
   aws events put-targets --rule ${function} --targets 'Id='${function}'_step_functions,Arn=arn:aws:states:'${region}:${account}:stateMachine:${function},RoleArn=arn:aws:iam::${account}:role/service-role/${function}_events
+  aws logs put-retention-policy --log-group-name /aws/lambda/${function} --retention-in-days 1
+  aws logs put-retention-policy --log-group-name /aws/step_functions/${function} --retention-in-days 1
 }
 
 if test -z "$6"; then
