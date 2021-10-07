@@ -9,6 +9,7 @@ function handler () {
   region=`cat $HOME/.config/rclone/my_remote_bucket.txt | grep ^region_main_sub | cut -d= -f2 | sed -e 's| ||g' | cut -d';' -f${main_sub_num}`
   running=`aws stepfunctions list-executions --state-machine-arn arn:aws:states:${region}:${account}:stateMachine:${function} --max-item ${the_number_of_execution_within_timeout} | grep '"status": "' | grep RUNNING | wc -l`
   if test ${running} -gt 1; then
+    echo "INFO: A former ${function} is running. ${function} ends." >&2
     return 0
   fi
   rclone_remote_bucket=`cat $HOME/.config/rclone/my_remote_bucket.txt | grep ^rclone_remote_bucket_main_sub | cut -d= -f2 | sed -e 's| ||g' | cut -d';' -f${main_sub_num}`
@@ -29,6 +30,7 @@ function handler () {
     cpec=$?
     set -e
     if test ${cpec} -ne 0; then
+      echo "ERROR: ${function} can not move 4PubSub/*/* 4Search/*/*/*." >&2
       rc=${cpec}
     fi
   done
