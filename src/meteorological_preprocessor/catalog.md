@@ -150,7 +150,7 @@ $ chmod 755 /path/to/clone.sh /path/to/move_4PubSub_4Search.sh
 $ crontab -e
 
 * * * * * /path/to/clone.sh /path/to/pub_clone_work_directory jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
-* * * * * /path/to/move_4PubSub_4Search.sh /path/to/pub_clone_work_directory ***your_center_id***_main txt '***your_center_id***_main:***your_bucket_on_cloud_storage***'
+* * * * * /path/to/move_4PubSub_4Search.sh /path/to/pub_clone_work_directory ***your_center_id***_main txt '***your_center_id***_main:***your_bucket_main***'
 
 :wq
 ```
@@ -168,4 +168,9 @@ AWS Access Key ID [None]: ***your_access_key_id***
 AWS Secret Access Key [None]: ***your_secret_access_key***
 Default region name [None]: ***your_region***
 Default output format [None]: None
+```
+2. Download [deploy.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/deploy.sh), [clone_jma.zip](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/clone_jma.zip) and [bootstrap_body.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/bootstrap_body.txt).
+3. Run deploy.sh
+```
+/path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
