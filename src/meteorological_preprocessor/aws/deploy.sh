@@ -3,6 +3,15 @@ set -e
 
 deploy(){
   set +ex
+  subarn=`aws sns list-subscriptions-by-topic --topic-arn arn:aws:sns:${region}:${account}:${function} 2>/dev/null | grep SubscriptionArn | cut -d: -f2- | sed -e 's|[" ,]||g'`
+  aws sns unsubscribe --subscription-arn ${subarn} 1>/dev/null 2>/dev/null
+  aws sns delete-topic --topic-arn arn:aws:sns:${region}:${account}:${function} 1>/dev/null 2>/dev/null
+  aws events list-targets-by-rule --rule ${function} 2>/dev/null | grep '"Id":' | cut -d: -f2- | sed -e 's|[" ,]||g' | xargs -r -n 1 -I {} aws events remove-targets --rule ${function} --ids {} 1>/dev/null 2>/dev/null
+  aws events delete-rule --name ${function} 1>/dev/null 2>/dev/null
+  aws stepfunctions delete-state-machine --state-machine-arn arn:aws:states:${region}:${account}:stateMachine:${function} 1>/dev/null 2>/dev/null
+  aws lambda delete-function --function-name ${function} 1>/dev/null 2>/dev/null
+  aws logs delete-log-group --log-group-name /aws/lambda/${function} 1>/dev/null 2>/dev/null
+  aws logs delete-log-group --log-group-name /aws/step_functions/${function} 1>/dev/null 2>/dev/null
   aws iam detach-role-policy --role-name ${function}_lambda --policy-arn arn:aws:iam::${account}:policy/${function}_lambda_list_executions 1>/dev/null 2>/dev/null
   aws iam detach-role-policy --role-name ${function}_lambda --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole 1>/dev/null 2>/dev/null
   aws iam detach-role-policy --role-name ${function}_step_functions --policy-arn arn:aws:iam::${account}:policy/${function}_step_functions_lambda 1>/dev/null 2>/dev/null
@@ -16,14 +25,6 @@ deploy(){
   aws iam delete-role --role-name ${function}_lambda 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_step_functions 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_events 1>/dev/null 2>/dev/null
-  aws logs delete-log-group --log-group-name /aws/step_functions/${function} 1>/dev/null 2>/dev/null
-  aws lambda delete-function --function-name ${function} 1>/dev/null 2>/dev/null
-  aws stepfunctions delete-state-machine --state-machine-arn arn:aws:states:${region}:${account}:stateMachine:${function} 1>/dev/null 2>/dev/null
-  subarn=`aws sns list-subscriptions-by-topic --topic-arn arn:aws:sns:${region}:${account}:${function} 2>/dev/null | grep SubscriptionArn | cut -d: -f2- | sed -e 's|[" ,]||g'`
-  aws sns unsubscribe --subscription-arn ${subarn} 1>/dev/null 2>/dev/null
-  aws sns delete-topic --topic-arn arn:aws:sns:${region}:${account}:${function} 1>/dev/null 2>/dev/null
-  aws events list-targets-by-rule --rule ${function} 2>/dev/null | grep '"Id":' | cut -d: -f2- | sed -e 's|[" ,]||g' | xargs -r -n 1 -I {} aws events remove-targets --rule ${function} --ids {} 1>/dev/null 2>/dev/null
-  aws events delete-rule --name ${function} 1>/dev/null 2>/dev/null
   sleep 10
   set -ex
   aws iam create-role --role-name ${function}_lambda --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
@@ -37,6 +38,7 @@ deploy(){
   aws iam attach-role-policy --role-name ${function}_step_functions --policy-arn arn:aws:iam::${account}:policy/${function}_step_functions_lambda
   aws iam create-policy --policy-name ${function}_step_functions_cloud_watch --policy-document '{"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": ["logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery", "logs:DeleteLogDelivery", "logs:ListLogDeliveries", "logs:PutResourcePolicy", "logs:DescribeResourcePolicies", "logs:DescribeLogGroups"], "Resource": "*"}]}'
   aws iam attach-role-policy --role-name ${function}_step_functions --policy-arn arn:aws:iam::${account}:policy/${function}_step_functions_cloud_watch
+  aws logs create-log-group --log-group-name /aws/lambda/${function}
   aws logs create-log-group --log-group-name /aws/step_functions/${function}
   sleep 20
   aws stepfunctions create-state-machine --name ${function} --definition '{"StartAt": "'${function}'", "States": {"'${function}'": {"Type": "Task", "Resource": "arn:aws:lambda:'${region}:${account}:function:${function}'", "End": true}}, "TimeoutSeconds":'${timeout_seconds}'}' --role-arn arn:aws:iam::${account}:role/service-role/${function}_step_functions --logging-configuration '{"level": "ERROR", "includeExecutionData": false, "destinations": [{"cloudWatchLogsLogGroup": {"logGroupArn": "arn:aws:logs:'${region}:${account}:log-group:/aws/step_functions/${function}':*"}}]}'
@@ -127,7 +129,6 @@ region=${region}" > bootstrap
 cat ${bootstrap_body_file} >> bootstrap
 chmod 755 bootstrap
 zip -ll ${function_zip} bootstrap
-
 
 region_count=1
 for region in `echo ${region_main_sub} | tr ';' '\n'`; do
