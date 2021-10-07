@@ -170,7 +170,11 @@ Default region name [None]: ***your_region***
 Default output format [None]: None
 ```
 2. Download [deploy.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/deploy.sh), [clone_jma.zip](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/clone_jma.zip) and [bootstrap_body.txt](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/bootstrap_body.txt).
-3. Run deploy.sh
+3. Change file mode.
+```
+$ chmod 755 /path/to/deploy.sh
+```
+4. Run deploy.sh
 ```
 /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
