@@ -37,12 +37,12 @@ function handler () {
       timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt
       exit_code=$?
       set -e
-      if test ${exit_code} -ne 0; then
+      if test ${exit_code} -eq 0; then
+        is_destination_alive=1
+      else
         cat ${work_directory}/err_log.tmp >&2
         echo "WARNING: ${function} can not get a list of ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/." >&2
         rc=${exit_code}
-      else
-        is_destination_alive=1
       fi
     done
     if test ${is_destination_alive} -eq 0; then
@@ -78,7 +78,9 @@ function handler () {
     timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_tar_index_directory}/tar/${extension_type}/ | grep -E '^[0-9]+\.tar' | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${work_directory}/tar/${extension_type}/list.txt
     exit_code=$?
     set -e
-    if test ${exit_code} -ne 0; then
+    if test ${exit_code} -eq 0; then
+      is_destination_alive=1
+    else
       cat ${work_directory}/err_log.tmp >&2
       echo "WARNING: ${function} can not get a list of ${destination_rclone_remote_bucket}/${destination_tar_index_directory}/tar/${extension_type}/." >&2
       rc=${exit_code}
