@@ -130,6 +130,19 @@ cat ${bootstrap_body_file} >> bootstrap
 chmod 755 bootstrap
 zip -ll ${function_zip} bootstrap
 
+set +e
+aws events disable-rule --name clone_jma_txt_main_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name tar_txt_index_main_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name clone_jma_bin_main_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name tar_bin_index_main_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name move_4PubSub_4Search_main_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name clone_jma_txt_sub_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name tar_txt_index_sub_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name clone_jma_bin_sub_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name tar_bin_index_sub_function 1>/dev/null 2>/dev/null
+aws events disable-rule --name move_4PubSub_4Search_sub_function 1>/dev/null 2>/dev/null
+set -e
+
 region_count=1
 for region in `echo ${region_main_sub} | tr ';' '\n'`; do
   if test ${region_count} -eq 1; then
