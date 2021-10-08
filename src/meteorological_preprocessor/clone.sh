@@ -41,6 +41,7 @@ clone() {
         continue
       fi
     fi
+    cp /dev/null ${source_work_directory}/${pubsub_index_directory}_index_diff.txt
     for get_pubsub_index_retry_count in `seq 2`; do
       rm -rf ${source_work_directory}/${pubsub_index_directory}/${extension_type}
       cp /dev/null ${source_work_directory}/${pubsub_index_directory}_newly_created_index.tmp
