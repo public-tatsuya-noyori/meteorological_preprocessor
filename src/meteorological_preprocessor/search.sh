@@ -2,15 +2,15 @@
 set -e
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
-end_yyyymmddhhmm=0
+end_yyyymmddhhmm=999999999999
 job_directory=4Search.tmp
 out=0
+parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=600
 search_index_directory=4Search
 start_yyyymmddhhmm=0
 timeout=8s
-parallel=16
 for arg in "$@"; do
   case "${arg}" in
     "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
@@ -50,8 +50,14 @@ else
 fi
 exclusive_pattern_file=''
 if test -n $5; then
-  exclusive_pattern_file=$5
+  if test ! -f $5; then
+    echo "ERROR: $5 is not a file." >&2
+    exit 199
+  else
+    exclusive_pattern_file=$5
+  fi
 fi
+set -u
 if test -n "${start_yyyymmddhhmm}"; then
   set +e
   start_yyyymmddhhmm=`echo "${start_yyyymmddhhmm}" | grep -E "^([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]|0)$"`
@@ -66,7 +72,7 @@ if test -n "${start_yyyymmddhhmm}"; then
 fi
 if test -n "${end_yyyymmddhhmm}"; then
   set +e
-  end_yyyymmddhhmm=`echo "${end_yyyymmddhhmm}" | grep -E "^([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]|0)$"`
+  end_yyyymmddhhmm=`echo "${end_yyyymmddhhmm}" | grep -E "^([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])$"`
   set -e
   if test -z ${end_yyyymmddhhmm}; then
     echo "ERROR: end_yyyymmddhhmm is not yyyymmddhhmm." >&2
@@ -81,7 +87,6 @@ if test -e ${work_directory}; then
   echo "ERROR: exist ${work_directory}." >&2
   exit 199
 fi
-set -u
 mkdir -p ${work_directory}
 cp /dev/null ${work_directory}/err_log.tmp
 set +e
@@ -94,26 +99,37 @@ if test ${exit_code} -ne 0; then
   rm -rf ${work_directory}
   exit ${exit_code}
 fi
-if test ${end_yyyymmddhhmm} -eq 0; then
-  if test ${start_yyyymmddhhmm} -eq 0; then
-    for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
-      yyyymmddhh=`echo ${index_directory} | cut -c1-10`
-      cp /dev/null ${work_directory}/err_log.tmp
+for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
+  yyyymmddhh=`echo ${index_directory} | cut -c1-10`
+  set +e
+  yyyymmddhh00=`expr 100 \* ${yyyymmddhh}`
+  yyyymmddhh99=`expr 99 + ${yyyymmddhh00}`
+  set -e
+  if test ${yyyymmddhh99} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhh00} -le ${end_yyyymmddhhmm}; then
+    cp /dev/null ${work_directory}/err_log.tmp
+    set +e
+    timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
+    exit_code=$?
+    set -e
+    if test ${exit_code} -ne 0; then
+      cat ${work_directory}/err_log.tmp >&2
+      echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}." >&2
+      rm -rf ${work_directory}
+      exit ${exit_code}
+    fi
+    for index_file in `cat ${work_directory}/search_index_list.tmp`; do
+      mm=`echo ${index_file} | cut -c1-2`
       set +e
-      yyyymmddhh=`expr 0 + ${yyyymmddhh}`
-      timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
-      exit_code=$?
+      mm=`expr 0 + ${mm}`
+      yyyymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
       set -e
-      if test ${exit_code} -ne 0; then
-        cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}." >&2
-        rm -rf ${work_directory}
-        exit ${exit_code}
-      fi
-      for index_file in `cat ${work_directory}/search_index_list.tmp`; do
+      if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
+        index_path="${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file}"
+        echo ${index_path} > ${work_directory}/search_raw.tmp
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
+#        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_raw.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_raw.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
@@ -122,187 +138,7 @@ if test ${end_yyyymmddhhmm} -eq 0; then
           rm -rf ${work_directory}
           exit ${exit_code}
         fi
-        cp /dev/null ${work_directory}/search_file.tmp
-        set +e
-        if test -n "${exclusive_pattern_file}"; then
-          zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-        elif test -n "${inclusive_pattern_file}"; then
-          zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-        else
-          zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
-        fi
-        set -e
-        if test -s ${work_directory}/search_file.tmp; then
-          if test ${out} -eq 0; then
-            cat ${work_directory}/search_file.tmp
-          else
-            cp /dev/null ${work_directory}/err_log.tmp
-            set +e
-#            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-            timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-            exit_code=$?
-            set -e
-            if test ${exit_code} -ne 0; then
-              cat ${work_directory}/err_log.tmp >&2
-              echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
-              rm -rf ${work_directory}
-              exit ${exit_code}
-            fi
-            sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
-          fi
-        fi
-      done
-    done
-    cp /dev/null ${work_directory}/err_log.tmp
-    set +e
-    timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
-    exit_code=$?
-    set -e
-    if test ${exit_code} -ne 0; then
-      cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
-      rm -rf ${work_directory}
-      exit ${exit_code}
-    fi
-    for index_file in `cat ${work_directory}/search_index_list.tmp`; do
-      cp /dev/null ${work_directory}/err_log.tmp
-      set +e
-      timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${work_directory}/search_index.tmp
-      exit_code=$?
-      set -e
-      if test ${exit_code} -ne 0; then
-        cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
-        rm -rf ${work_directory}
-        exit ${exit_code}
-      fi
-      cp /dev/null ${work_directory}/search_file.tmp
-      set +e
-      if test -n "${exclusive_pattern_file}"; then
-        zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-      elif test -n "${inclusive_pattern_file}"; then
-        zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-      else
-        zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
-      fi
-      set -e
-      if test -s ${work_directory}/search_file.tmp; then
-        if test ${out} -eq 0; then
-          cat ${work_directory}/search_file.tmp
-        else
-          cp /dev/null ${work_directory}/err_log.tmp
-          set +e
-#          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-          exit_code=$?
-          set -e
-          if test ${exit_code} -ne 0; then
-            cat ${work_directory}/err_log.tmp >&2
-            echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
-            rm -rf ${work_directory}
-            exit ${exit_code}
-          fi
-          sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
-        fi
-      fi
-    done
-  else
-    for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
-      yyyymmddhh=`echo ${index_directory} | cut -c1-10`
-      set +e
-      yyyymmddhh00=`expr 100 \* ${yyyymmddhh}`
-      set -e
-      if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm}; then
-        cp /dev/null ${work_directory}/err_log.tmp
-        set +e
-        timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
-        exit_code=$?
-        set -e
-        if test ${exit_code} -ne 0; then
-          cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}." >&2
-          rm -rf ${work_directory}
-          exit ${exit_code}
-        fi
-        for index_file in `cat ${work_directory}/search_index_list.tmp`; do
-          mm=`echo ${index_file} | cut -c1-2`
-          set +e
-          mm=`expr 0 + ${mm}`
-          yyyymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
-          set -e
-          if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
-            cp /dev/null ${work_directory}/err_log.tmp
-            set +e
-            timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
-            exit_code=$?
-            set -e
-            if test ${exit_code} -ne 0; then
-              cat ${work_directory}/err_log.tmp >&2
-              echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file}." >&2
-              rm -rf ${work_directory}
-              exit ${exit_code}
-            fi
-            cp /dev/null ${work_directory}/search_file.tmp
-            set +e
-            if test -n "${exclusive_pattern_file}"; then
-              zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-            elif test -n "${inclusive_pattern_file}"; then
-              zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-            else
-              zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
-            fi
-            set -e
-            if test -s ${work_directory}/search_file.tmp; then
-              if test ${out} -eq 0; then
-                cat ${work_directory}/search_file.tmp
-              else
-                cp /dev/null ${work_directory}/err_log.tmp
-                set +e
-#                timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-                timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-                exit_code=$?
-                set -e
-                if test ${exit_code} -ne 0; then
-                  cat ${work_directory}/err_log.tmp >&2
-                  echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
-                  rm -rf ${work_directory}
-                  exit ${exit_code}
-                fi
-                sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
-              fi
-            fi
-          fi
-        done
-      fi
-    done
-    cp /dev/null ${work_directory}/err_log.tmp
-    set +e
-    timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
-    exit_code=$?
-    set -e
-    if test ${exit_code} -ne 0; then
-      cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
-      rm -rf ${work_directory}
-      exit ${exit_code}
-    fi
-    for index_file in `cat ${work_directory}/search_index_list.tmp`; do
-      yyyymmddhhmm=`echo ${index_file} | cut -c1-12`
-      set +e
-      yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
-      set -e
-      if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm}; then
-        cp /dev/null ${work_directory}/err_log.tmp
-        set +e
-        timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${work_directory}/search_index.tmp
-        exit_code=$?
-        set -e
-        if test ${exit_code} -ne 0; then
-          cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
-          rm -rf ${work_directory}
-          exit ${exit_code}
-        fi
+        mv -f ${work_directory}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
         cp /dev/null ${work_directory}/search_file.tmp
         set +e
         if test -n "${exclusive_pattern_file}"; then
@@ -335,133 +171,68 @@ if test ${end_yyyymmddhhmm} -eq 0; then
       fi
     done
   fi
-else
-  for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
-    yyyymmddhh=`echo ${index_directory} | cut -c1-10`
-    set +e
-    yyyymmddhh00=`expr 100 \* ${yyyymmddhh}`
-    set -e
-    if test ${yyyymmddhh00} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhh00} -le ${end_yyyymmddhhmm}; then
-      cp /dev/null ${work_directory}/err_log.tmp
-      set +e
-      timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/ > ${work_directory}/search_index_list.tmp
-      exit_code=$?
-      set -e
-      if test ${exit_code} -ne 0; then
-        cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}." >&2
-        rm -rf ${work_directory}
-        exit ${exit_code}
-      fi
-      for index_file in `cat ${work_directory}/search_index_list.tmp`; do
-        mm=`echo ${index_file} | cut -c1-2`
-        set +e
-        mm=`expr 0 + ${mm}`
-        yyyymmddhhmm=`expr ${yyyymmddhh00} + ${mm}`
-        set -e
-        if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
-          cp /dev/null ${work_directory}/err_log.tmp
-          set +e
-          timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file} ${work_directory}/search_index.tmp
-          exit_code=$?
-          set -e
-          if test ${exit_code} -ne 0; then
-            cat ${work_directory}/err_log.tmp >&2
-            echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file}." >&2
-            rm -rf ${work_directory}
-            exit ${exit_code}
-          fi
-          cp /dev/null ${work_directory}/search_file.tmp
-          set +e
-          if test -n "${exclusive_pattern_file}"; then
-            zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-          elif test -n "${inclusive_pattern_file}"; then
-            zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-          else
-            zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
-          fi
-          set -e
-          if test -s ${work_directory}/search_file.tmp; then
-            if test ${out} -eq 0; then
-              cat ${work_directory}/search_file.tmp
-            else
-              cp /dev/null ${work_directory}/err_log.tmp
-              set +e
-#              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-              timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-              exit_code=$?
-              set -e
-              if test ${exit_code} -ne 0; then
-                cat ${work_directory}/err_log.tmp >&2
-                echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
-                rm -rf ${work_directory}
-                exit ${exit_code}
-              fi
-              sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
-            fi
-          fi
-        fi
-      done
-    fi
-  done
-  cp /dev/null ${work_directory}/err_log.tmp
-  set +e
-  timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/search_index_list.tmp
-  exit_code=$?
-  set -e
-  if test ${exit_code} -ne 0; then
-    cat ${work_directory}/err_log.tmp >&2
-    echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
-    rm -rf ${work_directory}
-    exit ${exit_code}
-  fi
-  for index_file in `cat ${work_directory}/search_index_list.tmp`; do
-    yyyymmddhhmm=`echo ${index_file} | cut -c1-12`
-    set +e
-    yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
-    set -e
-    if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
-      cp /dev/null ${work_directory}/err_log.tmp
-      set +e
-      timeout -k 3 ${rclone_timeout} rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${work_directory}/search_index.tmp
-      exit_code=$?
-      set -e
-      if test ${exit_code} -ne 0; then
-        cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
-        rm -rf ${work_directory}
-        exit ${exit_code}
-      fi
-      cp /dev/null ${work_directory}/search_file.tmp
-      set +e
-      if test -n "${exclusive_pattern_file}"; then
-        zcat ${work_directory}/search_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-      elif test -n "${inclusive_pattern_file}"; then
-        zcat ${work_directory}/search_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/search_file.tmp
-      else
-        zcat ${work_directory}/search_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/search_file.tmp
-      fi
-      set -e
-      if test -s ${work_directory}/search_file.tmp; then
-        if test ${out} -eq 0; then
-          cat ${work_directory}/search_file.tmp
-        else
-          cp /dev/null ${work_directory}/err_log.tmp
-          set +e
-#          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-          timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/search_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
-          exit_code=$?
-          set -e
-          if test ${exit_code} -ne 0; then
-            cat ${work_directory}/err_log.tmp >&2
-            echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
-            rm -rf ${work_directory}
-            exit ${exit_code}
-          fi
-          sed -e "s|^|${local_work_directory}/|g" ${work_directory}/search_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
-        fi
-      fi
-    fi
-  done
+done
+cp /dev/null ${work_directory}/err_log.tmp
+set +e
+timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/pubsub_index_list.tmp
+exit_code=$?
+set -e
+if test ${exit_code} -ne 0; then
+  cat ${work_directory}/err_log.tmp >&2
+  echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
+  rm -rf ${work_directory}
+  exit ${exit_code}
 fi
+for index_file in `cat ${work_directory}/pubsub_index_list.tmp`; do
+  yyyymmddhhmm=`echo ${index_file} | cut -c1-12`
+  set +e
+  yyyymmddhhmm=`expr 0 + ${yyyymmddhhmm}`
+  set -e
+  if test ${yyyymmddhhmm} -ge ${start_yyyymmddhhmm} -a ${yyyymmddhhmm} -le ${end_yyyymmddhhmm}; then
+    cp /dev/null ${work_directory}/err_log.tmp
+    index_path="${pubsub_index_directory}/${extension_type}/${index_file}"
+    echo ${index_path} > ${work_directory}/pubsub_raw.tmp
+    set +e
+#    timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/pubsub_raw.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+    timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/pubsub_raw.tmp --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+    exit_code=$?
+    set -e
+    if test ${exit_code} -ne 0; then
+      cat ${work_directory}/err_log.tmp >&2
+      echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
+      rm -rf ${work_directory}
+      exit ${exit_code}
+    fi
+    mv -f ${work_directory}/${pubsub_index_directory}/${extension_type}/${index_file} ${work_directory}/pubsub_index.tmp
+    cp /dev/null ${work_directory}/pubsub_file.tmp
+    set +e
+    if test -n "${exclusive_pattern_file}"; then
+      zcat ${work_directory}/pubsub_index.tmp | grep -v -E -f ${exclusive_pattern_file} | grep -E -f ${inclusive_pattern_file} > ${work_directory}/pubsub_file.tmp
+    elif test -n "${inclusive_pattern_file}"; then
+      zcat ${work_directory}/pubsub_index.tmp | grep -E -f ${inclusive_pattern_file} > ${work_directory}/pubsub_file.tmp
+    else
+      zcat ${work_directory}/pubsub_index.tmp | grep -E ${keyword_pattern} > ${work_directory}/pubsub_file.tmp
+    fi
+    set -e
+    if test -s ${work_directory}/pubsub_file.tmp; then
+      if test ${out} -eq 0; then
+        cat ${work_directory}/pubsub_file.tmp
+      else
+        cp /dev/null ${work_directory}/err_log.tmp
+        set +e
+#        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/pubsub_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+        timeout -k 3 ${rclone_timeout} rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/pubsub_file.tmp --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} --transfers ${parallel} ${rclone_remote_bucket} ${local_work_directory}
+        exit_code=$?
+        set -e
+        if test ${exit_code} -ne 0; then
+          cat ${work_directory}/err_log.tmp >&2
+          echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
+          rm -rf ${work_directory}
+          exit ${exit_code}
+        fi
+        sed -e "s|^|${local_work_directory}/|g" ${work_directory}/pubsub_file.tmp | xargs -r -n 64 -P ${parallel} gunzip -f
+      fi
+    fi
+  fi
+done
 rm -rf ${work_directory}
