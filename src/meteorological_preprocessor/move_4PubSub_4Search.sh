@@ -26,20 +26,6 @@ move_4PubSub_4Search() {
       return ${exit_code}
     fi
   done
-  index_file_count=`grep -E '^[0-9]{14}_.*\.txt\.gz$' ${work_directory}/${pubsub_index_directory}_index.tmp | wc -l`
-  if test ${index_file_count} -eq 1; then
-    touch_index_file=`grep -E '^[0-9]{14}_.*\.txt\.gz$' ${work_directory}/${pubsub_index_directory}_index.tmp`
-    cp /dev/null ${work_directory}/err_log.tmp
-    set +e
-    timeout -k 3 30 rclone touch --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${touch_index_file}
-    exit_code=$?
-    set -e
-    if test ${exit_code} -ne 0; then
-      cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not touch ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${touch_index_file}." >&2
-      return ${exit_code}
-    fi
-  fi
   return ${exit_code}
 }
 bandwidth_limit_k_bytes_per_s=0
