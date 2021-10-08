@@ -9,7 +9,7 @@ move_4PubSub_4Search() {
   set -e
   if test ${exit_code} -ne 0; then
     cat ${work_directory}/err_log.tmp >&2
-    echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
+    echo "ERROR: can not get a list of index file on ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
     return ${exit_code}
   fi
   for index_file in `head -n -1 ${work_directory}/${pubsub_index_directory}_index.tmp | grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]_.*\.txt\.gz$"`; do
@@ -78,7 +78,7 @@ set +e
 extension_type=`echo $3 | grep -E '^(txt|bin)$'`
 rclone_remote_bucket=`echo $4 | grep -F ':'`
 set -e
-if test -z ${extension_type}; then
+if test -z "${extension_type}"; then
   echo "ERROR: $3 is not txt or bin." >&2
   exit 199
 fi

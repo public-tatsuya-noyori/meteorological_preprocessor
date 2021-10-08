@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+IFS=$'\n'
 bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
 end_yyyymmddhhmm=999999999999
@@ -95,7 +96,7 @@ exit_code=$?
 set -e
 if test ${exit_code} -ne 0; then
   cat ${work_directory}/err_log.tmp >&2
-  echo "ERROR: can not get index directory list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
+  echo "ERROR: can not get a list of index directory from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
   rm -rf ${work_directory}
   exit ${exit_code}
 fi
@@ -113,7 +114,7 @@ for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
     set -e
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}." >&2
+      echo "ERROR: can not get a list of index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}." >&2
       rm -rf ${work_directory}
       exit ${exit_code}
     fi
@@ -134,7 +135,7 @@ for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file}." >&2
+          echo "ERROR: can not get a index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${yyyymmddhh}/${index_file}." >&2
           rm -rf ${work_directory}
           exit ${exit_code}
         fi
@@ -161,7 +162,7 @@ for index_directory in `cat ${work_directory}/search_index_dir_list.tmp`; do
             set -e
             if test ${exit_code} -ne 0; then
               cat ${work_directory}/err_log.tmp >&2
-              echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
+              echo "ERROR: can not get files from ${rclone_remote_bucket} ${extension_type}." >&2
               rm -rf ${work_directory}
               exit ${exit_code}
             fi
@@ -179,7 +180,7 @@ exit_code=$?
 set -e
 if test ${exit_code} -ne 0; then
   cat ${work_directory}/err_log.tmp >&2
-  echo "ERROR: can not get index list from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
+  echo "ERROR: can not get a list of index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}." >&2
   rm -rf ${work_directory}
   exit ${exit_code}
 fi
@@ -199,7 +200,7 @@ for index_file in `cat ${work_directory}/pubsub_index_list.tmp`; do
     set -e
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not get index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
+      echo "ERROR: can not get a index file from ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
       rm -rf ${work_directory}
       exit ${exit_code}
     fi
@@ -226,7 +227,7 @@ for index_file in `cat ${work_directory}/pubsub_index_list.tmp`; do
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not get file from ${rclone_remote_bucket} ${extension_type}." >&2
+          echo "ERROR: can not get files from ${rclone_remote_bucket} ${extension_type}." >&2
           rm -rf ${work_directory}
           exit ${exit_code}
         fi

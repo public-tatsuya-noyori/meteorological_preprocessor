@@ -73,7 +73,7 @@ publish(){
       set +e
       grep -F ERROR ${work_directory}/info_log.tmp >&2
       set -e
-      echo "ERROR: can not put to ${destination_rclone_remote_bucket} ${extension_type}." >&2
+      echo "ERROR: can not put ${extension_type} files on ${destination_rclone_remote_bucket}." >&2
       return ${exit_code}
     fi
     set +e
@@ -123,7 +123,7 @@ no_check_pid=0
 parallel=4
 pubsub_index_directory=4PubSub
 rclone_timeout=480
-retry_num=16
+retry_num=4
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in

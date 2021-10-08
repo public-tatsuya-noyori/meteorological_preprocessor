@@ -20,7 +20,7 @@ delete_4Search() {
       set -e
       if test ${exit_code} -ne 0; then
         cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: can not get index file list from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${date_hour_directory}." >&2
+        echo "ERROR: can not get a list of index file on ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${date_hour_directory}." >&2
         return ${exit_code}
       fi
       if test -s ${work_directory}/${search_index_directory}_index.tmp; then
@@ -31,7 +31,7 @@ delete_4Search() {
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not get index file from ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
+          echo "ERROR: can not get index files on ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
           return ${exit_code}
         fi
         find ${work_directory}/${search_index_directory}/${extension_type}/${date_hour_directory} -regextype posix-egrep -regex "^.*/[0-9]{4}_[^/]*\.txt.gz$" -type f | xargs -r zcat > ${work_directory}/${search_index_directory}_file.tmp
@@ -44,7 +44,7 @@ delete_4Search() {
           set -e
           if test ${exit_code} -ne 0; then
             cat ${work_directory}/err_log.tmp >&2
-            echo "ERROR: can not delete file on ${rclone_remote_bucket}." >&2
+            echo "ERROR: can not delete files on ${rclone_remote_bucket}." >&2
             return ${exit_code}
           fi
         fi
@@ -56,7 +56,7 @@ delete_4Search() {
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "ERROR: can not delete index file on ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
+          echo "ERROR: can not delete index files on ${rclone_remote_bucket}/${search_index_directory}/${extension_type}." >&2
           return ${exit_code}
         fi
       fi
@@ -100,7 +100,7 @@ set +e
 extension_type=`echo $3 | grep -E '^(txt|bin)$'`
 rclone_remote_bucket=`echo $4 | grep -F ':'`
 set -e
-if test -z ${extension_type}; then
+if test -z "${extension_type}"; then
   echo "ERROR: $3 is not txt or bin." >&2
   exit 199
 fi

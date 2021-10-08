@@ -9,7 +9,7 @@ delete() {
   set -e
   if test ${exit_code} -ne 0; then
     cat ${work_directory}/err_log.tmp >&2
-    echo "ERROR: can not delete on ${rclone_remote_bucket}." >&2
+    echo "ERROR: can not delete files on ${rclone_remote_bucket}." >&2
   fi
   return ${exit_code}
 }
@@ -42,7 +42,7 @@ if test -z "${rclone_remote_bucket}"; then
   echo "ERROR: $3 is not rclone_remote:bucket." >&2
   exit 199
 fi
-if test -z ${days_ago}; then
+if test -z "${days_ago}"; then
   echo "ERROR: $4 is not integer." >&2
   exit 199
 elif test $4 -le 0; then
