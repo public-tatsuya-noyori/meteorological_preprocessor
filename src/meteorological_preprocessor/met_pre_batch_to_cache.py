@@ -411,7 +411,7 @@ def main():
     parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('input_directory_or_list_file', type=str, metavar='input_directory_or_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
-    parser.add_argument('checksum_arrow_file', type=str, metavar='checksum.feather')
+    parser.add_argument('checksum_arrow_file', type=str, metavar='checksum.arrow')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument('--tmp_grib_file', type=str, metavar='tmp_grib_file', default='tmp_grib_file.bin')
     parser.add_argument('--tmp_bufr_file', type=str, metavar='tmp_bufr_file', default='tmp_bufr_file.bin')
