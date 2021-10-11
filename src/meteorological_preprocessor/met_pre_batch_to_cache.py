@@ -21,7 +21,7 @@ def getHash(out_file):
     checksum = md5.hexdigest()
     return checksum
 
-def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
+def is_bufr_matched(in_file, bufr_descriptor):
     warno = 184
     rc = False
     with open(in_file, 'rb') as in_file_stream:
@@ -33,18 +33,11 @@ def is_bufr_matched(in_file, bufr_descriptor, bufr_key_of_not_missing):
                     break
                 unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
                 if bufr_descriptor in unexpanded_descriptors:
-                    if bufr_key_of_not_missing:
-                        values = codes_get_array(bufr, bufr_key_of_not_missing)
-                        if type(values[0]) == str and len(values[0].lstrip().rstrip()) > 0:
-                            rc = True
-                        elif not np.isnan(values[0]):
-                            rc = True
-                    else:
-                        rc = True
+                    rc = True
+                codes_release(bufr)
             except:
+                print('Warning', warno, ':', 'BUFR decode error on', in_file, 'has occurred. The file is not created', file=sys.stderr)
                 rc = False
-                break
-            codes_release(bufr)
     return rc
 
 def get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug):
@@ -120,7 +113,7 @@ def get_grib_subdir_list(grib_file):
         return []
     return subdir_list
 
-def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug):
+def create_file(in_file, my_cccc, message, start_char4, out_dir, conf_list, debug):
     warno = 187
     in_file_name = os.path.basename(in_file)
     for conf_row in conf_list:
@@ -153,7 +146,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
                 continue
             if conf_row.file_extension == 'txt' and conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                 continue
-            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_matched(in_file, conf_row.bufr_descriptor, conf_row.bufr_key_of_not_missing):
+            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_matched(in_file, conf_row.bufr_descriptor):
                 continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
@@ -222,7 +215,7 @@ def create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, 
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
-def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug):
+def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, tmp_bufr_file, conf_list, debug):
     warno = 188
     ttaaii_cccc_ddhhmm_bbb_data_date_list = get_ttaaii_cccc_ddhhmm_bbb_data_date_list(message, in_file, debug)
     if len(ttaaii_cccc_ddhhmm_bbb_data_date_list) != 5:
@@ -239,8 +232,11 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
                 continue
             if conf_row.file_extension == 'txt' and conf_row.text_pattern and not re.search(r'' + conf_row.text_pattern, message.decode("ascii", errors="ignore").replace(ttaaii, '', 1).replace(cccc, '', 1).replace('\r', ' ').replace('\n', ' ')):
                 continue
-            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor) and not is_bufr_matched(in_file, conf_row.bufr_descriptor, conf_row.bufr_key_of_not_missing):
-                continue
+            if conf_row.format == 'bufr' and not np.isnan(conf_row.bufr_descriptor):
+                with open(tmp_bufr_file, 'wb') as tmp_bufr_file_stream:
+                    tmp_bufr_file_stream.write(message)
+                if not is_bufr_matched(tmp_bufr_file, conf_row.bufr_descriptor):
+                    continue
             if not re.match(r'^[A-Z][A-Z][A-Z][A-Z]$', cccc):
                 print('Warning', warno, ':', 'cccc of', ttaaii, cccc, ddhhmm, bbb, 'on', in_file, 'is invalid. The file is not created', file=sys.stderr)
                 return ''
@@ -287,7 +283,7 @@ def create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, co
     print('Warning', warno, ':', in_file, 'is not matched on configuration file. The file is not created', file=sys.stderr)
     return ''
 
-def convert_to_cache(my_cccc, input_file_list, out_dir, checksum_arrow_file, out_list_file, tmp_grib_file, conf_list, debug):
+def convert_to_cache(my_cccc, input_file_list, out_dir, checksum_arrow_file, out_list_file, tmp_grib_file, tmp_bufr_file, conf_list, debug):
     warno = 189
     checksum_df = feather.read_feather(checksum_arrow_file)
     checksum_list = []
@@ -354,7 +350,7 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, checksum_arrow_file, out
                     except:
                         print('Warning', warno, ':', 'can not encode or read', in_file, file=sys.stderr)
                         break
-                    out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, tmp_grib_file, conf_list, debug)
+                    out_file = create_file(in_file, my_cccc, message, start_char4, out_dir, conf_list, debug)
                     if out_file:
                         out_file_checksum = getHash(out_file)
                         if len(checksum_df[checksum_df['checksum'] == out_file_checksum].index) == 0 and not out_file_checksum in checksum_list:
@@ -387,7 +383,7 @@ def convert_to_cache(my_cccc, input_file_list, out_dir, checksum_arrow_file, out
                     else:
                         break
                     message_counter += 1
-                out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, conf_list, debug)
+                out_file = create_file_from_batch(in_file, my_cccc, message, out_dir, tmp_grib_file, tmp_bufr_file, conf_list, debug)
                 if out_file:
                     out_file_checksum = getHash(out_file)
                     if len(checksum_df[checksum_df['checksum'] == out_file_checksum].index) == 0 and not out_file_checksum in checksum_list:
@@ -418,6 +414,7 @@ def main():
     parser.add_argument('checksum_arrow_file', type=str, metavar='checksum.feather')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument('--tmp_grib_file', type=str, metavar='tmp_grib_file', default='tmp_grib_file.bin')
+    parser.add_argument('--tmp_bufr_file', type=str, metavar='tmp_bufr_file', default='tmp_bufr_file.bin')
     parser.add_argument("--config", type=str, metavar='conf_batch_to_cache.csv', default=pkg_resources.resource_filename(__name__, 'conf_batch_to_cache.csv'))
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
@@ -467,7 +464,7 @@ def main():
         sys.exit(errno)
     try:
         conf_list = list(csv.read_csv(args.config).to_pandas().itertuples())
-        convert_to_cache(args.my_cccc, input_file_list, args.output_directory, args.checksum_arrow_file, args.output_list_file, args.tmp_grib_file, conf_list, args.debug)
+        convert_to_cache(args.my_cccc, input_file_list, args.output_directory, args.checksum_arrow_file, args.output_list_file, args.tmp_grib_file, args.tmp_bufr_file, conf_list, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
