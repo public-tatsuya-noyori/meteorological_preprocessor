@@ -2,6 +2,8 @@
 set -e
 IFS=$'\n'
 move_4PubSub_4Search() {
+  rm -rf ${work_directory}/4PubSub
+  cp /dev/null ${work_directory}/${pubsub_index_directory}_index.tmp
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
   timeout -k 3 30 rclone lsf --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/ > ${work_directory}/${pubsub_index_directory}_index.tmp
@@ -15,14 +17,37 @@ move_4PubSub_4Search() {
   for index_file in `head -n -1 ${work_directory}/${pubsub_index_directory}_index.tmp | grep -v -E "^(${move_index_date_hour_minute_pattern})[0-9][0-9]_.*\.txt\.gz$"`; do
     index_file_date_hour=`echo ${index_file} | cut -c1-10`
     index_file_minute_second_extension=`echo ${index_file} | cut -c11-`
+    echo "${pubsub_index_directory}/${extension_type}/${index_file}" > ${work_directory}/raw.txt
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 30 rclone moveto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}
+#    timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+    timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
-      echo "ERROR: can not move ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}." >&2
+      echo "ERROR: can not get ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
+      return ${exit_code}
+    fi
+    cp /dev/null ${work_directory}/err_log.tmp
+    set +e
+    timeout -k 3 30 rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}
+    exit_code=$?
+    set -e
+    if test ${exit_code} -ne 0; then
+      cat ${work_directory}/err_log.tmp >&2
+      echo "ERROR: can not put ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}." >&2
+      return ${exit_code}
+    fi
+    cp /dev/null ${work_directory}/err_log.tmp
+    set +e
+#    timeout -k 3 30 rclone delete --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+    timeout -k 3 30 rclone delete --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+    exit_code=$?
+    set -e
+    if test ${exit_code} -ne 0; then
+      cat ${work_directory}/err_log.tmp >&2
+      echo "ERROR: can not delete ${rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/${index_file}." >&2
       return ${exit_code}
     fi
   done
