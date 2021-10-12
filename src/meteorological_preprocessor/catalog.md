@@ -180,6 +180,6 @@ $ chmod 755 /path/to/deploy.sh
 ```
 ## How to conver a message file to 24h-cache
 1. prepare files of accumulated messages (CCCCNNNNNNNN.ext)
-1. or prepare files of message (A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type)
-1. or prepare files of [tgftp.nws.noaa.gov/SL.us008001/](https://tgftp.nws.noaa.gov/SL.us008001/)(sn.[0-9][0-9][0-9][0-9].type)
+ or prepare files of message (A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type)
+ or prepare files of [tgftp.nws.noaa.gov/SL.us008001/](https://tgftp.nws.noaa.gov/SL.us008001/)(sn.[0-9][0-9][0-9][0-9].type).
 2. 
