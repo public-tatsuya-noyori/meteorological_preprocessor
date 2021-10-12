@@ -191,11 +191,15 @@ $ pip3 install .
 $ exit
 ```
 2. Save the current files in one directory. The current files are as follows:
- CCCCNNNNNNNN.ext on your MSS
- A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss_.*.ext on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
- sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
-3. Run met_pre_batch_to_cache
+ - CCCCNNNNNNNN.ext on your MSS
+ - A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss_.*.ext on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
+ - sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
+3. Run met_pre_batch_to_cache and pub.sh
 ```
-$ met_pre_batch_to_cache ***your_cccc*** ***your_directory_of_the_current_files*** ***your_24h-cache_directory*** checksum.arrow
+$ met_pre_batch_to_cache ***your_cccc*** ***your_directory_of_the_current_files*** ***your_24h-cache_directory*** checksum.arrow > all_index.txt
+$ grep txt$ all_index.txt > txt_index.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** txt /path/to/index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+$ grep bin$ all_index.txt > bin_index.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** bin /path/to/index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 ```
 4. To see the command options, run the command with --help.
