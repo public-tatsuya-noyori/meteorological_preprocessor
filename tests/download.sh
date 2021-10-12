@@ -19,12 +19,12 @@ elif test $1 = 'p2_crex'; then
   category=''
 elif test $1 = 'p3'; then
   priority=p3
-  parallel=1
+  parallel=16
   format=BUFR
   category=''
 elif test $1 = 'p4'; then
   priority=p4
-  parallel=1
+  parallel=16
   format=GRIB
   category=''
 fi
