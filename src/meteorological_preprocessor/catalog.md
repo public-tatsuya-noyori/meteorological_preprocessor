@@ -188,7 +188,7 @@ $ sudo apt install git
 $ git clone https://github.com/public-tatsuya-noyori/meteorological_preprocessor
 $ cd meteorological_preprocessor
 $ pip3 install .
-$ exit
+$ exec $SHELL -l
 ```
 2. Save the current files in one directory. The current files are as follows:
  - CCCCNNNNNNNN.ext on your MSS
