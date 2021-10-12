@@ -178,4 +178,8 @@ $ chmod 755 /path/to/deploy.sh
 ```
 /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
-## How to conver a message file(A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type)/a file of accumulated messages(CCCCNNNNNNNN.ext)/a file on [tgftp.nws.noaa.gov/SL.us008001/](https://tgftp.nws.noaa.gov/SL.us008001/)(sn.[0-9][0-9][0-9][0-9].bin or sn.[0-9][0-9][0-9][0-9].txt) to 24h-cache
+## How to conver a message file to 24h-cache
+1. prepare files of accumulated messages (CCCCNNNNNNNN.ext)
+1. or prepare files of message (A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type)
+1. or prepare files of [tgftp.nws.noaa.gov/SL.us008001/](https://tgftp.nws.noaa.gov/SL.us008001/)(sn.[0-9][0-9][0-9][0-9].type)
+2. 
