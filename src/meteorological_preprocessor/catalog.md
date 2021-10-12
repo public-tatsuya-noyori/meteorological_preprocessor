@@ -178,3 +178,28 @@ $ chmod 755 /path/to/deploy.sh
 ```
 $ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
+## How to convert current files and publish data
+1. Install tools to convert
+```
+$ sudo apt install python3
+$ sudo apt install python3-pip
+$ sudo apt install libeccodes-tools
+$ sudo apt install git
+$ git clone https://github.com/public-tatsuya-noyori/meteorological_preprocessor
+$ cd meteorological_preprocessor
+$ pip3 install .
+$ exec $SHELL -l
+```
+2. Save the following current files in a directory.
+ - CCCCNNNNNNNN.ext on your MSS
+ - A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss_.*.ext on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
+ - sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
+3. Run met_pre_batch_to_cache and pub.sh
+```
+$ met_pre_batch_to_cache ***your_cccc*** /path/to/the_directory_of_current_files /path/to/pub_clone_work_directory checksum.arrow > all_index.txt
+$ grep txt$ all_index.txt > txt_index.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** txt txt_index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+$ grep bin$ all_index.txt > bin_index.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** bin bin_index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+```
+4. To see the command options, run the command with --help.
