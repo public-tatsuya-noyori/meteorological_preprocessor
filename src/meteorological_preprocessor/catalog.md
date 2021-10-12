@@ -192,7 +192,7 @@ $ exit
 ```
 2. Prepare files of accumulated messages of CCCCNNNNNNNN.ext on your MSS
  or prepare files of A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
- or prepare files of sn.[0-9][0-9][0-9][0-9].type on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
+ or prepare files of sn.[0-9][0-9][0-9][0-9].type on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
 3. Run met_pre_batch_to_cache
 ```
 $ met_pre_batch_to_cache ***your_cccc*** ***your_directory_of_prepared_files*** ***your_24h-cache_directory*** checksum.arrow
