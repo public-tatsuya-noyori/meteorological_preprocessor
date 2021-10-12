@@ -178,7 +178,7 @@ $ chmod 755 /path/to/deploy.sh
 ```
 $ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
-## How to conver message files to 24h-cache
+## How to convert current files and publish the converted data
 1. Install tools to convert
 ```
 $ sudo apt install python3
@@ -190,11 +190,12 @@ $ cd meteorological_preprocessor
 $ pip3 install .
 $ exit
 ```
-2. Prepare files of accumulated messages of CCCCNNNNNNNN.ext on your MSS
- or prepare files of A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
- or prepare files of sn.[0-9][0-9][0-9][0-9].type on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
+2. Save the current files in one directory. The current files are as follows:
+ CCCCNNNNNNNN.ext on your MSS
+ A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss_.*.ext on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
+ sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
 3. Run met_pre_batch_to_cache
 ```
-$ met_pre_batch_to_cache ***your_cccc*** ***your_directory_of_prepared_files*** ***your_24h-cache_directory*** checksum.arrow
+$ met_pre_batch_to_cache ***your_cccc*** ***your_directory_of_the_current_files*** ***your_24h-cache_directory*** checksum.arrow
 ```
 4. To see the command options, run the command with --help.
