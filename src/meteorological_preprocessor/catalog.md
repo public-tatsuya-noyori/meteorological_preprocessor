@@ -178,7 +178,7 @@ $ chmod 755 /path/to/deploy.sh
 ```
 $ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
-## How to conver message file to 24h-cache
+## How to conver message files to 24h-cache
 1. Install tools to convert
 ```
 $ sudo apt install python3
