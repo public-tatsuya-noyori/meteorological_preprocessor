@@ -190,5 +190,5 @@ $ sudo apt install libeccodes-tools or See [eccodes installation](https://github
 $ sudo apt install git
 $ git clone https://github.com/public-tatsuya-noyori/meteorological_preprocessor
 $ cd meteorological_preprocessor
-$ pip3 install
+$ pip3 install .
 ```
