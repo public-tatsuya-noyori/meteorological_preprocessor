@@ -178,3 +178,23 @@ $ chmod 755 /path/to/deploy.sh
 ```
 $ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
+## How to conver message file to 24h-cache
+1. Install tools to convert
+```
+$ sudo apt install python3
+$ sudo apt install python3-pip
+$ sudo apt install libeccodes-tools
+$ sudo apt install git
+$ git clone https://github.com/public-tatsuya-noyori/meteorological_preprocessor
+$ cd meteorological_preprocessor
+$ pip3 install .
+$ exit
+```
+2. Prepare files of accumulated messages (CCCCNNNNNNNN.ext)
+ or prepare files of message (A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss.type)
+ or prepare files of [https://tgftp.nws.noaa.gov/SL.us008001/*/*](https://tgftp.nws.noaa.gov/SL.us008001/)(sn.[0-9][0-9][0-9][0-9].type).
+3. Run met_pre_batch_to_cache
+```
+$ met_pre_batch_to_cache ***your_cccc*** ***your_directory_of_prepared_files*** ***your_24h-cache_directory*** checksum.arrow
+```
+4. To see the command options, run the command with --help.
