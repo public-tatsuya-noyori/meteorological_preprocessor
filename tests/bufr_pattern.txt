@@ -1,4 +1,0 @@
-/bufr/surface/synop/
-/bufr/surface/ship/
-/bufr/surface/moored_buoy/
-/bufr/surface/drifting_buoy/
