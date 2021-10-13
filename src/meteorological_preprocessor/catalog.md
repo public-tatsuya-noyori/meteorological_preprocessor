@@ -193,7 +193,7 @@ $ exec $SHELL -l
 2. Save the following current files in a directory.
  - CCCCNNNNNNNN.ext on your MSS
  - A_TTAAiiCCCCYYGGgg_C_CCCC_yyyyMMddhhmmss_.*.ext on [https://www.wis-jma.go.jp/d/o/\*/\*/\*/\*/\*/\*/\*](https://www.wis-jma.go.jp/d/o/)
- - sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/\*/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
+ - sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/(DF.an|DF.bf)/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
 3. Run met_pre_batch_to_cache and pub.sh
 ```
 $ met_pre_batch_to_cache ***your_cccc*** /path/to/the_directory_of_current_files /path/to/pub_clone_work_directory checksum.arrow > all_index.txt
