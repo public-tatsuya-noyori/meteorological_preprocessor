@@ -143,7 +143,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                         out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
                         out_directory = '/'.join(out_directory_list)
                         os.makedirs(out_directory, exist_ok=True)
-                        out_file_list = [out_directory, '/', dt_str, '_', create_datetime, '.feather']
+                        out_file_list = [out_directory, '/', dt_str, '_', create_datetime, '.arrow']
                         out_file = ''.join(out_file_list)
                         with open(out_file, 'bw') as out_f:
                             property_batch = pa.record_batch(data_list, names=name_list)

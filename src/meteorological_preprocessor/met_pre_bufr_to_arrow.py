@@ -301,7 +301,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)
                     now = datetime.utcnow()
-                    out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.feather']
+                    out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.arrow']
                     out_file = ''.join(out_file_list)
                     with open(out_file, 'bw') as out_f:
                         batch = pa.record_batch(data_list, names=name_list)
