@@ -197,9 +197,9 @@ $ exec $SHELL -l
 3. Run met_pre_batch_to_cache and pub.sh
 ```
 $ met_pre_batch_to_cache ***your_cccc*** /path/to/the_directory_of_current_files /path/to/pub_clone_work_directory checksum.arrow > all_index.txt
-$ grep txt$ all_index.txt > txt_index.txt
+$ grep -E /A_[A-Z]{4}[0-9]{2}***your_cccc***[0-9]{6} all_index.txt | grep txt$ > txt_index.txt
 $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** txt txt_index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
-$ grep bin$ all_index.txt > bin_index.txt
+$ grep -E /A_[A-Z]{4}[0-9]{2}***your_cccc***[0-9]{6} all_index.txt | grep bin$ > bin_index.txt
 $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** bin bin_index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 ```
 4. To see the command options, run the command with --help.
