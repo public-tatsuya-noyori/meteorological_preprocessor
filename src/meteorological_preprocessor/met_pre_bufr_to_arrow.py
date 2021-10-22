@@ -1,82 +1,15 @@
 #!/usr/bin/env python3
 import argparse
+import eccodes as ec
 import numpy as np
 import os
-import pandas as pd
 import pkg_resources
 import pyarrow as pa
 import re
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
-from pyarrow import csv, feather
-from eccodes import *
-
-datetime_name = 'datetime'
-location_name = 'location'
-
-def getArray(bufr, subset_num, subset_len, conf_row, in_file):
-    array = np.array([])
-    is_success = True
-    try:
-        if subset_num > 0:
-            array = codes_get_array(bufr, "/subsetNumber=" + str(subset_num) + "/" + conf_row.key)
-        else:
-            array = codes_get_array(bufr, conf_row.key)
-    except:
-        is_success = False
-    if not is_success and subset_num > 0:
-        try:
-            array = codes_get_array(bufr, conf_row.key)
-            if len(array) == subset_len:
-                value = array[subset_num - 1]
-                array = np.array([value])
-                is_success = True
-            elif len(array) == 1:
-                value = array[0]
-                array = np.array([value])
-                is_success = True
-            else:
-                is_success = False
-        except:
-            is_success = False
-    if is_success:
-        if conf_row.datatype == 'string':
-            array = np.array([value.lstrip().rstrip() for value in array], dtype=object)
-        else:
-            array = np.where(np.isnan(array), None, array)
-            if conf_row.name == 'datetime':
-                if conf_row.key == 'year':
-                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(4) for value in array], dtype=object)
-                elif conf_row.key == 'month':
-                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
-                elif conf_row.key == 'day':
-                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
-                elif conf_row.key == 'hour':
-                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
-                elif conf_row.key == 'minute':
-                    array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
-                elif conf_row.key == 'second':
-                    if not np.isnan(conf_row.missing):
-                        array = np.array([str(int(conf_row.missing)).zfill(2) if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
-                    else:
-                        array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(2) for value in array], dtype=object)
-                elif conf_row.key == 'millisecond':
-                    if not np.isnan(conf_row.missing):
-                        array = np.array([str(int(conf_row.missing)).zfill(3) if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
-                    else:
-                        array = np.array([None if value < conf_row.min or value > conf_row.max else str(value).zfill(3) for value in array], dtype=object)
-            elif not np.isnan(conf_row.missing):
-                array = np.array([conf_row.missing if value < conf_row.min or value > conf_row.max else value for value in array], dtype=object)
-            else:
-                array = np.array([None if value < conf_row.min or value > conf_row.max else value for value in array], dtype=object)
-            if conf_row.name == 'longitude [degree]':
-                array = np.where(array == conf_row.max, conf_row.min, array)
-            if conf_row.slide > -1 and conf_row.step > 0:
-                array = array[conf_row.slide::conf_row.step]
-    else:
-        array = np.array([])
-    return array
+from pyarrow import csv
 
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
     warno = 189
@@ -90,15 +23,14 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
         for cat_subcat in cat_subcat_set:
             cat = re.sub('/.*$', '', cat_subcat)
             subcat = re.sub('^.*/', '', cat_subcat)
-            out_cat_subcat_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat)]
-            location_type_output_cat_subcat_set = set([str(location_type) + '/' + output_cat + '/' + output_subcat for output_index, location_type, output_cat, output_subcat in list(out_cat_subcat_df[['location_type','output_category','output_subcategory']].itertuples())])
-            for location_type_output_cat_subcat in location_type_output_cat_subcat_set:
-                datatype_dict = {}
-                property_dict = {}
-                location_type_output_cat_subcat_list = location_type_output_cat_subcat.split('/')
-                location_type = int(location_type_output_cat_subcat_list[0])
-                output_cat = location_type_output_cat_subcat_list[1]
-                output_subcat = location_type_output_cat_subcat_list[2]
+            input_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat)]
+            output_directory_set = set([output_tuple.output_category + '/' + output_tuple.output_subcategory for output_tuple in input_conf_df[['output_category','output_subcategory']].itertuples()])
+            for output_directory in output_directory_set:
+                output_directory_list = output_directory.split('/')
+                output_cat = output_directory_list[0]
+                output_subcat = output_directory_list[1]
+                output_conf_df = input_conf_df[(input_conf_df['output_category'] == output_cat) & (input_conf_df['output_subcategory'] == output_subcat)]
+                output_dict = {}
                 for in_file in in_file_list:
                     match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
                     if not match:
@@ -114,199 +46,205 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         continue
                     if debug:
                         print('Debug', ':', in_file, file=sys.stderr)
+                    input_dict = {}
+                    required_np = np.array([])
                     with open(in_file, 'rb') as in_file_stream:
                         while True:
                             bufr = None
-                            unexpanded_descriptors = []
                             try:
-                                bufr = codes_bufr_new_from_file(in_file_stream)
+                                bufr = ec.codes_bufr_new_from_file(in_file_stream)
                                 if bufr is None:
                                     break
-                                unexpanded_descriptors = codes_get_array(bufr, 'unexpandedDescriptors')
-                            except:
-                                break
-                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
-                            for bufr_descriptor in unexpanded_descriptors:
-                                descriptor_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['location_type'] == location_type) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat) & (conf_df['descriptor'] == bufr_descriptor)]
-                                if len(descriptor_conf_df.index) > 0:
-                                    descriptor_2_list = list(set(descriptor_conf_df[['descriptor_2']].values.flatten()))
-                                    if len(descriptor_2_list) > 0 and not np.isnan(descriptor_2_list[0]):
-                                        is_descriptor_2 = False
-                                        for descriptor_2 in descriptor_2_list:
-                                            if descriptor_2 in unexpanded_descriptors:
-                                                descriptor_conf_df = descriptor_conf_df[descriptor_conf_df['descriptor_2'] == descriptor_2]
-                                                is_descriptor_2 = True
+                                unexpanded_descriptors = ec.codes_get_array(bufr, 'unexpandedDescriptors')
+                                descriptors_list_set = set([output_conf_tuple.descriptors_list for output_conf_tuple in output_conf_df[['descriptors_list']].itertuples()])
+                                for descriptors_list in descriptors_list_set:
+                                    for descriptors in descriptors_list.split(';'):
+                                        is_descriptors = True
+                                        for descriptor in descriptors.split(' '):
+                                            if not int(descriptor) in unexpanded_descriptors:
+                                                is_descriptors = False
                                                 break
-                                        if not is_descriptor_2:
-                                            descriptor_conf_df = pd.DataFrame(index=[], columns=['descriptor','descriptor_2'])
-                                    break
-                            if len(descriptor_conf_df.index) == 0:
-                                print('Info', ':', 'not found descriptor.', unexpanded_descriptors, in_file, file=sys.stderr)
-                                break
-                            number_of_subsets = codes_get(bufr, 'numberOfSubsets')
-                            if number_of_subsets == 0:
-                                break
-                            try:
-                                codes_set(bufr, 'unpack', 1)
+                                        if not is_descriptors:
+                                            continue
+                                        compressed_data = ec.codes_get(bufr, 'compressedData')
+                                        number_of_subsets = ec.codes_get(bufr, 'numberOfSubsets')
+                                        if number_of_subsets <= 0:
+                                            print('Warning', warno, ':', in_file, 'numberOfSubsets is 0.', file=sys.stderr)
+                                            continue
+                                        ec.codes_set(bufr, 'unpack', 1)
+                                        descriptor_conf_df = output_conf_df[(output_conf_df['descriptors_list'] == descriptors_list)]
+                                        is_array = False
+                                        subset_array_size_list = []
+                                        if len(descriptor_conf_df[(descriptor_conf_df['is_array'] == 1)].index) > 0:
+                                            is_array = True
+                                        pre_value_list_len = 0
+                                        for descriptor_conf_tuple in descriptor_conf_df.itertuples():
+                                            is_first_key = 0
+                                            if len(subset_array_size_list) == 0:
+                                                is_first_key = 1
+                                            value_list = []
+                                            for subset_number in range(1, number_of_subsets + 1):
+                                                if compressed_data == 0 and (is_array or descriptor_conf_tuple.key_number > 0):
+                                                    subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + descriptor_conf_tuple.key).tolist()
+                                                    if is_first_key == 1:
+                                                        subset_array_size_list.append(len(subset_value_list))
+                                                    if descriptor_conf_tuple.key_number > 0 and not descriptor_conf_tuple.is_array:
+                                                        if len(subset_value_list) >= descriptor_conf_tuple.key_number:
+                                                            subset_value_list = [subset_value_list[descriptor_conf_tuple.key_number - 1]]
+                                                        else:
+                                                            subset_value_list = [None]
+                                                    elif descriptor_conf_tuple.is_array:
+                                                        if len(subset_value_list) < subset_array_size_list[subset_number - 1]:
+                                                            for none_counter in range(subset_array_size_list[subset_number - 1] - len(subset_value_list)):
+                                                                subset_value_list.append(None)
+                                                    elif (is_array and not descriptor_conf_tuple.is_array):
+                                                        if len(subset_value_list) == 1:
+                                                            subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
+                                                    value_list = value_list + subset_value_list
+                                                else:
+                                                    if compressed_data != 0:
+                                                        if descriptor_conf_tuple.key_number > 0:
+                                                            value_list = ec.codes_get_array(bufr, '#' + str(descriptor_conf_tuple.key_number) + '#' + descriptor_conf_tuple.key).tolist()
+                                                        else:
+                                                            value_list = ec.codes_get_array(bufr, descriptor_conf_tuple.key).tolist()
+                                                        if len(value_list) == 1:
+                                                            value_list = [value_list[0] for i in range(pre_value_list_len)]
+                                                    else:
+                                                        value_list = ec.codes_get_array(bufr, descriptor_conf_tuple.key).tolist()
+                                                    break
+                                            if pre_value_list_len > 0:
+                                                if pre_value_list_len != len(value_list):
+                                                    print('Warning', warno, in_file, ':', descriptor_conf_tuple.key, ' is not equals to pre_value_list_len.', file=sys.stderr)
+                                                    break
+                                            pre_value_list_len = len(value_list)
+                                            value_np = np.array(value_list)
+                                            if np.issubdtype(value_np.dtype, np.integer):
+                                                value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
+                                            elif np.issubdtype(value_np.dtype, float):
+                                                value_np = np.where(value_np == ec.CODES_MISSING_DOUBLE, None, value_np)
+                                            elif np.issubdtype(value_np.dtype, str):
+                                                value_np = np.array([string.strip() for string in value_np], dtype=str)
+                                            if descriptor_conf_tuple.name == 'longitude [degree]':
+                                                value_np = np.where(value_np == 180, -180, value_np)
+                                            if descriptor_conf_tuple.slide > -1 and descriptor_conf_tuple.step > 0:
+                                                value_np = value_np[descriptor_conf_tuple.slide::descriptor_conf_tuple.step]
+                                            if descriptor_conf_tuple.is_required:
+                                                tmp_required_np = np.array([False if value == None else True for value in value_np])
+                                                if len(required_np) > 0:
+                                                    required_np = required_np * tmp_required_np
+                                                else:
+                                                    required_np = tmp_required_np
+                                            if descriptor_conf_tuple.key_number > 0:
+                                                input_dict[descriptor_conf_tuple.key + '#' + str(descriptor_conf_tuple.key_number)] = value_np
+                                            else:
+                                                input_dict[descriptor_conf_tuple.key] = value_np
+                                        if len(required_np) <= 0 or not True in required_np:
+                                            continue
+                                        index_np = np.array([index for index, value in enumerate(required_np) if value == True])
+                                        for descriptor_conf_tuple in descriptor_conf_df.itertuples():
+                                            if descriptor_conf_tuple.key_number > 0:
+                                                input_dict[descriptor_conf_tuple.key + '#' + str(descriptor_conf_tuple.key_number)] = input_dict[descriptor_conf_tuple.key + '#' + str(descriptor_conf_tuple.key_number)][index_np]
+                                            else:
+                                                input_dict[descriptor_conf_tuple.key] = input_dict[descriptor_conf_tuple.key][index_np]
+                                        datetime_np = np.array([])
+                                        datetime_tail_tuple = list(descriptor_conf_df[(descriptor_conf_df['name'] == 'datetime')].tail(1).itertuples())[0]
+                                        year_np = input_dict['year']
+                                        month_np = input_dict['month']
+                                        day_np = input_dict['day']
+                                        time_dict = {}
+                                        is_time_type_end = False
+                                        for time_type in ['hour', 'minute', 'second', 'millisecond']:
+                                            if is_time_type_end:
+                                                time_dict[time_type] = np.array([0 for value in year_np])
+                                            else:
+                                                if datetime_tail_tuple.key == time_type:
+                                                    if datetime_tail_tuple.is_required:
+                                                        time_dict[time_type] = np.array([0 if value == None else value for value in input_dict[time_type]])
+                                                    else:
+                                                        time_dict[time_type] = input_dict[time_type]
+                                                    is_time_type_end = True
+                                                else:
+                                                    time_dict[time_type] = input_dict[time_type]
+                                        hour_np = time_dict['hour']
+                                        minute_np = time_dict['minute']
+                                        second_np = time_dict['second']
+                                        millisecond_np = time_dict['millisecond']
+                                        timedelta_millisecond_list = [0 for value in year_np]
+                                        timedelta_second_list = [0 for value in year_np]
+                                        for timedelta_conf_tuple in descriptor_conf_df[(descriptor_conf_df['name'] == 'timedelta [millisecond]') | (descriptor_conf_df['name'] == 'timedelta [second]')].itertuples():
+                                            if timedelta_conf_tuple.name == 'timedelta [second]':
+                                                timedelta_second_list = input_dict[timedelta_conf_tuple.key].tolist()
+                                            elif timedelta_conf_tuple.name == 'timedelta [millisecond]':
+                                                timedelta_millisecond_list = input_dict[timedelta_conf_tuple.key].tolist()
+                                        datetime_list = []
+                                        for i, year in enumerate(year_np):
+                                            datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_np[i], second_np[i], millisecond_np[i], tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
+                                        input_dict['datetime'] = np.array(datetime_list)
+                                        calc_dict = {}
+                                        pre_name = ''
+                                        for descriptor_conf_tuple in descriptor_conf_df.itertuples():
+                                            if descriptor_conf_tuple.key == 'year':
+                                                input_np = input_dict['datetime']
+                                            elif descriptor_conf_tuple.key in ['month', 'day', 'hour', 'minute', 'second', 'millisecond'] or descriptor_conf_tuple.name in ['timedelta [second]', 'timedelta [millisecond]']:
+                                                continue
+                                            else:
+                                                if descriptor_conf_tuple.key_number > 0:
+                                                    input_np = input_dict[descriptor_conf_tuple.key + '#' + str(descriptor_conf_tuple.key_number)]
+                                                else:
+                                                    input_np = input_dict[descriptor_conf_tuple.key]
+                                            if descriptor_conf_tuple.name in calc_dict:
+                                                tmp_np = calc_dict[descriptor_conf_tuple.name]
+                                                if descriptor_conf_tuple.multiply != 0:
+                                                    calc_dict[descriptor_conf_tuple.name] = tmp_np + descriptor_conf_tuple.multiply * input_np
+                                                else:
+                                                    calc_dict[descriptor_conf_tuple.name] = tmp_np + input_np
+                                            else:
+                                                if descriptor_conf_tuple.multiply != 0:
+                                                    calc_dict[descriptor_conf_tuple.name] = descriptor_conf_tuple.multiply * input_np
+                                                else:
+                                                    calc_dict[descriptor_conf_tuple.name] = input_np
+                                            if len(pre_name) > 0 and pre_name != descriptor_conf_tuple.name:
+                                                if pre_name in output_dict:
+                                                    output_dict[pre_name] = output_dict[pre_name] + calc_dict[pre_name].tolist()
+                                                else:
+                                                    output_dict[pre_name] = calc_dict[pre_name].tolist()
+                                            pre_name = descriptor_conf_tuple.name
+                                        if len(pre_name) > 0:
+                                            if pre_name in output_dict:
+                                                output_dict[pre_name] = output_dict[pre_name] + calc_dict[pre_name].tolist()
+                                            else:
+                                                output_dict[pre_name] = calc_dict[pre_name].tolist()
+                                ec.codes_release(bufr)
                             except:
+                                traceback.print_exc(file=sys.stderr)
                                 break
-                            bufr_dict = {}
-                            none_np = np.array([])
-                            if descriptor_conf_df['get_type'].values.flatten()[0] == 'subset':
-                                for subset_num in range(1, number_of_subsets + 1):
-                                    number_of_array = 0
-                                    for conf_row in descriptor_conf_df.itertuples():
-                                        array = getArray(bufr, subset_num, number_of_subsets, conf_row, in_file)
-                                        if number_of_array == 0:
-                                            if len(array) > 0:
-                                                number_of_array = len(array)
-                                            else:
-                                                break
-                                        if conf_row.convert_type == 'to_value' or conf_row.convert_type == 'to_value_to_array':
-                                            if len(array) > conf_row.array_index:
-                                                value = array[int(conf_row.array_index)]
-                                                if conf_row.convert_type == 'to_value_to_array':
-                                                    array = np.array([value for i in range(0, number_of_array)], dtype=object)
-                                                else:
-                                                    array = np.array([value], dtype=object)
-                                            elif len(array) == 0:
-                                                array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                            else:
-                                                print('Warning', warno, ':', 'len(array) is not more than conf_row.array_index.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                                array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                        if len(array) < number_of_array:
-                                            for padding_count in range(len(array), number_of_array):
-                                                array = np.append(array, None)
-                                        elif len(array) > number_of_array:
-                                            print('Warning', warno, ':', 'len(array) is more than number_of_array.', 'subset', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                            break
-                                        if conf_row.key in bufr_dict:
-                                            bufr_dict[conf_row.key] = np.concatenate([bufr_dict[conf_row.key], array])
-                                        else:
-                                            bufr_dict[conf_row.key] = array
-                            else:
-                                number_of_array = 0
-                                for conf_row in descriptor_conf_df.itertuples():
-                                    array = getArray(bufr, 0, 0, conf_row, in_file)
-                                    if number_of_array == 0:
-                                        if len(array) == 0:
-                                            print('Warning', warno, ':', 'len(array) is 0.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                            break
-                                        else:
-                                            number_of_array = len(array)
-                                    elif len(array) != number_of_array:
-                                        if len(array) == 1:
-                                            value = array[0]
-                                            array = np.array([value for i in range(0, number_of_array)], dtype=object)
-                                        else:
-                                            print('Warning', warno, ':', 'len(array) is not equals to number_of_array.', '', 'key:', conf_row.key, 'array length:', len(array), 'number of array:', number_of_array, 'file:', in_file, file=sys.stderr)
-                                            array = np.array([None for i in range(0, number_of_array)], dtype=object)
-                                            break
-                                    bufr_dict[conf_row.key] = array
-                            for conf_row in descriptor_conf_df.itertuples():
-                                if conf_row.output == 'location_datetime' and conf_row.key in bufr_dict:
-                                    tmp_none_np = np.array([False if value == None else True for value in bufr_dict[conf_row.key]])
-                                    if len(none_np) > 0:
-                                        none_np = none_np * tmp_none_np
-                                    else:
-                                        none_np = tmp_none_np
-                            codes_release(bufr)
-                            if len(bufr_dict) == 0:
-                                break
-                            bufr_dict['none'] = none_np
-                            location_datetime_index_np = np.array([index for index, value in enumerate(bufr_dict['none']) if value == True])
-                            if len(location_datetime_index_np) > 0:
-                                message_np = np.array([])
-                                pre_conf_row_name = ''
-                                for conf_row in descriptor_conf_df.itertuples():
-                                    if conf_row.name != pre_conf_row_name:
-                                        datatype_dict[conf_row.name] = conf_row.datatype
-                                        if len(message_np) > 0 and len(pre_conf_row_name) > 0:
-                                            if pre_conf_row_name in property_dict:
-                                                property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
-                                            else:
-                                                property_dict[pre_conf_row_name] = message_np
-                                            message_np = np.array([])
-                                    if conf_row.key in bufr_dict:
-                                        tmp_message_np = bufr_dict[conf_row.key]
-                                        if max(location_datetime_index_np) < len(tmp_message_np):
-                                            tmp_message_np = tmp_message_np[location_datetime_index_np]
-                                            if len(tmp_message_np) > 0:
-                                                if len(message_np) > 0:
-                                                    if conf_row.multiply != 0:
-                                                        message_np = message_np + conf_row.multiply * tmp_message_np
-                                                    else:
-                                                        message_np = message_np + tmp_message_np
-                                                else:
-                                                    if conf_row.multiply != 0:
-                                                        message_np = conf_row.multiply * tmp_message_np
-                                                    else:
-                                                        message_np = tmp_message_np
-                                        else:
-                                            print('Info', 'unexpanded_descriptors :', unexpanded_descriptors, ': conditon of', conf_row.key, max(location_datetime_index_np), len(tmp_message_np), in_file, file=sys.stderr)
-                                    pre_conf_row_name = conf_row.name
-                                if len(message_np) > 0 and len(pre_conf_row_name) > 0:
-                                    if pre_conf_row_name in property_dict:
-                                        property_dict[pre_conf_row_name] = np.concatenate([property_dict[pre_conf_row_name], message_np])
-                                    else:
-                                        property_dict[pre_conf_row_name] = message_np
-                if datetime_name in property_dict:
-                    name_list = []
+                if 'datetime' in output_dict:
+                    output_conf_name_np = np.array(list(set([output_conf_tuple.name for output_conf_tuple in output_conf_df.itertuples()])), dtype=str)
+                    field_list = []
                     data_list = []
-                    del_key_list = []
-                    cat_subcat_conf_df = conf_df[(conf_df['input_category'] == cat) & (conf_df['input_subcategory'] == subcat) & (conf_df['location_type'] == location_type) & (conf_df['output_category'] == output_cat) & (conf_df['output_subcategory'] == output_subcat)]
-                    datetime_tail = cat_subcat_conf_df[(cat_subcat_conf_df['name'] == 'datetime')]['key'].values.flatten()[-1]
-                    for conf_row_name in set(cat_subcat_conf_df[(cat_subcat_conf_df['output'] == 'location_datetime')]['name'].values.flatten()):
-                        if conf_row_name == 'datetime':
-                            plus_second_list = [0 for dt in range(0, len(property_dict[conf_row_name]))]
-                            if 'time period [s]' in property_dict:
-                                plus_second_list = property_dict['time period [s]']
-                                del_key_list.append('time period [s]')
-                            datetime_list = []
-                            for i, dt_str in enumerate(property_dict[conf_row_name]):
-                                try:
-                                    if datetime_tail == 'millisecond':
-                                        obs_datetime = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), int(dt_str[15:]), tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    elif datetime_tail == 'second':
-                                        obs_datetime = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), int(dt_str[12:14]), 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    elif datetime_tail == 'minute':
-                                        obs_datetime = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), int(dt_str[10:12]), 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    elif datetime_tail == 'hour':
-                                        obs_datetime = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    elif datetime_tail == 'day':
-                                        obs_datetime = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    elif datetime_tail == 'month':
-                                        obs_datetime = datetime(int(dt_str[0:4]), int(dt_str[4:6]), 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    elif datetime_tail == 'year':
-                                        obs_datetime = datetime(int(dt_str[0:4]), 0, 0, 0, 0, 0, 0, tzinfo=timezone.utc) + timedelta(seconds=plus_second_list[i])
-                                    datetime_list.append(obs_datetime)
-                                except:
-                                    for property_dict_key in property_dict.keys():
-                                        property_dict[property_dict_key].pop(i)
-                            data_list.append(pa.array(datetime_list, pa.timestamp('ms', tz='utc')))
-                            name_list.append(conf_row_name)
-                            datatype_dict.pop(conf_row_name)
-                        elif conf_row_name != 'time period [s]':
-                            if conf_row_name in property_dict:
-                                data_list.append(pa.array(property_dict[conf_row_name], datatype_dict[conf_row_name]))
-                                name_list.append(conf_row_name)
-                                datatype_dict.pop(conf_row_name)
-                    for datatype_key in datatype_dict.keys():
-                        if datatype_key in property_dict:
-                            if any([False if value == None else True for value in property_dict[datatype_key]]):
-                                name_list.append(datatype_key)
-                                data_list.append(pa.array(property_dict[datatype_key], datatype_dict[datatype_key]))
+                    for output_conf_name in np.sort(output_conf_name_np):
+                        if output_conf_name in output_dict and any([False if value == None else True for value in output_dict[output_conf_name]]):
+                            for output_conf_name_tuple in output_conf_df[(output_conf_df['name'] == output_conf_name)].head(1).itertuples():
+                                if debug:
+                                    print('Debug', ':', 'output_conf_name =', output_conf_name, file=sys.stderr)
+                                if output_conf_name_tuple.data_type == 'timestamp':
+                                    field_list.append(pa.field(output_conf_name, pa.timestamp('ms', tz='utc')))
+                                else:
+                                    field_list.append(pa.field(output_conf_name, output_conf_name_tuple.data_type))
+                                data_list.append(pa.array(output_dict[output_conf_name]))
+                    if len(field_list) <=0:
+                        continue
                     out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat]
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)
                     now = datetime.utcnow()
                     out_file_list = [out_directory, '/', 'C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2), '.arrow']
                     out_file = ''.join(out_file_list)
+                    batch = pa.record_batch(data_list, pa.schema(field_list))
                     with open(out_file, 'bw') as out_f:
-                        batch = pa.record_batch(data_list, names=name_list)
-                        table = pa.Table.from_batches([batch])
-                        feather.write_feather(table, out_f, compression='zstd')
+                        ipc_writer = pa.ipc.new_file(out_f, batch.schema, options=pa.ipc.IpcWriteOptions(compression=pa.Codec('zstd', compression_level=16)))
+                        ipc_writer.write_batch(batch)
+                        ipc_writer.close()
                         print(out_file, file=out_list_file)
 
 def main():
@@ -315,10 +253,10 @@ def main():
     parser.add_argument('my_cccc', type=str, metavar='my_cccc')
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
-    parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
+    parser.add_argument("--config", type=str, metavar='conf_bufr_to_arrow.csv', default=pkg_resources.resource_filename(__name__, 'conf_bufr_to_arrow.csv'))
     parser.add_argument("--debug", action='store_true')
+    parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     args = parser.parse_args()
-    config = pkg_resources.resource_filename(__name__, 'conf_bufr_to_arrow.csv')
     if not re.match(r'^[A-Z][A-Z0-9]{3}$', args.my_cccc):
         print('Error', errno, ':', 'CCCC of', args.my_cccc, 'is invalid (!=^[A-Z][A-Z0-9]{3}$).', file=sys.stderr)
         sys.exit(errno)
@@ -327,8 +265,8 @@ def main():
         sys.exit(errno)
     if not os.access(args.output_directory, os.F_OK):
         os.makedirs(args.output_directory, exist_ok=True)
-    if not os.access(config, os.F_OK):
-        print('Error', errno, ':', config, 'does not exist.', file=sys.stderr)
+    if not os.access(args.config, os.F_OK):
+        print('Error', errno, ':', args.config, 'does not exist.', file=sys.stderr)
         sys.exit(errno)
     if not os.path.isfile(args.input_list_file):
         print('Error', errno, ':', args.input_list_file, 'is not file.', file=sys.stderr)
@@ -336,8 +274,8 @@ def main():
     if not os.path.isdir(args.output_directory):
         print('Error', errno, ':', args.output_directory, 'is not directory.', file=sys.stderr)
         sys.exit(errno)
-    if not os.path.isfile(config):
-        print('Error', errno, ':', config, 'is not file.', file=sys.stderr)
+    if not os.path.isfile(args.config):
+        print('Error', errno, ':', args.config, 'is not file.', file=sys.stderr)
         sys.exit(errno)
     if not os.access(args.input_list_file, os.R_OK):
         print('Error', errno, ':', args.input_list_file, 'is not readable.', file=sys.stderr)
@@ -345,14 +283,14 @@ def main():
     if not (os.access(args.output_directory, os.R_OK) and os.access(args.output_directory, os.W_OK) and os.access(args.output_directory, os.X_OK)):
         print('Error', errno, ':', args.output_directory, 'is not readable/writable/executable.', file=sys.stderr)
         sys.exit(errno)
-    if not os.access(config, os.R_OK):
-        print('Error', errno, ':', config, 'is not readable.', file=sys.stderr)
+    if not os.access(args.config, os.R_OK):
+        print('Error', errno, ':', args.config, 'is not readable.', file=sys.stderr)
         sys.exit(errno)
     try:
         input_file_list = []
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
-        conf_df = csv.read_csv(config).to_pandas()
+        conf_df = csv.read_csv(args.config).to_pandas()
         convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
