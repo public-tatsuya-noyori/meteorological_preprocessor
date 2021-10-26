@@ -205,6 +205,7 @@ $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** bin bin
 4. To see the command options, run the command with --help.
 
 ## Security configuration for multiple users(CCCC) to publish data to a single bucket on cloud storage
+### When using AWS
 1. Run the following commands to enable for CCCC to publish/write to ${bucket}/CCCC and ${bucket}/4PubSub/(txt|bin)/*_CCCC*.txt
 ```
 $ cccc=***your_cccc***
