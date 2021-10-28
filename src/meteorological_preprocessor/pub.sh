@@ -44,7 +44,7 @@ publish(){
     echo "ERROR: exist already published file on ${input_index_file}." >&2
     return 199
   fi
-  cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" | xargs -r -n 64 -P ${parallel} gzip -f
+  cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" -e "s|\.gz$||g" | xargs -r -n 64 -P ${parallel} gzip -f
   for destination_rclone_remote_bucket in `echo ${destination_rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
@@ -59,7 +59,7 @@ publish(){
     fi
   done
   if test ${exit_code} -ne 0; then
-    cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" -e "s|$|.gz|g" | xargs -r -n 64 -P ${parallel} gunzip -f
+    cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" | xargs -r -n 64 -P ${parallel} gunzip -f
     echo "ERROR: can not access on ${destination_rclone_remote_bucket_main_sub}." >&2
     return ${exit_code}
   fi
@@ -74,7 +74,7 @@ publish(){
       set +e
       grep -F ERROR ${work_directory}/info_log.tmp >&2
       set -e
-      cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" -e "s|$|.gz|g" | xargs -r -n 64 -P ${parallel} gunzip -f
+      cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" | xargs -r -n 64 -P ${parallel} gunzip -f
       echo "ERROR: can not put ${extension_type} files on ${destination_rclone_remote_bucket}." >&2
       return ${exit_code}
     fi
@@ -101,7 +101,7 @@ publish(){
     done
     if test ${exit_code} -ne 0; then
       cat ${work_directory}/err_log.tmp >&2
-      cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" -e "s|$|.gz|g" | xargs -r -n 64 -P ${parallel} gunzip -f
+      cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" | xargs -r -n 64 -P ${parallel} gunzip -f
       echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/." >&2
       return ${exit_code}
     fi
