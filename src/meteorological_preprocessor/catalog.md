@@ -206,12 +206,12 @@ $ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** bin bin
 
 ## Security configuration for multiple users(CCCC) to publish data to a single bucket on cloud storage
 ### When using AWS
-1. Run the following commands to enable for CCCC to publish/write to ${bucket}/CCCC and ${bucket}/4PubSub/(txt|bin)/\*_CCCC\*.txt
+1. Run the following commands to enable for CCCC to publish/write to ${bucket}/CCCC and ${bucket}/4PubSub/(txt|bin)/\*_CCCC\*.txt.gz
 ```
 $ bucket=****your_bucket***
 $ account=`aws sts get-caller-identity | grep '"Account"' | cut -d: -f2 | sed -e 's|[", ]||g'`
 $ aws iam create-group --group-name publish
-$ aws iam create-policy --policy-name publish --policy-document '{"Version": "2012-10-17","Statement": [{"Action": ["s3:ListBucket"],"Effect": "Allow","Resource": ["arn:aws:s3:::'${bucket}'"]},{"Action": ["s3:GetObject"],"Effect": "Allow","Resource": ["arn:aws:s3:::'${bucket}'/*"]},{"Action": ["s3:PutObject"],"Effect": "Allow","Resource": ["arn:aws:s3:::'${bucket}'/4PubSub/txt/*_${aws:username}*.txt","arn:aws:s3:::'${bucket}'/4PubSub/bin/*_${aws:username}*.txt", "arn:aws:s3:::'${bucket}'/${aws:username}/*"]}]}'
+$ aws iam create-policy --policy-name publish --policy-document '{"Version": "2012-10-17","Statement": [{"Action": ["s3:ListBucket"],"Effect": "Allow","Resource": ["arn:aws:s3:::'${bucket}'"]},{"Action": ["s3:GetObject"],"Effect": "Allow","Resource": ["arn:aws:s3:::'${bucket}'/*"]},{"Action": ["s3:PutObject"],"Effect": "Allow","Resource": ["arn:aws:s3:::'${bucket}'/4PubSub/txt/*_${aws:username}*.txt.gz","arn:aws:s3:::'${bucket}'/4PubSub/bin/*_${aws:username}*.txt.gz", "arn:aws:s3:::'${bucket}'/${aws:username}/*"]}]}'
 $ aws iam attach-group-policy --group-name publish --policy-arn arn:aws:iam::${account}:policy/publish
 
 $ cccc=***CCCC***
