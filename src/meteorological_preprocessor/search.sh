@@ -14,10 +14,10 @@ start_yyyymmddhhmm=0
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
-    "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
+    "--bandwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
     "--end" ) end_yyyymmddhhmm=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory extension_type rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
+    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory extension_type rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]"; exit 0;;
     "--out" ) out=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--start" ) start_yyyymmddhhmm=$2;shift;shift;;

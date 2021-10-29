@@ -72,9 +72,9 @@ search_index_directory=4Search
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
-    "--bnadwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
+    "--bandwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
   esac
 done
