@@ -178,6 +178,10 @@ $ chmod 755 /path/to/deploy.sh
 ```
 $ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
 ```
+5. For a deletion of the deploy, run the follwoing command. 
+```
+$ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address*** delete
+```
 ## How to convert current files and publish data
 1. Install tools to convert
 ```
