@@ -105,6 +105,9 @@ publish(){
       echo "ERROR: can not put ${now}.txt on ${destination_rclone_remote_bucket}/${pubsub_index_directory}/${extension_type}/." >&2
       return ${exit_code}
     fi
+    if test ${gunzip_at_end} -eq 1; then
+      cat ${work_directory}/filtered_newly_created_file.tmp | sed -e "s|^|${local_work_directory}/|g" | xargs -r -n 64 -P ${parallel} gunzip -f
+    fi
   fi
   if test ${exit_code} -eq 0; then
     find ${processed_directory} -regextype posix-egrep -regex "^${processed_directory}/[0-9]{14}_${unique_center_id}\.txt.gz$" -type f -mmin +${delete_index_minute} 2>/dev/null | xargs -r rm -f
@@ -119,6 +122,7 @@ config=$HOME/.config/rclone/rclone.conf
 delete_index_minute=480
 delete_input_index_file=0
 ec=0
+gunzip_at_end=0
 job_directory=4PubClone
 no_check_pid=0
 parallel=4
@@ -132,7 +136,8 @@ for arg in "$@"; do
     "--config") config=$2;shift;shift;;
     "--delete_index_minute" ) delete_index_minute=$2;shift;shift;;
     "--delete_input_index_file" ) delete_input_index_file=1;shift;;
-    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension_type input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
+    "--gunzip_at_end" ) gunzip_at_end=1;shift;;
+    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--delete_index_minute delete_index_minute] [--delete_input_index_file] [--gunzip_at_end] [--no_check_pid] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id extension_type input_index_file 'destination_rclone_remote_bucket_main[;destination_rclone_remote_bucket_sub]' inclusive_pattern_file exclusive_pattern_file"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;shift;shift;;
