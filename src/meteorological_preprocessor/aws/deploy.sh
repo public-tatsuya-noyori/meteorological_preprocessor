@@ -25,6 +25,9 @@ deploy(){
   aws iam delete-role --role-name ${function}_lambda 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_step_functions 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_events 1>/dev/null 2>/dev/null
+  if "$7" = 'delete'; then
+    return
+  fi
   sleep 10
   set -ex
   aws iam create-role --role-name ${function}_lambda --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
