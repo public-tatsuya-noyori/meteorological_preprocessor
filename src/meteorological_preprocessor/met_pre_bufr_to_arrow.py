@@ -57,6 +57,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     break
                                 unexpanded_descriptors = ec.codes_get_array(bufr, 'unexpandedDescriptors')
                                 descriptors_list_set = set([output_conf_tuple.descriptors_list for output_conf_tuple in output_conf_df[['descriptors_list']].itertuples()])
+                                is_descriptors = True
                                 for descriptors_list in descriptors_list_set:
                                     for descriptors in descriptors_list.split(';'):
                                         is_descriptors = True
@@ -214,6 +215,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 output_dict[pre_name] = output_dict[pre_name] + calc_dict[pre_name].tolist()
                                             else:
                                                 output_dict[pre_name] = calc_dict[pre_name].tolist()
+                                if not is_descriptors:
+                                    if debug:
+                                        print('Debug', in_file, ':', unexpanded_descriptors, ' is not found in config file.', file=sys.stderr)
                                 ec.codes_release(bufr)
                             except:
                                 traceback.print_exc(file=sys.stderr)
