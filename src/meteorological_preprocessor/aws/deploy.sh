@@ -25,7 +25,7 @@ deploy(){
   aws iam delete-role --role-name ${function}_lambda 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_step_functions 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_events 1>/dev/null 2>/dev/null
-  if test "$7" = 'delete'; then
+  if test "${delete}" = 'delete'; then
     return
   fi
   sleep 10
@@ -72,7 +72,6 @@ if test -z "$6"; then
   echo "ERROR: The number of arguments is incorrect." >&2
   exit 199
 fi
-
 account=`aws sts get-caller-identity | grep '"Account"' | cut -d: -f2 | sed -e 's|[", ]||g'`
 access_key_id=`cat $HOME/.aws/credentials | grep ^aws_access_key_id | cut -d= -f2 | sed -e 's| ||g'`
 secret_access_key=`cat $HOME/.aws/credentials | grep ^aws_secret_access_key | cut -d= -f2 | sed -e 's| ||g'`
@@ -82,14 +81,16 @@ region_main_sub="$3"
 rclone_remote_bucket_main_sub="$4"
 center_id=$5
 email=$6
+delete=$7
 
-cp /dev/null rclone.conf
+if test "${delete}" != 'delete'; then
+  cp /dev/null rclone.conf
 
-rclone_remote_bucket_count=1
-for rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
-  region=`echo "${region_main_sub}" | cut -d';' -f${rclone_remote_bucket_count}`
-  rclone_remote=`echo ${rclone_remote_bucket} | cut -d':' -f1`
-  echo "[${rclone_remote}]
+  rclone_remote_bucket_count=1
+  for rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
+    region=`echo "${region_main_sub}" | cut -d';' -f${rclone_remote_bucket_count}`
+    rclone_remote=`echo ${rclone_remote_bucket} | cut -d':' -f1`
+    echo "[${rclone_remote}]
 type = s3
 env_auth = false
 access_key_id = ${access_key_id}
@@ -98,15 +99,15 @@ region = ${region}
 endpoint = https://s3.${region}.amazonaws.com
 acl = public-read
 " >> rclone.conf
-  rclone_remote_bucket_count=`expr 1 + ${rclone_remote_bucket_count}`
-  set -x
-  rclone --config rclone.conf mkdir ${rclone_remote_bucket}
-  bucket=`echo ${rclone_remote_bucket} | cut -d: -f2`
-  aws s3api put-bucket-lifecycle-configuration --bucket ${bucket} --lifecycle-configuration '{"Rules": [{"Expiration": {"Days": 1}, "ID": "Delete objects that are one day old", "Filter": {}, "Status": "Enabled", "NoncurrentVersionExpiration": {"NoncurrentDays": 1}, "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 1}}]}'
-  set +x
-done
+    rclone_remote_bucket_count=`expr 1 + ${rclone_remote_bucket_count}`
+    set -x
+    rclone --config rclone.conf mkdir ${rclone_remote_bucket}
+    bucket=`echo ${rclone_remote_bucket} | cut -d: -f2`
+    aws s3api put-bucket-lifecycle-configuration --bucket ${bucket} --lifecycle-configuration '{"Rules": [{"Expiration": {"Days": 1}, "ID": "Delete objects that are one day old", "Filter": {}, "Status": "Enabled", "NoncurrentVersionExpiration": {"NoncurrentDays": 1}, "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 1}}]}'
+    set +x
+  done
 
-echo "[jma]
+  echo "[jma]
 type = s3
 env_auth = false
 access_key_id =
@@ -114,12 +115,14 @@ secret_access_key =
 region =
 endpoint = http://202.32.195.138:9000
 acl = public-read" >> rclone.conf
-chmod 644 rclone.conf
-zip -ll ${function_zip} rclone.conf
+  chmod 644 rclone.conf
+  zip -ll ${function_zip} rclone.conf
+fi
 
 region=`echo "${region_main_sub}" | cut -d';' -f1`
 
-echo "#!/bin/sh
+if test "${delete}" != 'delete'; then
+  echo "#!/bin/sh
 set -euo pipefail
 
 access_key_id=${access_key_id}
@@ -129,9 +132,10 @@ rclone_remote_bucket_main_sub='${rclone_remote_bucket_main_sub}'
 center_id=${center_id}
 region=${region}" > bootstrap
 
-cat ${bootstrap_body_file} >> bootstrap
-chmod 755 bootstrap
-zip -ll ${function_zip} bootstrap
+  cat ${bootstrap_body_file} >> bootstrap
+  chmod 755 bootstrap
+  zip -ll ${function_zip} bootstrap
+fi
 
 set +e
 aws events disable-rule --name clone_jma_txt_main_function 1>/dev/null 2>/dev/null
