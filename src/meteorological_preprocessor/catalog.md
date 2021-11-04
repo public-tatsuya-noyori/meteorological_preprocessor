@@ -60,7 +60,7 @@ $ /path/to/search.sh --out /path/to/sub_search_work_directory txt jma:center-aa-
 11. To see the command options, run the command with --help.
 ```
 $ /path/to/search.sh --help
-search.sh [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--parallel the_number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory extension_type rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]
+search.sh [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--parallel number_of_parallel_transfer] [--timeout rclone_timeout] [--start yyyymmddhhmm] [--end yyyymmddhhmm] [--out] local_work_directory extension_type rclone_remote_bucket keyword_pattern|inclusive_pattern_file [exclusive_pattern_file]
 ```
 ## How to publish data and clone data
 1. Configure rclone.conf.
@@ -68,7 +68,7 @@ search.sh [--bnadwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_fil
 $ vi $HOME/.config/rclone/rclone.conf
 
 # When using AWS, write as follows.
-[***your_center_id***_main]
+[***your_CCCC***_main]
 type = s3
 env_auth = false
 access_key_id = ***your_access_key_id***
@@ -78,13 +78,13 @@ endpoint = https://s3.***your_region***.amazonaws.com
 acl = public-read
 
 # When using Microsoft Azure, write as follows.
-[***your_center_id***_main]
+[***your_CCCC***_main]
 type = azureblob
 account = ***your_account***
 key = ***your_key***
 
 # When using Alibaba Cloud, write as follows.
-[***your_center_id***_main]
+[***your_CCCC***_main]
 type = s3
 env_auth = false
 access_key_id = ***your_access_key_id***
@@ -95,7 +95,7 @@ acl = public-read
 force_path_style = false
 
 # When using Google Cloud, write as follows.
-[***your_center_id***_main]
+[***your_CCCC***_main]
 type = s3
 env_auth = false
 access_key_id = ***your_access_key_id***
@@ -105,7 +105,7 @@ endpoint = https://storage.googleapis.com
 acl = public-read
 
 # When using Wasabi, write as follows.
-[***your_center_id***_main]
+[***your_CCCC***_main]
 type = s3
 env_auth = false
 access_key_id = ***your_access_key_id***
@@ -115,7 +115,7 @@ endpoint = https://s3.**your_region***.wasabisys.com
 acl = public-read
 
 # When using Minio, write as follows.
-[***your_center_id***_main]
+[***your_CCCC***_main]
 type = s3
 env_auth = false
 access_key_id = ***your_access_key_id***
@@ -138,7 +138,7 @@ $ chmod 755 /path/to/pub.sh
 ```
 5. Run pub.sh.
 ```
-$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** txt /path/to/index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_CCCC[0-9]**** txt /path/to/index.txt '***your_CCCC***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 ```
 6. Download [clone.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/clone.sh) and [move_4PubSub_4Search.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/move_4PubSub_4Search.sh).
 7. Change file mode.
@@ -149,8 +149,8 @@ $ chmod 755 /path/to/clone.sh /path/to/move_4PubSub_4Search.sh
 ```
 $ crontab -e
 
-* * * * * /path/to/clone.sh /path/to/pub_clone_work_directory jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
-* * * * * /path/to/move_4PubSub_4Search.sh /path/to/pub_clone_work_directory ***your_center_id***_main txt '***your_center_id***_main:***your_bucket_main***'
+* * * * * /path/to/clone.sh /path/to/pub_clone_work_directory jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' '***your_CCCC***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+* * * * * /path/to/move_4PubSub_4Search.sh /path/to/pub_clone_work_directory ***your_CCCC***_main txt '***your_CCCC***_main:***your_bucket_main***'
 
 :wq
 ```
@@ -176,11 +176,11 @@ $ chmod 755 /path/to/deploy.sh
 ```
 4. Run deploy.sh
 ```
-$ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address***
+$ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_CCCC***_main:***your_bucket_main***;***your_CCCC***_sub:***your_bucket_sub***' ***your_CCCC*** ***your_email_address***
 ```
 5. For a deletion of the deploy, run the follwoing command. 
 ```
-$ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_center_id***_main:***your_bucket_main***;***your_center_id***_sub:***your_bucket_sub***' ***your_center_id*** ***your_email_address*** delete
+$ /path/to/deploy.sh /path/to/clone_jma.zip /path/to/bootstrap_body.txt '***your_region_main***;***your_region_sub***' '***your_CCCC***_main:***your_bucket_main***;***your_CCCC***_sub:***your_bucket_sub***' ***your_CCCC*** ***your_email_address*** delete
 ```
 ## How to convert current files and publish data
 1. Install tools to convert
@@ -200,11 +200,11 @@ $ exec $SHELL -l
  - sn.[0-9][0-9][0-9][0-9].ext on [https://tgftp.nws.noaa.gov/SL.us008001/(DF.an|DF.bf)/\*/\*](https://tgftp.nws.noaa.gov/SL.us008001/).
 3. Run met_pre_batch_to_cache and pub.sh
 ```
-$ met_pre_batch_to_cache ***your_cccc*** /path/to/the_directory_of_current_files /path/to/pub_clone_work_directory checksum.arrow > all_index.txt
-$ grep -E /A_[A-Z]{4}[0-9]{2}***your_cccc***[0-9]{6} all_index.txt | grep txt$ > txt_index.txt
-$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** txt txt_index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
-$ grep -E /A_[A-Z]{4}[0-9]{2}***your_cccc***[0-9]{6} all_index.txt | grep bin$ > bin_index.txt
-$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_center_id*** bin bin_index.txt '***your_center_id***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+$ met_pre_batch_to_cache ***your_CCCC*** /path/to/the_directory_of_current_files /path/to/pub_clone_work_directory checksum.arrow > all_index.txt
+$ grep -E /A_[A-Z]{4}[0-9]{2}***your_CCCC***[0-9]{6} all_index.txt | grep txt$ > txt_index.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_CCCC[0-9]**** txt txt_index.txt '***your_CCCC***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
+$ grep -E /A_[A-Z]{4}[0-9]{2}***your_CCCC***[0-9]{6} all_index.txt | grep bin$ > bin_index.txt
+$ /path/to/pub.sh /path/to/pub_clone_work_directory ***your_CCCC[0-9]**** bin bin_index.txt '***your_CCCC***_main:***your_bucket_on_cloud_storage***' /path/to/inclusive_pattern.txt /path/to/exclusive_pattern.txt
 ```
 4. To see the command options, run the command with --help.
 
@@ -221,7 +221,7 @@ $ aws iam attach-group-policy --group-name publish --policy-arn arn:aws:iam::${a
 $ cccc=***CCCC***
 $ aws iam create-user --user-name ${cccc}
 $ aws iam create-access-key --user-name ${cccc}
-        "UserName": "***your_cccc***",
+        "UserName": "***your_CCCC***",
         "AccessKeyId": "***your_access_key_id***",
         "SecretAccessKey": "***your_secret_access_key***"
 $ aws iam add-user-to-group --user-name ${cccc} --group-name publish
