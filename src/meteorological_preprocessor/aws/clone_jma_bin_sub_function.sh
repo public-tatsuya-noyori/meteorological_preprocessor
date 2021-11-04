@@ -143,8 +143,7 @@ function handler () {
       set -e
       if test ${exit_code} -ne 0; then
         cat ${work_directory}/err_log.tmp >&2
-        echo "ERROR: ${function} can not get a list of ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/." >&2
-        rc=${exit_code}
+        echo "INFO: ${function} can not get a list of ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/." >&2
       fi
       if test -s ${work_directory}/delete.txt; then
         cp /dev/null ${work_directory}/err_log.tmp
