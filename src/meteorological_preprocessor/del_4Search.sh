@@ -75,6 +75,7 @@ done
 ec=0
 job_directory=4Del_4Search
 no_check_pid=0
+parallel=4
 rclone_timeout=3600
 search_index_directory=4Search
 timeout=8s
@@ -82,8 +83,9 @@ for arg in "$@"; do
   case "${arg}" in
     "--bandwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
+    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid]  [--parallel number_of_parallel_transfer] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub extension_type rclone_remote_bucket"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
+    "--parallel" ) parallel=$2;shift;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
 done
