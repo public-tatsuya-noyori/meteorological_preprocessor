@@ -1,4 +1,49 @@
 input_category,input_subcategory,descriptors_list,key,key_number,is_required,is_array,slide,step,multiply,output_category,output_subcategory,name,data_type
+surface,ship,308009,latitude,0,True,False,0,0,0,surface,ship,latitude [degree],float64
+surface,ship,308009,longitude,0,True,False,0,0,0,surface,ship,longitude [degree],float64
+surface,ship,308009,year,0,True,False,0,0,0,surface,ship,datetime,timestamp
+surface,ship,308009,month,0,True,False,0,0,0,surface,ship,datetime,timestamp
+surface,ship,308009,day,0,True,False,0,0,0,surface,ship,datetime,timestamp
+surface,ship,308009,hour,0,True,False,0,0,0,surface,ship,datetime,timestamp
+surface,ship,308009,minute,0,True,False,0,0,0,surface,ship,datetime,timestamp
+surface,ship,308009,shipOrMobileLandStationIdentifier,0,False,False,0,0,0,surface,ship,ship id,str
+surface,ship,308009,directionOfMotionOfMovingObservingPlatform,1,False,False,0,0,0,surface,ship,direction of motion [degree],float32
+surface,ship,308009,movingObservingPlatformSpeed,1,False,False,0,0,0,surface,ship,speed of motion [m/s],float64
+surface,ship,308009,pressureReducedToMeanSeaLevel,1,False,False,0,0,0,surface,ship,pressure reduced to mean sea level [Pa],float64
+surface,ship,308009,characteristicOfPressureTendency,1,False,False,0,0,0,surface,ship,pressure tendency,uint8
+surface,ship,308009,airTemperature,1,False,False,0,0,0,surface,ship,air temperature [K],float64
+surface,ship,308009,dewpointTemperature,1,False,False,0,0,0,surface,ship,dewpoint temperature [K],float64
+surface,ship,308009,relativeHumidity,1,False,False,0,0,0,surface,ship,relative humidity [%],uint8
+surface,ship,308009,horizontalVisibility,1,False,False,0,0,0,surface,ship,horizontal visibility [m],float64
+surface,ship,308009,cloudCoverTotal,1,False,False,0,0,0,surface,ship,cloud cover total [%],uint8
+surface,ship,308009,cloudAmount,1,False,False,0,0,0,surface,ship,cloud amount,uint8
+surface,ship,308009,heightOfBaseOfCloud,1,False,False,0,0,0,surface,ship,height of base of cloud [m],uint16
+surface,ship,308009,cloudType,1,False,False,0,0,0,surface,ship,low cloud type,uint8
+surface,ship,308009,cloudType,2,False,False,0,0,0,surface,ship,middle cloud type,uint8
+surface,ship,308009,cloudType,3,False,False,0,0,0,surface,ship,high cloud type,uint8
+surface,ship,308009,presentWeather,1,False,False,0,0,0,surface,ship,present weather,uint16
+surface,ship,308009,totalPrecipitationOrTotalWaterEquivalent,1,False,False,0,0,0,surface,ship,total precipitation [kg/m2](1),float64
+surface,ship,308009,timePeriod,4,False,False,0,0,0,surface,ship,total precipitation [kg/m2](1)@hour,int8
+surface,ship,308009,totalPrecipitationOrTotalWaterEquivalent,2,False,False,0,0,0,surface,ship,total precipitation [kg/m2](2),float64
+surface,ship,308009,timePeriod,5,False,False,0,0,0,surface,ship,total precipitation [kg/m2](2)@hour,int8
+surface,ship,308009,windDirection,1,False,False,0,0,0,surface,ship,wind direction [degree],float64
+surface,ship,308009,windSpeed,1,False,False,0,0,0,surface,ship,wind speed [m/s],float64
+surface,ship,308009,oceanographicWaterTemperature,1,False,False,0,0,0,surface,ship,oceanographic water temperature [K],float64
+surface,ship,308009,wavesDirection,1,False,False,0,0,0,surface,ship,waves direction [degree],float32
+surface,ship,308009,periodOfWaves,1,False,False,0,0,0,surface,ship,period of waves [s],uint8
+surface,ship,308009,heightOfWaves,1,False,False,0,0,0,surface,ship,height of waves [m],float64
+surface,ship,308009,swellWavesDirection,1,False,False,0,0,0,surface,ship,swell waves direction [degree](1),float32
+surface,ship,308009,periodOfSwellWaves,1,False,False,0,0,0,surface,ship,period of swell waves [s](1),uint8
+surface,ship,308009,heightOfSwellWaves,1,False,False,0,0,0,surface,ship,height of swell waves [m](1),float64
+surface,ship,308009,swellWavesDirection,2,False,False,0,0,0,surface,ship,swell waves direction [degree](2),float32
+surface,ship,308009,periodOfSwellWaves,2,False,False,0,0,0,surface,ship,period of swell waves [s](2),uint8
+surface,ship,308009,heightOfSwellWaves,2,False,False,0,0,0,surface,ship,height of swell waves [m](2),float64
+surface,ship,308009,maximumWindGustDirection,1,False,False,0,0,0,surface,ship,maximum wind gust direction [degree](1),float32
+surface,ship,308009,maximumWindGustSpeed,1,False,False,0,0,0,surface,ship,maximum wind gust speed [m/s](1),float64
+surface,ship,308009,timePeriod,9,False,False,0,0,0,surface,ship,maximum wind gust speed [m/s](1)@minute,int8
+surface,ship,308009,maximumWindGustDirection,2,False,False,0,0,0,surface,ship,maximum wind gust direction [degree](2),float32
+surface,ship,308009,maximumWindGustSpeed,2,False,False,0,0,0,surface,ship,maximum wind gust speed [m/s](2),float64
+surface,ship,308009,timePeriod,10,False,False,0,0,0,surface,ship,maximum wind gust speed [m/s](2)@minute,int8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,latitude,0,True,False,0,0,0,surface,synop,latitude [degree],float64
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,longitude,0,True,False,0,0,0,surface,synop,longitude [degree],float64
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,year,0,True,False,0,0,0,surface,synop,datetime,timestamp
@@ -6,10 +51,11 @@ surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,day,0,True,False,0,0,0,surface,synop,datetime,timestamp
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,hour,0,True,False,0,0,0,surface,synop,datetime,timestamp
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,minute,0,True,False,0,0,0,surface,synop,datetime,timestamp
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,blockNumber,0,True,False,0,0,1000,surface,synop,station number,uint32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,stationNumber,0,True,False,0,0,1,surface,synop,station number,uint32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,blockNumber,0,False,False,0,0,1000,surface,synop,station number,uint32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,stationNumber,0,False,False,0,0,1,surface,synop,station number,uint32
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,heightOfStationGroundAboveMeanSeaLevel,1,True,False,0,0,0,surface,synop,height of station ground above mean sea level [m],float64
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,pressureReducedToMeanSeaLevel,1,False,False,0,0,0,surface,synop,pressure reduced to mean sea level [Pa],float64
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,characteristicOfPressureTendency,1,False,False,0,0,0,surface,synop,pressure tendency,uint8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,airTemperature,1,False,False,0,0,0,surface,synop,air temperature [K],float64
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,dewpointTemperature,1,False,False,0,0,0,surface,synop,dewpoint temperature [K],float64
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,relativeHumidity,1,False,False,0,0,0,surface,synop,relative humidity [%],uint8
@@ -20,98 +66,96 @@ surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,1,False,False,0,0,0,surface,synop,low cloud type,uint8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,2,False,False,0,0,0,surface,synop,middle cloud type,uint8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,3,False,False,0,0,0,surface,synop,high cloud type,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,presentWeather,1,False,False,0,0,0,surface,synop,present weather,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,4,False,False,0,0,0,surface,synop,total precipitation [kg/m2](1)@hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,presentWeather,1,False,False,0,0,0,surface,synop,present weather,uint16
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,totalPrecipitationOrTotalWaterEquivalent,1,False,False,0,0,0,surface,synop,total precipitation [kg/m2](1),float64
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,5,False,False,0,0,0,surface,synop,total precipitation [kg/m2](2)@hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,4,False,False,0,0,0,surface,synop,total precipitation [kg/m2](1)@hour,int8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,totalPrecipitationOrTotalWaterEquivalent,2,False,False,0,0,0,surface,synop,total precipitation [kg/m2](2),float64
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windDirection,1,False,False,0,0,0,surface,synop,wind direction [degree],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,5,False,False,0,0,0,surface,synop,total precipitation [kg/m2](2)@hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windDirection,1,False,False,0,0,0,surface,synop,wind direction [degree],float64
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windSpeed,1,False,False,0,0,0,surface,synop,wind speed [m/s],float64
-upper_air,pilot,309051,latitudeDisplacement,0,True,True,0,0,0,upper_air,pilot,latitude [degree],float64
-upper_air,pilot,309051,latitude,0,True,False,0,0,0,upper_air,pilot,latitude [degree],float64
-upper_air,pilot,309051,longitudeDisplacement,0,True,True,0,0,0,upper_air,pilot,longitude [degree],float64
-upper_air,pilot,309051,longitude,0,True,False,0,0,0,upper_air,pilot,longitude [degree],float64
-upper_air,pilot,309051,timePeriod,0,True,False,0,0,0,upper_air,pilot,timedelta [second],timestamp
-upper_air,pilot,309051,year,0,True,False,0,0,0,upper_air,pilot,datetime,timestamp
-upper_air,pilot,309051,month,0,True,False,0,0,0,upper_air,pilot,datetime,timestamp
-upper_air,pilot,309051,day,0,True,False,0,0,0,upper_air,pilot,datetime,timestamp
-upper_air,pilot,309051,hour,0,True,False,0,0,0,upper_air,pilot,datetime,timestamp
-upper_air,pilot,309051,minute,0,True,False,0,0,0,upper_air,pilot,datetime,timestamp
-upper_air,pilot,309051,second,0,True,False,0,0,0,upper_air,pilot,datetime,timestamp
-upper_air,pilot,309051,blockNumber,0,True,False,0,0,1000,upper_air,pilot,station number,uint32
-upper_air,pilot,309051,stationNumber,0,True,False,0,0,1,upper_air,pilot,station number,uint32
-upper_air,pilot,309051,geopotentialHeight,0,True,False,0,0,0,upper_air,pilot,geopotential height [m],float64
-upper_air,pilot,309051,windDirection,0,True,False,0,0,0,upper_air,pilot,wind direction [degree],float32
-upper_air,pilot,309051,windSpeed,0,True,False,0,0,0,upper_air,pilot,wind speed [m/s],float64
-upper_air,pilot,309051,extendedVerticalSoundingSignificance,0,True,False,0,0,0,upper_air,pilot,extended vertical sounding significance,uint32
-upper_air,pilot,309051,latitude,0,True,False,0,0,0,surface,pilot,latitude [degree],float64
-upper_air,pilot,309051,longitude,0,True,False,0,0,0,surface,pilot,longitude [degree],float64
-upper_air,pilot,309051,year,0,True,False,0,0,0,surface,pilot,datetime,timestamp
-upper_air,pilot,309051,month,0,True,False,0,0,0,surface,pilot,datetime,timestamp
-upper_air,pilot,309051,day,0,True,False,0,0,0,surface,pilot,datetime,timestamp
-upper_air,pilot,309051,hour,0,True,False,0,0,0,surface,pilot,datetime,timestamp
-upper_air,pilot,309051,minute,0,True,False,0,0,0,surface,pilot,datetime,timestamp
-upper_air,pilot,309051,second,0,True,False,0,0,0,surface,pilot,datetime,timestamp
-upper_air,pilot,309051,blockNumber,0,True,False,0,0,1000,surface,pilot,station number,uint32
-upper_air,pilot,309051,stationNumber,0,True,False,0,0,1,surface,pilot,station number,uint32
-upper_air,pilot,309051,heightOfStationGroundAboveMeanSeaLevel,1,True,False,0,0,0,surface,pilot,height of station ground above mean sea level [m],float64
-upper_air,pilot,309051,cloudAmount,1,False,False,0,0,0,surface,pilot,cloud amount,uint8
-upper_air,pilot,309051,heightOfBaseOfCloud,1,False,False,0,0,0,surface,pilot,height of base of cloud [m],uint16
-upper_air,pilot,309051,cloudType,1,False,False,0,0,0,surface,pilot,low cloud type,uint8
-upper_air,pilot,309051,cloudType,2,False,False,0,0,0,surface,pilot,middle cloud type,uint8
-upper_air,pilot,309051,cloudType,3,False,False,0,0,0,surface,pilot,high cloud type,uint8
-upper_air,temp,309052,latitudeDisplacement,0,True,True,0,0,0,upper_air,temp,latitude [degree],float64
-upper_air,temp,309052,latitude,0,True,False,0,0,0,upper_air,temp,latitude [degree],float64
-upper_air,temp,309052,longitudeDisplacement,0,True,True,0,0,0,upper_air,temp,longitude [degree],float64
-upper_air,temp,309052,longitude,0,True,False,0,0,0,upper_air,temp,longitude [degree],float64
-upper_air,temp,309052,timePeriod,0,True,True,0,0,0,upper_air,temp,timedelta [second],timestamp
-upper_air,temp,309052,year,0,True,False,0,0,0,upper_air,temp,datetime,timestamp
-upper_air,temp,309052,month,0,True,False,0,0,0,upper_air,temp,datetime,timestamp
-upper_air,temp,309052,day,0,True,False,0,0,0,upper_air,temp,datetime,timestamp
-upper_air,temp,309052,hour,0,True,False,0,0,0,upper_air,temp,datetime,timestamp
-upper_air,temp,309052,minute,0,True,False,0,0,0,upper_air,temp,datetime,timestamp
-upper_air,temp,309052,second,0,True,False,0,0,0,upper_air,temp,datetime,timestamp
-upper_air,temp,309052,blockNumber,0,True,False,0,0,1000,upper_air,temp,station number,uint32
-upper_air,temp,309052,stationNumber,0,True,False,0,0,1,upper_air,temp,station number,uint32
-upper_air,temp,309052,extendedVerticalSoundingSignificance,0,False,True,0,0,0,upper_air,temp,extended vertical sounding significance,uint32
-upper_air,temp,309052,pressure,0,False,True,0,0,0,upper_air,temp,pressure [Pa],float64
-upper_air,temp,309052,nonCoordinateGeopotentialHeight,0,False,True,0,0,0,upper_air,temp,non coordinate geopotential height [m],float32
-upper_air,temp,309052,airTemperature,0,False,True,0,0,0,upper_air,temp,air temperature [K],float64
-upper_air,temp,309052,dewpointTemperature,0,False,True,0,0,0,upper_air,temp,dewpoint temperature [K],float64
-upper_air,temp,309052,windDirection,0,False,True,0,0,0,upper_air,temp,wind direction [degree],float32
-upper_air,temp,309052,windSpeed,0,False,True,0,0,0,upper_air,temp,wind speed [m/s],float64
-upper_air,temp,309052,latitude,0,True,False,0,0,0,surface,temp,latitude [degree],float64
-upper_air,temp,309052,longitude,0,True,False,0,0,0,surface,temp,longitude [degree],float64
-upper_air,temp,309052,year,0,True,False,0,0,0,surface,temp,datetime,timestamp
-upper_air,temp,309052,month,0,True,False,0,0,0,surface,temp,datetime,timestamp
-upper_air,temp,309052,day,0,True,False,0,0,0,surface,temp,datetime,timestamp
-upper_air,temp,309052,hour,0,True,False,0,0,0,surface,temp,datetime,timestamp
-upper_air,temp,309052,minute,0,True,False,0,0,0,surface,temp,datetime,timestamp
-upper_air,temp,309052,second,0,True,False,0,0,0,surface,temp,datetime,timestamp
-upper_air,temp,309052,blockNumber,0,True,False,0,0,1000,surface,temp,station number,uint32
-upper_air,temp,309052,stationNumber,0,True,False,0,0,1,surface,temp,station number,uint32
-upper_air,temp,309052,heightOfStationGroundAboveMeanSeaLevel,1,True,False,0,0,0,surface,temp,height of station ground above mean sea level [m],float64
-upper_air,temp,309052,cloudAmount,1,False,False,0,0,0,surface,temp,cloud amount,uint8
-upper_air,temp,309052,heightOfBaseOfCloud,1,False,False,0,0,0,surface,temp,height of base of cloud [m],uint16
-upper_air,temp,309052,cloudType,1,False,False,0,0,0,surface,temp,low cloud type,uint8
-upper_air,temp,309052,cloudType,2,False,False,0,0,0,surface,temp,middle cloud type,uint8
-upper_air,temp,309052,cloudType,3,False,False,0,0,0,surface,temp,high cloud type,uint8
-upper_air,temp_drop,309053,latitudeDisplacement,0,True,True,0,0,0,upper_air,temp_drop,latitude [degree],float64
-upper_air,temp_drop,309053,latitude,0,True,False,0,0,0,upper_air,temp_drop,latitude [degree],float64
-upper_air,temp_drop,309053,longitudeDisplacement,0,True,True,0,0,0,upper_air,temp_drop,longitude [degree],float64
-upper_air,temp_drop,309053,longitude,0,True,False,0,0,0,upper_air,temp_drop,longitude [degree],float64
-upper_air,temp_drop,309053,timePeriod,0,True,True,0,0,0,upper_air,temp_drop,timedelta [second],timestamp
-upper_air,temp_drop,309053,year,0,True,False,0,0,0,upper_air,temp_drop,datetime,timestamp
-upper_air,temp_drop,309053,month,0,True,False,0,0,0,upper_air,temp_drop,datetime,timestamp
-upper_air,temp_drop,309053,day,0,True,False,0,0,0,upper_air,temp_drop,datetime,timestamp
-upper_air,temp_drop,309053,hour,0,True,False,0,0,0,upper_air,temp_drop,datetime,timestamp
-upper_air,temp_drop,309053,minute,0,True,False,0,0,0,upper_air,temp_drop,datetime,timestamp
-upper_air,temp_drop,309053,second,0,True,False,0,0,0,upper_air,temp_drop,datetime,timestamp
-upper_air,temp_drop,309053,aircraftFlightNumber,0,True,False,0,0,0,upper_air,temp_drop,aircraft flight number,string
-upper_air,temp_drop,309053,extendedVerticalSoundingSignificance,0,True,False,0,0,0,upper_air,temp_drop,extended vertical sounding significance,uint32
-upper_air,temp_drop,309053,pressure,0,True,False,0,0,0,upper_air,temp_drop,pressure [Pa],float64
-upper_air,temp_drop,309053,nonCoordinateGeopotentialHeight,0,True,False,0,0,0,upper_air,temp_drop,non coordinate geopotential height [m],float32
-upper_air,temp_drop,309053,airTemperature,0,True,False,0,0,0,upper_air,temp_drop,air temperature [K],float64
-upper_air,temp_drop,309053,dewpointTemperature,0,True,False,0,0,0,upper_air,temp_drop,dewpoint temperature [K],float64
-upper_air,temp_drop,309053,windDirection,0,True,False,0,0,0,upper_air,temp_drop,wind direction [degree],float32
-upper_air,temp_drop,309053,windSpeed,0,True,False,0,0,0,upper_air,temp_drop,wind speed [m/s],float64
+upper_air,pilot,309050;309051,timePeriod,0,False,True,0,0,0,upper_air,sonde,timedelta [second],timestamp
+upper_air,pilot,309050;309051,year,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,pilot,309050;309051,month,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,pilot,309050;309051,day,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,pilot,309050;309051,hour,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,pilot,309050;309051,minute,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,pilot,309050;309051,second,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,pilot,309050;309051,latitudeDisplacement,0,False,True,0,0,0,upper_air,sonde,latitude [degree],float64
+upper_air,pilot,309050;309051,latitude,0,True,False,0,0,0,upper_air,sonde,latitude [degree],float64
+upper_air,pilot,309050;309051,longitudeDisplacement,0,False,True,0,0,0,upper_air,sonde,longitude [degree],float64
+upper_air,pilot,309050;309051,longitude,0,True,False,0,0,0,upper_air,sonde,longitude [degree],float64
+upper_air,pilot,309050;309051,blockNumber,0,False,False,0,0,1000,upper_air,sonde,station number,uint32
+upper_air,pilot,309050;309051,stationNumber,0,False,False,0,0,1,upper_air,sonde,station number,uint32
+upper_air,pilot,309050;309051,extendedVerticalSoundingSignificance,0,False,True,0,0,0,upper_air,sonde,extended vertical sounding significance,uint32
+upper_air,pilot,309050;309051,windDirection,0,False,True,0,0,0,upper_air,sonde,wind direction [degree],float64
+upper_air,pilot,309050;309051,windSpeed,0,False,True,0,0,0,upper_air,sonde,wind speed [m/s],float64
+upper_air,pilot,309050,pressure,0,False,True,0,0,0,upper_air,sonde,pressure [Pa],float64
+upper_air,pilot,309051,geopotentialHeight,0,False,True,0,0,0,upper_air,sonde,geopotential height [m],float64
+upper_air,temp,309052,timePeriod,0,False,True,0,0,0,upper_air,sonde,timedelta [second],timestamp
+upper_air,temp,309052,year,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,temp,309052,month,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,temp,309052,day,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,temp,309052,hour,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,temp,309052,minute,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,temp,309052,second,0,True,False,0,0,0,upper_air,sonde,datetime,timestamp
+upper_air,temp,309052,latitudeDisplacement,0,False,True,0,0,0,upper_air,sonde,latitude [degree],float64
+upper_air,temp,309052,latitude,0,True,False,0,0,0,upper_air,sonde,latitude [degree],float64
+upper_air,temp,309052,longitudeDisplacement,0,False,True,0,0,0,upper_air,sonde,longitude [degree],float64
+upper_air,temp,309052,longitude,0,True,False,0,0,0,upper_air,sonde,longitude [degree],float64
+upper_air,temp,309052,blockNumber,0,False,False,0,0,1000,upper_air,sonde,station number,uint32
+upper_air,temp,309052,stationNumber,0,False,False,0,0,1,upper_air,sonde,station number,uint32
+upper_air,temp,309052,extendedVerticalSoundingSignificance,0,False,True,0,0,0,upper_air,sonde,extended vertical sounding significance,uint32
+upper_air,temp,309052,pressure,0,False,True,0,0,0,upper_air,sonde,pressure [Pa],float64
+upper_air,temp,309052,nonCoordinateGeopotentialHeight,0,False,True,0,0,0,upper_air,sonde,non coordinate geopotential height [m],float32
+upper_air,temp,309052,airTemperature,0,False,True,0,0,0,upper_air,sonde,air temperature [K],float64
+upper_air,temp,309052,dewpointTemperature,0,False,True,0,0,0,upper_air,sonde,dewpoint temperature [K],float64
+upper_air,temp,309052,windDirection,0,False,True,0,0,0,upper_air,sonde,wind direction [degree],float64
+upper_air,temp,309052,windSpeed,0,False,True,0,0,0,upper_air,sonde,wind speed [m/s],float64
+upper_air,temp,309052,year,0,True,False,0,0,0,surface,sonde,datetime,timestamp
+upper_air,temp,309052,month,0,True,False,0,0,0,surface,sonde,datetime,timestamp
+upper_air,temp,309052,day,0,True,False,0,0,0,surface,sonde,datetime,timestamp
+upper_air,temp,309052,hour,0,True,False,0,0,0,surface,sonde,datetime,timestamp
+upper_air,temp,309052,minute,0,True,False,0,0,0,surface,sonde,datetime,timestamp
+upper_air,temp,309052,second,0,True,False,0,0,0,surface,sonde,datetime,timestamp
+upper_air,temp,309052,latitude,0,True,False,0,0,0,surface,sonde,latitude [degree],float64
+upper_air,temp,309052,longitude,0,True,False,0,0,0,surface,sonde,longitude [degree],float64
+upper_air,temp,309052,blockNumber,0,False,False,0,0,1000,surface,sonde,station number,uint32
+upper_air,temp,309052,stationNumber,0,False,False,0,0,1,surface,sonde,station number,uint32
+upper_air,temp,309052,heightOfStationGroundAboveMeanSeaLevel,1,True,False,0,0,0,surface,sonde,height of station ground above mean sea level [m],float64
+upper_air,temp,309052,cloudAmount,1,False,False,0,0,0,surface,sonde,cloud amount,uint8
+upper_air,temp,309052,heightOfBaseOfCloud,1,False,False,0,0,0,surface,sonde,height of base of cloud [m],uint16
+upper_air,temp,309052,cloudType,1,False,False,0,0,0,surface,sonde,low cloud type,uint8
+upper_air,temp,309052,cloudType,2,False,False,0,0,0,surface,sonde,middle cloud type,uint8
+upper_air,temp,309052,cloudType,3,False,False,0,0,0,surface,sonde,high cloud type,uint8
+upper_air,temp_drop,309053,timePeriod,0,True,True,0,0,0,upper_air,drop_sonde,timedelta [second],timestamp
+upper_air,temp_drop,309053,year,0,True,False,0,0,0,upper_air,drop_sonde,datetime,timestamp
+upper_air,temp_drop,309053,month,0,True,False,0,0,0,upper_air,drop_sonde,datetime,timestamp
+upper_air,temp_drop,309053,day,0,True,False,0,0,0,upper_air,drop_sonde,datetime,timestamp
+upper_air,temp_drop,309053,hour,0,True,False,0,0,0,upper_air,drop_sonde,datetime,timestamp
+upper_air,temp_drop,309053,minute,0,True,False,0,0,0,upper_air,drop_sonde,datetime,timestamp
+upper_air,temp_drop,309053,second,0,True,False,0,0,0,upper_air,drop_sonde,datetime,timestamp
+upper_air,temp_drop,309053,latitudeDisplacement,0,True,True,0,0,0,upper_air,drop_sonde,latitude [degree],float64
+upper_air,temp_drop,309053,latitude,0,True,False,0,0,0,upper_air,drop_sonde,latitude [degree],float64
+upper_air,temp_drop,309053,longitudeDisplacement,0,True,True,0,0,0,upper_air,drop_sonde,longitude [degree],float64
+upper_air,temp_drop,309053,longitude,0,True,False,0,0,0,upper_air,drop_sonde,longitude [degree],float64
+upper_air,temp_drop,309053,aircraftFlightNumber,0,True,False,0,0,0,upper_air,drop_sonde,aircraft flight number,string
+upper_air,temp_drop,309053,extendedVerticalSoundingSignificance,0,True,False,0,0,0,upper_air,drop_sonde,extended vertical sounding significance,uint32
+upper_air,temp_drop,309053,pressure,0,True,False,0,0,0,upper_air,drop_sonde,pressure [Pa],float64
+upper_air,temp_drop,309053,nonCoordinateGeopotentialHeight,0,True,False,0,0,0,upper_air,drop_sonde,non coordinate geopotential height [m],float32
+upper_air,temp_drop,309053,airTemperature,0,True,False,0,0,0,upper_air,drop_sonde,air temperature [K],float64
+upper_air,temp_drop,309053,dewpointTemperature,0,True,False,0,0,0,upper_air,drop_sonde,dewpoint temperature [K],float64
+upper_air,temp_drop,309053,windDirection,0,True,False,0,0,0,upper_air,drop_sonde,wind direction [degree],float64
+upper_air,temp_drop,309053,windSpeed,0,True,False,0,0,0,upper_air,drop_sonde,wind speed [m/s],float64
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,height,0,True,True,0,0,0,upper_air,temperature_profiler,height [m],float64
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,year,0,True,False,0,0,0,upper_air,temperature_profiler,datetime,timestamp
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,month,0,True,False,0,0,0,upper_air,temperature_profiler,datetime,timestamp
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,day,0,True,False,0,0,0,upper_air,temperature_profiler,datetime,timestamp
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,hour,0,True,False,0,0,0,upper_air,temperature_profiler,datetime,timestamp
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,minute,0,True,False,0,0,0,upper_air,temperature_profiler,datetime,timestamp
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,latitude,0,True,False,0,0,0,upper_air,temperature_profiler,latitude [degree],float64
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,longitude,0,True,False,0,0,0,upper_air,temperature_profiler,longitude [degree],float64
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,blockNumber,0,False,False,0,0,1000,upper_air,temperature_profiler,station number,uint32
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,stationNumber,0,False,False,0,0,1,upper_air,temperature_profiler,station number,uint32
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,virtualTemperature,0,False,True,0,0,0,upper_air,temperature_profiler,virtual temperature [k],float64
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,w,0,False,True,0,0,0,upper_air,temperature_profiler,w [m/s],float64
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,signalToNoiseRatio,0,False,True,0,0,0,upper_air,temperature_profiler,signal to noise ratio [dB],float64
