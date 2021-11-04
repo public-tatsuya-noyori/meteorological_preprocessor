@@ -20,8 +20,7 @@ move_4PubSub_4Search() {
     echo "${pubsub_index_directory}/${extension_type}/${index_file}" > ${work_directory}/raw.txt
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-#    timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
-    timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
+    timeout -k 3 30 rclone copy --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --config ${config} --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket} ${work_directory}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -31,7 +30,7 @@ move_4PubSub_4Search() {
     fi
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 30 rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}
+    timeout -k 3 30 rclone copyto --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --config ${config} --contimeout ${timeout} --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-check-dest --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${work_directory}/${pubsub_index_directory}/${extension_type}/${index_file} ${rclone_remote_bucket}/${search_index_directory}/${extension_type}/${index_file_date_hour}/${index_file_minute_second_extension}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -41,8 +40,7 @@ move_4PubSub_4Search() {
     fi
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-#    timeout -k 3 30 rclone delete --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
-    timeout -k 3 30 rclone delete --bwlimit ${bandwidth_limit_k_bytes_per_s} --config ${config} --checksum --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+    timeout -k 3 30 rclone delete --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --config ${config} --contimeout ${timeout} --files-from-raw ${work_directory}/raw.txt --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then

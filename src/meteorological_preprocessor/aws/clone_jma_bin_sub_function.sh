@@ -34,7 +34,7 @@ function handler () {
     for destination_rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-      timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt
+      timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | sort -u | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/list.txt
       exit_code=$?
       set -e
       if test ${exit_code} -eq 0; then
@@ -56,8 +56,7 @@ function handler () {
       echo ${former_index} > ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/raw.txt
       cp /dev/null ${work_directory}/err_log.tmp
       set +e
-#      timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}
-      timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}
+      timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${work_directory}/${pub_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}
       exit_code=$?
       set -e
       if test ${exit_code} -ne 0; then
@@ -75,7 +74,7 @@ function handler () {
   for destination_rclone_remote_bucket in `echo ${rclone_remote_bucket_main_sub} | tr ';' '\n'`; do
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-    timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_tar_index_directory}/tar/${extension_type}/ | grep -E '^[0-9]+\.tar' | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${work_directory}/tar/${extension_type}/list.txt
+    timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_tar_index_directory}/tar/${extension_type}/ | grep -E '^[0-9]+\.tar' | sort -u | sed -e "s|$|/${destination_rclone_remote_bucket}|g" >> ${work_directory}/tar/${extension_type}/list.txt
     exit_code=$?
     set -e
     if test ${exit_code} -eq 0; then
@@ -98,8 +97,7 @@ function handler () {
     echo ${tar_file} > ${work_directory}/tar/${extension_type}/raw.txt
     cp /dev/null ${work_directory}/err_log.tmp
     set +e
-#    timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/tar/${extension_type}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${work_directory}/${pub_clone_directory}/processed/${extension_type}
-    timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/tar/${extension_type}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${work_directory}/${pub_clone_directory}/processed/${extension_type}
+    timeout -k 3 30 rclone copy --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/tar/${extension_type}/raw.txt --local-no-set-modtime --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout 8s ${remote_bucket} ${work_directory}/${pub_clone_directory}/processed/${extension_type}
     exit_code=$?
     set -e
     if test ${exit_code} -ne 0; then
@@ -137,17 +135,28 @@ function handler () {
         echo "ERROR: ${function} can not pub a file of ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/${now}.txt." >&2
         rc=${exit_code}
       fi
-      for index_file in `timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | head -n -2`; do
+      cp /dev/null ${work_directory}/delete.txt
+      cp /dev/null ${work_directory}/err_log.tmp
+      set +e
+      timeout -k 3 30 rclone lsf --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --max-depth 1 --no-traverse --quiet --retries 3 --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/ | grep -E '^[0-9]+\.txt' | sort -u | head -n -2 | sed -e "s|^|${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/|g" > ${work_directory}/delete.txt
+      exit_code=$?
+      set -e
+      if test ${exit_code} -ne 0; then
+        cat ${work_directory}/err_log.tmp >&2
+        echo "ERROR: ${function} can not get a list of ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/." >&2
+        rc=${exit_code}
+      fi
+      if test -s ${work_directory}/delete.txt; then
         cp /dev/null ${work_directory}/err_log.tmp
         set +e
-        timeout -k 3 30 rclone delete --config rclone.conf --contimeout 8s --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout 8s ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/${index_file}
+        timeout -k 3 30 rclone delete --checksum --config rclone.conf --contimeout 8s --files-from-raw ${work_directory}/delete.txt --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --no-traverse --quiet --retries 3 --s3-no-check-bucket --s3-no-head --s3-no-head-object --azureblob-no-head-object --stats 0 --timeout 8s ${destination_rclone_remote_bucket}
         exit_code=$?
         set -e
         if test ${exit_code} -ne 0; then
           cat ${work_directory}/err_log.tmp >&2
-          echo "INFO: ${function} can not delete a file of ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/${index_file}" >&2
+          echo "INFO: ${function} can not delete old files in ${destination_rclone_remote_bucket}/${destination_clone_directory}/${source_center_id}/${extension_type}/${source_rclone_remote_bucket_directory}/" >&2
         fi
-      done
+      fi
     done
   done
   return ${rc}

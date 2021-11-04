@@ -4,7 +4,7 @@ IFS=$'\n'
 delete() {
   cp /dev/null ${work_directory}/err_log.tmp
   set +e
-  timeout -k 3 ${rclone_timeout} rclone delete --config ${config} --contimeout ${timeout} --exclude=/4PubSub/** --exclude=/4Site/** --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
+  timeout -k 3 ${rclone_timeout} rclone delete --bwlimit ${bandwidth_limit_k_bytes_per_s} --checksum --config ${config} --contimeout ${timeout} --exclude=/4Site/** --log-file ${work_directory}/err_log.tmp --low-level-retries 3 --min-age ${days_ago}d --quiet --retries 3 --s3-no-check-bucket --s3-no-head --stats 0 --timeout ${timeout} ${rclone_remote_bucket}
   exit_code=$?
   set -e
   if test ${exit_code} -ne 0; then
@@ -13,6 +13,7 @@ delete() {
   fi
   return ${exit_code}
 }
+bandwidth_limit_k_bytes_per_s=0
 config=$HOME/.config/rclone/rclone.conf
 ec=0
 job_directory=4Del
@@ -21,8 +22,9 @@ rclone_timeout=43200
 timeout=8s
 for arg in "$@"; do
   case "${arg}" in
+    "--bandwidth_limit") bandwidth_limit_k_bytes_per_s=$2;shift;shift;;
     "--config") config=$2;shift;shift;;
-    "--help" ) echo "$0 [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
+    "--help" ) echo "$0 [--bandwidth_limit bandwidth_limit_k_bytes_per_s] [--config config_file] [--no_check_pid] [--timeout rclone_timeout] local_work_directory unique_center_id_main_or_sub rclone_remote_bucket days_ago"; exit 0;;
     "--no_check_pid" ) no_check_pid=1;shift;;
     "--timeout" ) rclone_timeout=$2;set +e;rclone_timeout=`expr 0 + ${rclone_timeout}`;set -e;shift;shift;;
   esac
