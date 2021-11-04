@@ -25,7 +25,7 @@ deploy(){
   aws iam delete-role --role-name ${function}_lambda 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_step_functions 1>/dev/null 2>/dev/null
   aws iam delete-role --role-name ${function}_events 1>/dev/null 2>/dev/null
-  if "$7" = 'delete'; then
+  if test "$7" = 'delete'; then
     return
   fi
   sleep 10
