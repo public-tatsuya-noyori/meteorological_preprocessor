@@ -1,4 +1,22 @@
 input_category,input_subcategory,descriptors_list,key,key_number,is_required,slide,step,multiply,math,output_category,output_subcategory,name,data_type
+surface,gps_pwv,307022,latitude,0,True,0,0,0,,surface,gps_pwv,latitude [degree],float32
+surface,gps_pwv,307022,longitude,0,True,0,0,0,,surface,gps_pwv,longitude [degree],float32
+surface,gps_pwv,307022,year,0,True,0,0,0,,surface,gps_pwv,datetime,timestamp
+surface,gps_pwv,307022,month,0,True,0,0,0,,surface,gps_pwv,datetime,timestamp
+surface,gps_pwv,307022,day,0,True,0,0,0,,surface,gps_pwv,datetime,timestamp
+surface,gps_pwv,307022,hour,0,True,0,0,0,,surface,gps_pwv,datetime,timestamp
+surface,gps_pwv,307022,minute,0,True,0,0,0,,surface,gps_pwv,datetime,timestamp
+surface,gps_pwv,307022,stationOrSiteName,0,False,0,0,0,,surface,gps_pwv,station,string
+surface,gps_pwv,307022,heightOfStation,0,False,0,0,0,,surface,gps_pwv,height of station [m],float32
+surface,gps_pwv,307022,airTemperature,0,False,0,0,0,,surface,gps_pwv,air temperature [K],float32
+surface,gps_pwv,307022,relativeHumidity,0,False,0,0,0,,surface,gps_pwv,relative humidity [%],float32
+surface,gps_pwv,307022,#1#atmosphericPathDelayInSatelliteSignal,0,False,0,0,0,,surface,gps_pwv,atmospheric path delay in satellite signal [m],float32
+surface,gps_pwv,307022,#1#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,False,0,0,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](1),float32
+surface,gps_pwv,307022,#1#estimatedErrorInAtmosphericPathDelay,0,False,0,0,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](1),float32
+surface,gps_pwv,307022,#2#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,False,0,0,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](2),float32
+surface,gps_pwv,307022,#2#estimatedErrorInAtmosphericPathDelay,0,False,0,0,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](2),float32
+surface,gps_pwv,307022,componentOfZenithPathDelayDueToWaterVapour,0,False,0,0,0,,surface,gps_pwv,component of zenith path delay due to water vapour [m],float32
+surface,gps_pwv,307022,precipitableWater,0,False,0,0,0,,surface,gps_pwv,precipitable water [kg/m2],float32
 surface,drifting_buoy,315009,year,2,True,0,0,0,,surface,buoy,datetime,timestamp
 surface,drifting_buoy,315009,month,2,True,0,0,0,,surface,buoy,datetime,timestamp
 surface,drifting_buoy,315009,day,2,True,0,0,0,,surface,buoy,datetime,timestamp
@@ -38,7 +56,7 @@ surface,ship,308009,month,1,True,0,0,0,,surface,ship,datetime,timestamp
 surface,ship,308009,day,1,True,0,0,0,,surface,ship,datetime,timestamp
 surface,ship,308009,hour,1,True,0,0,0,,surface,ship,datetime,timestamp
 surface,ship,308009,minute,1,True,0,0,0,,surface,ship,datetime,timestamp
-surface,ship,308009,shipOrMobileLandStationIdentifier,1,False,0,0,0,,surface,ship,ship id,str
+surface,ship,308009,shipOrMobileLandStationIdentifier,1,False,0,0,0,,surface,ship,ship id,string
 surface,ship,308009,directionOfMotionOfMovingObservingPlatform,1,False,0,0,0,,surface,ship,direction of motion [degree],float32
 surface,ship,308009,movingObservingPlatformSpeed,1,False,0,0,0,,surface,ship,speed of motion [m/s],float32
 surface,ship,308009,pressureReducedToMeanSeaLevel,1,False,0,0,0,,surface,ship,pressure reduced to mean sea level [Pa],float32
@@ -55,9 +73,9 @@ surface,ship,308009,cloudType,2,False,0,0,0,,surface,ship,middle cloud type,uint
 surface,ship,308009,cloudType,3,False,0,0,0,,surface,ship,high cloud type,uint8
 surface,ship,308009,presentWeather,1,False,0,0,0,,surface,ship,present weather,uint16
 surface,ship,308009,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,0,,surface,ship,total precipitation [kg/m2](1),float32
-surface,ship,308009,timePeriod,4,False,0,0,0,abs,surface,ship,total precipitation [kg/m2](1):hour,uint8
+surface,ship,308009,timePeriod,4,False,0,0,0,abs,surface,ship,total precipitation [kg/m2](1)@hour,uint8
 surface,ship,308009,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,0,,surface,ship,total precipitation [kg/m2](2),float32
-surface,ship,308009,timePeriod,5,False,0,0,0,abs,surface,ship,total precipitation [kg/m2](2):hour,uint8
+surface,ship,308009,timePeriod,5,False,0,0,0,abs,surface,ship,total precipitation [kg/m2](2)@hour,uint8
 surface,ship,308009,windDirection,1,False,0,0,0,,surface,ship,wind direction [degree],float32
 surface,ship,308009,windSpeed,1,False,0,0,0,,surface,ship,wind speed [m/s],float32
 surface,ship,308009,oceanographicWaterTemperature,1,False,0,0,0,,surface,ship,oceanographic water temperature [K],float32
@@ -72,10 +90,10 @@ surface,ship,308009,periodOfSwellWaves,2,False,0,0,0,,surface,ship,period of swe
 surface,ship,308009,heightOfSwellWaves,2,False,0,0,0,,surface,ship,height of swell waves [m](2),float32
 surface,ship,308009,maximumWindGustDirection,1,False,0,0,0,,surface,ship,maximum wind gust direction [degree](1),float32
 surface,ship,308009,maximumWindGustSpeed,1,False,0,0,0,,surface,ship,maximum wind gust speed [m/s](1),float32
-surface,ship,308009,timePeriod,9,False,0,0,0,abs,surface,ship,maximum wind gust speed [m/s](1):minute,uint8
+surface,ship,308009,timePeriod,9,False,0,0,0,abs,surface,ship,maximum wind gust speed [m/s](1)@minute,uint8
 surface,ship,308009,maximumWindGustDirection,2,False,0,0,0,,surface,ship,maximum wind gust direction [degree](2),float32
 surface,ship,308009,maximumWindGustSpeed,2,False,0,0,0,,surface,ship,maximum wind gust speed [m/s](2),float32
-surface,ship,308009,timePeriod,10,False,0,0,0,abs,surface,ship,maximum wind gust speed [m/s](2):minute,uint8
+surface,ship,308009,timePeriod,10,False,0,0,0,abs,surface,ship,maximum wind gust speed [m/s](2)@minute,uint8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,latitude,1,True,0,0,0,,surface,synop,latitude [degree],float32
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,longitude,1,True,0,0,0,,surface,synop,longitude [degree],float32
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,year,1,True,0,0,0,,surface,synop,datetime,timestamp
@@ -100,11 +118,28 @@ surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,3,False,0,0,0,,surface,synop,high cloud type,uint8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,presentWeather,1,False,0,0,0,,surface,synop,present weather,uint16
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,0,,surface,synop,total precipitation [kg/m2](1),float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,4,False,0,0,0,abs,surface,synop,total precipitation [kg/m2](1):hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,4,False,0,0,0,abs,surface,synop,total precipitation [kg/m2](1)@hour,int8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,0,,surface,synop,total precipitation [kg/m2](2),float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,5,False,0,0,0,abs,surface,synop,total precipitation [kg/m2](2):hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,5,False,0,0,0,abs,surface,synop,total precipitation [kg/m2](2)@hour,int8
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windDirection,1,False,0,0,0,,surface,synop,wind direction [degree],float32
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windSpeed,1,False,0,0,0,,surface,synop,wind speed [m/s],float32
+surface,tesac,315003,waterPressure,0,True,0,0,0,,surface,tesac,water pressure [Pa],float32
+surface,tesac,315003,latitude,1,True,0,0,0,,surface,tesac,latitude [degree],float32
+surface,tesac,315003,longitude,1,True,0,0,0,,surface,tesac,longitude [degree],float32
+surface,tesac,315003,year,1,True,0,0,0,,surface,tesac,datetime,timestamp
+surface,tesac,315003,month,1,True,0,0,0,,surface,tesac,datetime,timestamp
+surface,tesac,315003,day,1,True,0,0,0,,surface,tesac,datetime,timestamp
+surface,tesac,315003,hour,1,True,0,0,0,,surface,tesac,datetime,timestamp
+surface,tesac,315003,minute,1,True,0,0,0,,surface,tesac,datetime,timestamp
+surface,tesac,315003,marineObservingPlatformIdentifier,1,False,0,0,0,,surface,tesac,station id,uint32
+surface,tesac,315003,oceanographicWaterTemperature,0,False,0,0,0,,surface,tesac,oceanographic water temperature [k],float32
+surface,tesac,315003,salinity,0,False,0,0,0,,surface,tesac,salinity [%],float32
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,1,3,0,,surface,tesac,waterPressure [Pa]@qualifier for gtspp quality flag,uint8
+surface,tesac,315003,globalGtsppQualityFlag,0,False,1,3,0,,surface,tesac,waterPressure [Pa]@global gtspp quality flag,uint8
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,2,3,0,,surface,tesac,oceanographic water temperature [k]@qualifier for gtspp quality flag,uint8
+surface,tesac,315003,globalGtsppQualityFlag,0,False,2,3,0,,surface,tesac,oceanographic water temperature [k]@global gtspp quality flag,uint8
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,3,3,0,,surface,tesac,salinity [%]@qualifier for gtspp quality flag,uint8
+surface,tesac,315003,globalGtsppQualityFlag,0,False,3,3,0,,surface,tesac,salinity [%]@global gtspp quality flag,uint8
 upper_air,pilot,309050;309051,timePeriod,0,False,0,0,0,,upper_air,sonde,timedelta [second],timezstamp
 upper_air,pilot,309050;309051,year,1,True,0,0,0,,upper_air,sonde,datetime,timestamp
 upper_air,pilot,309050;309051,month,1,True,0,0,0,,upper_air,sonde,datetime,timestamp
@@ -247,131 +282,165 @@ upper_air,wind_profiler,301001 301011 301012 301022 002003 106000 031001 007007 
 upper_air,wind_profiler,301001 301011 301012 301022 002003 106000 031001 007007 011001 011002 033002 011006 033002,windSpeed,0,False,0,0,0,,upper_air,profiler,wind speed [m/s],float32
 upper_air,wind_profiler,301001 301011 301012 301022 002003 106000 031001 007007 011001 011002 033002 011006 033002,w,0,False,0,0,0,,upper_air,profiler,w [m/s],float32
 upper_air,wind_profiler,301001 301011 301012 301022 002003 106000 031001 007007 011001 011002 033002 011006 033002,qualityInformation,0,False,0,0,0,,upper_air,profiler,quality information,uint8
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,latitude,1,True,0,0,0,,upper_air,aircraft,latitude [degree],float32
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,longitude,1,True,0,0,0,,upper_air,aircraft,longitude [degree],float32
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,year,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,month,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,day,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,hour,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,minute,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,second,1,False,0,0,0,0,upper_air,amdar,datetime,timestamp
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,flightLevel,1,False,0,0,0,,upper_air,aircraft,flight level [m],float32
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,aircraftRegistrationNumberOrOtherIdentification,1,False,0,0,0,,upper_air,aircraft,aircraft id,string
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,detailedPhaseOfFlight,1,False,0,0,0,,upper_air,aircraft,detailed phase of flight,uint8
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,windDirection,1,False,0,0,0,,upper_air,aircraft,wind direction [degree],float32
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,windSpeed,1,False,0,0,0,,upper_air,aircraft,wind speed [m/s],float32
+upper_air,amdar,311005;311008 002061 002062 002005 011031 011036,airTemperature,1,False,0,0,0,,upper_air,aircraft,air temperature [K],float32
+upper_air,amdar,311010,latitude,1,True,0,0,0,,upper_air,aircraft,latitude [degree],float32
+upper_air,amdar,311010,longitude,1,True,0,0,0,,upper_air,aircraft,longitude [degree],float32
+upper_air,amdar,311010,year,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311010,month,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311010,day,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311010,hour,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311010,minute,1,True,0,0,0,,upper_air,aircraft,datetime,timestamp
+upper_air,amdar,311010,second,1,False,0,0,0,0,upper_air,amdar,datetime,timestamp
+upper_air,amdar,311010,flightLevel,1,False,0,0,0,,upper_air,aircraft,flight level [m],float32
+upper_air,amdar,311010,aircraftRegistrationNumberOrOtherIdentification,1,False,0,0,0,,upper_air,aircraft,aircraft id,string
+upper_air,amdar,311010,detailedPhaseOfFlight,1,False,0,0,0,,upper_air,aircraft,detailed phase of flight,uint8
+upper_air,amdar,311010,windDirection,1,False,0,0,0,,upper_air,aircraft,wind direction [degree],float32
+upper_air,amdar,311010,windSpeed,1,False,0,0,0,,upper_air,aircraft,wind speed [m/s],float32
+upper_air,amdar,311010,aircraftRollAngleQuality,1,False,0,0,0,,upper_air,aircraft,aircraft roll angle quality,uint8
+upper_air,amdar,311010,airTemperature,1,False,0,0,0,,upper_air,aircraft,air temperature [K],float32
+upper_air,amdar,311010,mixingRatio,1,False,0,0,0,,upper_air,aircraft,mixing ratio [kg/kg],float32
+upper_air,amdar,311010,relativeHumidity,1,False,0,0,0,,upper_air,aircraft,relative humidity [%],float32
+upper_air,amdar,311010,dewpointTemperature,1,False,0,0,0,,upper_air,aircraft,dewpoint temperature [K],float32
+upper_air,amdar,311010,moistureQuality,1,False,0,0,0,,upper_air,aircraft,moisture quality,0,uint8
+
 satellite,csr,310023,latitude,0,True,0,0,0,,satellite,csr,latitude [degree],float32
 satellite,csr,310023,longitude,0,True,0,0,0,,satellite,csr,longitude [degree],float32
 satellite,csr,310023,landOrSeaQualifier,0,False,0,0,0,,satellite,csr,land or sea qualifier,bool
-satellite,csr,310023,satelliteZenithAngle,0,False,0,0,0,,satellite,csr,satellite zenith angle,float32
-satellite,csr,310023,solarZenithAngle,0,False,0,0,0,,satellite,csr,solar zenith angle,float32
-satellite,csr,310023,cloudAmountInSegment,1,False,0,0,0,,satellite,csr,cloud amount in segment (channel=1),uint8
-satellite,csr,310023,amountSegmentCloudFree,1,False,0,0,0,,satellite,csr,amount segment cloud free (channel=1),uint8
+satellite,csr,310023,satelliteZenithAngle,0,False,0,0,0,,satellite,csr,satellite zenith angle [degree],float32
+satellite,csr,310023,solarZenithAngle,0,False,0,0,0,,satellite,csr,solar zenith angle [degree],float32
+satellite,csr,310023,cloudAmountInSegment,1,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=1),uint8
+satellite,csr,310023,amountSegmentCloudFree,1,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=1),uint8
 satellite,csr,310023,cloudType,1,False,0,0,0,,satellite,csr,cloud type (channel=1),uint8
-satellite,csr,310023,cloudAmountInSegment,2,False,0,0,0,,satellite,csr,cloud amount in segment (channel=2),uint8
-satellite,csr,310023,amountSegmentCloudFree,2,False,0,0,0,,satellite,csr,amount segment cloud free (channel=2),uint8
+satellite,csr,310023,cloudAmountInSegment,2,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=2),uint8
+satellite,csr,310023,amountSegmentCloudFree,2,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=2),uint8
 satellite,csr,310023,cloudType,2,False,0,0,0,,satellite,csr,cloud type (channel=2),uint8
-satellite,csr,310023,cloudAmountInSegment,3,False,0,0,0,,satellite,csr,cloud amount in segment (channel=3),uint8
-satellite,csr,310023,amountSegmentCloudFree,3,False,0,0,0,,satellite,csr,amount segment cloud free (channel=3),uint8
+satellite,csr,310023,cloudAmountInSegment,3,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=3),uint8
+satellite,csr,310023,amountSegmentCloudFree,3,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=3),uint8
 satellite,csr,310023,cloudType,3,False,0,0,0,,satellite,csr,cloud type (channel=3),uint8
-satellite,csr,310023,cloudAmountInSegment,4,False,0,0,0,,satellite,csr,cloud amount in segment (channel=4),uint8
-satellite,csr,310023,amountSegmentCloudFree,4,False,0,0,0,,satellite,csr,amount segment cloud free (channel=4),uint8
+satellite,csr,310023,cloudAmountInSegment,4,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=4),uint8
+satellite,csr,310023,amountSegmentCloudFree,4,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=4),uint8
 satellite,csr,310023,cloudType,4,False,0,0,0,,satellite,csr,cloud type (channel=4),uint8
-satellite,csr,310023,cloudAmountInSegment,5,False,0,0,0,,satellite,csr,cloud amount in segment (channel=5),uint8
-satellite,csr,310023,amountSegmentCloudFree,5,False,0,0,0,,satellite,csr,amount segment cloud free (channel=5),uint8
+satellite,csr,310023,cloudAmountInSegment,5,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=5),uint8
+satellite,csr,310023,amountSegmentCloudFree,5,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=5),uint8
 satellite,csr,310023,cloudType,5,False,0,0,0,,satellite,csr,cloud type (channel=5),uint8
-satellite,csr,310023,cloudAmountInSegment,6,False,0,0,0,,satellite,csr,cloud amount in segment (channel=6),uint8
-satellite,csr,310023,amountSegmentCloudFree,6,False,0,0,0,,satellite,csr,amount segment cloud free (channel=6),uint8
+satellite,csr,310023,cloudAmountInSegment,6,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=6),uint8
+satellite,csr,310023,amountSegmentCloudFree,6,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=6),uint8
 satellite,csr,310023,cloudType,6,False,0,0,0,,satellite,csr,cloud type (channel=6),uint8
-satellite,csr,310023,cloudAmountInSegment,7,False,0,0,0,,satellite,csr,cloud amount in segment (channel=7),uint8
-satellite,csr,310023,amountSegmentCloudFree,7,False,0,0,0,,satellite,csr,amount segment cloud free (channel=7),uint8
+satellite,csr,310023,cloudAmountInSegment,7,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=7),uint8
+satellite,csr,310023,amountSegmentCloudFree,7,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=7),uint8
 satellite,csr,310023,cloudType,7,False,0,0,0,,satellite,csr,cloud type (channel=7),uint8
-satellite,csr,310023,cloudAmountInSegment,8,False,0,0,0,,satellite,csr,cloud amount in segment (channel=8),uint8
-satellite,csr,310023,amountSegmentCloudFree,8,False,0,0,0,,satellite,csr,amount segment cloud free (channel=8),uint8
+satellite,csr,310023,cloudAmountInSegment,8,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=8),uint8
+satellite,csr,310023,amountSegmentCloudFree,8,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=8),uint8
 satellite,csr,310023,cloudType,8,False,0,0,0,,satellite,csr,cloud type (channel=8),uint8
-satellite,csr,310023,cloudAmountInSegment,9,False,0,0,0,,satellite,csr,cloud amount in segment (channel=9),uint8
-satellite,csr,310023,amountSegmentCloudFree,9,False,0,0,0,,satellite,csr,amount segment cloud free (channel=9),uint8
+satellite,csr,310023,cloudAmountInSegment,9,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=9),uint8
+satellite,csr,310023,amountSegmentCloudFree,9,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=9),uint8
 satellite,csr,310023,cloudType,9,False,0,0,0,,satellite,csr,cloud type (channel=9),uint8
-satellite,csr,310023,cloudAmountInSegment,10,False,0,0,0,,satellite,csr,cloud amount in segment (channel=10),uint8
-satellite,csr,310023,amountSegmentCloudFree,10,False,0,0,0,,satellite,csr,amount segment cloud free (channel=10),uint8
+satellite,csr,310023,cloudAmountInSegment,10,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=10),uint8
+satellite,csr,310023,amountSegmentCloudFree,10,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=10),uint8
 satellite,csr,310023,cloudType,10,False,0,0,0,,satellite,csr,cloud type (channel=10),uint8
-satellite,csr,310023,cloudAmountInSegment,11,False,0,0,0,,satellite,csr,cloud amount in segment (channel=11),uint8
-satellite,csr,310023,amountSegmentCloudFree,11,False,0,0,0,,satellite,csr,amount segment cloud free (channel=11),uint8
+satellite,csr,310023,cloudAmountInSegment,11,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=11),uint8
+satellite,csr,310023,amountSegmentCloudFree,11,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=11),uint8
 satellite,csr,310023,cloudType,11,False,0,0,0,,satellite,csr,cloud type (channel=11),uint8
-satellite,csr,310023,cloudAmountInSegment,12,False,0,0,0,,satellite,csr,cloud amount in segment (channel=12),uint8
-satellite,csr,310023,amountSegmentCloudFree,12,False,0,0,0,,satellite,csr,amount segment cloud free (channel=12),uint8
+satellite,csr,310023,cloudAmountInSegment,12,False,0,0,0,,satellite,csr,cloud amount in segment [%](channel=12),uint8
+satellite,csr,310023,amountSegmentCloudFree,12,False,0,0,0,,satellite,csr,amount segment cloud free [%](channel=12),uint8
 satellite,csr,310023,cloudType,12,False,0,0,0,,satellite,csr,cloud type (channel=12),uint8
-satellite,csr,310023,brightnessTemperature,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,1,False,0,0,0,,satellite,csr,brightness temperature (channel=1):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,2,False,0,0,0,,satellite,csr,brightness temperature (channel=2):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,3,False,0,0,0,,satellite,csr,brightness temperature (channel=3):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,4,False,0,0,0,,satellite,csr,brightness temperature (channel=4):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,5,False,0,0,0,,satellite,csr,brightness temperature (channel=5):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,6,False,0,0,0,,satellite,csr,brightness temperature (channel=6):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,7,False,0,0,0,,satellite,csr,brightness temperature (channel=7):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,8,False,0,0,0,,satellite,csr,brightness temperature (channel=8):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,9,False,0,0,0,,satellite,csr,brightness temperature (channel=9):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,10,False,0,0,0,,satellite,csr,brightness temperature (channel=10):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,11,False,0,0,0,,satellite,csr,brightness temperature (channel=11):first order statistical value(1),float32
-satellite,csr,310023,brightnessTemperature,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12),float32
-satellite,csr,310023,brightnessTemperature->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12):percent confidence(1),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12):percent confidence(2),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12):percent confidence(3),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12):percent confidence(4),uint8
-satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12):percent confidence(5),uint8
-satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,12,False,0,0,0,,satellite,csr,brightness temperature (channel=12):first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,1,False,0,0,0,,satellite,csr,brightness temperature [K](channel=1)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,2,False,0,0,0,,satellite,csr,brightness temperature [K](channel=2)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,3,False,0,0,0,,satellite,csr,brightness temperature [K](channel=3)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,4,False,0,0,0,,satellite,csr,brightness temperature [K](channel=4)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,5,False,0,0,0,,satellite,csr,brightness temperature [K](channel=5)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,6,False,0,0,0,,satellite,csr,brightness temperature [K](channel=6)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,7,False,0,0,0,,satellite,csr,brightness temperature [K](channel=7)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,8,False,0,0,0,,satellite,csr,brightness temperature [K](channel=8)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,9,False,0,0,0,,satellite,csr,brightness temperature [K](channel=9)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,10,False,0,0,0,,satellite,csr,brightness temperature [K](channel=10)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,11,False,0,0,0,,satellite,csr,brightness temperature [K](channel=11)@first order statistical value(1),float32
+satellite,csr,310023,brightnessTemperature,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12),float32
+satellite,csr,310023,brightnessTemperature->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](1),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](2),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](3),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](4),uint8
+satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](5),uint8
+satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@first order statistical value(1),float32
 satellite,csr,310023,year,1,True,0,0,0,,satellite,csr,datetime,timestamp
 satellite,csr,310023,month,1,True,0,0,0,,satellite,csr,datetime,timestamp
 satellite,csr,310023,day,1,True,0,0,0,,satellite,csr,datetime,timestamp

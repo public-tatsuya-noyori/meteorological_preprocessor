@@ -65,7 +65,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 is_array = False
                                 if len(output_conf_df[(output_conf_df['key_number'] == 0)].index) > 0:
                                     is_array = True
-                                pre_value_list_len = 0
+                                pre_value_np_len = 0
                                 subset_array_size_list = []
                                 for output_conf_tuple in output_conf_df.itertuples():
                                     value_list = []
@@ -75,18 +75,18 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             is_descriptors = True
                                             break
                                     if not is_descriptors:
-                                        if pre_value_list_len == 0:
+                                        if pre_value_np_len == 0:
                                             print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
                                             break
                                         else:
-                                            input_dict[output_conf_tuple.key] = np.array([None for i in range(pre_value_list_len)])
+                                            input_dict[output_conf_tuple.key] = np.array([None for i in range(pre_value_np_len)])
                                             continue
                                     if compressed_data == 0:
                                         for subset_number in range(1, number_of_subsets + 1):
                                             subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + output_conf_tuple.key)
                                             if (type(subset_value_list) is np.ndarray):
                                                 subset_value_list = subset_value_list.tolist()
-                                            if pre_value_list_len == 0:
+                                            if pre_value_np_len == 0:
                                                 subset_array_size_list.append(len(subset_value_list))
                                             if output_conf_tuple.key_number == 0:
                                                 if len(subset_value_list) < subset_array_size_list[subset_number - 1]:
@@ -107,13 +107,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
                                         if (type(value_list) is np.ndarray):
                                             value_list = value_list.tolist()
-                                        if len(value_list) == 1 and pre_value_list_len > 0:
-                                            value_list = [value_list[0] for i in range(pre_value_list_len)]
-                                    if pre_value_list_len > 0:
-                                        if pre_value_list_len != len(value_list):
-                                            print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to pre_value_list_len.', file=sys.stderr)
-                                            break
-                                    pre_value_list_len = len(value_list)
+                                        if len(value_list) == 1 and pre_value_np_len > 0:
+                                            value_list = [value_list[0] for i in range(pre_value_np_len)]
                                     value_np = np.array(value_list)
                                     if np.issubdtype(value_np.dtype, np.integer):
                                         value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
@@ -134,6 +129,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         value_np = value_np[output_conf_tuple.slide::output_conf_tuple.step]
                                     if output_conf_tuple.math == 'abs':
                                         value_np = np.array([None if value == None else abs(value) for value in value_np])
+                                    if pre_value_np_len > 0:
+                                        if pre_value_np_len != len(value_np):
+                                            print(pre_value_np_len)
+                                            print(len(value_np))
+                                            print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to pre_value_np_len.', file=sys.stderr)
+                                            break
+                                    pre_value_np_len = len(value_np)
                                     if output_conf_tuple.is_required:
                                         tmp_required_np = np.array([False if value == None else True for value in value_np])
                                         if len(required_np) > 0:
@@ -230,8 +232,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     data_list = []
                     is_required_list = []
                     for output_conf_name in np.sort(output_conf_name_np):
-                        if ':' in output_conf_name:
-                            if output_conf_name.split(':')[0] not in name_list:
+                        if '@' in output_conf_name:
+                            if output_conf_name.split('@')[0] not in name_list:
                                 continue
                         if output_conf_name in output_dict and any([False if value == None else True for value in output_dict[output_conf_name]]):
                             for output_conf_name_tuple in output_conf_df[(output_conf_df['name'] == output_conf_name)].head(1).itertuples():
