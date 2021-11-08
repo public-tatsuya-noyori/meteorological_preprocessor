@@ -15,6 +15,7 @@ def main():
     parser.add_argument('input_arrow_file', type=str, metavar='input_arrow_file')
     parser.add_argument("--rows", action='store_true')
     parser.add_argument("--columns", action='store_true')
+    parser.add_argument("--csv", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_arrow_file, os.F_OK):
         print('Error', errno, ':', args.input_arrow_file, 'does not exist.', file=sys.stderr)
@@ -27,15 +28,19 @@ def main():
         sys.exit(errno)
     try:
         if args.rows:
-            pd.set_option('display.max_rows', None)
+            pd.options.display.max_rows = None
         if args.columns:
-            pd.set_option('display.max_columns', None)
+            pd.options.display.max_columns = None
+        pd.options.display.float_format = '{:.6g}'.format
         ipc_reader = pa.ipc.open_file(args.input_arrow_file)
-        print('num_record_batches:', ipc_reader.num_record_batches)
-        print('\nschema:')
-        print(ipc_reader.schema)
-        print('\nread_pandas:')
-        print(ipc_reader.read_pandas(integer_object_nulls=True, types_mapper=null_int))
+        if args.csv:
+            print(ipc_reader.read_pandas(integer_object_nulls=True, types_mapper=null_int).to_csv())
+        else:
+            print('num_record_batches:', ipc_reader.num_record_batches)
+            print('\nschema:')
+            print(ipc_reader.schema)
+            print('\nread_pandas:')
+            print(ipc_reader.read_pandas(integer_object_nulls=True, types_mapper=null_int))
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
