@@ -226,3 +226,6 @@ $ aws iam create-access-key --user-name ${cccc}
         "SecretAccessKey": "***your_secret_access_key***"
 $ aws iam add-user-to-group --user-name ${cccc} --group-name publish
 ```
+## How to notify the contents of a text file when it is created on cloud storage.
+### When using AWS
+![notify](notify.png)
