@@ -229,7 +229,7 @@ $ aws iam add-user-to-group --user-name ${cccc} --group-name publish
 ## How to configure to notify the contents of a text file when it is created on cloud storage.
 ### When using AWS
 ![notify](notify.png)
-1. Download [deploy_notify.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/blob/master/src/meteorological_preprocessor/aws/notify_contents_of_file_function/deploy_notify.sh), [notify.zip](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/blob/master/src/meteorological_preprocessor/aws/notify_contents_of_file_function/notify.zip)
+1. Download [deploy_notify.sh](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/notify_contents_of_file_function/deploy_notify.sh), [notify.zip](https://raw.githubusercontent.com/public-tatsuya-noyori/meteorological_preprocessor/master/src/meteorological_preprocessor/aws/notify_contents_of_file_function/notify.zip)
 2. Change file mode.
 ```
 $ chmod 755 /path/to/deploy_notify.sh
