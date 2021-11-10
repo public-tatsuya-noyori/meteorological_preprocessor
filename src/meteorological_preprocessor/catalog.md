@@ -238,6 +238,6 @@ $ chmod 755 /path/to/deploy_notify.sh
 ```
 $ /path/to/deploy_notify.sh /path/to/notify.zip '***your_region_main***:***your_bucket_main***;***your_region_sub***:***your_bucket_sub***' ***your_notification_object_directory_path*** ***your_email_address_1;your_email_address_2;...***
 
-example:
+example to notify RJTD/alphanumeric/warning/tsunami/*:
 $ /path/to/deploy_notify.sh /path/to/notify.zip ap-northeast-1:my_bucket RJTD/alphanumeric/warning/tsunami/ my_email@example.com
 ```
