@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import eccodes as ec
+import gribapi
 import numpy as np
 import os
 import pkg_resources
@@ -102,9 +103,15 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             value_list = value_list + subset_value_list
                                     else:
                                         if output_conf_tuple.key_number > 0:
-                                            value_list = ec.codes_get_array(bufr, '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key)
+                                            try:
+                                                value_list = ec.codes_get_array(bufr, '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key)
+                                            except gribapi.errors.KeyValueNotFoundError:
+                                                value_list = [None for i in range(pre_value_np_len)]
                                         else:
-                                            value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
+                                            try:
+                                                value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
+                                            except gribapi.errors.KeyValueNotFoundError:
+                                                value_list = [None for i in range(pre_value_np_len)]
                                         if (type(value_list) is np.ndarray):
                                             value_list = value_list.tolist()
                                         if len(value_list) == 1 and pre_value_np_len > 0:

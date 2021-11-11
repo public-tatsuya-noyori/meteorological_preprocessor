@@ -10,11 +10,11 @@ surface,gps_pwv,307022,stationOrSiteName,0,False,0,0,0,,surface,gps_pwv,station,
 surface,gps_pwv,307022,heightOfStation,0,False,0,0,0,,surface,gps_pwv,height of station [m],float32
 surface,gps_pwv,307022,airTemperature,0,False,0,0,0,,surface,gps_pwv,air temperature [K],float32
 surface,gps_pwv,307022,relativeHumidity,0,False,0,0,0,,surface,gps_pwv,relative humidity [%],float32
-surface,gps_pwv,307022,#1#atmosphericPathDelayInSatelliteSignal,0,False,0,0,0,,surface,gps_pwv,atmospheric path delay in satellite signal [m],float32
-surface,gps_pwv,307022,#1#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,False,0,0,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](1),float32
-surface,gps_pwv,307022,#1#estimatedErrorInAtmosphericPathDelay,0,False,0,0,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](1),float32
-surface,gps_pwv,307022,#2#differenceInPathDelaysForLimbViewsAtExtremesOfScan,0,False,0,0,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](2),float32
-surface,gps_pwv,307022,#2#estimatedErrorInAtmosphericPathDelay,0,False,0,0,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](2),float32
+surface,gps_pwv,307022,atmosphericPathDelayInSatelliteSignal,1,False,0,0,0,,surface,gps_pwv,atmospheric path delay in satellite signal [m],float32
+surface,gps_pwv,307022,differenceInPathDelaysForLimbViewsAtExtremesOfScan,1,False,0,0,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](1),float32
+surface,gps_pwv,307022,estimatedErrorInAtmosphericPathDelay,1,False,0,0,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](1),float32
+surface,gps_pwv,307022,differenceInPathDelaysForLimbViewsAtExtremesOfScan,2,False,0,0,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](2),float32
+surface,gps_pwv,307022,estimatedErrorInAtmosphericPathDelay,2,False,0,0,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](2),float32
 surface,gps_pwv,307022,componentOfZenithPathDelayDueToWaterVapour,0,False,0,0,0,,surface,gps_pwv,component of zenith path delay due to water vapour [m],float32
 surface,gps_pwv,307022,precipitableWater,0,False,0,0,0,,surface,gps_pwv,precipitable water [kg/m2],float32
 surface,drifting_buoy,315009,year,2,True,0,0,0,,surface,buoy,datetime,timestamp
@@ -314,10 +314,16 @@ upper_air,amdar,311010,airTemperature,1,False,0,0,0,,upper_air,aircraft,air temp
 upper_air,amdar,311010,mixingRatio,1,False,0,0,0,,upper_air,aircraft,mixing ratio [kg/kg],float32
 upper_air,amdar,311010,relativeHumidity,1,False,0,0,0,,upper_air,aircraft,relative humidity [%],float32
 upper_air,amdar,311010,dewpointTemperature,1,False,0,0,0,,upper_air,aircraft,dewpoint temperature [K],float32
-upper_air,amdar,311010,moistureQuality,1,False,0,0,0,,upper_air,aircraft,moisture quality,0,uint8
-
+upper_air,amdar,311010,moistureQuality,1,False,0,0,0,,upper_air,aircraft,moisture quality,uint8
 satellite,csr,310023,latitude,0,True,0,0,0,,satellite,csr,latitude [degree],float32
 satellite,csr,310023,longitude,0,True,0,0,0,,satellite,csr,longitude [degree],float32
+satellite,csr,310023,year,1,True,0,0,0,,satellite,csr,datetime,timestamp
+satellite,csr,310023,month,1,True,0,0,0,,satellite,csr,datetime,timestamp
+satellite,csr,310023,day,1,True,0,0,0,,satellite,csr,datetime,timestamp
+satellite,csr,310023,hour,1,True,0,0,0,,satellite,csr,datetime,timestamp
+satellite,csr,310023,minute,1,True,0,0,0,,satellite,csr,datetime,timestamp
+satellite,csr,310023,second,1,True,0,0,0,,satellite,csr,datetime,timestamp
+satellite,csr,310023,satelliteIdentifier,1,False,0,0,0,,satellite,csr,satellite id,uint8
 satellite,csr,310023,landOrSeaQualifier,0,False,0,0,0,,satellite,csr,land or sea qualifier,bool
 satellite,csr,310023,satelliteZenithAngle,0,False,0,0,0,,satellite,csr,satellite zenith angle [degree],float32
 satellite,csr,310023,solarZenithAngle,0,False,0,0,0,,satellite,csr,solar zenith angle [degree],float32
@@ -441,10 +447,27 @@ satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence
 satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](4),uint8
 satellite,csr,310023,brightnessTemperature->percentConfidence->percentConfidence->percentConfidence->percentConfidence->percentConfidence,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@percent confidence [%](5),uint8
 satellite,csr,310023,brightnessTemperature->firstOrderStatisticalValue,12,False,0,0,0,,satellite,csr,brightness temperature [K](channel=12)@first order statistical value(1),float32
-satellite,csr,310023,year,1,True,0,0,0,,satellite,csr,datetime,timestamp
-satellite,csr,310023,month,1,True,0,0,0,,satellite,csr,datetime,timestamp
-satellite,csr,310023,day,1,True,0,0,0,,satellite,csr,datetime,timestamp
-satellite,csr,310023,hour,1,True,0,0,0,,satellite,csr,datetime,timestamp
-satellite,csr,310023,minute,1,True,0,0,0,,satellite,csr,datetime,timestamp
-satellite,csr,310023,second,1,True,0,0,0,,satellite,csr,datetime,timestamp
-satellite,csr,310023,satelliteIdentifier,1,False,0,0,0,,satellite,csr,satellite id,uint8
+satellite,csr,310023,brightnessTemperature,13,False,0,0,0,,satellite,csr,brightness temperature [K](channel=13),float32
+satellite,csr,310023,brightnessTemperature,14,False,0,0,0,,satellite,csr,brightness temperature [K](channel=14),float32
+satellite,csr,310023,brightnessTemperature,15,False,0,0,0,,satellite,csr,brightness temperature [K](channel=15),float32
+satellite,csr,310023,brightnessTemperature,16,False,0,0,0,,satellite,csr,brightness temperature [K](channel=16),float32
+satellite,csr,310023,brightnessTemperature,17,False,0,0,0,,satellite,csr,brightness temperature [K](channel=17),float32
+satellite,csr,310023,brightnessTemperature,18,False,0,0,0,,satellite,csr,brightness temperature [K](channel=18),float32
+satellite,csr,310023,brightnessTemperature,19,False,0,0,0,,satellite,csr,brightness temperature [K](channel=19),float32
+satellite,csr,310023,brightnessTemperature,20,False,0,0,0,,satellite,csr,brightness temperature [K](channel=20),float32
+satellite,csr,310023,brightnessTemperature,21,False,0,0,0,,satellite,csr,brightness temperature [K](channel=21),float32
+satellite,csr,310023,brightnessTemperature,22,False,0,0,0,,satellite,csr,brightness temperature [K](channel=22),float32
+satellite,csr,310023,brightnessTemperature,23,False,0,0,0,,satellite,csr,brightness temperature [K](channel=23),float32
+satellite,csr,310023,brightnessTemperature,24,False,0,0,0,,satellite,csr,brightness temperature [K](channel=24),float32
+satellite,csr,310023,brightnessTemperature,25,False,0,0,0,,satellite,csr,brightness temperature [K](channel=25),float32
+satellite,csr,310023,brightnessTemperature,26,False,0,0,0,,satellite,csr,brightness temperature [K](channel=26),float32
+satellite,csr,310023,brightnessTemperature,27,False,0,0,0,,satellite,csr,brightness temperature [K](channel=27),float32
+satellite,csr,310023,brightnessTemperature,28,False,0,0,0,,satellite,csr,brightness temperature [K](channel=28),float32
+satellite,csr,310023,brightnessTemperature,29,False,0,0,0,,satellite,csr,brightness temperature [K](channel=29),float32
+satellite,csr,310023,brightnessTemperature,30,False,0,0,0,,satellite,csr,brightness temperature [K](channel=30),float32
+satellite,csr,310023,brightnessTemperature,31,False,0,0,0,,satellite,csr,brightness temperature [K](channel=31),float32
+satellite,csr,310023,brightnessTemperature,32,False,0,0,0,,satellite,csr,brightness temperature [K](channel=32),float32
+satellite,csr,310023,brightnessTemperature,33,False,0,0,0,,satellite,csr,brightness temperature [K](channel=33),float32
+satellite,csr,310023,brightnessTemperature,34,False,0,0,0,,satellite,csr,brightness temperature [K](channel=34),float32
+satellite,csr,310023,brightnessTemperature,35,False,0,0,0,,satellite,csr,brightness temperature [K](channel=35),float32
+satellite,csr,310023,brightnessTemperature,36,False,0,0,0,,satellite,csr,brightness temperature [K](channel=36),float32

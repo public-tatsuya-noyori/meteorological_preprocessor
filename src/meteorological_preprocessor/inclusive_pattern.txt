@@ -103,14 +103,13 @@
 ^[A-Z][A-Z0-9]{3}/bufr/climatic/climat_ship/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/airs/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/amsua/[0-9]{12}/[^/]+\.bin.gz$
-^[A-Z][A-Z0-9]{3}/bufr/satellite/amv/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/ascat/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/asr/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/atms/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/cloud_analysis/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/cris/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/csr/[0-9]{12}/[^/]+\.bin.gz$
-^[A-Z][A-Z0-9]{3}/bufr/satellite/gnss_ro/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/gpsro/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/hirs/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/iasi/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/iasi_l2/[0-9]{12}/[^/]+\.bin.gz$
@@ -118,6 +117,7 @@
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/mwhs/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/mwts/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/ogdr/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/satob/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/siral/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/surface/bathy/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/surface/buoy/[0-9]{12}/[^/]+\.bin.gz$
