@@ -33,7 +33,7 @@ def main():
             pd.options.display.max_rows = None
         if args.columns:
             pd.options.display.max_columns = None
-        pd.options.display.float_format = '{:.5g}'.format
+        pd.options.display.float_format = '{:.6g}'.format
         ipc_reader = pa.ipc.open_file(args.input_arrow_file)
         if args.csv:
             print(ipc_reader.read_pandas(integer_object_nulls=True, types_mapper=null_int).to_csv(float_format='{:.6g}'.format))

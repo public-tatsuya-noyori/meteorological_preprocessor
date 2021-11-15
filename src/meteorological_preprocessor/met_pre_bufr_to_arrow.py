@@ -269,8 +269,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             if output_conf_name.split('@')[0] not in name_list:
                                 continue
                         if output_conf_name in output_dict and any([False if value == None else True for value in output_dict[output_conf_name]]):
-                            if debug:
-                                print('Debug', ':', 'output_conf_name =', output_conf_name, file=sys.stderr)
                             if output_data_type_dict[output_conf_name] == 'timestamp':
                                 field_list.append(pa.field(output_conf_name, pa.timestamp('ms', tz='utc'), nullable=not output_is_required_dict[output_conf_name]))
                             else:

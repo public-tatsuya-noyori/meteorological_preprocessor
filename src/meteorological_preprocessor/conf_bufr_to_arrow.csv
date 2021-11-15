@@ -94,35 +94,35 @@ surface,ship,308009,timePeriod,9,False,0,0,0,abs,surface,ship,maximum wind gust 
 surface,ship,308009,maximumWindGustDirection,2,False,0,0,0,,surface,ship,maximum wind gust direction [degree](2),float32
 surface,ship,308009,maximumWindGustSpeed,2,False,0,0,0,,surface,ship,maximum wind gust speed [m s-1](2),float32
 surface,ship,308009,timePeriod,10,False,0,0,0,abs,surface,ship,maximum wind gust speed [m s-1](2)@minute,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,latitude,1,True,0,0,0,,surface,synop,latitude [degree],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,longitude,1,True,0,0,0,,surface,synop,longitude [degree],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,year,1,True,0,0,0,,surface,synop,datetime,timestamp
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,month,1,True,0,0,0,,surface,synop,datetime,timestamp
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,day,1,True,0,0,0,,surface,synop,datetime,timestamp
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,hour,1,True,0,0,0,,surface,synop,datetime,timestamp
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,minute,1,True,0,0,0,,surface,synop,datetime,timestamp
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,blockNumber,1,False,0,0,1000,,surface,synop,station number,uint32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,stationNumber,1,False,0,0,1,,surface,synop,station number,uint32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,heightOfStationGroundAboveMeanSeaLevel,1,True,0,0,0,,surface,synop,height of station ground above mean sea level [m],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,pressureReducedToMeanSeaLevel,1,False,0,0,0,,surface,synop,pressure reduced to mean sea level [Pa],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,characteristicOfPressureTendency,1,False,0,0,0,,surface,synop,pressure tendency,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,airTemperature,1,False,0,0,0,,surface,synop,air temperature [K],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,dewpointTemperature,1,False,0,0,0,,surface,synop,dewpoint temperature [K],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,relativeHumidity,1,False,0,0,0,,surface,synop,relative humidity [%],uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,horizontalVisibility,1,False,0,0,0,,surface,synop,horizontal visibility [m],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudCoverTotal,1,False,0,0,0,,surface,synop,cloud cover total [%],uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudAmount,1,False,0,0,0,,surface,synop,cloud amount,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,heightOfBaseOfCloud,1,False,0,0,0,,surface,synop,height of base of cloud [m],uint16
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,1,False,0,0,0,,surface,synop,low cloud type,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,2,False,0,0,0,,surface,synop,middle cloud type,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,cloudType,3,False,0,0,0,,surface,synop,high cloud type,uint8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,presentWeather,1,False,0,0,0,,surface,synop,present weather,uint16
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,0,,surface,synop,total precipitation [kg m-2](1),float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,4,False,0,0,0,abs,surface,synop,total precipitation [kg m-2](1)@hour,int8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,0,,surface,synop,total precipitation [kg m-2](2),float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,timePeriod,5,False,0,0,0,abs,surface,synop,total precipitation [kg m-2](2)@hour,int8
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windDirection,1,False,0,0,0,,surface,synop,wind direction [degree],float32
-surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307096,windSpeed,1,False,0,0,0,,surface,synop,wind speed [m s-1],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,latitude,1,True,0,0,0,,surface,synop,latitude [degree],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,longitude,1,True,0,0,0,,surface,synop,longitude [degree],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,year,1,True,0,0,0,,surface,synop,datetime,timestamp
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,month,1,True,0,0,0,,surface,synop,datetime,timestamp
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,day,1,True,0,0,0,,surface,synop,datetime,timestamp
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,hour,1,True,0,0,0,,surface,synop,datetime,timestamp
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,minute,1,True,0,0,0,,surface,synop,datetime,timestamp
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,blockNumber,1,False,0,0,1000,,surface,synop,station number,uint32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,stationNumber,1,False,0,0,1,,surface,synop,station number,uint32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,heightOfStationGroundAboveMeanSeaLevel,1,True,0,0,0,,surface,synop,height of station ground above mean sea level [m],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,pressureReducedToMeanSeaLevel,1,False,0,0,0,,surface,synop,pressure reduced to mean sea level [Pa],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,characteristicOfPressureTendency,1,False,0,0,0,,surface,synop,pressure tendency,uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,airTemperature,1,False,0,0,0,,surface,synop,air temperature [K],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,dewpointTemperature,1,False,0,0,0,,surface,synop,dewpoint temperature [K],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,relativeHumidity,1,False,0,0,0,,surface,synop,relative humidity [%],uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,horizontalVisibility,1,False,0,0,0,,surface,synop,horizontal visibility [m],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,cloudCoverTotal,1,False,0,0,0,,surface,synop,cloud cover total [%],uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,cloudAmount,1,False,0,0,0,,surface,synop,cloud amount,uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,heightOfBaseOfCloud,1,False,0,0,0,,surface,synop,height of base of cloud [m],uint16
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,cloudType,1,False,0,0,0,,surface,synop,low cloud type,uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,cloudType,2,False,0,0,0,,surface,synop,middle cloud type,uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,cloudType,3,False,0,0,0,,surface,synop,high cloud type,uint8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,presentWeather,1,False,0,0,0,,surface,synop,present weather,uint16
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,0,,surface,synop,total precipitation [kg m-2](1),float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,timePeriod,4,False,0,0,0,abs,surface,synop,total precipitation [kg m-2](1)@hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,0,,surface,synop,total precipitation [kg m-2](2),float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,timePeriod,5,False,0,0,0,abs,surface,synop,total precipitation [kg m-2](2)@hour,int8
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,windDirection,1,False,0,0,0,,surface,synop,wind direction [degree],float32
+surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096,windSpeed,1,False,0,0,0,,surface,synop,wind speed [m s-1],float32
 surface,tesac,315003,waterPressure,0,True,0,0,0,,surface,tesac,water pressure [Pa],float32
 surface,tesac,315003,latitude,1,True,0,0,0,,surface,tesac,latitude [degree],float32
 surface,tesac,315003,longitude,1,True,0,0,0,,surface,tesac,longitude [degree],float32
