@@ -2,6 +2,7 @@
 import argparse
 import eccodes as ec
 import gribapi
+import math
 import numpy as np
 import os
 import pkg_resources
@@ -32,6 +33,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                 output_subcat = output_directory_list[1]
                 output_conf_df = input_conf_df[(input_conf_df['output_category'] == output_cat) & (input_conf_df['output_subcategory'] == output_subcat)]
                 output_dict = {}
+                output_data_type_dict = {}
+                output_is_required_dict = {}
                 for in_file in in_file_list:
                     match = re.search(r'^.*/' + cccc + '/bufr/' + cat_subcat + '/.*$', in_file)
                     if not match:
@@ -84,7 +87,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             continue
                                     if compressed_data == 0:
                                         for subset_number in range(1, number_of_subsets + 1):
-                                            subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + output_conf_tuple.key)
+                                            try:
+                                                subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + output_conf_tuple.key)
+                                            except gribapi.errors.KeyValueNotFoundError:
+                                                subset_value_list = [None]
+                                                if is_array:
+                                                    subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
                                             if (type(subset_value_list) is np.ndarray):
                                                 subset_value_list = subset_value_list.tolist()
                                             if pre_value_np_len == 0:
@@ -138,8 +146,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         value_np = np.array([None if value == None else abs(value) for value in value_np])
                                     if pre_value_np_len > 0:
                                         if pre_value_np_len != len(value_np):
-                                            print(pre_value_np_len)
-                                            print(len(value_np))
                                             print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to pre_value_np_len.', file=sys.stderr)
                                             break
                                     pre_value_np_len = len(value_np)
@@ -153,7 +159,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if output_conf_tuple.key in ['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond']:
                                             input_dict[output_conf_tuple.key] = value_np
                                         else:
-                                            input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number)] = value_np
+                                            input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key] = value_np
                                     else:
                                         input_dict[output_conf_tuple.key] = value_np
                                 if len(required_np) <= 0 or True not in required_np:
@@ -178,7 +184,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 hour_np = time_dict['hour']
                                 minute_np = time_dict['minute']
                                 second_np = time_dict['second']
-                                millisecond_np = time_dict['millisecond']
+                                if np.issubdtype(second_np.dtype, float):
+                                    millisecond_np = np.array([None if value == None else math.floor(value * 1000) - (math.floor(value) * 1000) for value in second_np])
+                                    second_np = np.array([None if value == None else math.floor(value) for value in second_np])
+                                else:
+                                    millisecond_np = time_dict['millisecond']
                                 timedelta_millisecond_list = [0 for value in year_np]
                                 timedelta_second_list = [0 for value in year_np]
                                 for timedelta_conf_tuple in output_conf_df[(output_conf_df['name'] == 'timedelta [millisecond]') | (output_conf_df['name'] == 'timedelta [second]')].itertuples():
@@ -188,71 +198,90 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         timedelta_millisecond_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key]]
                                 datetime_list = []
                                 for i, year in enumerate(year_np):
-                                    datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_np[i], second_np[i], millisecond_np[i], tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
+                                    datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_np[i], second_np[i], millisecond_np[i] * 1000, tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
                                 input_dict['datetime'] = np.array(datetime_list)
                                 calc_dict = {}
                                 pre_name = ''
+                                pre_data_type = ''
                                 for output_conf_tuple in output_conf_df.itertuples():
                                     if output_conf_tuple.key == 'year':
                                         input_np = input_dict['datetime']
                                     elif output_conf_tuple.key in ['month', 'day', 'hour', 'minute', 'second', 'millisecond'] or output_conf_tuple.name in ['timedelta [second]', 'timedelta [millisecond]']:
                                         continue
                                     else:
-                                        if output_conf_tuple.key_number > 0 and output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) in input_dict:
-                                            input_np = input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number)]
+                                        if output_conf_tuple.key_number > 0 and '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key in input_dict:
+                                            input_np = input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key]
                                         elif output_conf_tuple.key in input_dict:
                                             input_np = input_dict[output_conf_tuple.key]
                                         else:
                                             continue
                                         if output_conf_tuple.key == 'latitudeDisplacement' or output_conf_tuple.key == 'longitudeDisplacement':
                                             input_np = np.array([0.0 if value == None else value for value in input_np])
-                                    if output_conf_tuple.name in calc_dict:
-                                        tmp_np = calc_dict[output_conf_tuple.name]
-                                        if output_conf_tuple.multiply != 0:
-                                            calc_dict[output_conf_tuple.name] = tmp_np + output_conf_tuple.multiply * input_np
+                                    output_conf_tuple_name = output_conf_tuple.name
+                                    if len(output_conf_tuple_name) > 0:
+                                        if '{' in output_conf_tuple_name:
+                                            att_key = re.findall('{(.*)}', output_conf_tuple_name)[0]
+                                            att_value = input_dict[att_key][0]
+                                            if att_value != None:
+                                                output_conf_tuple_name = output_conf_tuple_name.replace('{' + att_key + '}', str(att_value))
+                                            else:
+                                                pre_name = output_conf_tuple_name
+                                                continue
+                                        if output_conf_tuple_name in calc_dict:
+                                            tmp_np = calc_dict[output_conf_tuple_name]
+                                            if output_conf_tuple.multiply != 0:
+                                                calc_dict[output_conf_tuple_name] = tmp_np + output_conf_tuple.multiply * input_np
+                                            else:
+                                                calc_dict[output_conf_tuple_name] = tmp_np + input_np
                                         else:
-                                            calc_dict[output_conf_tuple.name] = tmp_np + input_np
-                                    else:
-                                        if output_conf_tuple.multiply != 0:
-                                            calc_dict[output_conf_tuple.name] = output_conf_tuple.multiply * input_np
-                                        else:
-                                            calc_dict[output_conf_tuple.name] = input_np
-                                    if len(pre_name) > 0 and pre_name != output_conf_tuple.name:
-                                        if pre_name in output_dict:
-                                            output_dict[pre_name] = output_dict[pre_name] + calc_dict[pre_name].tolist()
-                                        else:
-                                            output_dict[pre_name] = calc_dict[pre_name].tolist()
-                                    pre_name = output_conf_tuple.name
+                                            if output_conf_tuple.multiply != 0:
+                                                calc_dict[output_conf_tuple_name] = output_conf_tuple.multiply * input_np
+                                            else:
+                                                calc_dict[output_conf_tuple_name] = input_np
+                                        if len(pre_name) > 0 and pre_name != output_conf_tuple_name:
+                                            if pre_name in output_dict:
+                                                output_dict[pre_name] = output_dict[pre_name] + calc_dict[pre_name].tolist()
+                                            else:
+                                                output_dict[pre_name] = calc_dict[pre_name].tolist()
+                                            output_data_type_dict[pre_name] = pre_data_type
+                                            output_is_required_dict[pre_name] = pre_is_required
+                                        pre_name = output_conf_tuple_name
+                                        pre_data_type = output_conf_tuple.data_type
+                                        pre_is_required = output_conf_tuple.is_required
                                 if len(pre_name) > 0:
                                     if pre_name in output_dict:
                                         output_dict[pre_name] = output_dict[pre_name] + calc_dict[pre_name].tolist()
                                     else:
                                         output_dict[pre_name] = calc_dict[pre_name].tolist()
+                                    output_data_type_dict[pre_name] = pre_data_type
+                                    output_is_required_dict[pre_name] = pre_is_required
                                 ec.codes_release(bufr)
                             except:
                                 traceback.print_exc(file=sys.stderr)
                                 break
                 if 'datetime' in output_dict:
-                    output_conf_name_np = np.array(list(set([output_conf_tuple.name for output_conf_tuple in output_conf_df.itertuples()])), dtype=str)
                     name_list = []
                     field_list = []
                     data_list = []
                     is_required_list = []
-                    for output_conf_name in np.sort(output_conf_name_np):
+                    for output_conf_name in np.sort(np.array(list(output_dict.keys()))):
                         if '@' in output_conf_name:
                             if output_conf_name.split('@')[0] not in name_list:
                                 continue
                         if output_conf_name in output_dict and any([False if value == None else True for value in output_dict[output_conf_name]]):
-                            for output_conf_name_tuple in output_conf_df[(output_conf_df['name'] == output_conf_name)].head(1).itertuples():
-                                if debug:
-                                    print('Debug', ':', 'output_conf_name =', output_conf_name, file=sys.stderr)
-                                if output_conf_name_tuple.data_type == 'timestamp':
-                                    field_list.append(pa.field(output_conf_name, pa.timestamp('ms', tz='utc'), nullable=not output_conf_name_tuple.is_required))
-                                else:
-                                    field_list.append(pa.field(output_conf_name, output_conf_name_tuple.data_type, nullable=not output_conf_name_tuple.is_required))
+                            if debug:
+                                print('Debug', ':', 'output_conf_name =', output_conf_name, file=sys.stderr)
+                            if output_data_type_dict[output_conf_name] == 'timestamp':
+                                field_list.append(pa.field(output_conf_name, pa.timestamp('ms', tz='utc'), nullable=not output_is_required_dict[output_conf_name]))
+                            else:
+                                field_list.append(pa.field(output_conf_name, output_data_type_dict[output_conf_name], nullable=not output_is_required_dict[output_conf_name]))
+                            if output_data_type_dict[output_conf_name] == 'float16':
+                                data_list.append(pa.array(np.array(output_dict[output_conf_name]).astype(np.float16), 'float16'))
+                            else:
                                 data_list.append(pa.array(output_dict[output_conf_name]))
-                                name_list.append(output_conf_name)
-                                is_required_list.append(output_conf_name_tuple.is_required)
+                            
+                            name_list.append(output_conf_name)
+                            is_required_list.append(output_is_required_dict[output_conf_name])
                     if len(field_list) <=0 or False not in is_required_list:
                         continue
                     out_directory_list = [out_dir, cccc, 'bufr_to_arrow', output_cat, output_subcat]
