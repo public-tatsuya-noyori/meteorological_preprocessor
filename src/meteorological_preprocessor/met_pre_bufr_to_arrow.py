@@ -83,7 +83,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
                                             break
                                         else:
-                                            input_dict[output_conf_tuple.key] = np.array([None for i in range(pre_value_np_len)])
                                             continue
                                     if compressed_data == 0:
                                         for subset_number in range(1, number_of_subsets + 1):
