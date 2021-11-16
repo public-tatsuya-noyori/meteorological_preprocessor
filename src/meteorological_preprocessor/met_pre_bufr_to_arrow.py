@@ -92,7 +92,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             except gribapi.errors.KeyValueNotFoundError:
                                                 subset_value_list = [None]
                                                 if is_array:
-                                                    subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
+                                                    if pre_value_np_len == 0:
+                                                        subset_array_size_list.append(0)
+                                                        continue
+                                                    else:
+                                                        subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
                                             if (type(subset_value_list) is np.ndarray):
                                                 subset_value_list = subset_value_list.tolist()
                                             if pre_value_np_len == 0:
@@ -122,8 +126,14 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 value_list = [None for i in range(pre_value_np_len)]
                                         if (type(value_list) is np.ndarray):
                                             value_list = value_list.tolist()
-                                        if len(value_list) == 1 and pre_value_np_len > 0:
-                                            value_list = [value_list[0] for i in range(pre_value_np_len)]
+                                        if pre_value_np_len > 0:
+                                            if len(value_list) == 1:
+                                                value_list = [value_list[0] for i in range(pre_value_np_len)]
+                                        elif pre_value_np_len == 0 and len(value_list) == 1:
+                                            if isinstance(value_list[0], int) and value_list[0] == ec.CODES_MISSING_LONG:
+                                                break 
+                                            elif isinstance(value_list[0], float) and value_list[0] == ec.CODES_MISSING_DOUBLE:
+                                                break 
                                     value_np = np.array(value_list)
                                     if np.issubdtype(value_np.dtype, np.integer):
                                         value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
@@ -132,12 +142,17 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     elif np.issubdtype(value_np.dtype, str):
                                         value_np = np.array([string.strip() for string in value_np], dtype=str)
                                     elif np.issubdtype(value_np.dtype, object):
-                                        if isinstance(value_np[0], int):
-                                            value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
-                                        elif isinstance(value_np[0], float):
-                                            value_np = np.where(value_np == ec.CODES_MISSING_DOUBLE, None, value_np)
-                                        elif isinstance(value_np[0], str):
-                                            value_np = np.array([string.strip() for string in value_np], dtype=str)
+                                        value_list = []
+                                        for value in value_np:
+                                            if isinstance(value, int) and value == ec.CODES_MISSING_LONG:
+                                                value_list.append(None)
+                                            elif isinstance(value, float) and value == ec.CODES_MISSING_DOUBLE:
+                                                value_list.append(None)
+                                            elif isinstance(value, str):
+                                                value_list.append(string.strip())
+                                            else:
+                                                value_list.append(value)
+                                        value_np = np.array(value_list)
                                     if output_conf_tuple.name == 'longitude [degree]':
                                         value_np = np.where(value_np == 180, -180, value_np)
                                     if output_conf_tuple.slide > -1 and output_conf_tuple.step > 0:
@@ -146,8 +161,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         value_np = np.array([None if value == None else abs(value) for value in value_np])
                                     if pre_value_np_len > 0:
                                         if pre_value_np_len != len(value_np):
-                                            print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to pre_value_np_len.', file=sys.stderr)
-                                            break
+                                            if pre_value_np_len == len(value_np) - 1:
+                                                value_np = np.delete(value_np, -1)
+                                            else:
+                                                print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to pre_value_np_len.', file=sys.stderr)
+                                                break
                                     pre_value_np_len = len(value_np)
                                     if output_conf_tuple.is_required:
                                         tmp_required_np = np.array([False if value == None else True for value in value_np])
@@ -256,6 +274,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     output_data_type_dict[pre_name] = pre_data_type
                                     output_is_required_dict[pre_name] = pre_is_required
                                 ec.codes_release(bufr)
+                            except gribapi.errors.WrongLengthError:
+                                print('Warning', warno, ': A BUFR of', in_file, 'is wrong length.', file=sys.stderr)
+                                break
                             except:
                                 traceback.print_exc(file=sys.stderr)
                                 break
