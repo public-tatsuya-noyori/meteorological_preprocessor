@@ -62,14 +62,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 unexpanded_descriptors = ec.codes_get_array(bufr, 'unexpandedDescriptors')
                                 compressed_data = ec.codes_get(bufr, 'compressedData')
                                 number_of_subsets = ec.codes_get(bufr, 'numberOfSubsets')
-                                if number_of_subsets <= 0:
-                                    print('Warning', warno, ':', in_file, 'numberOfSubsets is 0.', file=sys.stderr)
-                                    continue
                                 ec.codes_set(bufr, 'unpack', 1)
                                 is_array = False
                                 if len(output_conf_df[(output_conf_df['key_number'] == 0)].index) > 0:
                                     is_array = True
-                                pre_value_np_len = 0
+                                is_first_key = True
+                                first_key_value_np_len = 0
                                 subset_array_size_list = []
                                 for output_conf_tuple in output_conf_df.itertuples():
                                     value_list = []
@@ -78,107 +76,114 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if len(set([int(i) for i in descriptors.split(' ')]) - set(unexpanded_descriptors)) == 0:
                                             is_descriptors = True
                                             break
-                                    if not is_descriptors:
-                                        if pre_value_np_len == 0:
-                                            print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
-                                            break
-                                        else:
-                                            continue
-                                    if compressed_data == 0:
-                                        for subset_number in range(1, number_of_subsets + 1):
-                                            try:
-                                                subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + output_conf_tuple.key)
-                                            except gribapi.errors.KeyValueNotFoundError:
-                                                subset_value_list = [None]
-                                                if is_array:
-                                                    if pre_value_np_len == 0:
-                                                        subset_array_size_list.append(0)
-                                                        continue
-                                                    else:
-                                                        subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
-                                            if (type(subset_value_list) is np.ndarray):
-                                                subset_value_list = subset_value_list.tolist()
-                                            if pre_value_np_len == 0:
-                                                subset_array_size_list.append(len(subset_value_list))
-                                            if output_conf_tuple.key_number == 0:
-                                                if len(subset_value_list) < subset_array_size_list[subset_number - 1]:
-                                                    for none_counter in range(subset_array_size_list[subset_number - 1] - len(subset_value_list)):
-                                                        subset_value_list.append(None)
-                                            else:
-                                                if len(subset_value_list) >= output_conf_tuple.key_number:
-                                                    subset_value_list = [subset_value_list[output_conf_tuple.key_number - 1]]
+                                    if is_descriptors:
+                                        if compressed_data == 0:
+                                            for subset_number in range(1, number_of_subsets + 1):
+                                                subset_value_list = []
+                                                try:
+                                                    subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + output_conf_tuple.key)
+                                                except gribapi.errors.KeyValueNotFoundError:
+                                                    if not is_first_key:
+                                                        subset_value_list = [None for i in range(subset_array_size_list[subset_number - 1])]
+                                                if (type(subset_value_list) is np.ndarray):
+                                                    subset_value_list = subset_value_list.tolist()
+                                                if is_first_key:
+                                                    subset_array_size_list.append(len(subset_value_list))
                                                 else:
-                                                    subset_value_list = [None]
-                                                if is_array:
-                                                    subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
-                                            value_list = value_list + subset_value_list
-                                    else:
-                                        if output_conf_tuple.key_number > 0:
-                                            try:
-                                                value_list = ec.codes_get_array(bufr, '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key)
-                                            except gribapi.errors.KeyValueNotFoundError:
-                                                value_list = [None for i in range(pre_value_np_len)]
+                                                    if output_conf_tuple.key_number == 0:
+                                                        if len(subset_value_list) < subset_array_size_list[subset_number - 1]:
+                                                            for none_counter in range(subset_array_size_list[subset_number - 1] - len(subset_value_list)):
+                                                                subset_value_list.append(None)
+                                                    else:
+                                                        if is_array and len(subset_value_list) == 1:
+                                                            subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
+                                                        else:
+                                                            if output_conf_tuple.key_number <= len(subset_value_list):
+                                                                subset_value_list = [subset_value_list[output_conf_tuple.key_number - 1]]
+                                                            else:
+                                                                subset_value_list = [None]
+                                                value_list = value_list + subset_value_list
                                         else:
-                                            try:
-                                                value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
-                                            except gribapi.errors.KeyValueNotFoundError:
-                                                value_list = [None for i in range(pre_value_np_len)]
-                                        if (type(value_list) is np.ndarray):
-                                            value_list = value_list.tolist()
-                                        if pre_value_np_len > 0:
-                                            if len(value_list) == 1:
-                                                value_list = [value_list[0] for i in range(pre_value_np_len)]
-                                        elif pre_value_np_len == 0 and len(value_list) == 1:
-                                            if isinstance(value_list[0], int) and value_list[0] == ec.CODES_MISSING_LONG:
-                                                break 
-                                            elif isinstance(value_list[0], float) and value_list[0] == ec.CODES_MISSING_DOUBLE:
-                                                break 
-                                    value_np = np.array(value_list)
-                                    if np.issubdtype(value_np.dtype, np.integer):
-                                        value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
-                                    elif np.issubdtype(value_np.dtype, float):
-                                        value_np = np.where(value_np == ec.CODES_MISSING_DOUBLE, None, value_np)
-                                    elif np.issubdtype(value_np.dtype, str):
-                                        value_np = np.array([string.strip() for string in value_np], dtype=str)
-                                    elif np.issubdtype(value_np.dtype, object):
-                                        value_list = []
-                                        for value in value_np:
-                                            if isinstance(value, int) and value == ec.CODES_MISSING_LONG:
-                                                value_list.append(None)
-                                            elif isinstance(value, float) and value == ec.CODES_MISSING_DOUBLE:
-                                                value_list.append(None)
-                                            elif isinstance(value, str):
-                                                value_list.append(string.strip())
+                                            if output_conf_tuple.key_number > 0:
+                                                try:
+                                                    value_list = ec.codes_get_array(bufr, '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key)
+                                                except gribapi.errors.KeyValueNotFoundError:
+                                                    if is_first_key:
+                                                        value_list = []
+                                                    else:
+                                                        value_list = [None for i in range(first_key_value_np_len)]
                                             else:
-                                                value_list.append(value)
+                                                try:
+                                                    value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
+                                                except gribapi.errors.KeyValueNotFoundError:
+                                                    if is_first_key:
+                                                        value_list = []
+                                                    else:
+                                                        value_list = [None for i in range(first_key_value_np_len)]
+                                            if (type(value_list) is np.ndarray):
+                                                value_list = value_list.tolist()
+                                            if not is_first_key:
+                                                if len(value_list) == 1:
+                                                    value_list = [value_list[0] for i in range(first_key_value_np_len)]
+                                        if is_first_key:
+                                            if len(value_list) == 0:
+                                               break
+                                            elif len(value_list) == 1:
+                                                if isinstance(value_list[0], int) and value_list[0] == ec.CODES_MISSING_LONG:
+                                                    break 
+                                                elif isinstance(value_list[0], float) and value_list[0] == ec.CODES_MISSING_DOUBLE:
+                                                    break 
                                         value_np = np.array(value_list)
-                                    if output_conf_tuple.name == 'longitude [degree]':
-                                        value_np = np.where(value_np == 180, -180, value_np)
-                                    if output_conf_tuple.slide > -1 and output_conf_tuple.step > 0:
-                                        value_np = value_np[output_conf_tuple.slide::output_conf_tuple.step]
-                                    if output_conf_tuple.math == 'abs':
-                                        value_np = np.array([None if value == None else abs(value) for value in value_np])
-                                    if pre_value_np_len > 0:
-                                        if pre_value_np_len != len(value_np):
-                                            if pre_value_np_len == len(value_np) - 1:
-                                                value_np = np.delete(value_np, -1)
-                                            else:
-                                                print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to pre_value_np_len.', file=sys.stderr)
-                                                break
-                                    pre_value_np_len = len(value_np)
-                                    if output_conf_tuple.is_required:
-                                        tmp_required_np = np.array([False if value == None else True for value in value_np])
-                                        if len(required_np) > 0:
-                                            required_np = required_np * tmp_required_np
+                                        if np.issubdtype(value_np.dtype, np.integer):
+                                            value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
+                                        elif np.issubdtype(value_np.dtype, float):
+                                            value_np = np.where(value_np == ec.CODES_MISSING_DOUBLE, None, value_np)
+                                        elif np.issubdtype(value_np.dtype, str):
+                                            value_np = np.array([string.strip() for string in value_np], dtype=str)
+                                        elif np.issubdtype(value_np.dtype, object):
+                                            value_list = []
+                                            for value in value_np:
+                                                if isinstance(value, int) and value == ec.CODES_MISSING_LONG:
+                                                    value_list.append(None)
+                                                elif isinstance(value, float) and value == ec.CODES_MISSING_DOUBLE:
+                                                    value_list.append(None)
+                                                elif isinstance(value, str):
+                                                    value_list.append(value.strip())
+                                                else:
+                                                    value_list.append(value)
+                                            value_np = np.array(value_list)
+                                        if output_conf_tuple.name == 'longitude [degree]':
+                                            value_np = np.where(value_np == 180, -180, value_np)
+                                        if output_conf_tuple.slide > -1 and output_conf_tuple.step > 0:
+                                            value_np = value_np[output_conf_tuple.slide::output_conf_tuple.step]
+                                        if output_conf_tuple.math == 'abs':
+                                            value_np = np.array([None if value == None else abs(value) for value in value_np])
+                                        if is_first_key:
+                                            is_first_key = False
+                                            first_key_value_np_len = len(value_np)
                                         else:
-                                            required_np = tmp_required_np
-                                    if output_conf_tuple.key_number > 0:
+                                            if first_key_value_np_len != len(value_np):
+                                                if first_key_value_np_len == len(value_np) - 1:
+                                                    value_np = np.delete(value_np, -1)
+                                                else:
+                                                    print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to first_key_value_np_len.', file=sys.stderr)
+                                                    break
+                                        if output_conf_tuple.is_required:
+                                            tmp_required_np = np.array([False if value == None else True for value in value_np])
+                                            if len(required_np) > 0:
+                                                required_np = required_np * tmp_required_np
+                                            else:
+                                                required_np = tmp_required_np
                                         if output_conf_tuple.key in ['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond']:
                                             input_dict[output_conf_tuple.key] = value_np
                                         else:
-                                            input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key] = value_np
+                                            input_dict[output_conf_tuple.key + output_conf_tuple.name] = value_np
                                     else:
-                                        input_dict[output_conf_tuple.key] = value_np
+                                        if is_first_key:
+                                            print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
+                                            break
+                                        else:
+                                            input_dict[output_conf_tuple.key + output_conf_tuple.name] = np.array([None for i in range(first_key_value_np_len)])
                                 if len(required_np) <= 0 or True not in required_np:
                                     continue
                                 index_np = np.array([index for index, value in enumerate(required_np) if value == True])
@@ -210,9 +215,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 timedelta_second_list = [0 for value in year_np]
                                 for timedelta_conf_tuple in output_conf_df[(output_conf_df['name'] == 'timedelta [millisecond]') | (output_conf_df['name'] == 'timedelta [second]')].itertuples():
                                     if timedelta_conf_tuple.name == 'timedelta [second]':
-                                        timedelta_second_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key]]
+                                        timedelta_second_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key + timedelta_conf_tuple.name]]
                                     elif timedelta_conf_tuple.name == 'timedelta [millisecond]':
-                                        timedelta_millisecond_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key]]
+                                        timedelta_millisecond_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key + timedelta_conf_tuple.name]]
                                 datetime_list = []
                                 for i, year in enumerate(year_np):
                                     datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_np[i], second_np[i], millisecond_np[i] * 1000, tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
@@ -226,10 +231,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     elif output_conf_tuple.key in ['month', 'day', 'hour', 'minute', 'second', 'millisecond'] or output_conf_tuple.name in ['timedelta [second]', 'timedelta [millisecond]']:
                                         continue
                                     else:
-                                        if output_conf_tuple.key_number > 0 and '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key in input_dict:
-                                            input_np = input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key]
-                                        elif output_conf_tuple.key in input_dict:
-                                            input_np = input_dict[output_conf_tuple.key]
+                                        if output_conf_tuple.key + output_conf_tuple.name in input_dict:
+                                            input_np = input_dict[output_conf_tuple.key + output_conf_tuple.name]
                                         else:
                                             continue
                                         if output_conf_tuple.key == 'latitudeDisplacement' or output_conf_tuple.key == 'longitudeDisplacement':
@@ -247,12 +250,15 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if output_conf_tuple_name in calc_dict:
                                             tmp_np = calc_dict[output_conf_tuple_name]
                                             if output_conf_tuple.multiply != 0:
-                                                calc_dict[output_conf_tuple_name] = tmp_np + output_conf_tuple.multiply * input_np
+                                                calc_dict[output_conf_tuple_name] = np.array([None if value == None or tmp_np[i] == None else tmp_np[i] + (output_conf_tuple.multiply * value) for i, value in enumerate(input_np)])
                                             else:
+                                                if output_conf_tuple_name == 'height [m]':
+                                                    tmp_np = np.array([0 if value == None else value for value in tmp_np])
+                                                    input_np = np.array([0 if value == None else value for value in input_np])
                                                 calc_dict[output_conf_tuple_name] = tmp_np + input_np
                                         else:
                                             if output_conf_tuple.multiply != 0:
-                                                calc_dict[output_conf_tuple_name] = output_conf_tuple.multiply * input_np
+                                                calc_dict[output_conf_tuple_name] = np.array([None if value == None else output_conf_tuple.multiply * value for value in input_np])
                                             else:
                                                 calc_dict[output_conf_tuple_name] = input_np
                                         if len(pre_name) > 0 and pre_name != output_conf_tuple_name:
@@ -274,7 +280,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     output_is_required_dict[pre_name] = pre_is_required
                                 ec.codes_release(bufr)
                             except gribapi.errors.WrongLengthError:
-                                print('Warning', warno, ': A BUFR of', in_file, 'is wrong length.', file=sys.stderr)
                                 break
                             except:
                                 traceback.print_exc(file=sys.stderr)
