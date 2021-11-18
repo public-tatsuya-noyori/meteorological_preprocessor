@@ -180,7 +180,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             input_dict[output_conf_tuple.key + output_conf_tuple.name] = value_np
                                     else:
                                         if is_first_key:
-                                            print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
+                                            if debug:
+                                                print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
                                             break
                                         else:
                                             input_dict[output_conf_tuple.key + output_conf_tuple.name] = np.array([None for i in range(first_key_value_np_len)])
@@ -279,6 +280,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     output_data_type_dict[pre_name] = pre_data_type
                                     output_is_required_dict[pre_name] = pre_is_required
                                 ec.codes_release(bufr)
+                            except gribapi.errors.PrematureEndOfFileError:
+                                break
                             except gribapi.errors.WrongLengthError:
                                 break
                             except:
