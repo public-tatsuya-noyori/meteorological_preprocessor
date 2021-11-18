@@ -12,9 +12,8 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv, feather
 
-def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, debug):
+def convert_to_tile_arrow(in_file_list, out_dir, out_list_file, conf_df, debug):
     warno = 189
-    res = 180 / 2**zoom
     cccc = ''
     form = ''
     cat_dir = ''
@@ -27,15 +26,24 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
     del_etfo_id_dict = {}
     out_file_dict = {}
     all_column_dict = {}
-    convert_cat_subcat_set = set([re.sub(r'/[^/]*C_[A-Z]{4}_[0-9]*\.feather$', '', re.search(r'[^/]*/[^/]*/[^/]*/[^/]*\.feather$', in_file).group()) for in_file in in_file_list])
+    convert_cat_subcat_set = set([re.sub(r'/[^/]*C_[A-Z]{4}_[0-9]*\.arrow$', '', re.search(r'[^/]*/[^/]*/[^/]*/[^/]*\.arrow$', in_file).group()) for in_file in in_file_list])
     for convert_cat_subcat in convert_cat_subcat_set:
         convert_cat_subcat_match = re.search(r'^([^/]*)/([^/]*)/([^/]*)$', convert_cat_subcat)
         convert = convert_cat_subcat_match.group(1)
         cat = convert_cat_subcat_match.group(2)
         subcat = convert_cat_subcat_match.group(3)
         convert_cat_subcat_df = conf_df[(conf_df['convert'] == convert) & (conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
+        conf_tuple = ()
+        if len(convert_cat_subcat_df.index) == 1:
+            for convert_cat_subcat_tuple in convert_cat_subcat_df.head(1).itertuples():
+                conf_tuple = convert_cat_subcat_tuple
+        else:
+            continue
+        zoom = conf_tuple.zoom
+        res = 180 / 2**zoom
+        sort_key_list = conf_tuple.location_datetime_list.split(';')
         for in_file in in_file_list:
-            match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/' + convert_cat_subcat+ '/[^/]*C_([A-Z]{4})_([0-9]*)\.feather$', in_file)
+            match = re.search(r'^.*/([A-Z][A-Z][A-Z][A-Z])/' + convert_cat_subcat+ '/[^/]*C_([A-Z]{4})_([0-9]*)\.arrow$', in_file)
             if not match:
                 continue
             if debug:
@@ -56,8 +64,9 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                         tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] > 90.0 - res * (tile_y + 1))]
                     new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.floor("10T").unique()
                     for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                        sort_key_list = convert_cat_subcat_df[(convert_cat_subcat_df['location_datetime'] == 1)]['name'].values.tolist()
                         new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=10))].dropna(subset=sort_key_list).dropna(axis=1, how='all')
+                        property_np = set(new_df.columns.values.tolist()) - set(sort_key_list)
+                        print(property_np)
                         if len(new_df.index) > 0:
                             out_directory = ''.join([out_dir, '/', convert_cat_subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(zoom), '/', str(tile_x), '/', str(tile_y)])
                             ssc_df = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
@@ -73,14 +82,14 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                             new_df.drop_duplicates(subset=sort_key_list, keep='last', inplace=True)
                             sort_key_list.insert(1, 'time since created [s]')
                             new_df.reset_index(drop=True, inplace=True)
-                            out_file = ''.join([out_directory, '/location_datetime.feather'])
-                            properties_df = convert_cat_subcat_df[(convert_cat_subcat_df['location_datetime'] == 0)]
+                            out_file = ''.join([out_directory, '/location_datetime.arrow'])
+
                             if out_directory in all_column_dict:
                                 old_df = all_column_dict[out_directory]
                             elif os.path.exists(out_file):
                                 old_df = feather.read_feather(out_file)
-                                for column in properties_df['name'].values.tolist():
-                                    old_df.join(feather.read_feather(''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])))
+                                for column in property_np:
+                                    old_df.join(feather.read_feather(''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.arrow'])))
                             else:
                                 old_df = new_df.iloc[0:0]
                             if len(old_df.index) > 0:
@@ -92,14 +101,14 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
                                 concat_df.reset_index(drop=True, inplace=True)
                                 all_column_dict[out_directory] = concat_df
                                 out_file_dict[out_file] = concat_df[sort_key_list]
-                                for column in properties_df['name'].values.tolist():
-                                    out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])
+                                for column in property_np:
+                                    out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.arrow'])
                                     out_file_dict[out_file] = concat_df[[column]]
                             else:
                                 all_column_dict[out_directory] = new_df
                                 out_file_dict[out_file] = new_df[sort_key_list]
-                                for column in properties_df['name'].values.tolist():
-                                    out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.feather'])
+                                for column in property_np:
+                                    out_file = ''.join([out_directory, '/', column.split('[')[0].strip(' ').replace(' ', '_').replace('/', '_'), '.arrow'])
                                     out_file_dict[out_file] = new_df[[column]]
     for out_file, out_df in out_file_dict.items():
         os.makedirs(os.path.dirname(out_file), exist_ok=True)
@@ -107,17 +116,12 @@ def convert_to_tile_arrow(in_file_list, out_dir, zoom, out_list_file, conf_df, d
         with open(out_file, 'bw') as out_f:
             feather.write_feather(table, out_f, compression='zstd', compression_level=15)
         print(out_file, file=out_list_file)
-        out_file = re.sub(r'\.feather', '.arrow', out_file)
-        with open(out_file, 'bw') as out_f:
-            feather.write_feather(table, out_f, compression='uncompressed')
-        os.system("gzip {}".format(out_file))
 
 def main():
     errno=198
     parser = argparse.ArgumentParser()
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
-    parser.add_argument('zoom', type=int, metavar='zoom')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
@@ -153,7 +157,7 @@ def main():
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_df = csv.read_csv(config).to_pandas()
-        convert_to_tile_arrow(input_file_list, args.output_directory, args.zoom, args.output_list_file, conf_df, args.debug)
+        convert_to_tile_arrow(input_file_list, args.output_directory, args.output_list_file, conf_df, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
