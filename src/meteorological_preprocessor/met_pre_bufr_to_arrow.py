@@ -82,26 +82,26 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 subset_value_list = []
                                                 try:
                                                     subset_value_list = ec.codes_get_array(bufr, "/subsetNumber=" + str(subset_number) + "/" + output_conf_tuple.key)
+                                                    if (type(subset_value_list) is np.ndarray):
+                                                        subset_value_list = subset_value_list.tolist()
+                                                    if is_first_key:
+                                                        subset_array_size_list.append(len(subset_value_list))
+                                                    else:
+                                                        if output_conf_tuple.key_number == 0:
+                                                            if len(subset_value_list) < subset_array_size_list[subset_number - 1]:
+                                                                for none_counter in range(subset_array_size_list[subset_number - 1] - len(subset_value_list)):
+                                                                    subset_value_list.append(None)
+                                                        else:
+                                                            if is_array and len(subset_value_list) == 1:
+                                                                subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
+                                                            else:
+                                                                if output_conf_tuple.key_number <= len(subset_value_list):
+                                                                    subset_value_list = [subset_value_list[output_conf_tuple.key_number - 1]]
+                                                                else:
+                                                                    subset_value_list = [None]
                                                 except gribapi.errors.KeyValueNotFoundError:
                                                     if not is_first_key:
                                                         subset_value_list = [None for i in range(subset_array_size_list[subset_number - 1])]
-                                                if (type(subset_value_list) is np.ndarray):
-                                                    subset_value_list = subset_value_list.tolist()
-                                                if is_first_key:
-                                                    subset_array_size_list.append(len(subset_value_list))
-                                                else:
-                                                    if output_conf_tuple.key_number == 0:
-                                                        if len(subset_value_list) < subset_array_size_list[subset_number - 1]:
-                                                            for none_counter in range(subset_array_size_list[subset_number - 1] - len(subset_value_list)):
-                                                                subset_value_list.append(None)
-                                                    else:
-                                                        if is_array and len(subset_value_list) == 1:
-                                                            subset_value_list = [subset_value_list[0] for i in range(subset_array_size_list[subset_number - 1])]
-                                                        else:
-                                                            if output_conf_tuple.key_number <= len(subset_value_list):
-                                                                subset_value_list = [subset_value_list[output_conf_tuple.key_number - 1]]
-                                                            else:
-                                                                subset_value_list = [None]
                                                 value_list = value_list + subset_value_list
                                         else:
                                             if output_conf_tuple.key_number > 0:
@@ -109,7 +109,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                     value_list = ec.codes_get_array(bufr, '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key)
                                                 except gribapi.errors.KeyValueNotFoundError:
                                                     if is_first_key:
-                                                        value_list = []
+                                                        value_list = [None for i in range(number_of_subsets)]
                                                     else:
                                                         value_list = [None for i in range(first_key_value_np_len)]
                                             else:
@@ -117,22 +117,19 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                     value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
                                                 except gribapi.errors.KeyValueNotFoundError:
                                                     if is_first_key:
-                                                        value_list = []
+                                                        value_list = [None for i in range(number_of_subsets)]
                                                     else:
                                                         value_list = [None for i in range(first_key_value_np_len)]
                                             if (type(value_list) is np.ndarray):
                                                 value_list = value_list.tolist()
-                                            if not is_first_key:
-                                                if len(value_list) == 1:
+                                            if len(value_list) == 1:
+                                                if is_first_key:
+                                                    value_list = [value_list[0] for i in range(number_of_subsets)]
+                                                else:
                                                     value_list = [value_list[0] for i in range(first_key_value_np_len)]
                                         if is_first_key:
                                             if len(value_list) == 0:
                                                break
-                                            elif len(value_list) == 1:
-                                                if isinstance(value_list[0], int) and value_list[0] == ec.CODES_MISSING_LONG:
-                                                    break 
-                                                elif isinstance(value_list[0], float) and value_list[0] == ec.CODES_MISSING_DOUBLE:
-                                                    break 
                                         value_np = np.array(value_list)
                                         if np.issubdtype(value_np.dtype, np.integer):
                                             value_np = np.where(value_np == ec.CODES_MISSING_LONG, None, value_np)
@@ -161,6 +158,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if output_conf_tuple.math == 'str':
                                             value_np = np.array([None if value == None else str(value) for value in value_np], dtype=object)
                                         if is_first_key:
+                                            if np.all(value_np == None):
+                                                break
                                             is_first_key = False
                                             first_key_value_np_len = len(value_np)
                                         else:
@@ -168,7 +167,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 if first_key_value_np_len == len(value_np) - 1:
                                                     value_np = np.delete(value_np, -1)
                                                 else:
-                                                    print('Warning', warno, in_file, ':', output_conf_tuple.key, ' is not equals to first_key_value_np_len.', file=sys.stderr)
+                                                    print('Warning', warno, in_file, ':', output_conf_tuple.key, 'is not equals to first_key_value_np_len.', file=sys.stderr)
                                                     break
                                         if output_conf_tuple.is_required:
                                             tmp_required_np = np.array([False if value == None else True for value in value_np])
@@ -259,9 +258,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                     if output_conf_tuple_name == 'station id':
                                                         calc_dict[output_conf_tuple_name] = tmp_np + '-' + input_np
                                                     else:
-                                                        if output_conf_tuple_name == 'height [m]':
-                                                            tmp_np = np.array([0 if value == None else value for value in tmp_np])
-                                                            input_np = np.array([0 if value == None else value for value in input_np])
                                                         calc_dict[output_conf_tuple_name] = tmp_np + input_np
                                         else:
                                             if output_conf_tuple.is_reset:
