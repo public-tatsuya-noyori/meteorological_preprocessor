@@ -100,7 +100,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                                 else:
                                                                     subset_value_list = [None]
                                                 except gribapi.errors.KeyValueNotFoundError:
-                                                    if not is_first_key:
+                                                    if is_first_key:
+                                                        subset_array_size_list.append(0)
+                                                    else:
                                                         subset_value_list = [None for i in range(subset_array_size_list[subset_number - 1])]
                                                 value_list = value_list + subset_value_list
                                         else:
