@@ -137,23 +137,23 @@ surface,synop,307092,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,False,
 surface,synop,307092,timePeriod,2,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2]@minute,uint8,False
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096;301090 302031 302035 302036 302047 008002 302048 302037 302043 302044 101002 302045 302046;301090 302031 302032 302033 302034 302004 104004 008002 020011 020012 020013 302038 302040 302041 007032 002002 008021 004025 011001 011002 302044;301090 010004 010051 004024 010060 010063 302072 302042 004024 013011 302034,windDirection,1,False,0,0,False,False,0,,surface,synop,wind direction [degree],float32,False
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096;301090 302031 302035 302036 302047 008002 302048 302037 302043 302044 101002 302045 302046;301090 302031 302032 302033 302034 302004 104004 008002 020011 020012 020013 302038 302040 302041 007032 002002 008021 004025 011001 011002 302044;301090 010004 010051 004024 010060 010063 302072 302042 004024 013011 302034,windSpeed,1,False,0,0,False,False,0,,surface,synop,wind speed [m s-1],float32,False
-surface,tesac,315003,waterPressure,0,True,0,0,False,False,0,,surface,tesac,water pressure [Pa],float32,False
-surface,tesac,315003,latitude,1,True,0,0,False,False,0,,surface,tesac,latitude [degree],float32,False
-surface,tesac,315003,longitude,1,True,0,0,False,False,0,,surface,tesac,longitude [degree],float32,False
-surface,tesac,315003,year,1,True,0,0,False,False,0,,surface,tesac,datetime,timestamp,False
-surface,tesac,315003,month,1,True,0,0,False,False,0,,surface,tesac,datetime,timestamp,False
-surface,tesac,315003,day,1,True,0,0,False,False,0,,surface,tesac,datetime,timestamp,False
-surface,tesac,315003,hour,1,True,0,0,False,False,0,,surface,tesac,datetime,timestamp,False
-surface,tesac,315003,minute,1,True,0,0,False,False,0,,surface,tesac,datetime,timestamp,False
-surface,tesac,315003,marineObservingPlatformIdentifier,1,False,0,0,False,False,0,,surface,tesac,station id,string,False
-surface,tesac,315003,oceanographicWaterTemperature,0,False,0,0,False,False,0,,surface,tesac,oceanographic water temperature [K],float32,False
-surface,tesac,315003,salinity,0,False,0,0,False,False,0,,surface,tesac,salinity [%],float32,False
-surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,1,3,False,False,0,,surface,tesac,waterPressure [Pa]@qualifier for gtspp quality flag,uint8,False
-surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,2,3,False,False,0,,surface,tesac,oceanographic water temperature [K]@qualifier for gtspp quality flag,uint8,False
-surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,3,3,False,False,0,,surface,tesac,salinity [%]@qualifier for gtspp quality flag,uint8,False
-surface,tesac,315003,globalGtsppQualityFlag,0,False,1,3,False,False,0,,surface,tesac,waterPressure [Pa]@global gtspp quality flag,uint8,False
-surface,tesac,315003,globalGtsppQualityFlag,0,False,2,3,False,False,0,,surface,tesac,oceanographic water temperature [K]@global gtspp quality flag,uint8,False
-surface,tesac,315003,globalGtsppQualityFlag,0,False,3,3,False,False,0,,surface,tesac,salinity [%]@global gtspp quality flag,uint8,False
+surface,tesac,315003,waterPressure,0,True,0,0,False,False,0,,ocean,float,water pressure [Pa],float32,False
+surface,tesac,315003,latitude,1,True,0,0,False,False,0,,ocean,float,latitude [degree],float32,False
+surface,tesac,315003,longitude,1,True,0,0,False,False,0,,ocean,float,longitude [degree],float32,False
+surface,tesac,315003,year,1,True,0,0,False,False,0,,ocean,float,datetime,timestamp,False
+surface,tesac,315003,month,1,True,0,0,False,False,0,,ocean,float,datetime,timestamp,False
+surface,tesac,315003,day,1,True,0,0,False,False,0,,ocean,float,datetime,timestamp,False
+surface,tesac,315003,hour,1,True,0,0,False,False,0,,ocean,float,datetime,timestamp,False
+surface,tesac,315003,minute,1,True,0,0,False,False,0,,ocean,float,datetime,timestamp,False
+surface,tesac,315003,marineObservingPlatformIdentifier,1,False,0,0,False,False,0,,ocean,float,station id,string,False
+surface,tesac,315003,oceanographicWaterTemperature,0,False,0,0,False,False,0,,ocean,float,oceanographic water temperature [K],float32,False
+surface,tesac,315003,salinity,0,False,0,0,False,False,0,,ocean,float,salinity [%],float32,False
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,1,3,False,False,0,,ocean,float,waterPressure [Pa]@qualifier for gtspp quality flag,uint8,False
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,2,3,False,False,0,,ocean,float,oceanographic water temperature [K]@qualifier for gtspp quality flag,uint8,False
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [%]@qualifier for gtspp quality flag,uint8,False
+surface,tesac,315003,globalGtsppQualityFlag,0,False,1,3,False,False,0,,ocean,float,waterPressure [Pa]@global gtspp quality flag,uint8,False
+surface,tesac,315003,globalGtsppQualityFlag,0,False,2,3,False,False,0,,ocean,float,oceanographic water temperature [K]@global gtspp quality flag,uint8,False
+surface,tesac,315003,globalGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [%]@global gtspp quality flag,uint8,False
 upper_air,pilot,309050;309051,windSpeed,0,False,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
 upper_air,pilot,309050;309051,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
 upper_air,pilot,309050;309051,year,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
