@@ -1,4 +1,5 @@
 input_category,input_subcategory,descriptors_list,key,key_number,is_required,slide,step,is_abs,is_str,zfill,plus_str,output_category,output_subcategory,name,data_type,is_plus
+surface,gps_pwv,307022,atmosphericPathDelayInSatelliteSignal,1,False,0,0,False,False,0,,surface,gps_pwv,atmospheric path delay in satellite signal [m],float32,False
 surface,gps_pwv,307022,latitude,0,True,0,0,False,False,0,,surface,gps_pwv,latitude [degree],float32,False
 surface,gps_pwv,307022,longitude,0,True,0,0,False,False,0,,surface,gps_pwv,longitude [degree],float32,False
 surface,gps_pwv,307022,year,0,True,0,0,False,False,0,,surface,gps_pwv,datetime,timestamp,False
@@ -10,7 +11,6 @@ surface,gps_pwv,307022,stationOrSiteName,0,False,0,0,False,False,0,,surface,gps_
 surface,gps_pwv,307022,heightOfStation,0,False,0,0,False,False,0,,surface,gps_pwv,height of station [m],float32,False
 surface,gps_pwv,307022,airTemperature,0,False,0,0,False,False,0,,surface,gps_pwv,air temperature [K],float32,False
 surface,gps_pwv,307022,relativeHumidity,0,False,0,0,False,False,0,,surface,gps_pwv,relative humidity [%],float32,False
-surface,gps_pwv,307022,atmosphericPathDelayInSatelliteSignal,1,False,0,0,False,False,0,,surface,gps_pwv,atmospheric path delay in satellite signal [m],float32,False
 surface,gps_pwv,307022,differenceInPathDelaysForLimbViewsAtExtremesOfScan,1,False,0,0,False,False,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](1),float32,False
 surface,gps_pwv,307022,estimatedErrorInAtmosphericPathDelay,1,False,0,0,False,False,0,,surface,gps_pwv,estimated error in atmospheric path delay [m](1),float32,False
 surface,gps_pwv,307022,differenceInPathDelaysForLimbViewsAtExtremesOfScan,2,False,0,0,False,False,0,,surface,gps_pwv,difference in path delays for limb views at extremes of scan 1 [m](2),float32,False
