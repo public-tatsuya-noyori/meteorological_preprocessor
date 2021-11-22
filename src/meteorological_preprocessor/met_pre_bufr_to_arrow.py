@@ -191,14 +191,14 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if output_conf_tuple.key in ['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond']:
                                             input_dict[output_conf_tuple.key] = value_np
                                         else:
-                                            input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key + output_conf_tuple.name] = value_np
+                                            input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name] = value_np
                                     else:
                                         if is_first_key:
                                             if debug:
                                                 print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
                                             break
                                         else:
-                                            input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key + output_conf_tuple.name] = np.array([None for i in range(first_key_value_np_len)])
+                                            input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name] = np.array([None for i in range(first_key_value_np_len)])
                                 if len(required_np) <= 0 or True not in required_np:
                                     continue
                                 index_np = np.array([index for index, value in enumerate(required_np) if value == True])
@@ -230,9 +230,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 timedelta_second_list = [0 for value in year_np]
                                 for timedelta_conf_tuple in output_conf_df[(output_conf_df['name'] == 'timedelta [millisecond]') | (output_conf_df['name'] == 'timedelta [second]')].itertuples():
                                     if timedelta_conf_tuple.name == 'timedelta [second]':
-                                        timedelta_second_list = [0 if value == None else value for value in input_dict['#' + str(timedelta_conf_tuple.key_number) + '#' + timedelta_conf_tuple.key + timedelta_conf_tuple.name]]
+                                        timedelta_second_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key + '#' + str(timedelta_conf_tuple.key_number) + '#' + timedelta_conf_tuple.name]]
                                     elif timedelta_conf_tuple.name == 'timedelta [millisecond]':
-                                        timedelta_millisecond_list = [0 if value == None else value for value in input_dict['#' + str(timedelta_conf_tuple.key_number) + '#' + timedelta_conf_tuple.key + timedelta_conf_tuple.name]]
+                                        timedelta_millisecond_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key + '#' + str(timedelta_conf_tuple.key_number) + '#' + timedelta_conf_tuple.name]]
                                 datetime_list = []
                                 for i, year in enumerate(year_np):
                                     datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_np[i], second_np[i], millisecond_np[i] * 1000, tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
@@ -246,8 +246,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     elif output_conf_tuple.name in ['datetime', 'timedelta [second]', 'timedelta [millisecond]']:
                                         continue
                                     else:
-                                        if '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key + output_conf_tuple.name in input_dict:
-                                            input_np = input_dict['#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key + output_conf_tuple.name]
+                                        if output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name in input_dict:
+                                            input_np = input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name]
                                         else:
                                             continue
                                         if output_conf_tuple.key == 'latitudeDisplacement' or output_conf_tuple.key == 'longitudeDisplacement':
@@ -255,22 +255,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     output_conf_tuple_name = output_conf_tuple.name
                                     if len(output_conf_tuple_name) > 0:
                                         if '{' in output_conf_tuple_name:
-                                            att_key = re.findall('{(.*)}', output_conf_tuple_name)[0]
-                                            att_value = input_dict[att_key][0]
-                                            if att_value != None:
-                                                output_conf_tuple_name = output_conf_tuple_name.replace('{' + att_key + '}', str(att_value))
-                                            else:
-                                                pre_name = output_conf_tuple_name
-                                                continue
-                                        if output_conf_tuple_name == pre_name:
-                                            if not np.all(input_np == None):
-                                                if output_conf_tuple.is_plus:
-                                                    tmp_np = plus_dict[output_conf_tuple_name]
-                                                    plus_dict[output_conf_tuple_name] = np.array([None if value == None or tmp_np[i] == None else tmp_np[i] + value for i, value in enumerate(input_np)])
-                                                else:
-                                                    plus_dict[output_conf_tuple_name] = input_np
-                                        else:
-                                            plus_dict[output_conf_tuple_name] = input_np
                                             if len(pre_name) > 0:
                                                 if pre_name in output_dict:
                                                     output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
@@ -278,9 +262,44 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                     output_dict[pre_name] = plus_dict[pre_name].tolist()
                                                 output_data_type_dict[pre_name] = pre_data_type
                                                 output_is_required_dict[pre_name] = pre_is_required
-                                        pre_name = output_conf_tuple_name
-                                        pre_data_type = output_conf_tuple.data_type
-                                        pre_is_required = output_conf_tuple.is_required
+                                            att_key = re.findall('{(.*)}', output_conf_tuple_name)[0]
+                                            att_np = input_dict[att_key]
+                                            for att_set_value in set(att_np.tolist()):
+                                                if att_set_value != None:
+                                                    tmp_list = []
+                                                    tmp_output_conf_tuple_name = output_conf_tuple_name.replace('{' + att_key + '}', str(att_set_value))
+                                                    for i, att_value in enumerate(att_np):
+                                                        if att_set_value == att_value:
+                                                            tmp_list.append(input_np[i])
+                                                        else:
+                                                            tmp_list.append(None)
+                                                    if tmp_output_conf_tuple_name in output_dict:
+                                                        output_dict[tmp_output_conf_tuple_name] = output_dict[tmp_output_conf_tuple_name] + tmp_list
+                                                    else:
+                                                        output_dict[tmp_output_conf_tuple_name] = tmp_list
+                                                    output_data_type_dict[tmp_output_conf_tuple_name] = output_conf_tuple.data_type
+                                                    output_is_required_dict[tmp_output_conf_tuple_name] = output_conf_tuple.is_required
+                                            pre_name = ''
+                                        else:
+                                            if output_conf_tuple_name == pre_name:
+                                                if not np.all(input_np == None):
+                                                    if output_conf_tuple.is_plus:
+                                                        tmp_np = plus_dict[output_conf_tuple_name]
+                                                        plus_dict[output_conf_tuple_name] = np.array([None if value == None or tmp_np[i] == None else tmp_np[i] + value for i, value in enumerate(input_np)])
+                                                    else:
+                                                        plus_dict[output_conf_tuple_name] = input_np
+                                            else:
+                                                plus_dict[output_conf_tuple_name] = input_np
+                                                if len(pre_name) > 0:
+                                                    if pre_name in output_dict:
+                                                        output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
+                                                    else:
+                                                        output_dict[pre_name] = plus_dict[pre_name].tolist()
+                                                    output_data_type_dict[pre_name] = pre_data_type
+                                                    output_is_required_dict[pre_name] = pre_is_required
+                                            pre_name = output_conf_tuple_name
+                                            pre_data_type = output_conf_tuple.data_type
+                                            pre_is_required = output_conf_tuple.is_required
                                 if len(pre_name) > 0:
                                     if pre_name in output_dict:
                                         output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
@@ -303,8 +322,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     is_required_list = []
                     for output_conf_name in np.sort(np.array(list(output_dict.keys()))):
                         if '@' in output_conf_name:
-                            if output_conf_name.split('@')[0] not in name_list:
-                                continue
+                            continue
                         if output_conf_name in output_dict and any([False if value == None else True for value in output_dict[output_conf_name]]):
                             if output_data_type_dict[output_conf_name] == 'timestamp':
                                 field_list.append(pa.field(output_conf_name, pa.timestamp('ms', tz='utc'), nullable=not output_is_required_dict[output_conf_name]))
