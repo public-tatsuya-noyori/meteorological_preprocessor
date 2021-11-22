@@ -345,7 +345,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     out_file = ''.join(out_file_list)
                     batch = pa.record_batch(data_list, pa.schema(field_list))
                     with open(out_file, 'bw') as out_f:
-                        #ipc_writer = pa.ipc.new_file(out_f, batch.schema, options=pa.ipc.IpcWriteOptions(compression=pa.Codec('zstd', compression_level=16)))
                         ipc_writer = pa.ipc.new_file(out_f, batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
                         ipc_writer.write_batch(batch)
                         ipc_writer.close()
