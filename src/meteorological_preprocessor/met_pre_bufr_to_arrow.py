@@ -255,7 +255,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     output_conf_tuple_name = output_conf_tuple.name
                                     if len(output_conf_tuple_name) > 0:
                                         if '{' in output_conf_tuple_name:
-                                            if len(pre_name) > 0:
+                                            if len(pre_name) > 0 and '@' not in pre_name:
                                                 if pre_name in output_dict:
                                                     output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
                                                 else:
@@ -274,7 +274,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                         else:
                                                             tmp_list.append(None)
                                                     if tmp_output_conf_tuple_name in output_dict:
-                                                        output_dict[tmp_output_conf_tuple_name] = output_dict[tmp_output_conf_tuple_name] + tmp_list
+                                                        tmp2_list = output_dict[tmp_output_conf_tuple_name]
+                                                        output_dict[tmp_output_conf_tuple_name] = np.array([tmp2_list[i] if value == None else value for i, value in enumerate(tmp_list)])
                                                     else:
                                                         output_dict[tmp_output_conf_tuple_name] = tmp_list
                                                     output_data_type_dict[tmp_output_conf_tuple_name] = output_conf_tuple.data_type
@@ -290,7 +291,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                         plus_dict[output_conf_tuple_name] = input_np
                                             else:
                                                 plus_dict[output_conf_tuple_name] = input_np
-                                                if len(pre_name) > 0:
+                                                if len(pre_name) > 0 and '@' not in pre_name:
                                                     if pre_name in output_dict:
                                                         output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
                                                     else:

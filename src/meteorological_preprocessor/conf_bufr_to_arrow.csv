@@ -123,16 +123,16 @@ surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;301090 302
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;301090 302031 302035 302036 302047 008002 302048 302037 302043 302044 101002 302045 302046,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#4#total precipitation [kg m-2](1)@hour}),float32,False
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;301090 302031 302035 302036 302047 008002 302048 302037 302043 302044 101002 302045 302046,timePeriod,5,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](2)@hour,uint8,False
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;301090 302031 302035 302036 302047 008002 302048 302037 302043 302044 101002 302045 302046,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#5#total precipitation [kg m-2](2)@hour}),float32,False
-surface,synop,307096,timePeriod,17,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](1)@hour,uint8,False
-surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#17#total precipitation [kg m-2](1)@hour}),float32,False
-surface,synop,307096,timePeriod,18,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](2)@hour,uint8,False
-surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#18#total precipitation [kg m-2](2)@hour}),float32,False
-surface,synop,307096,timePeriod,19,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](3)@hour,uint8,False
-surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,3,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#19#total precipitation [kg m-2](3)@hour}),float32,False
-surface,synop,307096,timePeriod,20,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](4)@hour,uint8,False
-surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,4,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#20#total precipitation [kg m-2](4)@hour}),float32,False
-surface,synop,307096,timePeriod,21,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](5)@hour,uint8,False
-surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,5,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#21#total precipitation [kg m-2](5)@hour}),float32,False
+surface,synop,307096,timePeriod,17,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](3)@hour,uint8,False
+surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#17#total precipitation [kg m-2](3)@hour}),float32,False
+surface,synop,307096,timePeriod,18,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](4)@hour,uint8,False
+surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,2,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#18#total precipitation [kg m-2](4)@hour}),float32,False
+surface,synop,307096,timePeriod,19,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](5)@hour,uint8,False
+surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,3,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#19#total precipitation [kg m-2](5)@hour}),float32,False
+surface,synop,307096,timePeriod,20,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](6)@hour,uint8,False
+surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,4,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#20#total precipitation [kg m-2](6)@hour}),float32,False
+surface,synop,307096,timePeriod,21,False,0,0,True,False,0,,surface,synop,total precipitation [kg m-2](7)@hour,uint8,False
+surface,synop,307096,totalPrecipitationOrTotalWaterEquivalent,5,False,0,0,False,False,0,,surface,synop,total precipitation [kg m-2](hour={timePeriod#21#total precipitation [kg m-2](7)@hour}),float32,False
 surface,synop,307092,timePeriod,2,False,0,0,True,False,0,,surface,synop,precipitation [kg m-2]@minute,uint8,False
 surface,synop,307092,totalPrecipitationOrTotalWaterEquivalent,1,False,0,0,False,False,0,,surface,synop,precipitation [kg m-2](minute={timePeriod#2#precipitation [kg m-2]@minute}),float32,False
 surface,synop,307079;307080;307081;307082;307083;307084;307085;307086;307091;307092;307096;301090 302031 302035 302036 302047 008002 302048 302037 302043 302044 101002 302045 302046;301090 302031 302032 302033 302034 302004 104004 008002 020011 020012 020013 302038 302040 302041 007032 002002 008021 004025 011001 011002 302044;301090 010004 010051 004024 010060 010063 302072 302042 004024 013011 302034,windDirection,1,False,0,0,False,False,0,,surface,synop,wind direction [degree],float32,False
