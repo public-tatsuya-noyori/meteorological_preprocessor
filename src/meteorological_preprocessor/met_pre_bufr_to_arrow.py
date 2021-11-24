@@ -52,6 +52,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                         print('Debug', ':', in_file, file=sys.stderr)
                     input_dict = {}
                     required_np = np.array([])
+                    name_with_att_dict = {}
                     with open(in_file, 'rb') as in_file_stream:
                         while True:
                             bufr = None
@@ -257,9 +258,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         if '{' in output_conf_tuple_name:
                                             if len(pre_name) > 0 and '@' not in pre_name:
                                                 if pre_name in output_dict:
-                                                    output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
+                                                    output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name]
                                                 else:
-                                                    output_dict[pre_name] = plus_dict[pre_name].tolist()
+                                                    output_dict[pre_name] = plus_dict[pre_name]
                                                 output_data_type_dict[pre_name] = pre_data_type
                                                 output_is_required_dict[pre_name] = pre_is_required
                                             att_key = re.findall('{(.*)}', output_conf_tuple_name)[0]
@@ -273,29 +274,31 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                             tmp_list.append(input_np[i])
                                                         else:
                                                             tmp_list.append(None)
-                                                    if tmp_output_conf_tuple_name in output_dict:
-                                                        tmp2_list = output_dict[tmp_output_conf_tuple_name]
-                                                        output_dict[tmp_output_conf_tuple_name] = np.array([tmp2_list[i] if value == None else value for i, value in enumerate(tmp_list)])
+                                                    if tmp_output_conf_tuple_name in name_with_att_dict:
+                                                        tmp2_list = name_with_att_dict[tmp_output_conf_tuple_name]
+                                                        name_with_att_dict[tmp_output_conf_tuple_name] = [tmp2_list[i] if value == None else value for i, value in enumerate(tmp_list)]
                                                     else:
-                                                        output_dict[tmp_output_conf_tuple_name] = tmp_list
+                                                        name_with_att_dict[tmp_output_conf_tuple_name] = tmp_list
                                                     output_data_type_dict[tmp_output_conf_tuple_name] = output_conf_tuple.data_type
                                                     output_is_required_dict[tmp_output_conf_tuple_name] = output_conf_tuple.is_required
+                                            plus_dict = {}
                                             pre_name = ''
+                                            pre_data_type = ''
                                         else:
                                             if output_conf_tuple_name == pre_name:
                                                 if not np.all(input_np == None):
                                                     if output_conf_tuple.is_plus:
-                                                        tmp_np = plus_dict[output_conf_tuple_name]
-                                                        plus_dict[output_conf_tuple_name] = np.array([None if value == None or tmp_np[i] == None else tmp_np[i] + value for i, value in enumerate(input_np)])
+                                                        tmp_list = plus_dict[output_conf_tuple_name]
+                                                        plus_dict[output_conf_tuple_name] = [None if value == None or tmp_list[i] == None else tmp_list[i] + value for i, value in enumerate(input_np)]
                                                     else:
-                                                        plus_dict[output_conf_tuple_name] = input_np
+                                                        plus_dict[output_conf_tuple_name] = input_np.tolist()
                                             else:
-                                                plus_dict[output_conf_tuple_name] = input_np
+                                                plus_dict[output_conf_tuple_name] = input_np.tolist()
                                                 if len(pre_name) > 0 and '@' not in pre_name:
                                                     if pre_name in output_dict:
-                                                        output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
+                                                        output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name]
                                                     else:
-                                                        output_dict[pre_name] = plus_dict[pre_name].tolist()
+                                                        output_dict[pre_name] = plus_dict[pre_name]
                                                     output_data_type_dict[pre_name] = pre_data_type
                                                     output_is_required_dict[pre_name] = pre_is_required
                                             pre_name = output_conf_tuple_name
@@ -303,11 +306,16 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             pre_is_required = output_conf_tuple.is_required
                                 if len(pre_name) > 0:
                                     if pre_name in output_dict:
-                                        output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name].tolist()
+                                        output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name]
                                     else:
-                                        output_dict[pre_name] = plus_dict[pre_name].tolist()
+                                        output_dict[pre_name] = plus_dict[pre_name]
                                     output_data_type_dict[pre_name] = pre_data_type
                                     output_is_required_dict[pre_name] = pre_is_required
+                                for name_with_att in name_with_att_dict:
+                                    if name_with_att in output_dict:
+                                        output_dict[name_with_att] = output_dict[name_with_att] + name_with_att_dict[name_with_att]
+                                    else:
+                                        output_dict[name_with_att] = name_with_att_dict[name_with_att]
                                 ec.codes_release(bufr)
                             except gribapi.errors.PrematureEndOfFileError:
                                 break
