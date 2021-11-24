@@ -58,8 +58,8 @@ else
   running=0
 fi
 touch download_${priority}_${regions}${closed}/cached/dummy.tmp
-if test ! -f download_${priority}_${regions}${closed}/checksum.feather; then
-  cp checksum.feather download_${priority}_${regions}${closed}/
+if test ! -f download_${priority}_${regions}${closed}/checksum.arrow; then
+  cp checksum.arrow download_${priority}_${regions}${closed}/
 fi
 if test ${running} -eq 0; then
 {
@@ -99,7 +99,7 @@ if test -s download_${priority}_${regions}${closed}/created.txt; then
     else
       aria2c --http-user=${user} --http-passwd=${passwd} --check-certificate=false -j ${parallel} -s ${parallel} -x ${parallel} --header 'Cache-Control: no-cache' --auto-file-renaming=false --allow-overwrite=false --log-level=error -l download_${priority}_${regions}${closed}/aria2c.log -i download_${priority}_${regions}${closed}/created.txt -d download_${priority}_${regions}${closed}/downloaded >> download_${priority}_${regions}${closed}/get_file_stdout.txt
     fi
-    ./met_pre_batch_to_cache.py ${center} download_${priority}_${regions}${closed}/downloaded cache_${regions}${closed} download_${priority}_${regions}${closed}/checksum.feather 1>> download_${priority}_${regions}${closed}/cached/${now}.txt.tmp 2>> download_${priority}_${regions}${closed}/met_pre_batch_to_cache.log
+    ./met_pre_batch_to_cache.py ${center} download_${priority}_${regions}${closed}/downloaded cache_${regions}${closed} download_${priority}_${regions}${closed}/checksum.arrow 1>> download_${priority}_${regions}${closed}/cached/${now}.txt.tmp 2>> download_${priority}_${regions}${closed}/met_pre_batch_to_cache.log
     grep -F '[ERROR]' download_${priority}_${regions}${closed}/aria2c.log | grep 'URI=' | sed -e 's/^.*URI=//g' | grep -v '^ *$' | sort -u > download_${priority}_${regions}${closed}/created.txt
     if test -s download_${priority}_${regions}${closed}/created.txt; then
       created_num=`cat download_${priority}_${regions}${closed}/created.txt | wc -l`

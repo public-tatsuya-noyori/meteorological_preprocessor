@@ -1,2 +1,0 @@
-^[A-Z][A-Z0-9]{3}/alphanumeric/surface/synop/[0-9]{12}/[^/]+\.txt.gz$
-^[A-Z][A-Z0-9]{3}/bufr/surface/synop/[0-9]{12}/[^/]+\.bin.gz$
