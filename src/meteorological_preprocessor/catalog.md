@@ -189,10 +189,10 @@ $ sudo apt install python3
 $ sudo apt install python3-pip
 $ sudo apt install libeccodes-tools
 $ sudo apt install git
-$ git clone https://github.com/public-tatsuya-noyori/meteorological_preprocessor
-$ cd meteorological_preprocessor
 $ pip3 install --upgrade pip --user
 $ pip3 install --upgrade cython --user
+$ git clone https://github.com/public-tatsuya-noyori/meteorological_preprocessor
+$ cd meteorological_preprocessor
 $ pip3 install . --user
 $ exec $SHELL -l
 ```
