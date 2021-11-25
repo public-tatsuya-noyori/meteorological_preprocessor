@@ -1,0 +1,16 @@
+^[A-Z][A-Z0-9]{3}/bufr/satellite/amsua/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/atms/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/cris/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/csr/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/surface/drifting_buoy/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/surface/gps_pwv/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/surface/moored_buoy/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/surface/ship/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/surface/synop/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/surface/tesac/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/upper_air/amdar/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/upper_air/pilot/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/upper_air/temp/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/upper_air/temp_drop/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/upper_air/temperature_profiler/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/upper_air/wind_profiler/[0-9]{12}/[^/]+\.bin.gz$

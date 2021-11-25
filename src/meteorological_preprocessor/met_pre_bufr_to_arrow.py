@@ -53,6 +53,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     input_dict = {}
                     required_np = np.array([])
                     name_with_att_dict = {}
+                    out_name_list = []
+                    is_array = False
+                    is_first_key = True
+                    first_key = ''
+                    first_key_value_np_len = 0
                     with open(in_file, 'rb') as in_file_stream:
                         while True:
                             bufr = None
@@ -64,11 +69,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                 compressed_data = ec.codes_get(bufr, 'compressedData')
                                 number_of_subsets = ec.codes_get(bufr, 'numberOfSubsets')
                                 ec.codes_set(bufr, 'unpack', 1)
-                                is_array = False
                                 if len(output_conf_df[(output_conf_df['key_number'] == 0)].index) > 0:
                                     is_array = True
-                                is_first_key = True
-                                first_key_value_np_len = 0
                                 subset_array_size_list = []
                                 for output_conf_tuple in output_conf_df.itertuples():
                                     value_list = []
@@ -178,6 +180,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             if np.all(value_np == None):
                                                 break
                                             is_first_key = False
+                                            first_key = output_conf_tuple.name
                                             first_key_value_np_len = len(value_np)
                                         else:
                                             if first_key_value_np_len != len(value_np):
@@ -198,8 +201,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             if debug:
                                                 print('Warning', warno, in_file, ':', output_conf_tuple, 'The first key is not in the descriptors_list.', file=sys.stderr)
                                             break
-                                        else:
-                                            input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name] = np.array([None for i in range(first_key_value_np_len)])
                                 if len(required_np) <= 0 or True not in required_np:
                                     continue
                                 index_np = np.array([index for index, value in enumerate(required_np) if value == True])
@@ -259,6 +260,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             if len(pre_name) > 0 and '@' not in pre_name:
                                                 if pre_name in output_dict:
                                                     output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name]
+                                                    out_name_list.append(pre_name)
                                                 else:
                                                     output_dict[pre_name] = plus_dict[pre_name]
                                                 output_data_type_dict[pre_name] = pre_data_type
@@ -297,6 +299,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                                 if len(pre_name) > 0 and '@' not in pre_name:
                                                     if pre_name in output_dict:
                                                         output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name]
+                                                        out_name_list.append(pre_name)
                                                     else:
                                                         output_dict[pre_name] = plus_dict[pre_name]
                                                     output_data_type_dict[pre_name] = pre_data_type
@@ -304,19 +307,29 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                             pre_name = output_conf_tuple_name
                                             pre_data_type = output_conf_tuple.data_type
                                             pre_is_required = output_conf_tuple.is_required
-                                if len(pre_name) > 0:
+                                if len(pre_name) > 0 and '@' not in pre_name:
                                     if pre_name in output_dict:
                                         output_dict[pre_name] = output_dict[pre_name] + plus_dict[pre_name]
+                                        out_name_list.append(pre_name)
                                     else:
                                         output_dict[pre_name] = plus_dict[pre_name]
                                     output_data_type_dict[pre_name] = pre_data_type
                                     output_is_required_dict[pre_name] = pre_is_required
+                                ec.codes_release(bufr)
                                 for name_with_att in name_with_att_dict:
                                     if name_with_att in output_dict:
                                         output_dict[name_with_att] = output_dict[name_with_att] + name_with_att_dict[name_with_att]
                                     else:
-                                        output_dict[name_with_att] = name_with_att_dict[name_with_att]
-                                ec.codes_release(bufr)
+                                        ouput_dict_first_key_values_len = len(output_dict[first_key])
+                                        name_with_att_values_len = len(name_with_att_dict[name_with_att])
+                                        if ouput_dict_first_key_values_len == name_with_att_values_len:
+                                            output_dict[name_with_att] = name_with_att_dict[name_with_att]
+                                        else:
+                                            output_dict[name_with_att] = [None for i in range(ouput_dict_first_key_values_len - name_with_att_values_len)] + name_with_att_dict[name_with_att]
+                                if len(set(output_dict.keys()) - set(out_name_list)) > 0:
+                                    ouput_dict_first_key_values_len = len(output_dict[first_key])
+                                    for out_name in set(output_dict.keys()) - set(out_name_list):
+                                         output_dict[out_name] = output_dict[out_name] + [None for i in range(ouput_dict_first_key_values_len - len(output_dict[out_name]))]
                             except gribapi.errors.PrematureEndOfFileError:
                                 break
                             except gribapi.errors.WrongLengthError:
