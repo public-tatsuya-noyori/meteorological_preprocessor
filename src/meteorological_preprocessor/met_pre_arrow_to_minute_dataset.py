@@ -15,9 +15,9 @@ from pyarrow import csv
 def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
     warno = 189
     for conf_tuple in conf_df.itertuples():
-        output_tile_level_list = [conf_tuple.minute_tile_level, conf_tuple.day_tile_level]
-        output_time_level_list = ['1T', '1D']
-        output_child_directory_list = ['1MinuteDataset', '1DayDataset']
+        output_tile_level_list = [conf_tuple.minute_tile_level]
+        output_time_level_list = ['1T']
+        output_child_directory_list = ['1MinuteDataset']
         output_list = conf_tuple.output_list.split(';')
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         out_file_dict = {}
