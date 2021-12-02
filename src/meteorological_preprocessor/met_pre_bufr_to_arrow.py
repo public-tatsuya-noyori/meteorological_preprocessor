@@ -15,7 +15,6 @@ from pyarrow import csv
 
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
     warno = 189
-    out_arrows = []
     now = datetime.utcnow()
     create_datetime_directory_list = ['C_', my_cccc, '_', str(now.year).zfill(4), str(now.month).zfill(2), str(now.day).zfill(2), str(now.hour).zfill(2), str(now.minute).zfill(2), str(now.second).zfill(2)]
     create_datetime_directory = ''.join(create_datetime_directory_list)

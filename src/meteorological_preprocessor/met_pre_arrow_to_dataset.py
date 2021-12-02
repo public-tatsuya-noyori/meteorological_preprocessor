@@ -33,6 +33,7 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
             in_ipc_reader = pa.ipc.open_file(in_file)
             in_df = in_ipc_reader.read_pandas()
             for output_index, tile_level in enumerate(output_tile_level_list):
+                new_datetime_list_dict = {}
                 res = 180 / 2**tile_level
                 for tile_x in range(0, 2**(tile_level + 1)):
                     for tile_y in range(0, 2**(tile_level)):
