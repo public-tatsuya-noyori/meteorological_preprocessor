@@ -144,8 +144,11 @@
 #*/3 * * * * cd /home/noyori/tests; ./sub.sh --parallel 12 cache_s_3        bb bin 'minio:center-cc-cloud-c-region-e-open-main;minio:center-cc-cloud-c-region-f-open-sub' inclusive_pattern.txt exclusive_pattern.txt
 #*/3 * * * * cd /home/noyori/tests; ./sub.sh --parallel 12 cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
 #*/3 * * * * cd /home/noyori/tests; ./sub.sh --parallel 12 cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
+
 * * * * * cd /home/noyori/tests; ./sub_bufr_to_arrow.sh --parallel 12 cache_s aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' sub_bufr_to_arrow_inclusive_pattern.txt exclusive_pattern.txt
-*/10 * * * * cd /home/noyori/tests; ./arrow_to_dataset.sh
+* * * * * cd /home/noyori/tests; ./arrow_to_preprocess.sh
+* * * * * cd /home/noyori/tests; ./arrow_to_minute_dataset.sh
+*/10 * * * * cd /home/noyori/tests; ./arrow_to_day_dataset.sh
 
 # delete on local PC
 40 2,10,18 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_2 /home/noyori/tests/cache_s_3 /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_s_closed_2 /home/noyori/tests/cache_s_closed_3 /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r rm -rf > /dev/null 2>&1
