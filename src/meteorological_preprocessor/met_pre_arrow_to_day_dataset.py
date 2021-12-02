@@ -43,10 +43,10 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                             tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] > 90.0 - res * (tile_y + 1))]
                         new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.floor(output_time_level_list[output_index]).unique()
                         for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                            if output_index == 0:
+                            if output_child_directory_list[output_index] =='1MinuteDataset':
                                 new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=1))]
                                 out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
-                            elif output_index == 1:
+                            elif output_child_directory_list[output_index] =='1DayDataset':
                                 new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(days=1))]
                                 out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
                             if len(new_df.index) > 0:
