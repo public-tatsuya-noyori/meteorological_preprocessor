@@ -45,10 +45,11 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                         for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
                             if output_index == 0:
                                 new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=1))]
+                                out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
                             elif output_index == 1:
                                 new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(days=1))]
+                                out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
                             if len(new_df.index) > 0:
-                                out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(math.floor(new_datetime.minute / 10)), '0/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
                                 ssc_df = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
                                 ssc_df = - ssc_df.map(pd.Timestamp.timestamp).astype(int)
                                 new_df.insert(0, 'created time minus data time [s]', ssc_df)
