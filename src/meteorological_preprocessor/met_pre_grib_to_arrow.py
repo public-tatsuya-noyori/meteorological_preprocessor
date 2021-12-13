@@ -9,7 +9,7 @@ import re
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
-from pyarrow import csv, feather
+from pyarrow import csv
 from eccodes import *
 
 def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, write_location, debug):
@@ -102,12 +102,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                     out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
                                     out_directory = '/'.join(out_directory_list)
                                     os.makedirs(out_directory, exist_ok=True)
-                                    out_file_list = [out_directory, '/location.feather']
+                                    out_file_list = [out_directory, '/location.arrow']
                                     out_file = ''.join(out_file_list)
+                                    location_batch = pa.record_batch([pa.array(lat_list, 'float32'), pa.array(lon_list, 'float32')], names=['latitude [degree]', 'longitude [degree]'])
                                     with open(out_file, 'bw') as out_f:
-                                        location_batch = pa.record_batch([pa.array(lat_list, 'float32'), pa.array(lon_list, 'float32')], names=['latitude [degree]', 'longitude [degree]'])
-                                        location_table = pa.Table.from_batches([location_batch])
-                                        feather.write_feather(location_table, out_f, compression='zstd')
+                                        ipc_writer = pa.ipc.new_file(out_f, location_batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
+                                        ipc_writer.write_batch(location_batch)
+                                        ipc_writer.close()
                                 codes_release(gid)
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
@@ -115,9 +116,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                     out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)
-                    out_file_list = [out_directory, '/location.feather']
+                    out_file_list = [out_directory, '/location.arrow']
                     out_file = ''.join(out_file_list)
-                    location_df = feather.read_feather(out_file)
+                    location_df = pa.ipc.open_file(out_file).read_pandas()
                     dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
                     dt_list = [dt for i in range(0, len(location_df.index))]
                     for ft in ft_list:
@@ -145,10 +146,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                         os.makedirs(out_directory, exist_ok=True)
                         out_file_list = [out_directory, '/', dt_str, '_', create_datetime, '.arrow']
                         out_file = ''.join(out_file_list)
+                        batch = pa.record_batch(data_list, names=name_list)
                         with open(out_file, 'bw') as out_f:
-                            property_batch = pa.record_batch(data_list, names=name_list)
-                            property_table = pa.Table.from_batches([property_batch])
-                            feather.write_feather(property_table, out_f, compression='zstd')
+                            ipc_writer = pa.ipc.new_file(out_f, batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
+                            ipc_writer.write_batch(batch)
+                            ipc_writer.close()
                             print(out_file, file=out_list_file)
 
 def main():
