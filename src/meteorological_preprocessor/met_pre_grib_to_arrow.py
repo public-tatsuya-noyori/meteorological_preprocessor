@@ -23,10 +23,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
             keys = ['stepRange', 'typeOfLevel', 'level', 'shortName']
-            missingValue = -3.402823e+38
             for in_file in in_file_list:
                 property_dict = {}
-                ft_list = []
                 match = re.search(r'^.*/' + cccc + '/grib/' + cat_subcat + '/.*$', in_file)
                 if not match:
                     continue
@@ -60,7 +58,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                 gid = codes_new_from_index(iid)
                                 if gid is None:
                                     break
-                                codes_set(gid, 'missingValue', missingValue)
                                 iterid = codes_keys_iterator_new(gid, 'ls')
                                 step_range = None
                                 type_of_level = None
@@ -73,17 +70,12 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                     key = codes_keys_iterator_get_name(iterid)
                                     if key in keys:
                                         value = codes_get_string(gid, key)
-                                        if key == 'stepRange' or key == 'level':
+                                        if key == 'level':
                                             target_conf_df = target_conf_df[(target_conf_df[key] == int(value))]
                                         else:
                                             target_conf_df = target_conf_df[(target_conf_df[key] == value)]
+                                property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
                                 codes_keys_iterator_delete(iterid)
-                                message_np = np.array([])
-                                for conf_row in target_conf_df.itertuples():
-                                    ft = codes_get(gid, 'stepRange')
-                                    if not ft in ft_list:
-                                        ft_list.append(ft)
-                                    property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)] = np.array(codes_get_values(gid))
                                 if write_location:
                                     iterid = codes_grib_iterator_new(gid, 0)
                                     lat_list = []
@@ -99,7 +91,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                             else:
                                                 lon_list.append(latitude_longitude_value[1] - 360.0)
                                     codes_grib_iterator_delete(iterid)
-                                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
+                                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
                                     out_directory = '/'.join(out_directory_list)
                                     os.makedirs(out_directory, exist_ok=True)
                                     out_file_list = [out_directory, '/location.arrow']
@@ -113,7 +105,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
                 if len(property_dict) > 0:
-                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
+                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)
                     out_file_list = [out_directory, '/location.arrow']
@@ -121,32 +113,40 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                     location_df = pa.ipc.open_file(out_file).read_pandas()
                     dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
                     dt_list = [dt for i in range(0, len(location_df.index))]
-                    for ft in ft_list:
-                        name_list = ['latitude [degree]', 'longitude [degree]', 'datetime']
-                        data_list = [pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32')]
-                        data_list.append(pa.array(dt_list, pa.timestamp('ms', tz='utc')))
-                        for conf_row in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
-                            if len(property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]) > 0:
-                                if re.match(r'^.*U wind component.*$', conf_row.name):
-                                    u_value_np = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]
-                                    v_value_np = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName.replace('u', 'v'), ft)]
-                                    wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
-                                    wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
-                                    wind_direction_np = np.array([value + 360.0 if value < 0 else value for value in wind_direction_np])
-                                    name_list.append(ft + '/' + re.sub(r'U wind component', 'wind speed [m/s]', conf_row.name))
-                                    data_list.append(pa.array(np.array(wind_speed_np, dtype=conf_row.datatype)))
-                                    name_list.append(ft + '/' + re.sub(r'U wind component', 'wind direction [degree]', conf_row.name))
-                                    data_list.append(pa.array(np.array(wind_direction_np, dtype=conf_row.datatype)))
-                                elif not re.match(r'^.*V wind component.*$', conf_row.name):
-                                    value_list = property_dict[(conf_row.category, conf_row.subcategory, conf_row.stepRange, conf_row.typeOfLevel, conf_row.level, conf_row.shortName, ft)]
-                                    name_list.append(ft + '/' + conf_row.name)
-                                    data_list.append(pa.array(np.array(value_list, dtype=conf_row.datatype)))
-                        out_directory_list = [out_dir, cccc, 'grib_to_arrow', conf_row.category, conf_row.subcategory]
-                        out_directory = '/'.join(out_directory_list)
-                        os.makedirs(out_directory, exist_ok=True)
-                        out_file_list = [out_directory, '/', dt_str, '_', create_datetime, '.arrow']
+                    name_list = ['latitude [degree]', 'longitude [degree]', 'datetime']
+                    data_list = [pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32'), pa.array(dt_list, pa.timestamp('ms', tz='utc'))]
+                    out_name_dict = {}
+                    out_data_dict = {}
+                    for property_key in property_dict.keys():
+                        level_ft_out_directory = '/'.join([out_directory, property_key[6], str(property_key[7])])
+                        os.makedirs(level_ft_out_directory, exist_ok=True)
+                        out_file_list = [level_ft_out_directory, '/', dt_str, '_', create_datetime, '.arrow']
                         out_file = ''.join(out_file_list)
-                        batch = pa.record_batch(data_list, names=name_list)
+                        if re.match(r'^U wind component$', property_key[8]):
+                            u_value_np = property_dict[property_key]
+                            v_value_np = property_dict[(property_key[0], property_key[1], property_key[2], property_key[3], property_key[4], property_key[5].replace('u', 'v'), property_key[6], property_key[7], property_key[8].replace('U', 'V'), property_key[9])]
+                            wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
+                            wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
+                            wind_direction_np = np.array([value + 360.0 if value < 0 else value for value in wind_direction_np])
+                            if out_file in out_name_dict:
+                                out_name_dict[out_file] = out_name_dict[out_file] + [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8])]
+                                out_data_dict[out_file] = out_data_dict[out_file] + [pa.array(np.array(wind_speed_np, dtype=property_key[9]))]
+                                out_name_dict[out_file] = out_name_dict[out_file] + [re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
+                                out_data_dict[out_file] = out_data_dict[out_file] + [pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
+                            else:
+                                out_name_dict[out_file] = [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8])]
+                                out_data_dict[out_file] = [pa.array(np.array(wind_speed_np, dtype=property_key[9]))]
+                                out_name_dict[out_file] = [re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
+                                out_data_dict[out_file] = [pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
+                        elif not re.match(r'^V wind component$', property_key[8]):
+                            if out_file in out_name_dict:
+                                out_name_dict[out_file] = out_name_dict[out_file] + [property_key[8]]
+                                out_data_dict[out_file] = out_data_dict[out_file] + [pa.array(np.array(property_dict[property_key], dtype=property_key[9]))]
+                            else:
+                                out_name_dict[out_file] = [property_key[8]]
+                                out_data_dict[out_file] = [pa.array(np.array(property_dict[property_key], dtype=property_key[9]))]
+                    for out_file in out_name_dict.keys():
+                        batch = pa.record_batch(out_data_dict[out_file], names=out_name_dict[out_file])
                         with open(out_file, 'bw') as out_f:
                             ipc_writer = pa.ipc.new_file(out_f, batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
                             ipc_writer.write_batch(batch)
