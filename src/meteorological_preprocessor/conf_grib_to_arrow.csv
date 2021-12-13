@@ -1,99 +1,99 @@
-category,subcategory,stepRange,typeOfLevel,level,shortName,name,datatype
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-3,surface,0,unknown,surface/total precipitation [kg m-2](hour=3),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-6,surface,0,unknown,surface/total precipitation [kg m-2](hour=6),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-9,surface,0,unknown,surface/total precipitation [kg m-2](hour=9),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-12,surface,0,unknown,surface/total precipitation [kg m-2](hour=12),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-15,surface,0,unknown,surface/total precipitation [kg m-2](hour=15),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-18,surface,0,unknown,surface/total precipitation [kg m-2](hour=18),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-21,surface,0,unknown,surface/total precipitation [kg m-2](hour=21),float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,10,10u,surface/U wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,10,10v,surface/V wind component,float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,2,2t,surface/temperature [K],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,2,2r,surface/relative humidity [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,sp,surface/pressure [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,meanSea,0,prmsl,surface/pressure reduced to mean sea level [Pa],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,unknown,surface/total cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,hcc,surface/high cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,mcc,surface/medium cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,lcc,surface/low cloud cover [%],float32
-gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-24,surface,0,unknown,surface/total precipitation [kg m-2](hour=24),float32
+category,subcategory,stepRange,typeOfLevel,level,shortName,level_name,ft,name,data_type
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,3,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-3,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=3),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,6,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-6,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=6),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,9,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-9,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=9),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,12,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-12,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=12),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,15,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-15,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=15),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,18,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-18,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=18),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,21,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-21,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=21),float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,10,10u,surface,0,U wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,10,10v,surface,0,V wind component,float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,2,2t,surface,0,temperature [K],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,heightAboveGround,2,2r,surface,0,relative humidity [%],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,sp,surface,0,pressure [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,meanSea,0,prmsl,surface,0,pressure reduced to mean sea level [Pa],float32
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,unknown,surface,0,total cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,hcc,surface,0,high cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,mcc,surface,0,medium cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,24,surface,0,lcc,surface,0,low cloud cover [%],uint8
+gsm,0.25_0.25_90.0_0.0_-90.0_359.75,0-24,surface,0,unknown,surface,0,total precipitation [kg m-2](hour=24),float32
