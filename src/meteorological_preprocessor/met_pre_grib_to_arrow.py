@@ -129,15 +129,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                             wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
                             wind_direction_np = np.array([value + 360.0 if value < 0 else value for value in wind_direction_np])
                             if out_file in out_name_dict:
-                                out_name_dict[out_file] = out_name_dict[out_file] + [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8])]
-                                out_data_dict[out_file] = out_data_dict[out_file] + [pa.array(np.array(wind_speed_np, dtype=property_key[9]))]
-                                out_name_dict[out_file] = out_name_dict[out_file] + [re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
-                                out_data_dict[out_file] = out_data_dict[out_file] + [pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
+                                out_name_dict[out_file] = out_name_dict[out_file] + [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
+                                out_data_dict[out_file] = out_data_dict[out_file] + [pa.array(np.array(wind_speed_np, dtype=property_key[9])), pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
                             else:
-                                out_name_dict[out_file] = [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8])]
-                                out_data_dict[out_file] = [pa.array(np.array(wind_speed_np, dtype=property_key[9]))]
-                                out_name_dict[out_file] = [re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
-                                out_data_dict[out_file] = [pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
+                                out_name_dict[out_file] = [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
+                                out_data_dict[out_file] = [pa.array(np.array(wind_speed_np, dtype=property_key[9])), pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
                         elif not re.match(r'^V wind component$', property_key[8]):
                             if out_file in out_name_dict:
                                 out_name_dict[out_file] = out_name_dict[out_file] + [property_key[8]]
@@ -145,13 +141,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                             else:
                                 out_name_dict[out_file] = [property_key[8]]
                                 out_data_dict[out_file] = [pa.array(np.array(property_dict[property_key], dtype=property_key[9]))]
-                    for out_file in out_name_dict.keys():
-                        batch = pa.record_batch(out_data_dict[out_file], names=out_name_dict[out_file])
-                        with open(out_file, 'bw') as out_f:
+                    for out_file_key in out_name_dict.keys():
+                        batch = pa.record_batch(out_data_dict[out_file_key], names=out_name_dict[out_file_key])
+                        with open(out_file_key, 'bw') as out_f:
                             ipc_writer = pa.ipc.new_file(out_f, batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
                             ipc_writer.write_batch(batch)
                             ipc_writer.close()
-                            print(out_file, file=out_list_file)
+                            print(out_file_key, file=out_list_file)
 
 def main():
     errno=198
