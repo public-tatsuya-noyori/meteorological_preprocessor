@@ -43,70 +43,57 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                         print('Debug', ':', in_file, file=sys.stderr)
                     try:
                         codes_grib_multi_support_on()
-                        iid = codes_index_new_from_file(in_file, keys)
-                        key_values_list = []
-                        for key in keys:
-                            key_values = codes_index_get(iid, key)
-                            key_values_list.append(key_values)
-                        products = [[]]
-                        for key_values in key_values_list:
-                            products = [x + [y] for x in products for y in key_values]
-                        for product in products:
-                            for key_count in range(len(keys)):
-                                codes_index_select(iid, keys[key_count], product[key_count])
-                            while True:
-                                #gid = codes_new_from_index(iid)
-                                gid = codes_grib_new_from_file(in_file_stream)
-                                if gid is None:
-                                    break
-                                bitmapPresent = codes_get(gid, "bitmapPresent")
-                                if bitmapPresent:
-                                    codes_set(gid, "missingValue", 1e+20)
-                                iterid = codes_keys_iterator_new(gid, 'ls')
-                                step_range = None
-                                type_of_level = None
-                                level = None
-                                short_name = None
-                                cat = re.sub('/.*$', '', cat_subcat)
-                                subcat = re.sub('^.*/', '', cat_subcat)
-                                target_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
-                                while codes_keys_iterator_next(iterid):
-                                    key = codes_keys_iterator_get_name(iterid)
-                                    if key in keys:
-                                        value = codes_get_string(gid, key)
-                                        if key == 'level':
-                                            target_conf_df = target_conf_df[(target_conf_df[key] == int(value))]
+                        while True:
+                            gid = codes_grib_new_from_file(in_file_stream)
+                            if gid is None:
+                                break
+                            bitmapPresent = codes_get(gid, "bitmapPresent")
+                            if bitmapPresent:
+                                codes_set(gid, "missingValue", 1e+20)
+                            iterid = codes_keys_iterator_new(gid, 'ls')
+                            step_range = None
+                            type_of_level = None
+                            level = None
+                            short_name = None
+                            cat = re.sub('/.*$', '', cat_subcat)
+                            subcat = re.sub('^.*/', '', cat_subcat)
+                            target_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
+                            while codes_keys_iterator_next(iterid):
+                                key = codes_keys_iterator_get_name(iterid)
+                                if key in keys:
+                                    value = codes_get_string(gid, key)
+                                    if key == 'level':
+                                        target_conf_df = target_conf_df[(target_conf_df[key] == int(value))]
+                                    else:
+                                        target_conf_df = target_conf_df[(target_conf_df[key] == value)]
+                            property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
+                            codes_keys_iterator_delete(iterid)
+                            if write_location:
+                                iterid = codes_grib_iterator_new(gid, 0)
+                                lat_list = []
+                                lon_list = []
+                                while True:
+                                    latitude_longitude_value = codes_grib_iterator_next(iterid)
+                                    if not latitude_longitude_value:
+                                        break
+                                    else:
+                                        lat_list.append(latitude_longitude_value[0])
+                                        if latitude_longitude_value[1] < 180.0:
+                                            lon_list.append(latitude_longitude_value[1])
                                         else:
-                                            target_conf_df = target_conf_df[(target_conf_df[key] == value)]
-                                property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
-                                codes_keys_iterator_delete(iterid)
-                                if write_location:
-                                    iterid = codes_grib_iterator_new(gid, 0)
-                                    lat_list = []
-                                    lon_list = []
-                                    while True:
-                                        latitude_longitude_value = codes_grib_iterator_next(iterid)
-                                        if not latitude_longitude_value:
-                                            break
-                                        else:
-                                            lat_list.append(latitude_longitude_value[0])
-                                            if latitude_longitude_value[1] < 180.0:
-                                                lon_list.append(latitude_longitude_value[1])
-                                            else:
-                                                lon_list.append(latitude_longitude_value[1] - 360.0)
-                                    codes_grib_iterator_delete(iterid)
-                                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
-                                    out_directory = '/'.join(out_directory_list)
-                                    os.makedirs(out_directory, exist_ok=True)
-                                    out_file_list = [out_directory, '/location.arrow']
-                                    out_file = ''.join(out_file_list)
-                                    location_batch = pa.record_batch([pa.array(lat_list, 'float32'), pa.array(lon_list, 'float32')], names=['latitude [degree]', 'longitude [degree]'])
-                                    with open(out_file, 'bw') as out_f:
-                                        ipc_writer = pa.ipc.new_file(out_f, location_batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
-                                        ipc_writer.write_batch(location_batch)
-                                        ipc_writer.close()
-                                codes_release(gid)
-                        codes_index_release(iid)
+                                            lon_list.append(latitude_longitude_value[1] - 360.0)
+                                codes_grib_iterator_delete(iterid)
+                                out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
+                                out_directory = '/'.join(out_directory_list)
+                                os.makedirs(out_directory, exist_ok=True)
+                                out_file_list = [out_directory, '/location.arrow']
+                                out_file = ''.join(out_file_list)
+                                location_batch = pa.record_batch([pa.array(lat_list, 'float32'), pa.array(lon_list, 'float32')], names=['latitude [degree]', 'longitude [degree]'])
+                                with open(out_file, 'bw') as out_f:
+                                    ipc_writer = pa.ipc.new_file(out_f, location_batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
+                                    ipc_writer.write_batch(location_batch)
+                                    ipc_writer.close()
+                            codes_release(gid)
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
                 if len(property_dict) > 0:
