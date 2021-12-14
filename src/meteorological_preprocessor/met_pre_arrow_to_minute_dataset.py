@@ -22,7 +22,7 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         out_file_dict = {}
         for in_file in in_file_list:
-            match = re.search(r'^.*/([A-Z][A-Z0-9]{3})/' + conf_tuple.convert + '/' + conf_tuple.category + '/' + conf_tuple.subcategory + '/[^/]*C_[A-Z][A-Z0-9]{3}_([0-9]*)\.arrow$', in_file)
+            match = re.search(r'^.*/([A-Z][A-Z0-9]{3})/' + conf_tuple.input_path + '/[^/]*C_[A-Z][A-Z0-9]{3}_([0-9]*)\.arrow$', in_file)
             if not match:
                 continue
             if debug:
@@ -45,10 +45,10 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                         for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
                             if output_child_directory_list[output_index] =='1MinuteDataset':
                                 new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(minutes=1))]
-                                out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
+                                out_file = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.output_path, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y), '.arrow'])
                             elif output_child_directory_list[output_index] =='1DayDataset':
                                 new_df = tile_df[(new_datetime <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + timedelta(days=1))]
-                                out_directory = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y)])
+                                out_file = ''.join([out_dir, '/', output_child_directory_list[output_index], '/', conf_tuple.output_path, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(tile_level), '/', str(tile_x), '/', str(tile_y), '.arrow'])
                             if len(new_df.index) > 0:
                                 ssc_df = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
                                 ssc_df = - ssc_df.map(pd.Timestamp.timestamp).astype(int)
@@ -64,7 +64,6 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                                 new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last', inplace=True)
                                 tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
                                 new_df.reset_index(drop=True, inplace=True)
-                                out_file = ''.join([out_directory, '/', conf_tuple.output_name])
                                 if out_file in out_file_dict:
                                     former_df = out_file_dict[out_file]
                                 elif os.path.exists(out_file):
