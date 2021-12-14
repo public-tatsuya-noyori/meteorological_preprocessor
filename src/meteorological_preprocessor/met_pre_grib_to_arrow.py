@@ -38,7 +38,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                     print('Warning', warno, ':', in_file, 'is not readable.', file=sys.stderr)
                     continue
                 dt_str = re.sub('/.*$', '', re.sub('^.*/' + cccc + '/grib/' + cat_subcat + '/', '', in_file))
-                with open(in_file, 'r') as in_file_stream:
+                with open(in_file, 'rb') as in_file_stream:
                     if debug:
                         print('Debug', ':', in_file, file=sys.stderr)
                     try:
@@ -55,9 +55,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                             for key_count in range(len(keys)):
                                 codes_index_select(iid, keys[key_count], product[key_count])
                             while True:
-                                gid = codes_new_from_index(iid)
+                                #gid = codes_new_from_index(iid)
+                                gid = codes_grib_new_from_file(in_file_stream)
                                 if gid is None:
                                     break
+                                bitmapPresent = codes_get(gid, "bitmapPresent")
+                                if bitmapPresent:
+                                    codes_set(gid, "missingValue", 1e+20)
                                 iterid = codes_keys_iterator_new(gid, 'ls')
                                 step_range = None
                                 type_of_level = None
@@ -102,6 +106,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                         ipc_writer.write_batch(location_batch)
                                         ipc_writer.close()
                                 codes_release(gid)
+                        codes_index_release(iid)
                     except:
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
                 if len(property_dict) > 0:
