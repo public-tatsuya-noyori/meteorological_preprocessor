@@ -1,0 +1,9 @@
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0000_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0003_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0006_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0009_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0012_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0015_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0018_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0021_grib2.bin.gz$
+^RJTD/grib/gsm/0.25_0.25_90.0_0.0_-90.0_359.75/[0-9]{12}/GSM_GPV_Rgl_Gll0p25deg_Lsurf_FD0100_grib2.bin.gz$
