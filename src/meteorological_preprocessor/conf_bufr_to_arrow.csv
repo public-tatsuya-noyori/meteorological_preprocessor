@@ -170,28 +170,28 @@ upper_air,pilot,309050;309051,wigosLocalIdentifierCharacter,1,False,0,0,False,Fa
 upper_air,pilot,309050;309051,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,sonde,extended vertical sounding significance,uint32,False
 upper_air,pilot,309050,pressure,0,False,0,0,False,False,0,,upper_air,sonde,pressure [Pa],float32,False
 upper_air,pilot,309051,geopotentialHeight,0,False,0,0,False,False,0,,upper_air,sonde,geopotential height [m],float32,False
-upper_air,temp,309052,airTemperature,0,True,0,0,False,False,0,,upper_air,sonde,air temperature [K],float32,False
-upper_air,temp,309052,year,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
-upper_air,temp,309052,month,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
-upper_air,temp,309052,day,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
-upper_air,temp,309052,hour,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
-upper_air,temp,309052,minute,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
-upper_air,temp,309052,second,1,False,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
-upper_air,temp,309052,timePeriod,0,False,0,0,False,False,0,,upper_air,sonde,timedelta [second],timestamp,False
-upper_air,temp,309052,latitude,1,True,0,0,False,False,0,,upper_air,sonde,latitude [degree],float32,False
-upper_air,temp,309052,latitudeDisplacement,0,False,0,0,False,False,0,,upper_air,sonde,latitude [degree],float32,True
-upper_air,temp,309052,longitude,1,True,0,0,False,False,0,,upper_air,sonde,longitude [degree],float32,False
-upper_air,temp,309052,longitudeDisplacement,0,False,0,0,False,False,0,,upper_air,sonde,longitude [degree],float32,True
-upper_air,temp,309052,blockNumber,1,False,0,0,False,True,0,,upper_air,sonde,id,string,False
-upper_air,temp,309052,stationNumber,1,False,0,0,False,True,3,,upper_air,sonde,id,string,True
-upper_air,temp,309052,wigosIssuerOfIdentifier,1,False,0,0,False,True,0,,upper_air,sonde,id,string,False
-upper_air,temp,309052,wigosLocalIdentifierCharacter,1,False,0,0,False,False,0,,upper_air,sonde,id,string,True
-upper_air,temp,309052,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,sonde,extended vertical sounding significance,uint32,False
-upper_air,temp,309052,pressure,0,False,0,0,False,False,0,,upper_air,sonde,pressure [Pa],float32,False
-upper_air,temp,309052,nonCoordinateGeopotentialHeight,0,False,0,0,False,False,0,,upper_air,sonde,non coordinate geopotential height [m],float32,False
-upper_air,temp,309052,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,sonde,dewpoint temperature [K],float32,False
-upper_air,temp,309052,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
-upper_air,temp,309052,windSpeed,0,False,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
+upper_air,temp,309052;309057,airTemperature,0,True,0,0,False,False,0,,upper_air,sonde,air temperature [K],float32,False
+upper_air,temp,309052;309057,year,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
+upper_air,temp,309052;309057,month,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
+upper_air,temp,309052;309057,day,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
+upper_air,temp,309052;309057,hour,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
+upper_air,temp,309052;309057,minute,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
+upper_air,temp,309052;309057,second,1,False,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
+upper_air,temp,309052;309057,timePeriod,0,False,0,0,False,False,0,,upper_air,sonde,timedelta [second],timestamp,False
+upper_air,temp,309052;309057,latitude,1,True,0,0,False,False,0,,upper_air,sonde,latitude [degree],float32,False
+upper_air,temp,309052;309057,latitudeDisplacement,0,False,0,0,False,False,0,,upper_air,sonde,latitude [degree],float32,True
+upper_air,temp,309052;309057,longitude,1,True,0,0,False,False,0,,upper_air,sonde,longitude [degree],float32,False
+upper_air,temp,309052;309057,longitudeDisplacement,0,False,0,0,False,False,0,,upper_air,sonde,longitude [degree],float32,True
+upper_air,temp,309052;309057,blockNumber,1,False,0,0,False,True,0,,upper_air,sonde,id,string,False
+upper_air,temp,309052;309057,stationNumber,1,False,0,0,False,True,3,,upper_air,sonde,id,string,True
+upper_air,temp,309052;309057,wigosIssuerOfIdentifier,1,False,0,0,False,True,0,,upper_air,sonde,id,string,False
+upper_air,temp,309052;309057,wigosLocalIdentifierCharacter,1,False,0,0,False,False,0,,upper_air,sonde,id,string,True
+upper_air,temp,309052;309057,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,sonde,extended vertical sounding significance,uint32,False
+upper_air,temp,309052;309057,pressure,0,False,0,0,False,False,0,,upper_air,sonde,pressure [Pa],float32,False
+upper_air,temp,309052;309057,nonCoordinateGeopotentialHeight,0,False,0,0,False,False,0,,upper_air,sonde,geopotential height [m],float32,False
+upper_air,temp,309052;309057,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,sonde,dewpoint temperature [K],float32,False
+upper_air,temp,309052;309057,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
+upper_air,temp,309052;309057,windSpeed,0,False,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
 upper_air,temp_drop,309053,airTemperature,0,True,0,0,False,False,0,,upper_air,drop_sonde,air temperature [K],float32,False
 upper_air,temp_drop,309053,year,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
 upper_air,temp_drop,309053,month,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
@@ -207,7 +207,7 @@ upper_air,temp_drop,309053,longitudeDisplacement,0,False,0,0,False,False,0,,uppe
 upper_air,temp_drop,309053,aircraftFlightNumber,1,False,0,0,False,False,0,,upper_air,drop_sonde,aircraft flight number,string,False
 upper_air,temp_drop,309053,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,drop_sonde,extended vertical sounding significance,uint32,False
 upper_air,temp_drop,309053,pressure,0,False,0,0,False,False,0,,upper_air,drop_sonde,pressure [Pa],float32,False
-upper_air,temp_drop,309053,nonCoordinateGeopotentialHeight,0,False,0,0,False,False,0,,upper_air,drop_sonde,non coordinate geopotential height [m],float32,False
+upper_air,temp_drop,309053,nonCoordinateGeopotentialHeight,0,False,0,0,False,False,0,,upper_air,drop_sonde,geopotential height [m],float32,False
 upper_air,temp_drop,309053,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,dewpoint temperature [K],float32,False
 upper_air,temp_drop,309053,windDirection,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind direction [degree],float32,False
 upper_air,temp_drop,309053,windSpeed,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind speed [m s-1],float32,False
