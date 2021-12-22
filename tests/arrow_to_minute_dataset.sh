@@ -3,7 +3,7 @@ set -e
 
 make_dataset(){
   cp /dev/null ${work_directory}/${name}_input.txt
-  for i in `ls -1 ${work_directory}/${name}/*|grep txt$`; do
+  for i in `ls -1 ${work_directory}/${name}/*.txt`; do
     cat ${i} >> ${work_directory}/${name}_input.txt
     rm -f ${i}
   done 
