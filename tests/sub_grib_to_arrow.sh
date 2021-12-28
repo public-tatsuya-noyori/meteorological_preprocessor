@@ -195,9 +195,9 @@ subscribe() {
             mv ${work_directory}/${now}_${unique_center_id}.txt.gz ${processed_directory}/
             sleep 1
             now=`date -u "+%Y%m%d%H%M%S"`
-            cat ${work_directory}/processed_file.txt | sed -e 's|\.gz||g' -e "s|^|${local_work_directory}/|g" > ${local_work_directory}/sub_bufr_to_arrow.txt
-            ./met_pre_bufr_to_arrow.py --debug RJTD ${local_work_directory}/sub_bufr_to_arrow.txt ${local_work_directory} 1>${local_work_directory}/sub_bufr_to_arrow/${now}.txt.tmp 2>>${local_work_directory}/sub_bufr_to_arrow_stderr.log
-            mv -f ${local_work_directory}/sub_bufr_to_arrow/${now}.txt.tmp ${local_work_directory}/sub_bufr_to_arrow/${now}.txt
+            cat ${work_directory}/processed_file.txt | sed -e 's|\.gz||g' -e "s|^|${local_work_directory}/|g" > ${local_work_directory}/sub_grib_to_arrow.txt
+            ./met_pre_grib_to_arrow.py --debug --write_location RJTD ${local_work_directory}/sub_grib_to_arrow.txt ${local_work_directory} 1>${local_work_directory}/sub_grib_to_arrow/${now}.txt.tmp 2>>${local_work_directory}/sub_grib_to_arrow_stderr.log
+            mv -f ${local_work_directory}/sub_grib_to_arrow/${now}.txt.tmp ${local_work_directory}/sub_grib_to_arrow/${now}.txt
           fi
         else
           rm -rf ${work_directory}/prepare
@@ -289,8 +289,8 @@ for hour_count in `seq ${inclusive_index_hour}`; do
 done
 work_directory=${local_work_directory}/${job_directory}/${unique_center_id}/${extension_type}
 processed_directory=${local_work_directory}/${job_directory}/processed/${extension_type}
-mkdir -p ${work_directory} ${processed_directory} ${local_work_directory}/sub_bufr_to_arrow
-pid_prefix=_sub_bufr_to_arrow
+mkdir -p ${work_directory} ${processed_directory} ${local_work_directory}/sub_grib_to_arrow
+pid_prefix=_sub_grib_to_arrow
 if test -s ${work_directory}/${pid_prefix}pid.txt; then
   if test ${no_check_pid} -eq 0; then
     running=`cat ${work_directory}/${pid_prefix}pid.txt | xargs -r ps ho 'pid comm args' | grep -F " $0 " | grep -F " ${unique_center_id} " | grep -F " ${extension_type} " | wc -l`
