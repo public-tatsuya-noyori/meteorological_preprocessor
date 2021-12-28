@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
-def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, write_location, debug):
+def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, debug):
     warno = 189
     out_arrows = []
     now = datetime.utcnow()
@@ -68,7 +68,11 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                         target_conf_df = target_conf_df[(target_conf_df[key] == value)]
                             property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
                             codes_keys_iterator_delete(iterid)
-                            if write_location:
+                            out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
+                            out_directory = '/'.join(out_directory_list)
+                            out_file_list = [out_directory, '/location.arrow']
+                            out_file = ''.join(out_file_list)
+                            if not os.path.exists(out_file):
                                 iterid = codes_grib_iterator_new(gid, 0)
                                 lat_list = []
                                 lon_list = []
@@ -83,11 +87,7 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, wri
                                         else:
                                             lon_list.append(latitude_longitude_value[1] - 360.0)
                                 codes_grib_iterator_delete(iterid)
-                                out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
-                                out_directory = '/'.join(out_directory_list)
                                 os.makedirs(out_directory, exist_ok=True)
-                                out_file_list = [out_directory, '/location.arrow']
-                                out_file = ''.join(out_file_list)
                                 location_batch = pa.record_batch([pa.array(lat_list, 'float32'), pa.array(lon_list, 'float32')], names=['latitude [degree]', 'longitude [degree]'])
                                 with open(out_file, 'bw') as out_f:
                                     ipc_writer = pa.ipc.new_file(out_f, location_batch.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
@@ -148,7 +148,6 @@ def main():
     parser.add_argument('input_list_file', type=str, metavar='input_list_file')
     parser.add_argument('output_directory', type=str, metavar='output_directory')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
-    parser.add_argument("--write_location", action='store_true')
     parser.add_argument("--debug", action='store_true')
     args = parser.parse_args()
     config = pkg_resources.resource_filename(__name__, 'conf_grib_to_arrow.csv')
@@ -186,7 +185,7 @@ def main():
         with open(args.input_list_file, 'r') as in_list_file_stream:
             input_file_list = [in_file.rstrip('\n') for in_file in in_list_file_stream.readlines()]
         conf_df = csv.read_csv(config).to_pandas()
-        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.write_location, args.debug)
+        convert_to_arrow(args.my_cccc, input_file_list, args.output_directory, args.output_list_file, conf_df, args.debug)
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
