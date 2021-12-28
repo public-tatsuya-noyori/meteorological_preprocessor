@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import pyarrow as pa
 import sys
+import traceback
 
 def null_int(t):
   if pa.types.is_integer(t):
