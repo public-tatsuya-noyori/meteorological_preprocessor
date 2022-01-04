@@ -1,5 +1,6 @@
 category,subcategory,tile_level,minute_level,sort_unique_list
 surface,weather_station,1,10,latitude [degree];longitude [degree];datetime;id
+surface,ship,1,10,latitude [degree];longitude [degree];datetime;id
 surface,buoy,1,10,latitude [degree];longitude [degree];datetime;id
 surface,gps_station,1,10,latitude [degree];longitude [degree];datetime;id
 ocean,float,1,10,latitude [degree];longitude [degree];datetime;id;water pressure [Pa]
