@@ -29,9 +29,9 @@ def convert_to_dataset(cccc, cat, subcat, in_df, out_dir, out_list_file, conf_df
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]'])]
                 else:
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] > 90.0 - res * (tile_y + 1))]
-                new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.round(str(conf_tuple.minute_level) + 'T').unique()
+                new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.ceil(str(conf_tuple.minute_level) + 'T').unique()
                 for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                    new_df = tile_df[(new_datetime - (timedelta(minutes=conf_tuple.minute_level) / 2) <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + (timedelta(minutes=conf_tuple.minute_level) / 2))]
+                    new_df = tile_df[(new_datetime - timedelta(minutes=conf_tuple.minute_level) < tile_df['datetime']) & (tile_df['datetime'] <= new_datetime)]
                     out_file = ''.join([out_dir, '/', cccc, '/bufr_to_arrow/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
                     if len(new_df.index) > 0:
                         ctmdt_series = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
