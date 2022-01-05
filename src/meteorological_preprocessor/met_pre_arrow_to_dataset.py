@@ -19,7 +19,7 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
         tile_level = conf_tuple.tile_level
         out_file_dict = {}
         for in_file in in_file_list:
-            match = re.search(r'^.*/([A-Z][A-Z0-9]{3})/' + conf_tuple.convert + '/' + conf_tuple.category + '/' + conf_tuple.subcategory + '/[^/]*\.arrow$', in_file)
+            match = re.search(r'^.*/([A-Z][A-Z0-9]{3})/' + conf_tuple.convert + '/' + conf_tuple.category + '/' + conf_tuple.subcategory + '/.*\.arrow$', in_file)
             if not match:
                 continue
             if debug:
@@ -37,7 +37,7 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                     new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.floor(str(conf_tuple.minute_level) + 'T').unique()
                     for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
                         new_df = tile_df[(new_datetime - (timedelta(minutes=conf_tuple.minute_level) / 2) <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + (timedelta(minutes=conf_tuple.minute_level) / 2))]
-                        out_file = ''.join([out_dir, '/', conf_tuple.convert, '/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
+                        out_file = ''.join([out_dir, '/', conf_tuple.convert, '/', conf_tuple.category, '/', conf_tuple.subcategory, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
                         if len(new_df.index) > 0:
                             tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                             tmp_sort_unique_list.insert(0, 'indicator')
@@ -63,16 +63,16 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                                 new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last', inplace=True)
                                 tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
                             out_file_dict[out_file] = new_df
-            for out_file, out_df in out_file_dict.items():
-                os.makedirs(os.path.dirname(out_file), exist_ok=True)
-                table = pa.Table.from_pandas(out_df.reset_index(drop=True)).replace_schema_metadata(metadata=None)
-                with open(out_file, 'bw') as out_f:
-                    #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
-                    ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
-                    for batch in table.to_batches():
-                        ipc_writer.write_batch(batch)
-                    ipc_writer.close()
-                    print(out_file, file=out_list_file)
+        for out_file, out_df in out_file_dict.items():
+            os.makedirs(os.path.dirname(out_file), exist_ok=True)
+            table = pa.Table.from_pandas(out_df.reset_index(drop=True)).replace_schema_metadata(metadata=None)
+            with open(out_file, 'bw') as out_f:
+                #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
+                ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
+                for batch in table.to_batches():
+                    ipc_writer.write_batch(batch)
+                ipc_writer.close()
+                print(out_file, file=out_list_file)
 
 def main():
     errno=198

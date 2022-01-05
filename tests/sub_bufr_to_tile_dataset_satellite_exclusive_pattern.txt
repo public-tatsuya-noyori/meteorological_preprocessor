@@ -1,0 +1,5 @@
+^RKSL/bufr/satellite/amsua/[0-9]{12}/[^/]+\.bin.gz$
+^RKSL/bufr/satellite/atms/[0-9]{12}/[^/]+\.bin.gz$
+^RKSL/bufr/satellite/cris/[0-9]{12}/[^/]+\.bin.gz$
+^RKSL/bufr/satellite/csr/[0-9]{12}/[^/]+\.bin.gz$
+^RKSL/bufr/satellite/iasi/[0-9]{12}/[^/]+\.bin.gz$
