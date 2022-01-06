@@ -248,8 +248,11 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                             first_key_value_np_len = len(value_np)
                                         else:
                                             if first_key_value_np_len != len(value_np):
-                                                print('Warning', warno, in_file, ':', first_key_value_np_len, ':', len(value_np), output_conf_tuple.key, 'is not equals to first_key_value_np_len.', file=sys.stderr)
-                                                break
+                                                if first_key_value_np_len < len(value_np):
+                                                    value_np = value_np[0:first_key_value_np_len]
+                                                else:
+                                                    print('Warning', warno, in_file, ':', first_key_value_np_len, ':', len(value_np), output_conf_tuple.key, 'is not equals to first_key_value_np_len.', file=sys.stderr)
+                                                    break
                                         if output_conf_tuple.is_required:
                                             tmp_required_np = np.array([False if value == None else True for value in value_np])
                                             if len(required_np) > 0:
