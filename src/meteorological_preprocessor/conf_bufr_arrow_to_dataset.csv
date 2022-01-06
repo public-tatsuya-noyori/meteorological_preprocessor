@@ -4,8 +4,8 @@ surface,ship,1,10,ceil,latitude [degree];longitude [degree];datetime;id
 surface,buoy,1,10,ceil,latitude [degree];longitude [degree];datetime;id
 surface,gps_station,1,10,ceil,latitude [degree];longitude [degree];datetime;id
 ocean,float,1,10,ceil,latitude [degree];longitude [degree];datetime;id;water pressure [Pa]
-upper_air,sonde,1,180,round,latitude [degree];longitude [degree];datetime;id;pressure [Pa];geopotential height [m]
-upper_air,drop_sonde,1,180,round,latitude [degree];longitude [degree];datetime;aircraft flight number;pressure [Pa];non coordinate geopotential height [m]
+upper_air,sonde,1,10,ceil,latitude [degree];longitude [degree];datetime;id;pressure [Pa];geopotential height [m]
+upper_air,drop_sonde,1,10,ceil,latitude [degree];longitude [degree];datetime;aircraft flight number;pressure [Pa];non coordinate geopotential height [m]
 upper_air,aircraft,1,10,ceil,latitude [degree];longitude [degree];datetime;id;aircraft flight number;flight level [m];height [m]
 upper_air,profiler,1,10,ceil,latitude [degree];longitude [degree];datetime;id;height [m]
 satellite,csr,3,10,ceil,latitude [degree];longitude [degree];datetime;id
