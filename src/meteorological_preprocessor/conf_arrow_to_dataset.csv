@@ -1,14 +1,14 @@
-convert,category,subcategory,tile_level,minute_level,sort_unique_list
-bufr_to_arrow,surface,weather_station,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,surface,ship,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,surface,buoy,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,surface,gps_station,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,ocean,float,1,10,latitude [degree];longitude [degree];datetime;id;water pressure [Pa]
-bufr_to_arrow,upper_air,sonde,1,10,latitude [degree];longitude [degree];datetime;id;pressure [Pa];geopotential height [m]
-bufr_to_arrow,upper_air,drop_sonde,1,10,latitude [degree];longitude [degree];datetime;aircraft flight number;pressure [Pa];non coordinate geopotential height [m]
-bufr_to_arrow,upper_air,aircraft,1,10,latitude [degree];longitude [degree];datetime;id;aircraft flight number;flight level [m];height [m]
-bufr_to_arrow,upper_air,profiler,1,10,latitude [degree];longitude [degree];datetime;id;height [m]
-bufr_to_arrow,satellite,csr,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,satellite,amsua,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,satellite,atms,1,10,latitude [degree];longitude [degree];datetime;id
-bufr_to_arrow,satellite,cris,1,10,latitude [degree];longitude [degree];datetime;id
+convert,category,subcategory,tile_level,minute_level,minute_type,sort_unique_list
+bufr_to_arrow,surface,weather_station,1,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,surface,ship,1,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,surface,buoy,1,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,surface,gps_station,1,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,ocean,float,1,10,ceil,latitude [degree];longitude [degree];datetime;id;water pressure [Pa]
+bufr_to_arrow,upper_air,sonde,1,10,ceil,latitude [degree];longitude [degree];datetime;id;pressure [Pa];geopotential height [m]
+bufr_to_arrow,upper_air,drop_sonde,1,10,ceil,latitude [degree];longitude [degree];datetime;aircraft flight number;pressure [Pa];non coordinate geopotential height [m]
+bufr_to_arrow,upper_air,aircraft,1,10,ceil,latitude [degree];longitude [degree];datetime;id;aircraft flight number;flight level [m];height [m]
+bufr_to_arrow,upper_air,profiler,1,10,ceil,latitude [degree];longitude [degree];datetime;id;height [m]
+bufr_to_arrow,satellite,csr,3,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,satellite,amsua,3,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,satellite,atms,3,10,ceil,latitude [degree];longitude [degree];datetime;id
+bufr_to_arrow,satellite,cris,3,10,ceil,latitude [degree];longitude [degree];datetime;id
