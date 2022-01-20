@@ -143,13 +143,13 @@ surface,tesac,315003,hour,1,True,0,0,False,False,0,,ocean,float,datetime,timesta
 surface,tesac,315003,minute,1,True,0,0,False,False,0,,ocean,float,datetime,timestamp,False
 surface,tesac,315003,marineObservingPlatformIdentifier,1,False,0,0,False,False,0,,ocean,float,id,string,False
 surface,tesac,315003,oceanographicWaterTemperature,0,False,0,0,False,False,0,,ocean,float,oceanographic water temperature [K],float32,False
-surface,tesac,315003,salinity,0,False,0,0,False,False,0,,ocean,float,salinity [%],float32,False
+surface,tesac,315003,salinity,0,False,0,0,False,False,0,,ocean,float,salinity [0/00],float32,False
 surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,1,3,False,False,0,,ocean,float,waterPressure [Pa]#qualifier for gtspp quality flag,uint8,False
 surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,2,3,False,False,0,,ocean,float,oceanographic water temperature [K]#qualifier for gtspp quality flag,uint8,False
-surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [%]#qualifier for gtspp quality flag,uint8,False
+surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [0/00]#qualifier for gtspp quality flag,uint8,False
 surface,tesac,315003,globalGtsppQualityFlag,0,False,1,3,False,False,0,,ocean,float,waterPressure [Pa]#global gtspp quality flag,uint8,False
 surface,tesac,315003,globalGtsppQualityFlag,0,False,2,3,False,False,0,,ocean,float,oceanographic water temperature [K]#global gtspp quality flag,uint8,False
-surface,tesac,315003,globalGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [%]#global gtspp quality flag,uint8,False
+surface,tesac,315003,globalGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [0/00]#global gtspp quality flag,uint8,False
 upper_air,pilot,309050;309051,windSpeed,0,True,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
 upper_air,pilot,309050;309051,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
 upper_air,pilot,309050;309051,year,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
