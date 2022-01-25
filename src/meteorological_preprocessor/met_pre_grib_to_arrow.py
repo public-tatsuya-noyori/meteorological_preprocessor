@@ -22,6 +22,8 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
     cat_subcat_set = set([re.search(r'^[^/]*/[^/]*/', re.sub('^.*/grib/', '', in_file)).group().rstrip('/') for in_file in in_file_list])
     for cccc in cccc_set:
         for cat_subcat in cat_subcat_set:
+            cat = re.sub('/.*$', '', cat_subcat)
+            subcat = re.sub('^.*/', '', cat_subcat)
             keys = ['stepRange', 'typeOfLevel', 'level', 'shortName']
             for in_file in in_file_list:
                 property_dict = {}
@@ -55,8 +57,6 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                             type_of_level = None
                             level = None
                             short_name = None
-                            cat = re.sub('/.*$', '', cat_subcat)
-                            subcat = re.sub('^.*/', '', cat_subcat)
                             target_conf_df = conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)]
                             while codes_keys_iterator_next(iterid):
                                 key = codes_keys_iterator_get_name(iterid)
@@ -68,9 +68,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                         target_conf_df = target_conf_df[(target_conf_df[key] == value)]
                             property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
                             codes_keys_iterator_delete(iterid)
-                            out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
+                            out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat]
                             out_directory = '/'.join(out_directory_list)
-                            out_file_list = [out_directory, '/location.arrow']
+                            out_file_list = [out_directory, '/', subcat, '.arrow']
                             out_file = ''.join(out_file_list)
                             if not os.path.exists(out_file):
                                 iterid = codes_grib_iterator_new(gid, 0)
@@ -95,12 +95,13 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                                     ipc_writer.close()
                             codes_release(gid)
                     except:
+                        traceback.print_exc(file=sys.stderr)
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
                 if len(property_dict) > 0:
-                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat_subcat]
+                    out_directory_list = [out_dir, cccc, 'grib_to_arrow', cat]
                     out_directory = '/'.join(out_directory_list)
                     os.makedirs(out_directory, exist_ok=True)
-                    out_file_list = [out_directory, '/location.arrow']
+                    out_file_list = [out_directory, '/', subcat, '.arrow']
                     out_file = ''.join(out_file_list)
                     location_df = pa.ipc.open_file(out_file).read_pandas()
                     dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
@@ -110,9 +111,9 @@ def convert_to_arrow(my_cccc, in_file_list, out_dir, out_list_file, conf_df, deb
                     out_name_dict = {}
                     out_data_dict = {}
                     for property_key in property_dict.keys():
-                        level_ft_out_directory = '/'.join([out_directory, property_key[6], str(property_key[7])])
-                        os.makedirs(level_ft_out_directory, exist_ok=True)
-                        out_file_list = [level_ft_out_directory, '/', dt_str, '_', create_datetime, '.arrow']
+                        ft_out_directory = '/'.join([out_directory, str(property_key[7]).zfill(4)])
+                        os.makedirs(ft_out_directory, exist_ok=True)
+                        out_file_list = [ft_out_directory, '/', dt_str, '_', property_key[6], '_', create_datetime, '.arrow']
                         out_file = ''.join(out_file_list)
                         if re.match(r'^U wind component$', property_key[8]):
                             u_value_np = property_dict[property_key]
