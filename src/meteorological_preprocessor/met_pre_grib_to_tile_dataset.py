@@ -167,10 +167,10 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                         wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
                         wind_direction_np = np.array([value + 360.0 if value < 0 else value for value in wind_direction_np])
                         if out_key in out_name_dict:
-                            out_name_dict[out_key] = out_name_dict[out_key] + [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
+                            out_name_dict[out_key] = out_name_dict[out_key] + [re.sub(r'U wind component', 'wind speed [m s-1]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
                             out_data_dict[out_key] = out_data_dict[out_key] + [pa.array(np.array(wind_speed_np, dtype=property_key[9])), pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
                         else:
-                            out_name_dict[out_key] = name_list + [re.sub(r'U wind component', 'wind speed [m/s]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
+                            out_name_dict[out_key] = name_list + [re.sub(r'U wind component', 'wind speed [m s-1]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
                             out_data_dict[out_key] = data_list + [pa.array(np.array(wind_speed_np, dtype=property_key[9])), pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
                     elif not re.match(r'^V wind component$', property_key[8]):
                         if out_key in out_name_dict:
