@@ -116,15 +116,15 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                     if debug:
                         print('Debug', ':', in_file, file=sys.stderr)
                     input_dict = {}
-                    required_np = np.array([])
                     name_with_att_dict = {}
                     out_name_list = []
-                    is_array = False
-                    is_first_key = True
-                    first_key = ''
-                    first_key_value_np_len = 0
                     with open(in_file, 'rb') as in_file_stream:
                         while True:
+                            required_np = np.array([])
+                            is_array = False
+                            is_first_key = True
+                            first_key = ''
+                            first_key_value_np_len = 0
                             bufr = None
                             try:
                                 bufr = ec.codes_bufr_new_from_file(in_file_stream)
