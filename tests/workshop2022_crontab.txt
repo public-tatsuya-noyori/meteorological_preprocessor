@@ -1,2 +1,0 @@
-* * * * * cd /home/cloudshell-user/meteorological_preprocessor/tests; ./sub.sh --config rclone.conf workshop2022 jma txt 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' inclusive_pattern_synop.txt exclusive_pattern.txt
-* * * * * cd /home/cloudshell-user/meteorological_preprocessor/tests; ./sub.sh --config rclone.conf workshop2022 jma bin 'jma:center-aa-cloud-a-region-a-open-main;jma:center-aa-cloud-a-region-b-open-sub' inclusive_pattern_synop.txt exclusive_pattern.txt
