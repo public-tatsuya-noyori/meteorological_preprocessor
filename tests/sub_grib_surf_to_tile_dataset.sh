@@ -159,11 +159,6 @@ subscribe() {
       fi
       cp /dev/null ${work_directory}/processed_file.txt
       if test -s ${source_work_directory}/filtered_newly_created_file.tmp; then
-
-        if test `cat ${inclusive_pattern_file} | wc -l` -ne `cat ${source_work_directory}/filtered_newly_created_file.tmp | wc -l`; then
-          return 0
-        fi
-
         if test ${index_only} -eq 0; then
           cp /dev/null ${source_work_directory}/info_log.tmp
           set +e
