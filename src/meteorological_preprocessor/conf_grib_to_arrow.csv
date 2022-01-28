@@ -4684,7 +4684,7 @@ gsm,0.5_0.5_90.0_0.0_-90.0_359.5,96,isobaricInhPa,10,u,10hPa,96,U wind component
 gsm,0.5_0.5_90.0_0.0_-90.0_359.5,96,isobaricInhPa,10,v,10hPa,96,V wind component,float32
 gsm,0.5_0.5_90.0_0.0_-90.0_359.5,96,isobaricInhPa,10,t,10hPa,96,air temperature [K],float32
 gsm,0.5_0.5_90.0_0.0_-90.0_359.5,96,isobaricInhPa,10,r,10hPa,96,relative humidity [%],float32
-gsm,0.5_0.5_90.0_0.0_-90.0_359.5,96,isobaricInhPa,10,w,10hPa,96,vertical velocity [Pa s-1],
+gsm,0.5_0.5_90.0_0.0_-90.0_359.5,96,isobaricInhPa,10,w,10hPa,96,vertical velocity [Pa s-1],float32
 gsm,0.5_0.5_90.0_0.0_-90.0_359.5,99,isobaricInhPa,1000,gh,1000hPa,99,geopotential Height [m],float32
 gsm,0.5_0.5_90.0_0.0_-90.0_359.5,99,isobaricInhPa,1000,u,1000hPa,99,U wind component,float32
 gsm,0.5_0.5_90.0_0.0_-90.0_359.5,99,isobaricInhPa,1000,v,1000hPa,99,V wind component,float32

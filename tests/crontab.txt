@@ -140,13 +140,6 @@
 #*/3 * * * * cd /home/noyori/tests; ./sub.sh --parallel 12 cache_s_closed_3 bb txt 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
 #*/3 * * * * cd /home/noyori/tests; ./sub.sh --parallel 12 cache_s_closed_3 bb bin 'minio:center-cc-cloud-c-region-e-closed-main;minio:center-cc-cloud-c-region-f-closed-sub' inclusive_pattern.txt exclusive_pattern.txt
 
-#* * * * * cd /home/noyori/tests; ./sub_bufr_to_arrow.sh --parallel 12 cache_s aa bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' sub_bufr_to_arrow_inclusive_pattern.txt exclusive_pattern.txt
-#* * * * * cd /home/noyori/tests; ./arrow_to_preprocess.sh
-#* * * * * cd /home/noyori/tests; ./grib_arrow_to_preprocess.sh
-#* * * * * cd /home/noyori/tests; ./arrow_to_minute_dataset.sh
-#*/10 * * * * cd /home/noyori/tests; ./arrow_to_day_dataset.sh
-#* * * * * cd /home/noyori/tests; ./move_4PubSub_dataset_4Search.sh cache_s        aa_open_dataset 1MinuteDataset minio:aa-open-dataset
-#* * * * * cd /home/noyori/tests; ./sub_grib_to_arrow.sh --parallel 4 cache_s bb bin 'minio:center-bb-cloud-b-region-c-closed-main;minio:center-bb-cloud-b-region-d-closed-sub' sub_grib_to_arrow_inclusive_pattern.txt exclusive_pattern.txt
 * * * * * cd /home/noyori/tests; ./sub_bufr_to_tile_dataset.sh --parallel 12 cache_tile_dataset aa1 bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' sub_bufr_to_tile_dataset_surf_upper_inclusive_pattern.txt exclusive_pattern.txt
 * * * * * cd /home/noyori/tests; ./move_4PubSub_dataset_4Search.sh cache_tile_dataset aa arrow minio:aa-open-dataset
 * * * * * cd /home/noyori/tests; ./sub_bufr_to_tile_dataset.sh --parallel 12 cache_tile_dataset_satellite aa2 bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' sub_bufr_to_tile_dataset_satellite_inclusive_pattern.txt sub_bufr_to_tile_dataset_satellite_exclusive_pattern.txt
@@ -159,12 +152,3 @@
 40 2,10,18 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_2 /home/noyori/tests/cache_s_3 /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_s_closed_2 /home/noyori/tests/cache_s_closed_3 /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r rm -rf > /dev/null 2>&1
 #55 2,10,18 * * * find /home/noyori/tests/cache_bufr_to_arrow -mindepth 6 -type d -mmin +360 | grep C_RJTD | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
 #55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +1440 | grep 20 | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
-
-# convert bufr to arrow
-#* * * * * cd /home/noyori/tests; ./bufr_to_arrow.sh >> log/bufr_to_arrow.sh.log 2>&1
-
-# convert alphanumeric to arrow
-#* * * * * cd /home/noyori/tests; ./alphanumeric_to_arrow.sh >> log/alphanumeric_to_arrow.sh.log 2>&1
-
-# convert arrow to tile arrow
-#* * * * * cd /home/noyori/tests; ./arrow_to_tile_arrow.sh >> log/arrow_to_tile_arrow.sh.log 2>&1
