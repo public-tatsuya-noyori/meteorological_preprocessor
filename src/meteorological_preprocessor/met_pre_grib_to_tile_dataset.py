@@ -13,10 +13,10 @@ from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
 
-def convert_to_dataset(cccc, convert, cat, subcat, in_df, out_dir, out_list_file, conf_df, debug):
+def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, conf_df, debug):
     warno = 188
     created_second = int(math.floor(datetime.utcnow().timestamp()))
-    for conf_tuple in conf_df[(conf_df['convert'] == convert) & (conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
+    for conf_tuple in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['ft'] == ft)].itertuples():
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         tile_level = conf_tuple.tile_level
         new_datetime_list_dict = {}
@@ -27,16 +27,10 @@ def convert_to_dataset(cccc, convert, cat, subcat, in_df, out_dir, out_list_file
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]'])]
                 else:
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] > 90.0 - res * (tile_y + 1))]
-                if conf_tuple.minute_type == 'ceil':
-                    new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.ceil(str(conf_tuple.minute_level) + 'T').unique()
-                else:
-                    new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.round(str(conf_tuple.minute_level) + 'T').unique()
+                new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.ceil(str(conf_tuple.minute_level) + 'T').unique()
                 for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                    if conf_tuple.minute_type == 'ceil':
-                        new_df = tile_df[(new_datetime - timedelta(minutes=conf_tuple.minute_level) < tile_df['datetime']) & (tile_df['datetime'] <= new_datetime)]
-                    else:
-                        new_df = tile_df[(new_datetime - (timedelta(minutes=conf_tuple.minute_level)/2) <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + (timedelta(minutes=conf_tuple.minute_level)/2))]
-                    out_file = ''.join([out_dir, '/', cccc, '/', convert, '/', cat, '/', str(subcat).zfill(4), '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
+                    new_df = tile_df[(new_datetime - timedelta(minutes=conf_tuple.minute_level) < tile_df['datetime']) & (tile_df['datetime'] <= new_datetime)]
+                    out_file = ''.join([out_dir, '/', cccc, '/analysis_forecast/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/', str(ft).zfill(4), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
                     if len(new_df.index) > 0:
                         ctmdt_series = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
                         ctmdt_series = - ctmdt_series.map(pd.Timestamp.timestamp).astype(int)
@@ -70,7 +64,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
         for cat_subcat in cat_subcat_set:
             cat = re.sub('/.*$', '', cat_subcat)
             subcat = re.sub('^.*/', '', cat_subcat)
-            convert = cat + '_grib_to_arrow'
+            convert = 'analysis_forecast'
             keys = ['stepRange', 'typeOfLevel', 'level', 'shortName']
             property_dict = {}
             for in_file in in_file_list:
@@ -115,8 +109,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                                         target_conf_df = target_conf_df[(target_conf_df[key] == value)]
                             property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
                             codes_keys_iterator_delete(iterid)
-
-                            out_directory_list = [out_dir, cccc, convert]
+                            out_directory_list = [out_dir, cccc, convert, cat]
                             out_directory = '/'.join(out_directory_list)
                             out_file_list = [out_directory, '/', subcat, '.arrow']
                             out_file = ''.join(out_file_list)
@@ -146,7 +139,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                         traceback.print_exc(file=sys.stderr)
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
             if len(property_dict) > 0:
-                out_directory_list = [out_dir, cccc, convert]
+                out_directory_list = [out_dir, cccc, convert, cat]
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
                 out_file_list = [out_directory, '/', subcat, '.arrow']
@@ -154,12 +147,18 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                 location_df = pa.ipc.open_file(out_file).read_pandas()
                 dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
                 dt_list = [dt for i in range(0, len(location_df.index))]
-                name_list = ['latitude [degree]', 'longitude [degree]', 'datetime']
-                data_list = [pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32'), pa.array(dt_list, pa.timestamp('ms', tz='utc'))]
+                id_list = [property_key[6] for i in range(0, len(location_df.index))]
+                name_list = ['datetime', 'id', 'latitude [degree]', 'longitude [degree]']
+                data_list = [pa.array(dt_list, pa.timestamp('ms', tz='utc')), pa.array(id_list, 'string'), pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32')]
                 out_name_dict = {}
                 out_data_dict = {}
+                if (id == 'surface') {
+                    id_type = 'surface'
+                } else {
+                    id_type = 'upper_air'
+                }
                 for property_key in property_dict.keys():
-                    out_key = (property_key[6], property_key[7])
+                    out_key = (cat, id_type, property_key[7])
                     if re.match(r'^U wind component$', property_key[8]):
                         u_value_np = property_dict[property_key]
                         v_value_np = property_dict[(property_key[0], property_key[1], property_key[2], property_key[3], property_key[4], property_key[5].replace('u', 'v'), property_key[6], property_key[7], property_key[8].replace('U', 'V'), property_key[9])]
@@ -181,7 +180,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                             out_data_dict[out_key] = data_list + [pa.array(np.array(property_dict[property_key], dtype=property_key[9]))]
                 for out_key in out_name_dict.keys():
                     batch = pa.record_batch(out_data_dict[out_key], names=out_name_dict[out_key])
-                    convert_to_dataset(cccc, convert, out_key[0], out_key[1], batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug)
+                    convert_to_dataset(cccc, convert, out_key[0], out_key[1], out_key[2], batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug)
 
 def main():
     errno=198
