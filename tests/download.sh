@@ -84,6 +84,7 @@ if test ! -s download_${priority}_${regions}${closed}/aria2c.log; then
 fi
 grep "ETag:" download_${priority}_${regions}${closed}/aria2c.log | tail -1 | cut -d' ' -f2 > download_${priority}_${regions}${closed}/etag.txt
 if test -s download_${priority}_${regions}${closed}/created.txt; then
+  sleep 60
   cat download_${priority}_${regions}${closed}/created.txt | grep -v "/A_P" | sort -u > download_${priority}_${regions}${closed}/created.txt.tmp
   mv -f download_${priority}_${regions}${closed}/created.txt.tmp download_${priority}_${regions}${closed}/created.txt
   if test ! -s download_${priority}_${regions}${closed}/created.txt; then
@@ -119,5 +120,5 @@ fi
 pid=$!
 echo ${pid} > download_${priority}_${regions}${closed}/pid.txt
 wait ${pid}
-
+rm -f download_${priority}_${regions}${closed}/pid.txt
 fi

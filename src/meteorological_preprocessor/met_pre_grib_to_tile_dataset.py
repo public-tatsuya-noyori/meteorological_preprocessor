@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import copy
 import math
 import numpy as np
 import os
@@ -67,6 +68,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
             convert = 'analysis_forecast'
             keys = ['stepRange', 'typeOfLevel', 'level', 'shortName']
             property_dict = {}
+            dtype_dict = {}
             for in_file in in_file_list:
                 match = re.search(r'^.*/' + cccc + '/grib/' + cat_subcat + '/.*$', in_file)
                 if not match:
@@ -106,8 +108,10 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                                     if key == 'level':
                                         target_conf_df = target_conf_df[(target_conf_df[key] == int(value))]
                                     else:
-                                        target_conf_df = target_conf_df[(target_conf_df[key] == value)]
-                            property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
+                                        target_conf_df = target_conf_df[(target_conf_df[key] == str(value))]
+                            #property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
+                            property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = np.array(codes_get_values(gid))
+                            dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = target_conf_df.iloc[0]['data_type']
                             codes_keys_iterator_delete(iterid)
                             out_directory_list = [out_dir, cccc, convert, cat]
                             out_directory = '/'.join(out_directory_list)
@@ -147,40 +151,59 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                 location_df = pa.ipc.open_file(out_file).read_pandas()
                 dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
                 dt_list = [dt for i in range(0, len(location_df.index))]
-                id_list = [property_key[6] for i in range(0, len(location_df.index))]
-                name_list = ['datetime', 'id', 'latitude [degree]', 'longitude [degree]']
-                data_list = [pa.array(dt_list, pa.timestamp('ms', tz='utc')), pa.array(id_list, 'string'), pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32')]
-                out_name_dict = {}
-                out_data_dict = {}
-                if (id == 'surface') {
-                    id_type = 'surface'
-                } else {
-                    id_type = 'upper_air'
-                }
+                schema = [pa.field('datetime', pa.timestamp('ms', tz='utc')), pa.field('latitude [degree]', 'float32'), pa.field('longitude [degree]', 'float32'), pa.field('id', 'string')]
+                init_name_list = ['datetime', 'latitude [degree]', 'longitude [degree]','id']
+                init_data_list = [pa.array(dt_list, pa.timestamp('ms', tz='utc')), pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32')]
+                level_list = []
+                ft_list = []
+                name_list = []
+                property_dict2 = {}
                 for property_key in property_dict.keys():
-                    out_key = (cat, id_type, property_key[7])
-                    if re.match(r'^U wind component$', property_key[8]):
+                    if property_key[1] not in level_list:
+                        level_list = level_list + [property_key[1]]
+                    if property_key[2] not in ft_list:
+                        ft_list = ft_list + [property_key[2]]
+                    if re.match(r'^U wind component$', property_key[3]):
                         u_value_np = property_dict[property_key]
-                        v_value_np = property_dict[(property_key[0], property_key[1], property_key[2], property_key[3], property_key[4], property_key[5].replace('u', 'v'), property_key[6], property_key[7], property_key[8].replace('U', 'V'), property_key[9])]
+                        v_value_np = property_dict[(property_key[0], property_key[1], property_key[2], property_key[3].replace('U', 'V'))]
                         wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
                         wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
-                        wind_direction_np = np.array([value + 360.0 if value < 0 else value for value in wind_direction_np])
-                        if out_key in out_name_dict:
-                            out_name_dict[out_key] = out_name_dict[out_key] + [re.sub(r'U wind component', 'wind speed [m s-1]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
-                            out_data_dict[out_key] = out_data_dict[out_key] + [pa.array(np.array(wind_speed_np, dtype=property_key[9])), pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
-                        else:
-                            out_name_dict[out_key] = name_list + [re.sub(r'U wind component', 'wind speed [m s-1]', property_key[8]), re.sub(r'U wind component', 'wind direction [degree]', property_key[8])]
-                            out_data_dict[out_key] = data_list + [pa.array(np.array(wind_speed_np, dtype=property_key[9])), pa.array(np.array(wind_direction_np, dtype=property_key[9]))]
-                    elif not re.match(r'^V wind component$', property_key[8]):
-                        if out_key in out_name_dict:
-                            out_name_dict[out_key] = out_name_dict[out_key] + [property_key[8]]
-                            out_data_dict[out_key] = out_data_dict[out_key] + [pa.array(np.array(property_dict[property_key], dtype=property_key[9]))]
-                        else:
-                            out_name_dict[out_key] = name_list + [property_key[8]]
-                            out_data_dict[out_key] = data_list + [pa.array(np.array(property_dict[property_key], dtype=property_key[9]))]
-                for out_key in out_name_dict.keys():
-                    batch = pa.record_batch(out_data_dict[out_key], names=out_name_dict[out_key])
-                    convert_to_dataset(cccc, convert, out_key[0], out_key[1], out_key[2], batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug)
+                        property_dict2[(property_key[0], property_key[1], property_key[2], 'wind speed [m s-1]')] = wind_speed_np.tolist()
+                        dtype_dict[(property_key[0], property_key[1], property_key[2], 'wind speed [m s-1]')] = 'float32'
+                        property_dict2[(property_key[0], property_key[1], property_key[2], 'wind direction [degree]')] = [value + 360.0 if value < 0 else value for value in wind_direction_np]
+                        dtype_dict[(property_key[0], property_key[1], property_key[2], 'wind direction [degree]')] = 'float32'
+                        if 'wind speed [m s-1]' not in name_list:
+                            name_list.append('wind speed [m s-1]')
+                        if 'wind direction [degree]' not in name_list:
+                            name_list.append('wind direction [degree]')
+                    elif not re.match(r'^V wind component$', property_key[3]):
+                        if property_key[3] not in name_list:
+                            name_list.append(property_key[3])
+                none_data_list = [None for i in range(len(init_data_list[0]))]
+                level_dict = {}
+                for level in level_list:
+                    level_dict[level] = pa.array([level for i in range(len(init_data_list[0]))], 'string')
+                for ft in ft_list:
+                    data_list = copy.copy(init_data_list)
+                    tmp_name_list = []
+                    for level in level_list:
+                        data_list.append(level_dict[level])
+                        for name in name_list:
+                            if (cat, level, ft, name) in dtype_dict:
+                                tmp_name_list.append(name)
+                                if (cat, level, ft, name) in property_dict:
+                                    data_list.append(pa.array(np.array(property_dict[(cat, level, ft, name)], dtype=dtype_dict[(cat, level, ft, name)])))
+                                elif (cat, level, ft, name) in property_dict2:
+                                    data_list.append(pa.array(np.array(property_dict2[(cat, level, ft, name)], dtype=dtype_dict[(cat, level, ft, name)])))
+                                else:
+                                    data_list.append(pa.array(np.array(none_data_list, dtype=dtype_dict[(cat, level, ft, name)])))
+                    if 'surface' in level_list:
+                        level_type = 'surface'
+                    else:
+                        level_type = 'upper_air'
+                    names = init_name_list + tmp_name_list
+                    batch = pa.record_batch(data_list, names=names)
+                    convert_to_dataset(cccc, cat, level_type, ft, batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug)
 
 def main():
     errno=198
