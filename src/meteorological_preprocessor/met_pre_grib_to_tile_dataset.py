@@ -13,17 +13,17 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 from eccodes import *
+from concurrent import futures
 
 def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, conf_df, debug):
-    warno = 188
     created_second = int(math.floor(datetime.utcnow().timestamp()))
     for conf_tuple in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['ft'] == ft)].itertuples():
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         tile_level = conf_tuple.tile_level
         new_datetime_list_dict = {}
         res = 180 / 2**tile_level
-        for tile_x in range(0, 2**(tile_level + 1)):
-            for tile_y in range(0, 2**(tile_level)):
+        for tile_x in range(2**(tile_level + 1)):
+            for tile_y in range(2**(tile_level)):
                 if tile_y == 2**(tile_level) - 1:
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]'])]
                 else:
@@ -69,6 +69,10 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
             keys = ['stepRange', 'typeOfLevel', 'level', 'shortName']
             property_dict = {}
             dtype_dict = {}
+            datatype_dict = {}
+            level_list = []
+            ft_list = []
+            name_list = []
             for in_file in in_file_list:
                 match = re.search(r'^.*/' + cccc + '/grib/' + cat_subcat + '/.*$', in_file)
                 if not match:
@@ -109,9 +113,74 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                                         target_conf_df = target_conf_df[(target_conf_df[key] == int(value))]
                                     else:
                                         target_conf_df = target_conf_df[(target_conf_df[key] == str(value))]
-                            #property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['subcategory'], target_conf_df.iloc[0]['stepRange'], target_conf_df.iloc[0]['typeOfLevel'], target_conf_df.iloc[0]['level'], target_conf_df.iloc[0]['shortName'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'], target_conf_df.iloc[0]['data_type'])] = np.array(codes_get_values(gid))
-                            property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = np.array(codes_get_values(gid))
-                            dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = target_conf_df.iloc[0]['data_type']
+                            if 'U wind component' == target_conf_df.iloc[0]['name']:
+                                property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = np.array(codes_get_values(gid)).tolist()
+                                if (target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'V wind component') in property_dict and (target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind speed [m s-1]') not in property_dict:
+                                    u_value_np = np.array(codes_get_values(gid))
+                                    v_value_np = property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'V wind component')]
+                                    wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
+                                    wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
+                                    property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind speed [m s-1]')] = wind_speed_np.tolist()
+                                    dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind speed [m s-1]')] = target_conf_df.iloc[0]['data_type']
+                                    property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind direction [degree]')] = [value + 360.0 if value < 0 else value for value in wind_direction_np]
+                                    dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind direction [degree]')] = target_conf_df.iloc[0]['data_type']
+                                    if 'wind speed [m s-1]' not in name_list:
+                                        name_list.append('wind speed [m s-1]')
+                                    if 'wind direction [degree]' not in name_list:
+                                        name_list.append('wind direction [degree]')
+                                    if 'wind speed [m s-1]' not in datatype_dict:
+                                        datatype_dict['wind speed [m s-1]'] = target_conf_df.iloc[0]['data_type']
+                                    if 'wind direction [degree]' not in datatype_dict:
+                                        datatype_dict['wind direction [degree]'] = target_conf_df.iloc[0]['data_type']
+                            elif 'V wind component' == target_conf_df.iloc[0]['name']:
+                                property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = np.array(codes_get_values(gid)).tolist()
+                                if (target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'U wind component') in property_dict and (target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind speed [m s-1]') not in property_dict:
+                                    v_value_np = np.array(codes_get_values(gid))
+                                    u_value_np = property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'U wind component')]
+                                    wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
+                                    wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
+                                    property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind speed [m s-1]')] = wind_speed_np.tolist()
+                                    dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind speed [m s-1]')] = target_conf_df.iloc[0]['data_type']
+                                    property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind direction [degree]')] = [value + 360.0 if value < 0 else value for value in wind_direction_np]
+                                    dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'wind direction [degree]')] = target_conf_df.iloc[0]['data_type']
+                                    if 'wind speed [m s-1]' not in name_list:
+                                        name_list.append('wind speed [m s-1]')
+                                    if 'wind direction [degree]' not in name_list:
+                                       name_list.append('wind direction [degree]')
+                                    if 'wind speed [m s-1]' not in datatype_dict:
+                                        datatype_dict['wind speed [m s-1]'] = target_conf_df.iloc[0]['data_type']
+                                    if 'wind direction [degree]' not in datatype_dict:
+                                        datatype_dict['wind direction [degree]'] = target_conf_df.iloc[0]['data_type']
+                            elif 'total precipitation [kg m-2]' == target_conf_df.iloc[0]['name']:
+                                property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = np.array(codes_get_values(gid)).tolist()
+                                if target_conf_df.iloc[0]['ft'] == 3:
+                                    value_np = np.array(codes_get_values(gid))
+                                    property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'total precipitation [kg m-2](hour=3)')] = value_np.tolist()
+                                    dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'total precipitation [kg m-2](hour=3)')] = target_conf_df.iloc[0]['data_type']
+                                    if 'total precipitation [kg m-2](hour=3)' not in name_list:
+                                        name_list.append('total precipitation [kg m-2](hour=3)')
+                                    if 'total precipitation [kg m-2](hour=3)' not in datatype_dict:
+                                        datatype_dict['total precipitation [kg m-2](hour=3)'] = target_conf_df.iloc[0]['data_type']
+                                elif (target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'] - 3, 'total precipitation [kg m-2]') in property_dict:
+                                 
+                                    value_np = np.array(codes_get_values(gid)) - property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'] - 3, 'total precipitation [kg m-2]')]
+                                    property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'total precipitation [kg m-2](hour=3)')] = value_np.tolist()
+                                    dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], 'total precipitation [kg m-2](hour=3)')] = target_conf_df.iloc[0]['data_type']
+                                    if 'total precipitation [kg m-2](hour=3)' not in name_list:
+                                        name_list.append('total precipitation [kg m-2](hour=3)')
+                                    if 'total precipitation [kg m-2](hour=3)' not in datatype_dict:
+                                        datatype_dict['total precipitation [kg m-2](hour=3)'] = target_conf_df.iloc[0]['data_type']
+                            else:
+                                property_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = np.array(codes_get_values(gid)).tolist()
+                                dtype_dict[(target_conf_df.iloc[0]['category'], target_conf_df.iloc[0]['level_name'], target_conf_df.iloc[0]['ft'], target_conf_df.iloc[0]['name'])] = target_conf_df.iloc[0]['data_type']
+                                if target_conf_df.iloc[0]['name'] not in name_list:
+                                   name_list.append(target_conf_df.iloc[0]['name'])
+                                if target_conf_df.iloc[0]['name'] not in datatype_dict:
+                                    datatype_dict[target_conf_df.iloc[0]['name']] = target_conf_df.iloc[0]['data_type']
+                            if target_conf_df.iloc[0]['level_name'] not in level_list:
+                                level_list.append(target_conf_df.iloc[0]['level_name'])
+                            if target_conf_df.iloc[0]['ft'] not in ft_list:
+                                ft_list.append(target_conf_df.iloc[0]['ft']) 
                             codes_keys_iterator_delete(iterid)
                             out_directory_list = [out_dir, cccc, convert, cat]
                             out_directory = '/'.join(out_directory_list)
@@ -143,6 +212,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                         traceback.print_exc(file=sys.stderr)
                         print('Warning', warno, ':', in_file, 'is invalid grib.', file=sys.stderr)
             if len(property_dict) > 0:
+                level_list.sort()
+                ft_list.sort()
                 out_directory_list = [out_dir, cccc, convert, cat]
                 out_directory = '/'.join(out_directory_list)
                 os.makedirs(out_directory, exist_ok=True)
@@ -150,59 +221,53 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                 out_file = ''.join(out_file_list)
                 location_df = pa.ipc.open_file(out_file).read_pandas()
                 dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
-                dt_list = [dt for i in range(0, len(location_df.index))]
-                schema = [pa.field('datetime', pa.timestamp('ms', tz='utc')), pa.field('latitude [degree]', 'float32'), pa.field('longitude [degree]', 'float32'), pa.field('id', 'string')]
-                init_name_list = ['datetime', 'latitude [degree]', 'longitude [degree]','id']
-                init_data_list = [pa.array(dt_list, pa.timestamp('ms', tz='utc')), pa.array(location_df['latitude [degree]'].values.tolist(), 'float32'), pa.array(location_df['longitude [degree]'].values.tolist(), 'float32')]
-                level_list = []
-                ft_list = []
-                name_list = []
-                property_dict2 = {}
-                for property_key in property_dict.keys():
-                    if property_key[1] not in level_list:
-                        level_list = level_list + [property_key[1]]
-                    if property_key[2] not in ft_list:
-                        ft_list = ft_list + [property_key[2]]
-                    if re.match(r'^U wind component$', property_key[3]):
-                        u_value_np = property_dict[property_key]
-                        v_value_np = property_dict[(property_key[0], property_key[1], property_key[2], property_key[3].replace('U', 'V'))]
-                        wind_speed_np = np.sqrt(np.power(u_value_np, 2) + np.power(v_value_np, 2))
-                        wind_direction_np = np.degrees(np.arctan2(v_value_np, u_value_np))
-                        property_dict2[(property_key[0], property_key[1], property_key[2], 'wind speed [m s-1]')] = wind_speed_np.tolist()
-                        dtype_dict[(property_key[0], property_key[1], property_key[2], 'wind speed [m s-1]')] = 'float32'
-                        property_dict2[(property_key[0], property_key[1], property_key[2], 'wind direction [degree]')] = [value + 360.0 if value < 0 else value for value in wind_direction_np]
-                        dtype_dict[(property_key[0], property_key[1], property_key[2], 'wind direction [degree]')] = 'float32'
-                        if 'wind speed [m s-1]' not in name_list:
-                            name_list.append('wind speed [m s-1]')
-                        if 'wind direction [degree]' not in name_list:
-                            name_list.append('wind direction [degree]')
-                    elif not re.match(r'^V wind component$', property_key[3]):
-                        if property_key[3] not in name_list:
-                            name_list.append(property_key[3])
-                none_data_list = [None for i in range(len(init_data_list[0]))]
-                level_dict = {}
+                dt_list = [dt] * len(location_df.index)
+                init_name_list = ['datetime', 'id', 'latitude [degree]', 'longitude [degree]']
+                init_field_list = [pa.field('datetime', pa.timestamp('ms', tz='utc'), nullable=False), pa.field('id', 'string', nullable=False), pa.field('latitude [degree]', 'float32', nullable=False), pa.field('longitude [degree]', 'float32', nullable=False)]
+                levels = []
                 for level in level_list:
-                    level_dict[level] = pa.array([level for i in range(len(init_data_list[0]))], 'string')
+                    levels.extend([level] * len(location_df.index))
+                init_data_list = [pa.array(np.tile(dt_list, len(level_list)), pa.timestamp('ms', tz='utc')), pa.array(levels, 'string'), pa.array(np.tile(location_df['latitude [degree]'].values.tolist(), len(level_list)), 'float32'), pa.array(np.tile(location_df['longitude [degree]'].values.tolist(), len(level_list)), 'float32')]
+                none_data_list = [None] * len(location_df.index)
+                convert_to_dataset_args_list = []
                 for ft in ft_list:
                     data_list = copy.copy(init_data_list)
-                    tmp_name_list = []
-                    for level in level_list:
-                        data_list.append(level_dict[level])
-                        for name in name_list:
+                    field_list = copy.copy(init_field_list)
+                    init_len = len(init_data_list)
+                    for index, name in enumerate(name_list):
+                        i = index + init_len
+                        field_list.append(pa.field(name, datatype_dict[name], nullable=True))
+                        for level in level_list:
                             if (cat, level, ft, name) in dtype_dict:
-                                tmp_name_list.append(name)
                                 if (cat, level, ft, name) in property_dict:
-                                    data_list.append(pa.array(np.array(property_dict[(cat, level, ft, name)], dtype=dtype_dict[(cat, level, ft, name)])))
-                                elif (cat, level, ft, name) in property_dict2:
-                                    data_list.append(pa.array(np.array(property_dict2[(cat, level, ft, name)], dtype=dtype_dict[(cat, level, ft, name)])))
+                                    if len(data_list) > i:
+                                        if datatype_dict[name] == 'float32' or datatype_dict[name] == 'float64':
+                                            data_list[i] = data_list[i] + property_dict[(cat, level, ft, name)]
+                                        else:
+                                            data_list[i] = data_list[i] + np.array(property_dict[(cat, level, ft, name)], dtype=datatype_dict[name]).tolist()
+                                    else:
+                                        if datatype_dict[name] == 'float32' or datatype_dict[name] == 'float64':
+                                            data_list.append(property_dict[(cat, level, ft, name)])
+                                        else:
+                                            data_list.append(np.array(property_dict[(cat, level, ft, name)], dtype=datatype_dict[name]).tolist())
                                 else:
-                                    data_list.append(pa.array(np.array(none_data_list, dtype=dtype_dict[(cat, level, ft, name)])))
+                                    if len(data_list) > i:
+                                        data_list[i] = data_list[i] + none_data_list
+                                    else:
+                                        data_list.append(none_data_list)
+                            else:
+                                if len(level_list) > 1:
+                                    if len(data_list) > i:
+                                        data_list[i] = data_list[i] + none_data_list
+                                    else:
+                                        data_list.append(none_data_list)
+                                else:
+                                    del field_list[i]
                     if 'surface' in level_list:
                         level_type = 'surface'
                     else:
                         level_type = 'upper_air'
-                    names = init_name_list + tmp_name_list
-                    batch = pa.record_batch(data_list, names=names)
+                    batch = pa.record_batch(data_list, pa.schema(field_list))
                     convert_to_dataset(cccc, cat, level_type, ft, batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug)
 
 def main():

@@ -147,7 +147,7 @@
 * * * * * cd /home/noyori/tests; ./sub_bufr_to_tile_dataset.sh --parallel 12 cache_tile_dataset_satellite aa2 bin 'minio:center-aa-cloud-a-region-a-open-main;minio:center-aa-cloud-a-region-b-open-sub' sub_bufr_to_tile_dataset_satellite_inclusive_pattern.txt sub_bufr_to_tile_dataset_satellite_exclusive_pattern.txt
 * * * * * cd /home/noyori/tests; ./arrow_to_4all_dataset.sh
 * * * * * cd /home/noyori/tests; ./move_4PubSub_dataset_4Search.sh cache_4all_dataset aa 4all_arrow minio:aa-open-dataset
-* * * * * cd /home/noyori/tests; ./sub_grib_surf_to_tile_dataset.sh --parallel 12 cache_tile_dataset aa3 bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' sub_grib_surf_to_tile_dataset_inclusive_pattern.txt exclusive_pattern.txt
+* * * * * cd /home/noyori/tests; ./sub_grib_surf_to_tile_dataset.sh --parallel 12 cache_tile_dataset aa3 bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' sub_grib_surf_to_tile_dataset_inclusive_pattern.txt exclusive_pattern.txt; ./sub_grib_upper_air_to_tile_dataset.sh --parallel 12 cache_tile_dataset aa4 bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' sub_grib_upper_air_to_tile_dataset_inclusive_pattern.txt exclusive_pattern.txt
 1 0 * * * cd /home/noyori/tests; ./del_dataset_search.sh
 
 # delete on local PC
