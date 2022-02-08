@@ -17,7 +17,6 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
     for conf_tuple in conf_df.itertuples():
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         tile_level = conf_tuple.tile_level
-        out_file_dict = {}
         for in_file in in_file_list:
             match = re.search(r'^.*/([A-Z][A-Z0-9]{3})/' + conf_tuple.convert + '/' + conf_tuple.category + '/' + conf_tuple.subcategory + '/.*\.arrow$', in_file)
             if not match:
@@ -52,10 +51,9 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                             tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
                             tmp_sort_unique_list.remove('created time minus data time [s]')
                             new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
-                            if out_file in out_file_dict:
-                                former_df = out_file_dict[out_file]
-                            elif os.path.exists(out_file):
+                            if os.path.exists(out_file):
                                 former_ipc_reader = pa.ipc.open_file(out_file)
+                                schema = pa.unify_schemas([former_ipc_reader.schema, schema])
                                 former_df = former_ipc_reader.read_pandas()
                             else:
                                 former_df = pd.DataFrame()
@@ -67,7 +65,6 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                                 tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
                                 tmp_sort_unique_list.remove('created time minus data time [s]')
                                 new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
-                            out_file_dict[out_file] = new_df
                             os.makedirs(os.path.dirname(out_file), exist_ok=True)
                             table = pa.Table.from_pandas(new_df.reset_index(drop=True), schema=schema).replace_schema_metadata(metadata=None)
                             with open(out_file, 'bw') as out_f:
