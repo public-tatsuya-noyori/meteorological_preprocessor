@@ -66,7 +66,10 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                                 tmp_sort_unique_list.remove('created time minus datetime [s]')
                                 new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                             os.makedirs(os.path.dirname(out_file), exist_ok=True)
-                            table = pa.Table.from_pandas(new_df.reset_index(drop=True), schema=schema).replace_schema_metadata(metadata=None)
+                            field_list = []
+                            for column_name in new_df.columns:
+                                field_list.append(schema.field_by_name(column_name))
+                            table = pa.Table.from_pandas(new_df.reset_index(drop=True), schema=pa.schema(field_list)).replace_schema_metadata(metadata=None)
                             with open(out_file, 'bw') as out_f:
                                 #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
                                 ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
