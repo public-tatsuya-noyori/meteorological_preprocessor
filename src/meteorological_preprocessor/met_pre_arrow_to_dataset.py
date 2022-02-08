@@ -47,9 +47,9 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                         if len(new_df.index) > 0:
                             tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                             tmp_sort_unique_list.insert(0, 'indicator')
-                            tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
+                            tmp_sort_unique_list.insert(1, 'created time minus datetime [s]')
                             tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
-                            tmp_sort_unique_list.remove('created time minus data time [s]')
+                            tmp_sort_unique_list.remove('created time minus datetime [s]')
                             new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                             if os.path.exists(out_file):
                                 former_ipc_reader = pa.ipc.open_file(out_file)
@@ -61,9 +61,9 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                                 new_df = pd.concat([former_df, new_df])
                                 tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                                 tmp_sort_unique_list.insert(0, 'indicator')
-                                tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
+                                tmp_sort_unique_list.insert(1, 'created time minus datetime [s]')
                                 tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
-                                tmp_sort_unique_list.remove('created time minus data time [s]')
+                                tmp_sort_unique_list.remove('created time minus datetime [s]')
                                 new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                             os.makedirs(os.path.dirname(out_file), exist_ok=True)
                             table = pa.Table.from_pandas(new_df.reset_index(drop=True), schema=schema).replace_schema_metadata(metadata=None)

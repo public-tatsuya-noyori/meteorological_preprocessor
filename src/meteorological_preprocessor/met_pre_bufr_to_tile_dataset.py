@@ -40,9 +40,9 @@ def convert_to_dataset(cccc, cat, subcat, in_df, schema, out_dir, out_list_file,
                     if len(new_df.index) > 0:
                         tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                         tmp_sort_unique_list.insert(0, 'indicator')
-                        tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
+                        tmp_sort_unique_list.insert(1, 'created time minus datetime [s]')
                         tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
-                        tmp_sort_unique_list.remove('created time minus data time [s]')
+                        tmp_sort_unique_list.remove('created time minus datetime [s]')
                         new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                         if os.path.exists(out_file):
                             former_ipc_reader = pa.ipc.open_file(out_file)
@@ -54,9 +54,9 @@ def convert_to_dataset(cccc, cat, subcat, in_df, schema, out_dir, out_list_file,
                             new_df = pd.concat([former_df, new_df])
                             tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                             tmp_sort_unique_list.insert(0, 'indicator')
-                            tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
+                            tmp_sort_unique_list.insert(1, 'created time minus datetime [s]')
                             tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
-                            tmp_sort_unique_list.remove('created time minus data time [s]')
+                            tmp_sort_unique_list.remove('created time minus datetime [s]')
                             new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                         os.makedirs(os.path.dirname(out_file), exist_ok=True)
                         table = pa.Table.from_pandas(new_df.reset_index(drop=True), schema=schema).replace_schema_metadata(metadata=None)
@@ -391,7 +391,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                 traceback.print_exc(file=sys.stderr)
                                 break
                 if 'datetime' in output_dict:
-                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus data time [s]', 'int32', nullable=False)]
+                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus datetime [s]', 'int32', nullable=False)]
                     data_list = [[cccc] * len(output_dict['datetime']), np.array([datetime.utcnow().replace(tzinfo=None)] * len(output_dict['datetime'])).astype('datetime64[s]').astype('int') - np.array([value.replace(tzinfo=None) for value in output_dict['datetime']]).astype('datetime64[s]').astype('int')]
                     is_required_list = [True, True]
                     for output_conf_name in np.sort(np.array(list(output_dict.keys()))):
