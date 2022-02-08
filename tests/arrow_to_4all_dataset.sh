@@ -7,7 +7,12 @@ make_dataset(){
     cat ${i} >> ${work_directory}/${name}_input.txt
     rm -f ${i}
   done 
-  ./met_pre_arrow_to_dataset.py --debug ${work_directory}/${name}_input.txt ${work_directory}/${name} 1>${work_directory}/${name}_output.txt 2>>${work_directory}/${name}_stderr.log
+  ./met_pre_arrow_to_dataset.py --debug ${work_directory}/${name}_input.txt ${work_directory}/${name} 1>${work_directory}/${name}_tmp_output.txt 2>>${work_directory}/${name}_stderr.log
+  if test -s ${work_directory}/${name}_tmp_output.txt; then
+    sort -u ${work_directory}/${name}_tmp_output.txt > ${work_directory}/${name}_output.txt
+  else
+    exit 0
+  fi 
   if test -s ${work_directory}/${name}_output.txt; then
     cat ${work_directory}/${name}_output.txt | xargs -r -n 64 -P 16 gzip -f
     cat ${work_directory}/${name}_output.txt | xargs -r -n 1 -P 16 -I {} mv -f {}.gz {}

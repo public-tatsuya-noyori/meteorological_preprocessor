@@ -61,7 +61,7 @@ def convert_to_dataset(cccc, cat, subcat, in_df, schema, out_dir, out_list_file,
                         os.makedirs(os.path.dirname(out_file), exist_ok=True)
                         field_list = []
                         for column_name in new_df.columns:
-                            field_list.append(schema.field_by_name(column_name))
+                            field_list.append(schema.field(column_name))
                         table = pa.Table.from_pandas(new_df.reset_index(drop=True), schema=pa.schema(field_list)).replace_schema_metadata(metadata=None)
                         with open(out_file, 'bw') as out_f:
                             #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
