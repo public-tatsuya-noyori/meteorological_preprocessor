@@ -15,7 +15,7 @@ from pyarrow import csv
 from eccodes import *
 from concurrent import futures
 
-def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, conf_df, datetime, debug):
+def convert_to_dataset(cccc, cat, subcat, ft, in_df, schema, out_dir, out_list_file, conf_df, datetime, debug):
     created_second = int(math.floor(datetime.utcnow().timestamp()))
     for conf_tuple in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['ft'] == ft)].itertuples():
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
@@ -30,7 +30,7 @@ def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, con
                 out_file = ''.join([out_dir, '/', cccc, '/analysis_forecast/', cat, '/', subcat, '/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), str(datetime.minute).zfill(2), '/', str(ft).zfill(4), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
                 if len(tile_df.index) > 0:
                     os.makedirs(os.path.dirname(out_file), exist_ok=True)
-                    table = pa.Table.from_pandas(tile_df.reset_index(drop=True)).replace_schema_metadata(metadata=None)
+                    table = pa.Table.from_pandas(tile_df.reset_index(drop=True), schema=schema).replace_schema_metadata(metadata=None)
                     with open(out_file, 'bw') as out_f:
                         #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
                         ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
@@ -248,8 +248,9 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                         level_type = 'surface'
                     else:
                         level_type = 'upper_air'
-                    batch = pa.record_batch(data_list, pa.schema(field_list))
-                    convert_to_dataset(cccc, cat, level_type, ft, batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, dt, debug)
+                    schema = pa.schema(field_list)
+                    batch = pa.record_batch(data_list, schema)
+                    convert_to_dataset(cccc, cat, level_type, ft, batch.to_pandas(), schema, out_dir, out_list_file, conf_grib_arrow_to_dataset_df, dt, debug)
 
 def main():
     errno=198

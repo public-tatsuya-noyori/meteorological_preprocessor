@@ -14,9 +14,8 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pyarrow import csv
 
-def convert_to_dataset(cccc, cat, subcat, in_df, out_dir, out_list_file, conf_df, debug):
+def convert_to_dataset(cccc, cat, subcat, in_df, schema, out_dir, out_list_file, conf_df, debug):
     warno = 188
-    created_second = int(math.floor(datetime.utcnow().timestamp()))
     for conf_tuple in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat)].itertuples():
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         tile_level = conf_tuple.tile_level
@@ -40,20 +39,12 @@ def convert_to_dataset(cccc, cat, subcat, in_df, out_dir, out_list_file, conf_df
                         new_df = tile_df[(new_datetime - (timedelta(minutes=conf_tuple.minute_level)/2) <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + (timedelta(minutes=conf_tuple.minute_level)/2))]
                     out_file = ''.join([out_dir, '/', cccc, '/bufr_to_arrow/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
                     if len(new_df.index) > 0:
-                        ctmdt_series = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
-                        ctmdt_series = - ctmdt_series.map(pd.Timestamp.timestamp).astype(int)
-                        new_head_df = pd.DataFrame({'created time minus data time [s]': ctmdt_series})
-                        new_head_df = new_head_df.astype({'created time minus data time [s]': 'int32'})
-                        new_head_df.insert(0, 'indicator', cccc)
-                        new_head_df.astype({'indicator': 'string'})
-                        new_df = pd.concat([new_head_df, new_df], axis=1)
                         tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                         tmp_sort_unique_list.insert(0, 'indicator')
                         tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
-                        new_df.sort_values(tmp_sort_unique_list, inplace=True)
+                        tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
                         tmp_sort_unique_list.remove('created time minus data time [s]')
-                        new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last', inplace=True)
-                        tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
+                        new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                         if out_file in out_file_dict:
                             former_df = out_file_dict[out_file]
                         elif os.path.exists(out_file):
@@ -66,14 +57,13 @@ def convert_to_dataset(cccc, cat, subcat, in_df, out_dir, out_list_file, conf_df
                             tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                             tmp_sort_unique_list.insert(0, 'indicator')
                             tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
-                            new_df.sort_values(tmp_sort_unique_list, inplace=True)
+                            tmp_new_df = new_df.sort_values(tmp_sort_unique_list)
                             tmp_sort_unique_list.remove('created time minus data time [s]')
-                            new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last', inplace=True)
-                            tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
+                            new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                         out_file_dict[out_file] = new_df
         for out_file, out_df in out_file_dict.items():
             os.makedirs(os.path.dirname(out_file), exist_ok=True)
-            table = pa.Table.from_pandas(out_df.reset_index(drop=True)).replace_schema_metadata(metadata=None)
+            table = pa.Table.from_pandas(out_df.reset_index(drop=True), schema=schema).replace_schema_metadata(metadata=None)
             with open(out_file, 'bw') as out_f:
                 #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
                 ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
@@ -405,10 +395,9 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                 traceback.print_exc(file=sys.stderr)
                                 break
                 if 'datetime' in output_dict:
-                    name_list = []
-                    field_list = []
-                    data_list = []
-                    is_required_list = []
+                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus data time [s]', 'int32', nullable=False)]
+                    data_list = [[cccc] * len(output_dict['datetime']), np.array([value.replace(tzinfo=None) for value in output_dict['datetime']]).astype('datetime64[s]').astype('int') - np.array([datetime.utcnow().replace(tzinfo=None)] * len(output_dict['datetime'])).astype('datetime64[s]').astype('int')]
+                    is_required_list = [True, True]
                     for output_conf_name in np.sort(np.array(list(output_dict.keys()))):
                         if '@' in output_conf_name:
                             continue
@@ -417,17 +406,13 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                 field_list.append(pa.field(output_conf_name, pa.timestamp('ms', tz='utc'), nullable=not output_is_required_dict[output_conf_name]))
                             else:
                                 field_list.append(pa.field(output_conf_name, output_data_type_dict[output_conf_name], nullable=not output_is_required_dict[output_conf_name]))
-                            if output_data_type_dict[output_conf_name] == 'float16':
-                                data_list.append(pa.array(np.array(output_dict[output_conf_name]).astype(np.float16), 'float16'))
-                            else:
-                                data_list.append(pa.array(output_dict[output_conf_name]))
-                            
-                            name_list.append(output_conf_name)
+                            data_list.append(pa.array(output_dict[output_conf_name]))
                             is_required_list.append(output_is_required_dict[output_conf_name])
                     if len(field_list) <=0 or False not in is_required_list:
                         continue
-                    batch = pa.record_batch(data_list, pa.schema(field_list))
-                    convert_to_dataset(cccc, output_cat, output_subcat, batch.to_pandas(), out_dir, out_list_file, conf_bufr_arrow_to_dataset_df, debug)
+                    schema = pa.schema(field_list)
+                    batch = pa.record_batch(data_list, schema)
+                    convert_to_dataset(cccc, output_cat, output_subcat, batch.to_pandas(), schema, out_dir, out_list_file, conf_bufr_arrow_to_dataset_df, debug)
 
 def main():
     errno=198
