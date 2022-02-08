@@ -150,7 +150,7 @@ surface,tesac,315003,qualifierForGtsppQualityFlag,0,False,3,3,False,False,0,,oce
 surface,tesac,315003,globalGtsppQualityFlag,0,False,1,3,False,False,0,,ocean,float,waterPressure [Pa]#global gtspp quality flag,uint8,False
 surface,tesac,315003,globalGtsppQualityFlag,0,False,2,3,False,False,0,,ocean,float,oceanographic water temperature [K]#global gtspp quality flag,uint8,False
 surface,tesac,315003,globalGtsppQualityFlag,0,False,3,3,False,False,0,,ocean,float,salinity [0/00]#global gtspp quality flag,uint8,False
-upper_air,pilot,309050;309051,windSpeed,0,True,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
+upper_air,pilot,309050;309051,windSpeed,0,False,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
 upper_air,pilot,309050;309051,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
 upper_air,pilot,309050;309051,year,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
 upper_air,pilot,309050;309051,month,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
@@ -170,7 +170,7 @@ upper_air,pilot,309050;309051,wigosLocalIdentifierCharacter,1,False,0,0,False,Fa
 upper_air,pilot,309050;309051,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,sonde,extended vertical sounding significance,uint32,False
 upper_air,pilot,309050,pressure,0,False,0,0,False,False,0,,upper_air,sonde,pressure [Pa],float32,False
 upper_air,pilot,309051,geopotentialHeight,0,False,0,0,False,False,0,,upper_air,sonde,geopotential height [m],float32,False
-upper_air,temp,309052;309057,airTemperature,0,True,0,0,False,False,0,,upper_air,sonde,air temperature [K],float32,False
+upper_air,temp,309052;309057,airTemperature,0,False,0,0,False,False,0,,upper_air,sonde,air temperature [K],float32,False
 upper_air,temp,309052;309057,year,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
 upper_air,temp,309052;309057,month,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
 upper_air,temp,309052;309057,day,1,True,0,0,False,False,0,,upper_air,sonde,datetime,timestamp,False
@@ -192,7 +192,7 @@ upper_air,temp,309052;309057,nonCoordinateGeopotentialHeight,0,False,0,0,False,F
 upper_air,temp,309052;309057,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,sonde,dewpoint temperature [K],float32,False
 upper_air,temp,309052;309057,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
 upper_air,temp,309052;309057,windSpeed,0,False,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
-upper_air,temp_drop,309053,airTemperature,0,True,0,0,False,False,0,,upper_air,drop_sonde,air temperature [K],float32,False
+upper_air,temp_drop,309053,airTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,air temperature [K],float32,False
 upper_air,temp_drop,309053,year,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
 upper_air,temp_drop,309053,month,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
 upper_air,temp_drop,309053,day,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
@@ -211,7 +211,7 @@ upper_air,temp_drop,309053,nonCoordinateGeopotentialHeight,0,False,0,0,False,Fal
 upper_air,temp_drop,309053,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,dewpoint temperature [K],float32,False
 upper_air,temp_drop,309053,windDirection,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind direction [degree],float32,False
 upper_air,temp_drop,309053,windSpeed,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind speed [m s-1],float32,False
-upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,virtualTemperature,0,True,0,0,False,False,0,,upper_air,profiler,virtual temperature [K],float32,False
+upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,virtualTemperature,0,False,0,0,False,False,0,,upper_air,profiler,virtual temperature [K],float32,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,height,0,False,0,0,False,False,0,,upper_air,profiler,height [m],float32,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,year,1,True,0,0,False,False,0,,upper_air,profiler,datetime,timestamp,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,month,1,True,0,0,False,False,0,,upper_air,profiler,datetime,timestamp,False
@@ -224,7 +224,7 @@ upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,stationNumber,1,False,0,0,False,True,3,,upper_air,profiler,id,string,True
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,w,0,False,0,0,False,False,0,,upper_air,profiler,w [m s-1],float32,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,signalToNoiseRatio,0,False,0,0,False,False,0,,upper_air,profiler,signal to noise ratio [dB],float32,False
-upper_air,wind_profiler,301032 321021 025020 025021 008021 004025 101000 031001 321022;301001 301011 301012 301022 002003 031001 007007 011001 011002;301032 002003 002101 201130 002106 201000 201132 202131 002121 202000 201000 201133 202129 025001 202000 201000 025020 025021 008021 004025 111000 031001 204001 031021 011001 204000 011002 204001 031021 011006 204000 021030;309051,windSpeed,0,True,0,0,True,False,0,,upper_air,profiler,wind speed [m s-1],float32,False
+upper_air,wind_profiler,301032 321021 025020 025021 008021 004025 101000 031001 321022;301001 301011 301012 301022 002003 031001 007007 011001 011002;301032 002003 002101 201130 002106 201000 201132 202131 002121 202000 201000 201133 202129 025001 202000 201000 025020 025021 008021 004025 111000 031001 204001 031021 011001 204000 011002 204001 031021 011006 204000 021030;309051,windSpeed,0,False,0,0,False,False,0,,upper_air,profiler,wind speed [m s-1],float32,False
 upper_air,wind_profiler,301032 321021 025020 025021 008021 004025 101000 031001 321022;301001 301011 301012 301022 002003 031001 007007 011001 011002;301032 002003 002101 201130 002106 201000 201132 202131 002121 202000 201000 201133 202129 025001 202000 201000 025020 025021 008021 004025 111000 031001 204001 031021 011001 204000 011002 204001 031021 011006 204000 021030;309051,windDirection,0,False,0,0,False,False,0,,upper_air,profiler,wind direction [degree],float32,False
 upper_air,wind_profiler,301032 321021 025020 025021 008021 004025 101000 031001 321022;301001 301011 301012 301022 002003 031001 007007 011001 011002;301032 002003 002101 201130 002106 201000 201132 202131 002121 202000 201000 201133 202129 025001 202000 201000 025020 025021 008021 004025 111000 031001 204001 031021 011001 204000 011002 204001 031021 011006 204000 021030;309051,year,1,True,0,0,False,False,0,,upper_air,profiler,datetime,timestamp,False
 upper_air,wind_profiler,301032 321021 025020 025021 008021 004025 101000 031001 321022;301001 301011 301012 301022 002003 031001 007007 011001 011002;301032 002003 002101 201130 002106 201000 201132 202131 002121 202000 201000 201133 202129 025001 202000 201000 025020 025021 008021 004025 111000 031001 204001 031021 011001 204000 011002 204001 031021 011006 204000 021030;309051,month,1,True,0,0,False,False,0,,upper_air,profiler,datetime,timestamp,False
