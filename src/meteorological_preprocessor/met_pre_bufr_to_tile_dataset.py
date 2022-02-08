@@ -249,9 +249,15 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                             else:
                                                 required_np = tmp_required_np
                                         if output_conf_tuple.key in ['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond']:
-                                            input_dict[output_conf_tuple.key] = value_np
+                                            if output_conf_tuple.key in input_dict:
+                                                input_dict[output_conf_tuple.key] = np.array(input_dict[output_conf_tuple.key].tolist() + value_np.tolist())
+                                            else:
+                                                input_dict[output_conf_tuple.key] = value_np
                                         else:
-                                            input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name] = value_np
+                                            if output_conf_tuple.key in input_dict:
+                                                input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name] = np.array(input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name].tolist() + value_np.tolist())
+                                            else:
+                                                input_dict[output_conf_tuple.key + '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.name] = value_np
                                     else:
                                         if is_first_key:
                                             if debug:
@@ -261,7 +267,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                     continue
                                 index_np = np.array([index for index, value in enumerate(required_np) if value == True])
                                 for input_dict_key in input_dict.keys():
-                                    input_dict[input_dict_key] = input_dict[input_dict_key][index_np]                                
+                                    if input_dict_key != 'datetime':
+                                        input_dict[input_dict_key] = input_dict[input_dict_key][index_np]                                
                                 datetime_np = np.array([])
                                 year_np = input_dict['year']
                                 month_np = input_dict['month']
@@ -389,6 +396,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                             except gribapi.errors.PrematureEndOfFileError:
                                 break
                             except gribapi.errors.WrongLengthError:
+                                break
+                            except gribapi.errors.DecodingError:
                                 break
                             except:
                                 traceback.print_exc(file=sys.stderr)
