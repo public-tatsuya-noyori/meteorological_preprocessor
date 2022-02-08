@@ -15,12 +15,11 @@ from pyarrow import csv
 from eccodes import *
 from concurrent import futures
 
-def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, conf_df, debug):
+def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, conf_df, datetime, debug):
     created_second = int(math.floor(datetime.utcnow().timestamp()))
     for conf_tuple in conf_df[(conf_df['category'] == cat) & (conf_df['subcategory'] == subcat) & (conf_df['ft'] == ft)].itertuples():
         sort_unique_list = conf_tuple.sort_unique_list.split(';')
         tile_level = conf_tuple.tile_level
-        new_datetime_list_dict = {}
         res = 180 / 2**tile_level
         for tile_x in range(2**(tile_level + 1)):
             for tile_y in range(2**(tile_level)):
@@ -28,34 +27,17 @@ def convert_to_dataset(cccc, cat, subcat, ft, in_df, out_dir, out_list_file, con
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]'])]
                 else:
                     tile_df = in_df[(res * tile_x - 180.0 <= in_df['longitude [degree]']) & (in_df['longitude [degree]'] < res * (tile_x + 1) - 180.0) & (90.0 - res * tile_y >= in_df['latitude [degree]']) & (in_df['latitude [degree]'] > 90.0 - res * (tile_y + 1))]
-                new_datetime_list_dict[tile_x,  tile_y] = tile_df['datetime'].dt.ceil(str(conf_tuple.minute_level) + 'T').unique()
-                for new_datetime in new_datetime_list_dict[tile_x,  tile_y]:
-                    new_df = tile_df[(new_datetime - timedelta(minutes=conf_tuple.minute_level) < tile_df['datetime']) & (tile_df['datetime'] <= new_datetime)]
-                    out_file = ''.join([out_dir, '/', cccc, '/analysis_forecast/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/', str(ft).zfill(4), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
-                    if len(new_df.index) > 0:
-                        ctmdt_series = pd.to_datetime(new_df['datetime']) - pd.offsets.Second(created_second)
-                        ctmdt_series = - ctmdt_series.map(pd.Timestamp.timestamp).astype(int)
-                        new_head_df = pd.DataFrame({'created time minus data time [s]': ctmdt_series})
-                        new_head_df = new_head_df.astype({'created time minus data time [s]': 'int32'})
-                        new_head_df.insert(0, 'indicator', cccc)
-                        new_head_df.astype({'indicator': 'string'})
-                        new_df = pd.concat([new_head_df, new_df], axis=1)
-                        tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
-                        tmp_sort_unique_list.insert(0, 'indicator')
-                        tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
-                        new_df.sort_values(tmp_sort_unique_list, inplace=True)
-                        tmp_sort_unique_list.remove('created time minus data time [s]')
-                        new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last', inplace=True)
-                        tmp_sort_unique_list.insert(1, 'created time minus data time [s]')
-                        os.makedirs(os.path.dirname(out_file), exist_ok=True)
-                        table = pa.Table.from_pandas(new_df.reset_index(drop=True)).replace_schema_metadata(metadata=None)
-                        with open(out_file, 'bw') as out_f:
-                            #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
-                            ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
-                            for batch in table.to_batches():
-                                ipc_writer.write_batch(batch)
-                            ipc_writer.close()
-                            print(out_file, file=out_list_file)
+                out_file = ''.join([out_dir, '/', cccc, '/analysis_forecast/', cat, '/', subcat, '/', str(datetime.year).zfill(4), '/', str(datetime.month).zfill(2), str(datetime.day).zfill(2), '/', str(datetime.hour).zfill(2), str(datetime.minute).zfill(2), '/', str(ft).zfill(4), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
+                if len(tile_df.index) > 0:
+                    os.makedirs(os.path.dirname(out_file), exist_ok=True)
+                    table = pa.Table.from_pandas(tile_df.reset_index(drop=True)).replace_schema_metadata(metadata=None)
+                    with open(out_file, 'bw') as out_f:
+                        #ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression='zstd'))
+                        ipc_writer = pa.ipc.new_file(out_f, table.schema, options=pa.ipc.IpcWriteOptions(compression=None))
+                        for batch in table.to_batches():
+                            ipc_writer.write_batch(batch)
+                        ipc_writer.close()
+                        print(out_file, file=out_list_file)
 
 def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug):
     warno = 189
@@ -221,13 +203,12 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                 out_file = ''.join(out_file_list)
                 location_df = pa.ipc.open_file(out_file).read_pandas()
                 dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
-                dt_list = [dt] * len(location_df.index)
-                init_name_list = ['datetime', 'id', 'latitude [degree]', 'longitude [degree]']
-                init_field_list = [pa.field('datetime', pa.timestamp('ms', tz='utc'), nullable=False), pa.field('id', 'string', nullable=False), pa.field('latitude [degree]', 'float32', nullable=False), pa.field('longitude [degree]', 'float32', nullable=False)]
+                init_name_list = ['id', 'latitude [degree]', 'longitude [degree]']
+                init_field_list = [pa.field('id', 'string', nullable=False), pa.field('latitude [degree]', 'float32', nullable=False), pa.field('longitude [degree]', 'float32', nullable=False)]
                 levels = []
                 for level in level_list:
                     levels.extend([level] * len(location_df.index))
-                init_data_list = [pa.array(np.tile(dt_list, len(level_list)), pa.timestamp('ms', tz='utc')), pa.array(levels, 'string'), pa.array(np.tile(location_df['latitude [degree]'].values.tolist(), len(level_list)), 'float32'), pa.array(np.tile(location_df['longitude [degree]'].values.tolist(), len(level_list)), 'float32')]
+                init_data_list = [levels, np.tile(location_df['latitude [degree]'].values.tolist(), len(level_list)), np.tile(location_df['longitude [degree]'].values.tolist(), len(level_list))]
                 none_data_list = [None] * len(location_df.index)
                 convert_to_dataset_args_list = []
                 for ft in ft_list:
@@ -268,7 +249,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                     else:
                         level_type = 'upper_air'
                     batch = pa.record_batch(data_list, pa.schema(field_list))
-                    convert_to_dataset(cccc, cat, level_type, ft, batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, debug)
+                    convert_to_dataset(cccc, cat, level_type, ft, batch.to_pandas(), out_dir, out_list_file, conf_grib_arrow_to_dataset_df, dt, debug)
 
 def main():
     errno=198
