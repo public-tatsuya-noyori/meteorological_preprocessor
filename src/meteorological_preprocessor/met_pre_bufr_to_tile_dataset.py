@@ -36,7 +36,7 @@ def convert_to_dataset(cccc, cat, subcat, in_df, schema, out_dir, out_list_file,
                         new_df = tile_df[(new_datetime - timedelta(minutes=conf_tuple.minute_level) < tile_df['datetime']) & (tile_df['datetime'] <= new_datetime)]
                     else:
                         new_df = tile_df[(new_datetime - (timedelta(minutes=conf_tuple.minute_level)/2) <= tile_df['datetime']) & (tile_df['datetime'] < new_datetime + (timedelta(minutes=conf_tuple.minute_level)/2))]
-                    out_file = ''.join([out_dir, '/', cccc, '/bufr_to_arrow/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
+                    out_file = ''.join([out_dir, '/', cccc, '/observation/', cat, '/', subcat, '/', str(new_datetime.year).zfill(4), '/', str(new_datetime.month).zfill(2), str(new_datetime.day).zfill(2), '/', str(new_datetime.hour).zfill(2), str(new_datetime.minute).zfill(2), '/l', str(tile_level), 'x', str(tile_x), 'y', str(tile_y), '.arrow'])
                     if len(new_df.index) > 0:
                         tmp_sort_unique_list = list(set(new_df.columns) & set(sort_unique_list))
                         tmp_sort_unique_list.insert(0, 'indicator')
@@ -403,8 +403,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                 traceback.print_exc(file=sys.stderr)
                                 break
                 if 'datetime' in output_dict:
-                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus datetime [s]', 'int32', nullable=False)]
-                    data_list = [[cccc] * len(output_dict['datetime']), np.array([datetime.utcnow().replace(tzinfo=None)] * len(output_dict['datetime'])).astype('datetime64[s]').astype('int') - np.array([value.replace(tzinfo=None) for value in output_dict['datetime']]).astype('datetime64[s]').astype('int')]
+                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus datetime [s]', 'int32', nullable=False), pa.field('source format type', 'uint8', nullable=True)]
+                    data_list = [[cccc] * len(output_dict['datetime']), np.array([datetime.utcnow().replace(tzinfo=None)] * len(output_dict['datetime'])).astype('datetime64[s]').astype('int') - np.array([value.replace(tzinfo=None) for value in output_dict['datetime']]).astype('datetime64[s]').astype('int'), [2] * len(output_dict['datetime'])]
                     is_required_list = [True, True]
                     for output_conf_name in np.sort(np.array(list(output_dict.keys()))):
                         if '@' in output_conf_name:
