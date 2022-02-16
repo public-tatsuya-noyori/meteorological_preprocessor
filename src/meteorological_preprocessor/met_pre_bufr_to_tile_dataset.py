@@ -393,6 +393,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                 break
                             except gribapi.errors.DecodingError:
                                 break
+                            except gribapi.errors.MessageMalformedError:
+                                break
                             except:
                                 traceback.print_exc(file=sys.stderr)
                                 break
