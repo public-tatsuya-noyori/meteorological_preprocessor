@@ -278,7 +278,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                     else:
                                         time_dict[time_type] = input_dict[time_type]
                                 hour_np = time_dict['hour']
-                                minute_np = time_dict['minute']
+                                minute_list = time_dict['minute'].tolist()
                                 second_np = time_dict['second']
                                 if np.issubdtype(second_np.dtype, float):
                                     millisecond_np = np.array([None if value == None else math.floor(value * 1000) - (math.floor(value) * 1000) for value in second_np])
@@ -294,7 +294,10 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                         timedelta_millisecond_list = [0 if value == None else value for value in input_dict[timedelta_conf_tuple.key + '#' + str(timedelta_conf_tuple.key_number) + '#' + timedelta_conf_tuple.name]]
                                 datetime_list = []
                                 for i, year in enumerate(year_np):
-                                    datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_np[i], second_np[i], millisecond_np[i] * 1000, tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
+                                    if minute_list[i] >= 60:
+                                        datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], 0, second_np[i], millisecond_np[i] * 1000, tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i] + (60 * minute_list[i])) + timedelta(milliseconds=timedelta_millisecond_list[i]))
+                                    else:
+                                        datetime_list.append(datetime(year, month_np[i], day_np[i], hour_np[i], minute_list[i], second_np[i], millisecond_np[i] * 1000, tzinfo=timezone.utc) + timedelta(seconds=timedelta_second_list[i]) + timedelta(milliseconds=timedelta_millisecond_list[i]))
                                 input_dict['datetime'] = np.array(datetime_list)
                                 plus_dict = {}
                                 pre_name = ''
