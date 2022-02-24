@@ -35,17 +35,17 @@ def main():
         if args.columns:
             pd.options.display.max_columns = None
         pd.options.display.float_format = '{:.6g}'.format
-        ipc_reader = pa.ipc.open_file(args.input_arrow_file)
+        ipc_reader_with_memory_map = pa.ipc.RecordBatchFileReader(pa.memory_map(args.input_arrow_file, 'r'))
         if args.csv:
-            print(ipc_reader.read_pandas(integer_object_nulls=True, types_mapper=null_int).to_csv(float_format='{:.6g}'.format))
+            print(ipc_reader_with_memory_map.read_pandas(integer_object_nulls=True, types_mapper=null_int).to_csv(float_format='{:.6g}'.format))
         elif args.hdf5:
-            ipc_reader.read_pandas().to_hdf(args.hdf5, 'key', mode='w', complevel=9)
+            ipc_reader_with_memory_map.read_pandas().to_hdf(args.hdf5, 'key', mode='w', complevel=9)
         else:
-            print('num_record_batches:', ipc_reader.num_record_batches)
+            print('num_record_batches:', ipc_reader_with_memory_map.num_record_batches)
             print('\nschema:')
-            print(ipc_reader.schema)
+            print(ipc_reader_with_memory_map.schema)
             print('\nread_pandas:')
-            print(ipc_reader.read_pandas(integer_object_nulls=True, types_mapper=null_int))
+            print(ipc_reader_with_memory_map.read_pandas(integer_object_nulls=True, types_mapper=null_int))
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)

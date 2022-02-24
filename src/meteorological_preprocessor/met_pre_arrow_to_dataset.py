@@ -23,9 +23,9 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                 continue
             if debug:
                 print('Debug', ': in_file', in_file, file=sys.stderr)
-            in_ipc_reader = pa.ipc.open_file(in_file)
-            schema = in_ipc_reader.schema
-            in_df = in_ipc_reader.read_pandas()
+            in_ipc_reader_with_memory_map = pa.ipc.RecordBatchFileReader(pa.memory_map(in_file, 'r'))
+            schema = in_ipc_reader_with_memory_map.schema
+            in_df = in_ipc_reader_with_memory_map.read_pandas()
             new_datetime_list_dict = {}
             res = 180 / 2**tile_level
             for tile_x in range(0, 2**(tile_level + 1)):
@@ -52,9 +52,9 @@ def convert_to_dataset(in_file_list, out_dir, out_list_file, conf_df, debug):
                             tmp_sort_unique_list.remove('created time minus datetime [s]')
                             new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                             if os.path.exists(out_file):
-                                former_ipc_reader = pa.ipc.open_file(out_file)
-                                schema = pa.unify_schemas([former_ipc_reader.schema, schema])
-                                former_df = former_ipc_reader.read_pandas()
+                                ipc_reader_with_memory_map = pa.ipc.RecordBatchFileReader(pa.memory_map(out_file, 'r'))
+                                schema = pa.unify_schemas([ipc_reader_with_memory_map.schema, schema])
+                                former_df = ipc_reader_with_memory_map.read_pandas()
                             else:
                                 former_df = pd.DataFrame()
                             if len(former_df.index) > 0:

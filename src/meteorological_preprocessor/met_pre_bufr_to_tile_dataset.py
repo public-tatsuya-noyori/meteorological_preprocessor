@@ -39,9 +39,9 @@ def convert_to_dataset(cccc, cat, subcat, in_df, schema, out_dir, out_list_file,
                         tmp_sort_unique_list.remove('created time minus datetime [s]')
                         new_df = tmp_new_df.drop_duplicates(subset=tmp_sort_unique_list, keep='last')
                         if os.path.exists(out_file):
-                            former_ipc_reader = pa.ipc.open_file(out_file)
-                            schema = pa.unify_schemas([former_ipc_reader.schema, schema])
-                            former_df = former_ipc_reader.read_pandas()
+                            ipc_reader_with_memory_map = pa.ipc.RecordBatchFileReader(pa.memory_map(out_file, 'r'))
+                            schema = pa.unify_schemas([ipc_reader_with_memory_map.schema, schema])
+                            former_df = ipc_reader_with_memory_map.read_pandas()
                         else:
                             former_df = pd.DataFrame()
                         if len(former_df.index) > 0:

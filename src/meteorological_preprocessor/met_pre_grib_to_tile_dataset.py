@@ -201,7 +201,7 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_grib_ar
                 os.makedirs(out_directory, exist_ok=True)
                 out_file_list = [out_directory, '/', subcat, '.arrow']
                 out_file = ''.join(out_file_list)
-                location_df = pa.ipc.open_file(out_file).read_pandas()
+                location_df = pa.ipc.RecordBatchFileReader(pa.memory_map(out_file, 'r')).read_pandas()
                 dt = datetime(int(dt_str[0:4]), int(dt_str[4:6]), int(dt_str[6:8]), int(dt_str[8:10]), 0, 0, 0, tzinfo=timezone.utc)
                 init_name_list = ['id', 'latitude [degree]', 'longitude [degree]']
                 init_field_list = [pa.field('id', 'string', nullable=False), pa.field('latitude [degree]', 'float32', nullable=False), pa.field('longitude [degree]', 'float32', nullable=False)]
