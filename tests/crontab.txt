@@ -149,8 +149,9 @@
 * * * * * cd /home/noyori/tests; ./move_4PubSub_dataset_4Search.sh cache_4all_dataset aa 4all_arrow minio:aa-open-dataset
 * * * * * cd /home/noyori/tests; ./sub_grib_surf_to_tile_dataset.sh --parallel 12 cache_tile_dataset aa3 bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' sub_grib_surf_to_tile_dataset_inclusive_pattern.txt exclusive_pattern.txt; ./sub_grib_upper_air_to_tile_dataset.sh --parallel 12 cache_tile_dataset aa4 bin 'minio:center-aa-cloud-a-region-a-closed-main;minio:center-aa-cloud-a-region-b-closed-sub' sub_grib_upper_air_to_tile_dataset_inclusive_pattern.txt exclusive_pattern.txt
 1 0 * * * cd /home/noyori/tests; ./del_dataset_search.sh
+15 5 * * * cd /home/noyori/tests; ./del.sh cache_4all_dataset aa minio:aa-open-dataset 15
+0 0 * * 2 cd /home/noyori/tests; ./cp_dev_null_log.sh
+15 22 * * * cd /home/noyori/tests; ./rm_local_files.sh
 
 # delete on local PC
 40 2,10,18 * * * find /home/noyori/tests/cache_s /home/noyori/tests/cache_s_2 /home/noyori/tests/cache_s_3 /home/noyori/tests/cache_s_closed /home/noyori/tests/cache_s_closed_2 /home/noyori/tests/cache_s_closed_3 /home/noyori/tests/cache_1 /home/noyori/tests/cache_2 /home/noyori/tests/cache_3 /home/noyori/tests/cache_1_closed /home/noyori/tests/cache_2_closed /home/noyori/tests/cache_3_closed -mindepth 5 -type d -mmin +360 | grep 20 | xargs -r rm -rf > /dev/null 2>&1
-#55 2,10,18 * * * find /home/noyori/tests/cache_bufr_to_arrow -mindepth 6 -type d -mmin +360 | grep C_RJTD | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
-#55 3,11,19 * * * find /home/noyori/tests/cache_tile_arrow -mindepth 7 -maxdepth 7 -type d -mmin +1440 | grep 20 | xargs -r -n1 -I{} sh -c "rm -rf {} && sleep 10" > /dev/null 2>&1
