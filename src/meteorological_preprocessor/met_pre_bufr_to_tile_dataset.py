@@ -171,24 +171,24 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                                     value_list = ec.codes_get_array(bufr, '#' + str(output_conf_tuple.key_number) + '#' + output_conf_tuple.key)
                                                 except gribapi.errors.KeyValueNotFoundError:
                                                     if is_first_key:
-                                                        value_list = [None for i in range(number_of_subsets)]
+                                                        value_list = number_of_subsets * [None]
                                                     else:
-                                                        value_list = [None for i in range(first_key_value_np_len)]
+                                                        value_list = first_key_value_np_len * [None]
                                             else:
                                                 try:
                                                     value_list = ec.codes_get_array(bufr, output_conf_tuple.key)
                                                 except gribapi.errors.KeyValueNotFoundError:
                                                     if is_first_key:
-                                                        value_list = [None for i in range(number_of_subsets)]
+                                                        value_list = number_of_subsets * [None]
                                                     else:
-                                                        value_list = [None for i in range(first_key_value_np_len)]
+                                                        value_list = first_key_value_np_len * [None]
                                             if (type(value_list) is np.ndarray):
                                                 value_list = value_list.tolist()
                                             if len(value_list) == 1:
                                                 if is_first_key:
-                                                    value_list = [value_list[0] for i in range(number_of_subsets)]
+                                                    value_list = number_of_subsets * [value_list[0]]
                                                 else:
-                                                    value_list = [value_list[0] for i in range(first_key_value_np_len)]
+                                                    value_list = first_key_value_np_len * [value_list[0]]
                                         if is_first_key:
                                             if len(value_list) == 0:
                                                break
@@ -385,11 +385,11 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                         if ouput_dict_first_key_values_len == name_with_att_values_len:
                                             output_dict[name_with_att] = name_with_att_dict[name_with_att]
                                         else:
-                                            output_dict[name_with_att] = [None for i in range(ouput_dict_first_key_values_len - name_with_att_values_len)] + name_with_att_dict[name_with_att]
+                                            output_dict[name_with_att] = (ouput_dict_first_key_values_len - name_with_att_values_len) * [None] + name_with_att_dict[name_with_att]
                                 if len(set(output_dict.keys()) - set(out_name_list)) > 0:
                                     ouput_dict_first_key_values_len = len(output_dict[first_key])
                                     for out_name in set(output_dict.keys()) - set(out_name_list):
-                                         output_dict[out_name] = output_dict[out_name] + [None for i in range(ouput_dict_first_key_values_len - len(output_dict[out_name]))]
+                                         output_dict[out_name] = output_dict[out_name] + (ouput_dict_first_key_values_len - len(output_dict[out_name])) * [None]
                             except gribapi.errors.PrematureEndOfFileError:
                                 break
                             except gribapi.errors.WrongLengthError:
