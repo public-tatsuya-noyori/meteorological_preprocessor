@@ -192,25 +192,25 @@ upper_air,temp,309052;309057,nonCoordinateGeopotentialHeight,0,False,0,0,False,F
 upper_air,temp,309052;309057,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,sonde,dewpoint temperature [K],float32,False
 upper_air,temp,309052;309057,windDirection,0,False,0,0,False,False,0,,upper_air,sonde,wind direction [degree],float32,False
 upper_air,temp,309052;309057,windSpeed,0,False,0,0,False,False,0,,upper_air,sonde,wind speed [m s-1],float32,False
-upper_air,temp_drop,309053,airTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,air temperature [K],float32,False
-upper_air,temp_drop,309053,year,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
-upper_air,temp_drop,309053,month,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
-upper_air,temp_drop,309053,day,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
-upper_air,temp_drop,309053,hour,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
-upper_air,temp_drop,309053,minute,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
-upper_air,temp_drop,309053,second,1,False,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
-upper_air,temp_drop,309053,timePeriod,0,False,0,0,False,False,0,,upper_air,drop_sonde,timedelta [second],timestamp,False
-upper_air,temp_drop,309053,latitude,1,True,0,0,False,False,0,,upper_air,drop_sonde,latitude [degree],float32,False
-upper_air,temp_drop,309053,latitudeDisplacement,0,False,0,0,False,False,0,,upper_air,drop_sonde,latitude [degree],float32,True
-upper_air,temp_drop,309053,longitude,1,True,0,0,False,False,0,,upper_air,drop_sonde,longitude [degree],float32,False
-upper_air,temp_drop,309053,longitudeDisplacement,0,False,0,0,False,False,0,,upper_air,drop_sonde,longitude [degree],float32,True
-upper_air,temp_drop,309053,aircraftFlightNumber,1,False,0,0,False,False,0,,upper_air,drop_sonde,aircraft flight number,string,False
-upper_air,temp_drop,309053,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,drop_sonde,extended vertical sounding significance,uint32,False
-upper_air,temp_drop,309053,pressure,0,False,0,0,False,False,0,,upper_air,drop_sonde,pressure [Pa],float32,False
-upper_air,temp_drop,309053,nonCoordinateGeopotentialHeight,0,False,0,0,False,False,0,,upper_air,drop_sonde,geopotential height [m],float32,False
-upper_air,temp_drop,309053,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,dewpoint temperature [K],float32,False
-upper_air,temp_drop,309053,windDirection,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind direction [degree],float32,False
-upper_air,temp_drop,309053,windSpeed,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind speed [m s-1],float32,False
+upper_air,temp_drop,309053;309056,airTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,air temperature [K],float32,False
+upper_air,temp_drop,309053;309056,year,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
+upper_air,temp_drop,309053;309056,month,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
+upper_air,temp_drop,309053;309056,day,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
+upper_air,temp_drop,309053;309056,hour,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
+upper_air,temp_drop,309053;309056,minute,1,True,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
+upper_air,temp_drop,309053;309056,second,1,False,0,0,False,False,0,,upper_air,drop_sonde,datetime,timestamp,False
+upper_air,temp_drop,309053;309056,timePeriod,0,False,0,0,False,False,0,,upper_air,drop_sonde,timedelta [second],timestamp,False
+upper_air,temp_drop,309053;309056,latitude,1,True,0,0,False,False,0,,upper_air,drop_sonde,latitude [degree],float32,False
+upper_air,temp_drop,309053;309056,latitudeDisplacement,0,False,0,0,False,False,0,,upper_air,drop_sonde,latitude [degree],float32,True
+upper_air,temp_drop,309053;309056,longitude,1,True,0,0,False,False,0,,upper_air,drop_sonde,longitude [degree],float32,False
+upper_air,temp_drop,309053;309056,longitudeDisplacement,0,False,0,0,False,False,0,,upper_air,drop_sonde,longitude [degree],float32,True
+upper_air,temp_drop,309053;309056,aircraftFlightNumber,1,False,0,0,False,False,0,,upper_air,drop_sonde,aircraft flight number,string,False
+upper_air,temp_drop,309053;309056,extendedVerticalSoundingSignificance,0,False,0,0,False,False,0,,upper_air,drop_sonde,extended vertical sounding significance,uint32,False
+upper_air,temp_drop,309053;309056,pressure,0,False,0,0,False,False,0,,upper_air,drop_sonde,pressure [Pa],float32,False
+upper_air,temp_drop,309053;309056,nonCoordinateGeopotentialHeight,0,False,0,0,False,False,0,,upper_air,drop_sonde,geopotential height [m],float32,False
+upper_air,temp_drop,309053;309056,dewpointTemperature,0,False,0,0,False,False,0,,upper_air,drop_sonde,dewpoint temperature [K],float32,False
+upper_air,temp_drop,309053;309056,windDirection,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind direction [degree],float32,False
+upper_air,temp_drop,309053;309056,windSpeed,0,False,0,0,False,False,0,,upper_air,drop_sonde,wind speed [m s-1],float32,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,virtualTemperature,0,False,0,0,False,False,0,,upper_air,profiler,virtual temperature [K],float32,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,height,0,False,0,0,False,False,0,,upper_air,profiler,height [m],float32,False
 upper_air,temperature_profiler,301032 321021 025020 025021 025093 008021 004025 010004 101000 031001 321024,year,1,True,0,0,False,False,0,,upper_air,profiler,datetime,timestamp,False

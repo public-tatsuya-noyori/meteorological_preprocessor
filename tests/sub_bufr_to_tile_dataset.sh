@@ -208,6 +208,8 @@ subscribe() {
               cat ${local_work_directory}/${process_prefix}/${now}.txt | sed -e 's|$|.gz|' | xargs -r -n 64 -P 16 gunzip -f
               rm -f ${local_work_directory}/${process_prefix}/${now}_raw.txt.gz
               rm -f ${local_work_directory}/${process_prefix}/${now}.txt.tmp
+            else
+              rm -f ${local_work_directory}/${process_prefix}/${now}.txt.tmp
             fi
           fi
         else
