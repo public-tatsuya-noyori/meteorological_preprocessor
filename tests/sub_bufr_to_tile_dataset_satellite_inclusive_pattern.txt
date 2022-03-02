@@ -2,4 +2,4 @@
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/atms/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/cris/[0-9]{12}/[^/]+\.bin.gz$
 ^[A-Z][A-Z0-9]{3}/bufr/satellite/csr/[0-9]{12}/[^/]+\.bin.gz$
-^[A-Z][A-Z0-9]{3}/bufr/satellite/gnssro/[0-9]{12}/[^/]+\.bin.gz$
+^[A-Z][A-Z0-9]{3}/bufr/satellite/gpsro/[0-9]{12}/[^/]+\.bin.gz$
