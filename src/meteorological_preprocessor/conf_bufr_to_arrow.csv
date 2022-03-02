@@ -1496,7 +1496,7 @@ satellite,gpsro,310026,minute,0,True,0,0,False,False,0,,satellite,gpsro,datetime
 satellite,gpsro,310026,second,0,True,0,0,False,False,0,,satellite,gpsro,datetime,timestamp,False
 satellite,gpsro,310026,satelliteIdentifier,0,True,0,0,False,False,0,,satellite,gpsro,id,uint16,False
 satellite,gpsro,310026,height,0,True,0,0,False,False,0,,satellite,gpsro,height [m],float32,False
-satellite,gpsro,310026,bearingOrAzimuth,0,False,0,0,False,False,0,,satellite,gpsro,bearing or azimuth [degree],float32,False
+satellite,gpsro,310026,bearingOrAzimuth,0,False,1,0,False,False,0,,satellite,gpsro,bearing or azimuth [degree],float32,False
 satellite,gpsro,310026,atmosphericRefractivity,0,False,0,2,False,False,0,,satellite,gpsro,atmospheric refractivity [N units](1),float32,False
 satellite,gpsro,310026,atmosphericRefractivity,0,False,1,2,False,False,0,,satellite,gpsro,atmospheric refractivity [N units](2),float32,False
 satellite,gpsro,310026,percentConfidence,0,False,1,2,False,False,0,,satellite,gpsro,percent confidence [%],float32,False
