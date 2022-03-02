@@ -12,3 +12,4 @@ observation,satellite,csr,3,10,ceil,latitude [degree];longitude [degree];datetim
 observation,satellite,amsua,3,10,ceil,latitude [degree];longitude [degree];datetime;id
 observation,satellite,atms,3,10,ceil,latitude [degree];longitude [degree];datetime;id
 observation,satellite,cris,3,10,ceil,latitude [degree];longitude [degree];datetime;id
+observation,satellite,gpsro,3,10,ceil,latitude [degree];longitude [degree];datetime;id
