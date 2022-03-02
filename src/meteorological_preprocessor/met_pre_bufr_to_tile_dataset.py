@@ -215,6 +215,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                             value_np = np.where(value_np == 180, -180, value_np)
                                         if output_conf_tuple.slide > -1 and output_conf_tuple.step > 0:
                                             value_np = value_np[output_conf_tuple.slide::output_conf_tuple.step]
+                                        elif output_conf_tuple.slide > -1 and output_conf_tuple.step == 0:
+                                            value_np = value_np[output_conf_tuple.slide:]
                                         if output_conf_tuple.is_abs:
                                             value_np = np.array([None if value == None else abs(value) for value in value_np])
                                         if output_conf_tuple.is_str:

@@ -12,3 +12,4 @@ satellite,csr,3,10,latitude [degree];longitude [degree];datetime;id
 satellite,amsua,3,10,latitude [degree];longitude [degree];datetime;id
 satellite,atms,3,10,latitude [degree];longitude [degree];datetime;id
 satellite,cris,3,10,latitude [degree];longitude [degree];datetime;id
+satellite,gpsro,3,10,latitude [degree];longitude [degree];datetime;id
