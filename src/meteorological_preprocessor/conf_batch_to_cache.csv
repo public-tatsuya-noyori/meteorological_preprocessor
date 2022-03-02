@@ -57,7 +57,7 @@ file_name_pattern,ttaaii_pattern,text_pattern,bufr_descriptor,cccc,format,catego
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IU[KS][A-Z][0-9][0-9].*)$,^IU[KS][A-Z][0-9][0-9]$,,,,bufr,upper_air,temp,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IUP[A-Z][0-9][0-9].*)$,^IUP[A-Z][0-9][0-9]$,,,,bufr,upper_air,wind_profiler,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IUQ[A-Z][0-9][0-9].*)$,^IUQ[A-Z][0-9][0-9]$,,,,bufr,upper_air,temperature_profiler,bin
-^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IUT[A-Z][0-9][0-9].*)$,^IUT[A-Z][0-9][0-9]$,,,,bufr,satellite,gpsro,bin
+^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IUT[A-Z][0-9][0-9].*)$,^IUT[A-Z][0-9][0-9]$,,310026,,bufr,satellite,gpsro,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOW[A-Z][0-9][0-9].*)$,^IOW[A-Z][0-9][0-9]$,,308015,,bufr,surface,waveob,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOW[A-Z][0-9][0-9].*)$,^IOW[A-Z][0-9][0-9]$,,315008,,bufr,surface,moored_buoy,bin
 ^([A-Z][A-Z][A-Z][A-Z][0-9]+\.([abf]|u[ab])|sn\.[0-9]*\.(txt|bin)|A_IOW[A-Z][0-9][0-9].*)$,^IOW[A-Z][0-9][0-9]$,,315009,,bufr,surface,drifting_buoy,bin
