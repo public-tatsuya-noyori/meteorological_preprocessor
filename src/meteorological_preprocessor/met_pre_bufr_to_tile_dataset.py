@@ -404,8 +404,8 @@ def convert_to_arrow(in_file_list, conf_df, out_dir, out_list_file, conf_bufr_ar
                                 traceback.print_exc(file=sys.stderr)
                                 break
                 if 'datetime' in output_dict:
-                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus datetime [s]', 'int32', nullable=False), pa.field('source format type', 'uint8', nullable=True)]
-                    data_list = [[cccc] * len(output_dict['datetime']), np.array([datetime.utcnow().replace(tzinfo=None)] * len(output_dict['datetime'])).astype('datetime64[s]').astype('int') - np.array([value.replace(tzinfo=None) for value in output_dict['datetime']]).astype('datetime64[s]').astype('int'), [2] * len(output_dict['datetime'])]
+                    field_list = [pa.field('indicator', 'string', nullable=False), pa.field('created time minus datetime [s]', 'int32', nullable=False)]
+                    data_list = [[cccc] * len(output_dict['datetime']), np.array([datetime.utcnow().replace(tzinfo=None)] * len(output_dict['datetime'])).astype('datetime64[s]').astype('int') - np.array([value.replace(tzinfo=None) for value in output_dict['datetime']]).astype('datetime64[s]').astype('int')]
                     is_required_list = [True, True]
                     for output_conf_name in np.sort(np.array(list(output_dict.keys()))):
                         if '@' in output_conf_name:
