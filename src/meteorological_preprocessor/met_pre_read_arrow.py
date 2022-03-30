@@ -19,6 +19,7 @@ def main():
     parser.add_argument("--csv", action='store_true')
     parser.add_argument('--output_list_file', type=argparse.FileType('w'), metavar='output_list_file', default=sys.stdout)
     parser.add_argument('--hdf5', type=str, metavar='output.hdf5')
+    parser.add_argument("--all", action='store_true')
     args = parser.parse_args()
     if not os.access(args.input_arrow_file, os.F_OK):
         print('Error', errno, ':', args.input_arrow_file, 'does not exist.', file=sys.stderr)
@@ -43,9 +44,17 @@ def main():
         else:
             print('num_record_batches:', ipc_reader_with_memory_map.num_record_batches)
             print('\nschema:')
-            print(ipc_reader_with_memory_map.schema)
-            print('\nread_pandas:')
-            print(ipc_reader_with_memory_map.read_pandas(integer_object_nulls=True, types_mapper=null_int))
+            names = ipc_reader_with_memory_map.schema.names
+            types = ipc_reader_with_memory_map.schema.types
+            for i, name in enumerate(names):
+                print(name, ':', types[i])
+            print('\nschema.metadata:')
+            print(ipc_reader_with_memory_map.schema.metadata)
+            #print('\nread_pandas:')
+            #print(ipc_reader_with_memory_map.read_pandas(integer_object_nulls=True, types_mapper=null_int))
+            if args.all:
+                table = ipc_reader_with_memory_map.read_all()
+                print(ipc_reader_with_memory_map.read_all())
     except:
         traceback.print_exc(file=sys.stderr)
         sys.exit(199)
